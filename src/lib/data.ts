@@ -1,0 +1,152 @@
+import type { Appliance, AmcPlan, Brand } from "./types";
+
+export const BRANDS: Brand[] = [
+  { id: "samsung", name: "Samsung", tagline: "Authorised repair & genuine parts", accent: "#1428A0" },
+  { id: "lg", name: "LG", tagline: "Certified LG appliance specialists", accent: "#A50034" },
+  { id: "ifb", name: "IFB", tagline: "Expert front-load & modular care", accent: "#005EB8" },
+  { id: "bosch", name: "Bosch", tagline: "Precision German-engineered service", accent: "#EA0016" },
+];
+
+export const APPLIANCES: Appliance[] = [
+  {
+    id: "refrigerator",
+    name: "Refrigerator",
+    blurb: "Cooling, gas, compressor & installation by certified pros.",
+    startingPrice: 299,
+    serviceTime: "45–90 min",
+    rating: 4.9,
+    bookings: "1.2M+",
+    problems: [
+      { id: "not-cooling", label: "Not Cooling", price: [499, 1499], eta: "60 min", common: true },
+      { id: "water-leakage", label: "Water Leakage", price: [399, 899], eta: "45 min", common: true },
+      { id: "gas-filling", label: "Gas Filling", price: [1499, 2999], eta: "90 min" },
+      { id: "door-issue", label: "Door Issue", price: [299, 799], eta: "40 min" },
+      { id: "compressor", label: "Compressor", price: [2499, 5999], eta: "120 min" },
+      { id: "ice-build-up", label: "Ice Build-up", price: [399, 999], eta: "50 min" },
+      { id: "noise", label: "Noise / Vibration", price: [299, 699], eta: "40 min" },
+      { id: "installation", label: "Installation", price: [499, 999], eta: "45 min" },
+    ],
+  },
+  {
+    id: "washing-machine",
+    name: "Washing Machine",
+    blurb: "Front-load & top-load repair, drum, motor & spin fixes.",
+    startingPrice: 249,
+    serviceTime: "40–80 min",
+    rating: 4.8,
+    bookings: "980K+",
+    problems: [
+      { id: "not-starting", label: "Not Starting", price: [399, 1299], eta: "50 min", common: true },
+      { id: "motor-problem", label: "Motor Problem", price: [1499, 3499], eta: "90 min" },
+      { id: "water-leakage", label: "Water Leakage", price: [399, 999], eta: "45 min", common: true },
+      { id: "drum-issue", label: "Drum Issue", price: [899, 2499], eta: "80 min" },
+      { id: "spin-issue", label: "Spin Issue", price: [499, 1299], eta: "60 min" },
+      { id: "noise", label: "Noise / Vibration", price: [299, 799], eta: "40 min" },
+      { id: "installation", label: "Installation", price: [399, 799], eta: "45 min" },
+    ],
+  },
+  {
+    id: "microwave",
+    name: "Microwave",
+    blurb: "Heating, magnetron, display & door-lock diagnostics.",
+    startingPrice: 199,
+    serviceTime: "30–60 min",
+    rating: 4.9,
+    bookings: "640K+",
+    problems: [
+      { id: "not-heating", label: "Not Heating", price: [499, 1699], eta: "60 min", common: true },
+      { id: "spark", label: "Sparking", price: [399, 999], eta: "45 min", common: true },
+      { id: "plate-not-rotating", label: "Plate Not Rotating", price: [299, 699], eta: "40 min" },
+      { id: "display-issue", label: "Display Issue", price: [499, 1299], eta: "50 min" },
+      { id: "door-lock", label: "Door Lock", price: [299, 799], eta: "40 min" },
+      { id: "power-problem", label: "Power Problem", price: [399, 1199], eta: "50 min" },
+      { id: "installation", label: "Installation", price: [299, 599], eta: "30 min" },
+    ],
+  },
+  {
+    id: "oven",
+    name: "Oven",
+    blurb: "Heating elements, thermostat, fan & smart-panel repair.",
+    startingPrice: 249,
+    serviceTime: "40–75 min",
+    rating: 4.8,
+    bookings: "410K+",
+    problems: [
+      { id: "heating-issue", label: "Heating Issue", price: [499, 1799], eta: "60 min", common: true },
+      { id: "display-problem", label: "Display Problem", price: [499, 1299], eta: "50 min" },
+      { id: "thermostat", label: "Thermostat", price: [699, 1899], eta: "70 min", common: true },
+      { id: "door-lock", label: "Door Lock", price: [299, 799], eta: "40 min" },
+      { id: "fan-issue", label: "Fan Issue", price: [499, 1499], eta: "60 min" },
+      { id: "installation", label: "Installation", price: [399, 899], eta: "45 min" },
+    ],
+  },
+];
+
+export const AMC_PLANS: AmcPlan[] = [
+  {
+    id: "essential",
+    name: "Essential",
+    price: 1499,
+    period: "/ year",
+    perks: [
+      "2 preventive maintenance visits",
+      "Priority same-day support",
+      "10% off on all repairs",
+      "Free diagnosis, always",
+    ],
+  },
+  {
+    id: "premium",
+    name: "Premium",
+    price: 2999,
+    period: "/ year",
+    highlight: true,
+    perks: [
+      "4 preventive maintenance visits",
+      "Unlimited repair labour",
+      "Genuine spare parts included",
+      "Predictive maintenance alerts",
+      "Dedicated relationship manager",
+    ],
+  },
+  {
+    id: "business",
+    name: "Business",
+    price: 6999,
+    period: "/ year",
+    perks: [
+      "Up to 8 appliances covered",
+      "Monthly health checks",
+      "4-hour emergency SLA",
+      "On-site spare inventory",
+      "Consolidated GST invoicing",
+    ],
+  },
+];
+
+export const TIME_SLOTS = [
+  "08:00 – 10:00",
+  "10:00 – 12:00",
+  "12:00 – 02:00",
+  "02:00 – 04:00",
+  "04:00 – 06:00",
+  "06:00 – 08:00",
+];
+
+export const PAYMENT_METHODS = [
+  { id: "upi", label: "UPI", hint: "GPay · PhonePe · Paytm", instant: true },
+  { id: "razorpay", label: "Razorpay", hint: "Cards · Wallets · Net Banking", instant: true },
+  { id: "stripe", label: "Stripe", hint: "International cards", instant: true },
+  { id: "credit-card", label: "Credit Card", hint: "Visa · Mastercard · Amex", instant: true },
+  { id: "debit-card", label: "Debit Card", hint: "All major banks", instant: true },
+  { id: "net-banking", label: "Net Banking", hint: "60+ banks supported", instant: false },
+  { id: "cod", label: "Cash After Service", hint: "Pay once the job is done", instant: false },
+];
+
+export function getAppliance(id?: string) {
+  return APPLIANCES.find((a) => a.id === id);
+}
+
+export function getBrand(id?: string) {
+  return BRANDS.find((b) => b.id === id);
+}
