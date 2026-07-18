@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, X, Send, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -125,6 +126,7 @@ function getReply(raw: string): { text: string; actions?: Action[] } {
 }
 
 export function ChatAssistant() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([GREETING]);
   const [input, setInput] = useState("");
@@ -135,6 +137,9 @@ export function ChatAssistant() {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, typing, open]);
+
+  // The assistant is a customer-facing widget — never show it in the admin panel.
+  const hidden = pathname?.startsWith("/admin") ?? false;
 
   const send = (text: string) => {
     const value = text.trim();
@@ -148,6 +153,8 @@ export function ChatAssistant() {
       setMessages((m) => [...m, { id: idRef.current++, role: "bot", ...reply }]);
     }, 700 + Math.min(value.length * 12, 700));
   };
+
+  if (hidden) return null;
 
   return (
     <>

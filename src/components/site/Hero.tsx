@@ -4,7 +4,6 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight, Star, ShieldCheck, Clock } from "lucide-react";
 import { MagneticButton } from "./MagneticButton";
-import { AppliancePlinth } from "./AppliancePlinth";
 import { Marquee } from "./Marquee";
 import { BrandMark } from "@/components/ui/Icons";
 import { BRANDS } from "@/lib/data";
@@ -93,9 +92,19 @@ export function Hero() {
             initial={{ opacity: 0, scale: 0.92, y: 40 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 1.1, delay: 0.2, ease }}
-            className="relative mx-auto max-w-sm"
+            className="relative mx-auto max-w-md"
           >
-            <AppliancePlinth className="w-full drop-shadow-2xl" />
+            {/* real work — staggered photo collage */}
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="flex flex-col gap-3 sm:gap-4">
+                <Shot src="/work/refrigerator.png" alt="Technician servicing a refrigerator" ratio="aspect-[3/4]" delay={0.25} />
+                <Shot src="/work/ac.png" alt="Technician servicing an air conditioner" ratio="aspect-[4/3]" delay={0.45} />
+              </div>
+              <div className="flex flex-col gap-3 pt-8 sm:gap-4 sm:pt-10">
+                <Shot src="/work/washing-machine.png" alt="Technician repairing a washing machine" ratio="aspect-square" delay={0.35} />
+                <Shot src="/work/microwave.png" alt="Technician repairing a microwave" ratio="aspect-[4/3]" delay={0.55} />
+              </div>
+            </div>
 
             {/* floating certified tag */}
             <motion.div
@@ -175,5 +184,26 @@ function Proof({ icon, big, small }: { icon: React.ReactNode; big: string; small
         <p className="mt-1 text-xs text-muted">{small}</p>
       </div>
     </div>
+  );
+}
+
+function Shot({ src, alt, ratio, delay }: { src: string; alt: string; ratio: string; delay: number }) {
+  return (
+    <motion.figure
+      initial={{ opacity: 0, y: 24, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.9, delay, ease }}
+      className={`group relative overflow-hidden rounded-2xl border border-white/60 bg-surface shadow-premium-lg ${ratio}`}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+      />
+      {/* subtle top sheen to match the site's soft-lit look */}
+      <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-white/25 to-transparent" />
+    </motion.figure>
   );
 }

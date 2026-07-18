@@ -17,7 +17,7 @@ const DETAIL: Record<string, { services: string[]; note: string }> = {
 };
 
 export function BrandShowcase() {
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState<number | null>(null);
 
   return (
     <section id="brands" className="relative scroll-mt-28 py-28 sm:py-36">
@@ -32,7 +32,11 @@ export function BrandShowcase() {
         </div>
 
         {/* Desktop: expanding panels */}
-        <div className="mt-14 hidden gap-3 lg:flex" style={{ height: "26rem" }}>
+        <div
+          className="mt-14 hidden gap-3 lg:flex"
+          style={{ height: "26rem" }}
+          onMouseLeave={() => setActive(null)}
+        >
           {BRANDS.map((b, i) => {
             const open = active === i;
             const d = DETAIL[b.id];
@@ -44,18 +48,48 @@ export function BrandShowcase() {
                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                 className={cn(
                   "relative cursor-pointer overflow-hidden rounded-[1.75rem] border transition-colors",
-                  open ? "border-transparent text-white" : "border-border bg-surface"
+                  open ? "border-transparent text-white" : "border-white/60"
                 )}
-                style={open ? { background: `linear-gradient(150deg, ${b.accent}, ${shade(b.accent)})` } : undefined}
+                style={
+                  open
+                    ? {
+                        background: `linear-gradient(150deg, ${b.accent}, ${shade(b.accent)})`,
+                        boxShadow: `0 30px 60px -20px ${rgba(b.accent, 0.5)}, var(--shadow-lg)`,
+                      }
+                    : {
+                        background: `
+                          radial-gradient(135% 90% at 50% -12%, ${rgba(b.accent, 0.16)}, transparent 58%),
+                          radial-gradient(90% 70% at 50% 118%, ${rgba(b.accent, 0.1)}, transparent 72%),
+                          linear-gradient(180deg, #ffffff, var(--surface))
+                        `,
+                        boxShadow:
+                          "var(--shadow-lg), inset 0 1.5px 0 rgba(255,255,255,0.95), inset 0 -20px 34px -22px rgba(23,21,15,0.16)",
+                      }
+                }
               >
                 {/* collapsed label */}
                 {!open && (
                   <div className="absolute inset-0 flex flex-col items-center justify-between py-8">
-                    <span className="text-xs font-medium uppercase tracking-[0.2em] text-muted">{`0${i + 1}`}</span>
-                    <span className="[writing-mode:vertical-rl] rotate-180">
-                      <BrandMark id={b.id} className="text-lg" />
-                    </span>
-                    <BadgeCheck className="size-5 text-emerald" />
+                    {/* glossy top sheen for a raised, 3D surface */}
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/70 to-transparent"
+                    />
+                    <span className="relative text-xs font-medium uppercase tracking-[0.2em] text-muted">{`0${i + 1}`}</span>
+                    {b.id === "lg" ? (
+                      <BrandMark
+                        id={b.id}
+                        tone="brand"
+                        className="relative h-9 w-9 drop-shadow-[0_6px_10px_rgba(23,21,15,0.18)]"
+                      />
+                    ) : (
+                      <span
+                        className="relative [writing-mode:vertical-rl] rotate-180 drop-shadow-[0_3px_6px_rgba(23,21,15,0.14)]"
+                      >
+                        <BrandMark id={b.id} tone="brand" className="text-lg" />
+                      </span>
+                    )}
+                    <BadgeCheck className="relative size-5 text-emerald drop-shadow-sm" />
                   </div>
                 )}
 
@@ -75,9 +109,7 @@ export function BrandShowcase() {
                       </div>
 
                       <div>
-                        <span className="text-white [&_*]:text-white">
-                          <BrandMark id={b.id} className="text-4xl" />
-                        </span>
+                        <BrandMark id={b.id} tone="white" className="text-4xl" />
                         <p className="mt-3 max-w-sm text-white/85">{d.note}</p>
 
                         <div className="mt-6 flex flex-wrap gap-2">
@@ -114,8 +146,8 @@ export function BrandShowcase() {
               style={{ background: `linear-gradient(150deg, ${b.accent}, ${shade(b.accent)})` }}
             >
               <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/70">{`0${i + 1}`}</span>
-              <div className="mt-8 [&_*]:text-white">
-                <BrandMark id={b.id} className="text-3xl" />
+              <div className="mt-8">
+                <BrandMark id={b.id} tone="white" className="text-3xl" />
               </div>
               <p className="mt-2 text-sm text-white/80">{DETAIL[b.id].note}</p>
               <ArrowUpRight className="absolute right-6 top-6 size-5" />
@@ -125,6 +157,12 @@ export function BrandShowcase() {
       </div>
     </section>
   );
+}
+
+/** Hex → rgba() string with the given alpha. */
+function rgba(hex: string, a: number) {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${n >> 16}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
 }
 
 /** Darken a hex for gradient depth. */

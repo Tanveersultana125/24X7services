@@ -1,6 +1,8 @@
 import { SiteNav } from "@/components/site/SiteNav";
 import { Hero } from "@/components/site/Hero";
 import { ServicesIndex } from "@/components/site/ServicesIndex";
+import { MostBooked } from "@/components/site/MostBooked";
+import { WorkGallery } from "@/components/site/WorkGallery";
 import { BrandShowcase } from "@/components/site/BrandShowcase";
 import { Process } from "@/components/site/Process";
 import { TrustBento } from "@/components/site/TrustBento";
@@ -19,12 +21,14 @@ export default function Home() {
       <main className="flex-1">
         <Hero />
         <ServicesIndex />
+        <MostBooked />
         <BrandShowcase />
         <Process />
         <TrustBento />
         <Emergency />
         <Plans />
         <Reviews />
+        <WorkGallery />
         <Stats />
         <Faq />
         <Contact />
