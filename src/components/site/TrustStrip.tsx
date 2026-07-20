@@ -29,7 +29,10 @@ const PILLARS = [
 
 export function TrustStrip() {
   return (
-    <section className="relative z-20 -mt-32 pb-16 sm:-mt-40 sm:pb-20">
+    <section
+      className="relative z-20 -mt-40 pb-16 pt-20 sm:-mt-48 sm:pb-24 sm:pt-24"
+      style={{ background: "linear-gradient(180deg, #2b3b78 0%, #24305f 100%)" }}
+    >
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         <div className="grid gap-5 md:grid-cols-3">
           {PILLARS.map((p, i) => (

@@ -14,7 +14,11 @@ export function Hero() {
   const yType = useTransform(scrollYProgress, [0, 1], [0, -50]);
 
   return (
-    <section ref={ref} className="relative overflow-hidden bg-[#131018] pt-28 text-white sm:pt-32">
+    <section
+      ref={ref}
+      className="relative overflow-hidden pt-28 sm:pt-32"
+      style={{ background: "linear-gradient(100deg, #ffffff 0%, #eef2fd 40%, #3f53a0 60%, #2e3f82 100%)" }}
+    >
       {/* dotted texture */}
       <div
         aria-hidden
@@ -24,6 +28,12 @@ export function Hero() {
       {/* ambient glows */}
       <div aria-hidden className="pointer-events-none absolute -right-40 -top-20 size-[38rem] rounded-full blur-[130px]" style={{ background: `${RED}33` }} />
       <div aria-hidden className="pointer-events-none absolute -left-32 bottom-0 size-[30rem] rounded-full bg-royal-bright/15 blur-[130px]" />
+      {/* unify the hero's bottom into a flat deep blue so the trust strip flows on seamlessly */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-80"
+        style={{ background: "linear-gradient(180deg, transparent 0%, #2b3b78 78%, #2b3b78 100%)" }}
+      />
 
       <div className="relative mx-auto max-w-[92rem] px-6 pb-40 sm:px-10 sm:pb-48">
         {/* eyebrow */}
@@ -54,7 +64,7 @@ export function Hero() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5, ease }}
-              className="mt-8 max-w-md text-pretty text-lg leading-relaxed text-white/65"
+              className="mt-8 max-w-md text-pretty text-lg leading-relaxed text-muted"
             >
               Certified doorstep repair, installation and maintenance for Samsung, LG,
               IFB &amp; Bosch — genuine parts, a 90-day warranty, and a technician you can
@@ -77,7 +87,7 @@ export function Hero() {
               </Link>
               <Link
                 href="/book?emergency=1"
-                className="group inline-flex items-center gap-2 rounded-full border border-white/25 px-6 py-3.5 text-[0.95rem] font-medium text-white transition-colors hover:bg-white/10"
+                className="group inline-flex items-center gap-2 rounded-full border border-black/15 px-6 py-3.5 text-[0.95rem] font-medium text-ink transition-colors hover:bg-black/5"
               >
                 <span className="relative grid size-2 place-items-center">
                   <span className="absolute size-2 animate-ping rounded-full" style={{ background: "#ff6b6b" }} />
@@ -96,9 +106,9 @@ export function Hero() {
               className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-4"
             >
               <Proof icon={<Star className="size-4 fill-amber text-amber" />} big="4.9/5" small="128k reviews" />
-              <span className="hidden h-8 w-px bg-white/15 sm:block" />
+              <span className="hidden h-8 w-px bg-black/10 sm:block" />
               <Proof icon={<ShieldCheck className="size-4 text-emerald-bright" />} big="90 days" small="repair warranty" />
-              <span className="hidden h-8 w-px bg-white/15 sm:block" />
+              <span className="hidden h-8 w-px bg-black/10 sm:block" />
               <Proof icon={<Clock className="size-4" style={{ color: "#ff6b6b" }} />} big="< 90 min" small="avg. arrival" />
             </motion.div>
           </motion.div>
@@ -108,45 +118,48 @@ export function Hero() {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, delay: 0.3, ease }}
-            className="relative lg:col-span-6"
+            className="relative flex justify-center self-stretch items-end lg:col-span-6 lg:justify-end"
           >
-            {/* blue glow backdrop */}
-            <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-              <div className="absolute left-1/2 top-1/2 size-[26rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-royal-bright/25 blur-[100px]" />
-            </div>
-
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/work/technician.png"
-              alt="24X7 certified service technician"
-              className="mx-auto w-full max-w-[20rem] drop-shadow-[0_30px_60px_rgba(0,0,0,0.55)]"
-            />
-
-            {/* floating brand-authorised chip */}
-            <motion.div
-              animate={{ y: [0, -8, 0] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute left-0 top-8 flex items-center gap-2 rounded-full bg-white/95 px-3 py-1.5 shadow-premium-lg backdrop-blur"
-            >
-              <ShieldCheck className="size-4 text-emerald" />
-              <span className="text-xs font-semibold text-ink">Brand-authorised pro</span>
-            </motion.div>
-
-            {/* floating live card */}
-            <motion.div
-              animate={{ y: [0, 10, 0] }}
-              transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-              className="absolute bottom-6 left-0 rounded-2xl border border-white/70 bg-white px-4 py-3 shadow-premium-xl"
-            >
-              <div className="flex items-center gap-2">
-                <span className="relative flex size-2.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald opacity-60" />
-                  <span className="relative inline-flex size-2.5 rounded-full bg-emerald" />
-                </span>
-                <p className="text-[0.72rem] font-semibold text-ink">Ravi is on the way</p>
+            <div className="relative w-full max-w-[34rem]">
+              {/* blue glow backdrop */}
+              <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+                <div className="absolute left-1/2 top-1/2 size-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#6f8bff]/35 blur-[120px]" />
+                <div className="absolute bottom-10 left-1/2 size-72 -translate-x-1/2 rounded-full bg-white/10 blur-[90px]" />
               </div>
-              <p className="mt-1 text-[0.64rem] text-muted">Arriving in 8 min · live tracking</p>
-            </motion.div>
+
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/work/technician.png"
+                alt="24X7 certified service technician"
+                className="w-full drop-shadow-[0_36px_70px_rgba(0,0,0,0.6)]"
+              />
+
+              {/* floating brand-authorised chip — near the pointing hand */}
+              <motion.div
+                animate={{ y: [0, -8, 0] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -left-4 top-20 flex items-center gap-2 rounded-full bg-white/95 px-3.5 py-2 shadow-premium-lg backdrop-blur sm:-left-10"
+              >
+                <ShieldCheck className="size-4 text-emerald" />
+                <span className="text-xs font-semibold text-ink">Brand-authorised pro</span>
+              </motion.div>
+
+              {/* floating live card — lower left */}
+              <motion.div
+                animate={{ y: [0, 10, 0] }}
+                transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                className="absolute -left-6 bottom-24 rounded-2xl border border-white/70 bg-white px-4 py-3 shadow-premium-xl sm:-left-12"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="relative flex size-2.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald opacity-60" />
+                    <span className="relative inline-flex size-2.5 rounded-full bg-emerald" />
+                  </span>
+                  <p className="text-[0.72rem] font-semibold text-ink">Ravi is on the way</p>
+                </div>
+                <p className="mt-1 text-[0.64rem] text-muted">Arriving in 8 min · live tracking</p>
+              </motion.div>
+            </div>
           </motion.div>
         </div>
       </div>
@@ -174,8 +187,8 @@ function Proof({ icon, big, small }: { icon: React.ReactNode; big: string; small
     <div className="flex items-center gap-2.5">
       {icon}
       <div className="leading-none">
-        <p className="text-base font-semibold text-white">{big}</p>
-        <p className="mt-1 text-xs text-white/55">{small}</p>
+        <p className="text-base font-semibold text-ink">{big}</p>
+        <p className="mt-1 text-xs text-muted">{small}</p>
       </div>
     </div>
   );
