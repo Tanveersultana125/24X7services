@@ -1,161 +1,155 @@
 "use client";
 
 import { useRef } from "react";
+import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight, Star, ShieldCheck, Clock } from "lucide-react";
-import { MagneticButton } from "./MagneticButton";
-import { Marquee } from "./Marquee";
-import { BrandMark } from "@/components/ui/Icons";
-import { BRANDS } from "@/lib/data";
 
 const ease = [0.16, 1, 0.3, 1] as const;
+const RED = "#e11d2a";
 
 export function Hero() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const yProduct = useTransform(scrollYProgress, [0, 1], [0, 120]);
-  const yType = useTransform(scrollYProgress, [0, 1], [0, -60]);
-  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const yType = useTransform(scrollYProgress, [0, 1], [0, -50]);
 
   return (
-    <section ref={ref} className="relative overflow-hidden pt-28 sm:pt-32">
-      {/* meta row */}
-      <div className="mx-auto flex max-w-[92rem] items-center justify-between px-6 text-[0.7rem] font-medium uppercase tracking-[0.24em] text-muted sm:px-10">
-        <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
-          Appliance care, elevated
-        </motion.span>
-      </div>
+    <section ref={ref} className="relative overflow-hidden bg-[#131018] pt-28 text-white sm:pt-32">
+      {/* dotted texture */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.06]"
+        style={{ backgroundImage: "radial-gradient(#ffffff 1px, transparent 1px)", backgroundSize: "22px 22px" }}
+      />
+      {/* ambient glows */}
+      <div aria-hidden className="pointer-events-none absolute -right-40 -top-20 size-[38rem] rounded-full blur-[130px]" style={{ background: `${RED}33` }} />
+      <div aria-hidden className="pointer-events-none absolute -left-32 bottom-0 size-[30rem] rounded-full bg-royal-bright/15 blur-[130px]" />
 
-      <div className="relative mx-auto grid max-w-[92rem] grid-cols-1 items-center gap-8 px-6 pt-6 sm:px-10 lg:grid-cols-12 lg:pt-4">
-        {/* Headline block — asymmetric, spans 7 cols */}
-        <motion.div style={{ y: yType }} className="relative z-10 lg:col-span-7">
-          <h1 className="font-display text-[3.4rem] leading-[1.04] tracking-[-0.03em] sm:text-[5rem] lg:text-[6.4rem]">
-            <Line delay={0.05}>Broken today.</Line>
-            <Line delay={0.14}>
-              <span className="italic text-royal-bright">Flawless</span>
-            </Line>
-            <Line delay={0.22}>by evening.</Line>
-          </h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5, ease }}
-            className="mt-8 max-w-md text-pretty text-lg leading-relaxed text-muted"
-          >
-            Certified doorstep repair, installation and maintenance for Samsung, LG,
-            IFB &amp; Bosch — genuine parts, a 90-day warranty, and a technician you can
-            actually track.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.62, ease }}
-            className="mt-10 flex flex-wrap items-center gap-3"
-          >
-            <MagneticButton href="/book" tone="ink">
-              Book a service
-              <ArrowUpRight className="size-4" />
-            </MagneticButton>
-            <a
-              href="/book?emergency=1"
-              className="group inline-flex items-center gap-2 rounded-full px-4 py-3 text-[0.95rem] font-medium text-ink"
-            >
-              <span className="grid size-2 place-items-center">
-                <span className="size-2 animate-ping rounded-full bg-danger" />
-                <span className="absolute size-2 rounded-full bg-danger" />
-              </span>
-              Emergency repair
-              <span className="transition-transform group-hover:translate-x-0.5">→</span>
-            </a>
-          </motion.div>
-
-          {/* inline proof */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-4"
-          >
-            <Proof icon={<Star className="size-4 fill-amber text-amber" />} big="4.9/5" small="128k reviews" />
-            <span className="hidden h-8 w-px bg-border sm:block" />
-            <Proof icon={<ShieldCheck className="size-4 text-emerald" />} big="90 days" small="repair warranty" />
-            <span className="hidden h-8 w-px bg-border sm:block" />
-            <Proof icon={<Clock className="size-4 text-royal-bright" />} big="< 90 min" small="avg. arrival" />
-          </motion.div>
+      <div className="relative mx-auto max-w-[92rem] px-6 pb-40 sm:px-10 sm:pb-48">
+        {/* eyebrow */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.35 }}
+          className="flex items-center gap-3"
+        >
+          <span className="h-px w-8" style={{ background: RED }} />
+          <span className="text-[0.7rem] font-semibold uppercase tracking-[0.26em]" style={{ color: "#ff6b6b" }}>
+            Fast · Certified · 24×7
+          </span>
         </motion.div>
 
-        {/* Product — spans 5 cols, floats & parallaxes */}
-        <motion.div style={{ y: yProduct, opacity }} className="relative lg:col-span-5">
+        <div className="mt-8 grid grid-cols-1 items-center gap-6 lg:grid-cols-12">
+          {/* Headline */}
+          <motion.div style={{ y: yType }} className="relative z-10 lg:col-span-6">
+            <h1 className="font-display text-[3.4rem] leading-[1.03] tracking-[-0.03em] sm:text-[5rem] lg:text-[6.2rem]">
+              <Line delay={0.05}>Broken today.</Line>
+              <Line delay={0.14}>
+                <span className="italic" style={{ color: "#ff5c5c" }}>Flawless</span>
+              </Line>
+              <Line delay={0.22}>by evening.</Line>
+            </h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.5, ease }}
+              className="mt-8 max-w-md text-pretty text-lg leading-relaxed text-white/65"
+            >
+              Certified doorstep repair, installation and maintenance for Samsung, LG,
+              IFB &amp; Bosch — genuine parts, a 90-day warranty, and a technician you can
+              actually track.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.62, ease }}
+              className="mt-10 flex flex-wrap items-center gap-3"
+            >
+              <Link
+                href="/book"
+                className="group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-[0.95rem] font-semibold text-white shadow-lg transition-transform hover:scale-[1.03]"
+                style={{ background: RED, boxShadow: `0 16px 40px -12px ${RED}99` }}
+              >
+                Book a service
+                <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </Link>
+              <Link
+                href="/book?emergency=1"
+                className="group inline-flex items-center gap-2 rounded-full border border-white/25 px-6 py-3.5 text-[0.95rem] font-medium text-white transition-colors hover:bg-white/10"
+              >
+                <span className="relative grid size-2 place-items-center">
+                  <span className="absolute size-2 animate-ping rounded-full" style={{ background: "#ff6b6b" }} />
+                  <span className="size-2 rounded-full" style={{ background: "#ff6b6b" }} />
+                </span>
+                Emergency repair
+                <span className="transition-transform group-hover:translate-x-0.5">→</span>
+              </Link>
+            </motion.div>
+
+            {/* proof */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8 }}
+              className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-4"
+            >
+              <Proof icon={<Star className="size-4 fill-amber text-amber" />} big="4.9/5" small="128k reviews" />
+              <span className="hidden h-8 w-px bg-white/15 sm:block" />
+              <Proof icon={<ShieldCheck className="size-4 text-emerald-bright" />} big="90 days" small="repair warranty" />
+              <span className="hidden h-8 w-px bg-white/15 sm:block" />
+              <Proof icon={<Clock className="size-4" style={{ color: "#ff6b6b" }} />} big="< 90 min" small="avg. arrival" />
+            </motion.div>
+          </motion.div>
+
+          {/* Technician cutout — points toward the headline */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.92, y: 40 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 1.1, delay: 0.2, ease }}
-            className="relative mx-auto max-w-md"
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, delay: 0.3, ease }}
+            className="relative lg:col-span-6"
           >
-            {/* real work — staggered photo collage */}
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              <div className="flex flex-col gap-3 sm:gap-4">
-                <Shot src="/work/refrigerator.png" alt="Technician servicing a refrigerator" ratio="aspect-[3/4]" delay={0.25} />
-                <Shot src="/work/ac.png" alt="Technician servicing an air conditioner" ratio="aspect-[4/3]" delay={0.45} />
-              </div>
-              <div className="flex flex-col gap-3 pt-8 sm:gap-4 sm:pt-10">
-                <Shot src="/work/washing-machine.png" alt="Technician repairing a washing machine" ratio="aspect-square" delay={0.35} />
-                <Shot src="/work/microwave.png" alt="Technician repairing a microwave" ratio="aspect-[4/3]" delay={0.55} />
-              </div>
+            {/* blue glow backdrop */}
+            <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+              <div className="absolute left-1/2 top-1/2 size-[26rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-royal-bright/25 blur-[100px]" />
             </div>
 
-            {/* floating certified tag */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/work/technician.png"
+              alt="24X7 certified service technician"
+              className="mx-auto w-full max-w-[20rem] drop-shadow-[0_30px_60px_rgba(0,0,0,0.55)]"
+            />
+
+            {/* floating brand-authorised chip */}
             <motion.div
-              animate={{ y: [0, -10, 0] }}
+              animate={{ y: [0, -8, 0] }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -left-2 top-16 flex items-center gap-2 rounded-2xl glass-strong px-3.5 py-2.5 shadow-premium-lg sm:-left-6"
+              className="absolute left-0 top-8 flex items-center gap-2 rounded-full bg-white/95 px-3 py-1.5 shadow-premium-lg backdrop-blur"
             >
-              <span className="grid size-8 place-items-center rounded-xl bg-emerald/15 text-emerald">
-                <ShieldCheck className="size-4" />
-              </span>
-              <div className="text-left">
-                <p className="text-[0.7rem] font-semibold leading-none">Certified pro</p>
-                <p className="mt-1 text-[0.65rem] text-muted">Brand-authorised</p>
-              </div>
+              <ShieldCheck className="size-4 text-emerald" />
+              <span className="text-xs font-semibold text-ink">Brand-authorised pro</span>
             </motion.div>
 
-            {/* floating ETA card */}
+            {/* floating live card */}
             <motion.div
-              animate={{ y: [0, 12, 0] }}
+              animate={{ y: [0, 10, 0] }}
               transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-              className="absolute -right-2 bottom-20 rounded-2xl glass-strong px-4 py-3 shadow-premium-lg sm:-right-8"
+              className="absolute bottom-6 left-0 rounded-2xl border border-white/70 bg-white px-4 py-3 shadow-premium-xl"
             >
               <div className="flex items-center gap-2">
-                <span className="size-2 animate-pulse rounded-full bg-emerald" />
-                <p className="text-[0.7rem] font-semibold">Ravi · 8 min away</p>
+                <span className="relative flex size-2.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald opacity-60" />
+                  <span className="relative inline-flex size-2.5 rounded-full bg-emerald" />
+                </span>
+                <p className="text-[0.72rem] font-semibold text-ink">Ravi is on the way</p>
               </div>
-              <div className="mt-2 flex gap-1">
-                {[1, 1, 1, 0.4, 0.2].map((o, i) => (
-                  <span key={i} className="h-1 w-6 rounded-full bg-emerald" style={{ opacity: o }} />
-                ))}
-              </div>
+              <p className="mt-1 text-[0.64rem] text-muted">Arriving in 8 min · live tracking</p>
             </motion.div>
           </motion.div>
-        </motion.div>
+        </div>
       </div>
-
-      {/* Brand marquee footer */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.9 }}
-        className="mt-16 border-y border-hairline py-6 sm:mt-20"
-      >
-        <Marquee>
-          {[...BRANDS, ...BRANDS].map((b, i) => (
-            <span key={i} className="flex items-center gap-16">
-              <BrandMark id={b.id} className="text-xl text-muted opacity-70" />
-            </span>
-          ))}
-        </Marquee>
-      </motion.div>
     </section>
   );
 }
@@ -180,30 +174,9 @@ function Proof({ icon, big, small }: { icon: React.ReactNode; big: string; small
     <div className="flex items-center gap-2.5">
       {icon}
       <div className="leading-none">
-        <p className="text-base font-semibold">{big}</p>
-        <p className="mt-1 text-xs text-muted">{small}</p>
+        <p className="text-base font-semibold text-white">{big}</p>
+        <p className="mt-1 text-xs text-white/55">{small}</p>
       </div>
     </div>
-  );
-}
-
-function Shot({ src, alt, ratio, delay }: { src: string; alt: string; ratio: string; delay: number }) {
-  return (
-    <motion.figure
-      initial={{ opacity: 0, y: 24, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.9, delay, ease }}
-      className={`group relative overflow-hidden rounded-2xl border border-white/60 bg-surface shadow-premium-lg ${ratio}`}
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={src}
-        alt={alt}
-        loading="lazy"
-        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
-      />
-      {/* subtle top sheen to match the site's soft-lit look */}
-      <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-white/25 to-transparent" />
-    </motion.figure>
   );
 }

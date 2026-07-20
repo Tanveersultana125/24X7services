@@ -81,9 +81,9 @@ export function MostBooked() {
           <div>
             <Kicker>Most booked</Kicker>
             <h2 className="font-display mt-6 max-w-xl text-[2.6rem] leading-[1.05] tracking-[-0.03em] sm:text-6xl">
-              What the city
+              Our most
               <br />
-              books the most.
+              booked services.
             </h2>
           </div>
 

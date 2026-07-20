@@ -1,5 +1,6 @@
 import { SiteNav } from "@/components/site/SiteNav";
 import { Hero } from "@/components/site/Hero";
+import { TrustStrip } from "@/components/site/TrustStrip";
 import { ServicesIndex } from "@/components/site/ServicesIndex";
 import { MostBooked } from "@/components/site/MostBooked";
 import { WorkGallery } from "@/components/site/WorkGallery";
@@ -20,6 +21,7 @@ export default function Home() {
       <SiteNav />
       <main className="flex-1">
         <Hero />
+        <TrustStrip />
         <ServicesIndex />
         <MostBooked />
         <BrandShowcase />
