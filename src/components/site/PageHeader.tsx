@@ -20,9 +20,34 @@ export function PageHeader({
   image?: string;
 }) {
   return (
-    <header className="relative overflow-hidden border-b border-hairline pt-36 pb-16 sm:pt-40 sm:pb-20">
+    <header
+      className={
+        "relative overflow-hidden border-b border-hairline pt-36 pb-16 sm:pt-40 sm:pb-20" +
+        (image ? " lg:min-h-[34rem]" : "")
+      }
+    >
       <div className="pointer-events-none absolute -top-24 left-1/2 size-[38rem] -translate-x-1/2 rounded-full bg-royal-bright/8 blur-[120px]" />
-      <div className="relative mx-auto max-w-[92rem] px-6 sm:px-10">
+
+      {/* full-bleed technician image (desktop) — bleeds off the right, fades into the page */}
+      {image && (
+        <>
+          <div
+            aria-hidden
+            className="pointer-events-none absolute right-0 top-1/2 hidden size-[42rem] -translate-y-1/2 translate-x-1/5 rounded-full bg-royal-bright/12 blur-[120px] lg:block"
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <motion.img
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1.1, delay: 0.2, ease }}
+            src={image}
+            alt="24X7 certified technician on the job"
+            className="pointer-events-none absolute right-0 top-1/2 hidden w-[56%] max-w-[50rem] -translate-y-1/2 [-webkit-mask-image:linear-gradient(to_right,transparent_0%,#000_32%)] [mask-image:linear-gradient(to_right,transparent_0%,#000_32%)] lg:block"
+          />
+        </>
+      )}
+
+      <div className="relative z-10 mx-auto max-w-[92rem] px-6 sm:px-10">
         {/* breadcrumb */}
         <motion.nav
           initial={{ opacity: 0 }}
@@ -36,7 +61,7 @@ export function PageHeader({
           <span className="text-ink">{crumb}</span>
         </motion.nav>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-[1.5fr_1fr] lg:items-end">
+        <div className={image ? "mt-10 max-w-2xl" : "mt-8 grid gap-8 lg:grid-cols-[1.5fr_1fr] lg:items-end"}>
           <div>
             <h1 className="font-display text-[3rem] leading-[1.02] tracking-[-0.03em] sm:text-[4.5rem]">
               <span className="block overflow-hidden pb-[0.14em] -mb-[0.1em]">
@@ -65,7 +90,7 @@ export function PageHeader({
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.35, ease }}
-                className="mt-10 flex flex-wrap gap-x-10 gap-y-4"
+                className="mt-12 flex flex-wrap gap-x-12 gap-y-4"
               >
                 {stats.map((s) => (
                   <div key={s.label}>
@@ -77,42 +102,33 @@ export function PageHeader({
             )}
           </div>
 
-          {image ? (
-            <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1, delay: 0.3, ease }}
-              className="relative flex justify-center lg:justify-end"
+          {!image && stats && (
+            <motion.dl
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.35, ease }}
+              className="grid grid-cols-3 gap-6 lg:justify-items-end"
             >
-              <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-                <div className="absolute left-1/2 top-1/2 size-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-royal-bright/15 blur-[90px]" />
-              </div>
-              {/* no card frame — the image bleeds and fades into the page on the left */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={image}
-                alt="24X7 certified technician on the job"
-                className="w-full max-w-lg [-webkit-mask-image:linear-gradient(to_right,transparent_0%,#000_24%)] [mask-image:linear-gradient(to_right,transparent_0%,#000_24%)]"
-              />
-            </motion.div>
-          ) : (
-            stats && (
-              <motion.dl
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.35, ease }}
-                className="grid grid-cols-3 gap-6 lg:justify-items-end"
-              >
-                {stats.map((s) => (
-                  <div key={s.label} className="lg:text-right">
-                    <dt className="font-display text-3xl tracking-tight sm:text-4xl">{s.value}</dt>
-                    <dd className="mt-1 text-xs text-muted">{s.label}</dd>
-                  </div>
-                ))}
-              </motion.dl>
-            )
+              {stats.map((s) => (
+                <div key={s.label} className="lg:text-right">
+                  <dt className="font-display text-3xl tracking-tight sm:text-4xl">{s.value}</dt>
+                  <dd className="mt-1 text-xs text-muted">{s.label}</dd>
+                </div>
+              ))}
+            </motion.dl>
           )}
         </div>
+
+        {/* stacked image on mobile */}
+        {image && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={image}
+            alt=""
+            aria-hidden
+            className="mt-10 w-full rounded-2xl [-webkit-mask-image:linear-gradient(to_right,transparent,#000_18%)] [mask-image:linear-gradient(to_right,transparent,#000_18%)] lg:hidden"
+          />
+        )}
       </div>
     </header>
   );
