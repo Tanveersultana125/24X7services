@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, BadgeCheck } from "lucide-react";
 import { BrandMark } from "@/components/ui/Icons";
 import { BRANDS } from "@/lib/data";
 
@@ -116,9 +116,25 @@ export function PageHeader({
                   initial={{ opacity: 0, y: 18 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.3 + i * 0.08, ease }}
-                  className="grid h-24 place-items-center rounded-2xl border border-white/70 bg-gradient-to-b from-white to-surface shadow-[0_14px_30px_-16px_rgba(23,21,15,0.18),inset_0_1.5px_0_rgba(255,255,255,0.9)] transition-transform duration-500 hover:-translate-y-1 sm:h-28"
+                  className="group relative grid h-28 place-items-center overflow-hidden rounded-2xl border border-white/70 bg-gradient-to-b from-white to-surface shadow-[0_14px_30px_-16px_rgba(23,21,15,0.18),inset_0_1.5px_0_rgba(255,255,255,0.9)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_26px_46px_-20px_rgba(23,21,15,0.28)] sm:h-32"
                 >
-                  <BrandMark id={b.id} tone="brand" className="text-xl" />
+                  {/* brand-colour glow */}
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute -right-8 -top-8 size-24 rounded-full opacity-[0.14] blur-2xl transition-opacity duration-500 group-hover:opacity-25"
+                    style={{ background: b.accent }}
+                  />
+                  {/* authorised chip */}
+                  <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-emerald/12 px-2 py-0.5 text-[0.58rem] font-semibold text-emerald">
+                    <BadgeCheck className="size-3" /> Authorised
+                  </span>
+                  <BrandMark id={b.id} tone="brand" className="relative text-2xl" />
+                  {/* animated accent line */}
+                  <span
+                    aria-hidden
+                    className="absolute bottom-0 left-0 h-1 w-full origin-left scale-x-0 transition-transform duration-500 group-hover:scale-x-100"
+                    style={{ background: b.accent }}
+                  />
                 </motion.div>
               ))}
             </div>
