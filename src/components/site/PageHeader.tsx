@@ -28,12 +28,13 @@ export function PageHeader({
     >
       <div className="pointer-events-none absolute -top-24 left-1/2 size-[38rem] -translate-x-1/2 rounded-full bg-royal-bright/8 blur-[120px]" />
 
-      {/* full-bleed technician image (desktop) — bleeds off the right, fades into the page */}
+      {/* full-bleed technician image (desktop) — sits on a soft blue wash so it blends */}
       {image && (
         <>
           <div
             aria-hidden
-            className="pointer-events-none absolute right-0 top-1/2 hidden size-[42rem] -translate-y-1/2 translate-x-1/5 rounded-full bg-royal-bright/12 blur-[120px] lg:block"
+            className="pointer-events-none absolute inset-0 hidden lg:block"
+            style={{ background: "linear-gradient(105deg, transparent 40%, rgba(226,234,251,0.55) 64%, #e3ebfc 100%)" }}
           />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <motion.img
@@ -42,7 +43,7 @@ export function PageHeader({
             transition={{ duration: 1.1, delay: 0.2, ease }}
             src={image}
             alt="24X7 certified technician on the job"
-            className="pointer-events-none absolute right-0 top-1/2 hidden w-[56%] max-w-[50rem] -translate-y-1/2 [-webkit-mask-image:linear-gradient(to_right,transparent_0%,#000_32%)] [mask-image:linear-gradient(to_right,transparent_0%,#000_32%)] lg:block"
+            className="pointer-events-none absolute right-0 top-1/2 hidden w-[54%] max-w-[48rem] -translate-y-1/2 [-webkit-mask-image:linear-gradient(to_right,transparent_0%,#000_36%)] [mask-image:linear-gradient(to_right,transparent_0%,#000_36%)] lg:block"
           />
         </>
       )}
