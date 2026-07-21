@@ -4,6 +4,8 @@ import { TrustStrip } from "@/components/site/TrustStrip";
 import { MostBooked } from "@/components/site/MostBooked";
 import { Spotlight } from "@/components/site/Spotlight";
 import { Noteworthy } from "@/components/site/Noteworthy";
+import { CoolingSolutions } from "@/components/site/CoolingSolutions";
+import { ClimateExpertise } from "@/components/site/ClimateExpertise";
 import { BrandShowcase } from "@/components/site/BrandShowcase";
 import { Process } from "@/components/site/Process";
 import { TrustBento } from "@/components/site/TrustBento";
@@ -25,6 +27,8 @@ export default function Home() {
         <MostBooked />
         <Spotlight />
         <Noteworthy />
+        <CoolingSolutions />
+        <ClimateExpertise />
         <BrandShowcase />
         <Process />
         <TrustBento />
