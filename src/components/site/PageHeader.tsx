@@ -68,7 +68,7 @@ export function PageHeader({
           <span className="text-ink">{crumb}</span>
         </motion.nav>
 
-        <div className={image ? "mt-10 max-w-2xl" : "mt-8 grid gap-10 lg:grid-cols-2 lg:items-center"}>
+        <div className={image ? "mt-10 max-w-2xl" : "mt-8 grid gap-12 lg:grid-cols-[0.7fr_1.3fr] lg:items-center"}>
           <div className={logos || collage ? "lg:order-2" : undefined}>
             <h1 className="font-display text-[3rem] leading-[1.02] tracking-[-0.03em] sm:text-[4.5rem]">
               <span className="block overflow-hidden pb-[0.14em] -mb-[0.1em]">
