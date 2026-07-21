@@ -1,7 +1,6 @@
 import { SiteNav } from "@/components/site/SiteNav";
 import { Hero } from "@/components/site/Hero";
 import { TrustStrip } from "@/components/site/TrustStrip";
-import { ServicesIndex } from "@/components/site/ServicesIndex";
 import { MostBooked } from "@/components/site/MostBooked";
 import { Spotlight } from "@/components/site/Spotlight";
 import { Noteworthy } from "@/components/site/Noteworthy";
@@ -28,7 +27,6 @@ export default function Home() {
         <Spotlight />
         <Noteworthy />
         <WorkGallery />
-        <ServicesIndex />
         <BrandShowcase />
         <Process />
         <TrustBento />
