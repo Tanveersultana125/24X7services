@@ -52,7 +52,7 @@ export function Process() {
           <motion.span
             aria-hidden
             style={{ scaleY: lineScaleY }}
-            className="absolute left-[27px] top-7 hidden h-[calc(100%-5.5rem)] w-0.5 origin-top rounded-full bg-gradient-to-b from-royal-bright via-emerald to-amber sm:block"
+            className="absolute left-[27px] top-7 hidden h-[calc(100%-5.5rem)] w-0.5 origin-top rounded-full bg-royal-bright sm:block"
           />
           {STEPS.map((s) => (
             <motion.li
