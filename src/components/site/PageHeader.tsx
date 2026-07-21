@@ -69,7 +69,7 @@ export function PageHeader({
         </motion.nav>
 
         <div className={image ? "mt-10 max-w-2xl" : "mt-8 grid gap-10 lg:grid-cols-2 lg:items-center"}>
-          <div>
+          <div className={logos || collage ? "lg:order-2" : undefined}>
             <h1 className="font-display text-[3rem] leading-[1.02] tracking-[-0.03em] sm:text-[4.5rem]">
               <span className="block overflow-hidden pb-[0.14em] -mb-[0.1em]">
                 <motion.span
@@ -109,9 +109,9 @@ export function PageHeader({
             )}
           </div>
 
-          {/* brand-logo cards on the right */}
+          {/* brand-logo cards */}
           {!image && logos && (
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:order-1">
               {BRANDS.map((b, i) => (
                 <motion.div
                   key={b.id}
@@ -142,9 +142,9 @@ export function PageHeader({
             </div>
           )}
 
-          {/* photo collage on the right */}
+          {/* photo collage */}
           {!image && collage && collage.length >= 4 && (
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:order-1">
               <div className="flex flex-col gap-3 sm:gap-4">
                 <CollageShot src={collage[0]} ratio="aspect-square" delay={0.25} />
                 <CollageShot src={collage[1]} ratio="aspect-[4/5]" delay={0.4} />
