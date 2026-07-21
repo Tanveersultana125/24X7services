@@ -28,13 +28,6 @@ export function Hero() {
       {/* ambient glows */}
       <div aria-hidden className="pointer-events-none absolute -right-40 -top-20 size-[38rem] rounded-full blur-[130px]" style={{ background: `${RED}33` }} />
       <div aria-hidden className="pointer-events-none absolute -left-32 bottom-0 size-[30rem] rounded-full bg-royal-bright/15 blur-[130px]" />
-      {/* unify the hero's bottom into a flat deep blue so the trust strip flows on seamlessly */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-80"
-        style={{ background: "linear-gradient(180deg, transparent 0%, #2b3b78 78%, #2b3b78 100%)" }}
-      />
-
       <div className="relative mx-auto max-w-[92rem] px-6 pb-40 sm:px-10 sm:pb-48">
         {/* eyebrow */}
         <motion.div

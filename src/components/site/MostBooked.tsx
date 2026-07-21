@@ -30,11 +30,19 @@ type Card = {
 const CARDS: Card[] = [
   {
     title: "AC repair & service",
-    img: "/work/ac.png",
+    img: "/work/ac-service.png",
     price: 299,
     rating: 4.7,
     meta: "1.4M+ booked",
     instant: true,
+    href: "/book",
+  },
+  {
+    title: "AC installation",
+    img: "/work/ac.png",
+    price: 1099,
+    rating: 4.7,
+    meta: "620K+ booked",
     href: "/book",
   },
   ...APPLIANCES.filter((a) => PHOTO[a.id]).map((a) => ({
@@ -75,7 +83,7 @@ export function MostBooked() {
   };
 
   return (
-    <section id="most-booked" className="relative scroll-mt-28 py-28 sm:py-36">
+    <section id="most-booked" className="relative scroll-mt-28 pb-10 pt-2 sm:pb-14 sm:pt-4">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         <div className="flex items-end justify-between gap-6">
           <div>
@@ -104,8 +112,8 @@ export function MostBooked() {
             onClick={() => slide(-1)}
             disabled={atStart}
             className={cn(
-              "absolute left-0 top-1/2 z-10 hidden size-9 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-md transition-all hover:scale-110 hover:bg-surface-2 sm:grid",
-              atStart && "pointer-events-none opacity-0"
+              "absolute left-1 top-[40%] z-10 grid size-10 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:left-0 sm:top-[42%] sm:-translate-x-1/2",
+              atStart && "pointer-events-none opacity-30"
             )}
           >
             <ChevronLeft className="size-4" />
@@ -116,8 +124,8 @@ export function MostBooked() {
             onClick={() => slide(1)}
             disabled={atEnd}
             className={cn(
-              "absolute right-0 top-1/2 z-10 hidden size-9 -translate-y-1/2 translate-x-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-md transition-all hover:scale-110 hover:bg-surface-2 sm:grid",
-              atEnd && "pointer-events-none opacity-0"
+              "absolute right-1 top-[40%] z-10 grid size-10 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:right-0 sm:top-[42%] sm:translate-x-1/2",
+              atEnd && "pointer-events-none opacity-30"
             )}
           >
             <ChevronRight className="size-4" />
@@ -136,7 +144,7 @@ export function MostBooked() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.7, delay: i * 0.08, ease }}
-              className="w-[72%] shrink-0 grow-0 snap-start sm:w-[42%] lg:w-[23.3%]"
+              className="w-[76%] shrink-0 grow-0 snap-start sm:w-[44%] lg:w-[30%]"
             >
               <Link
                 href={c.href}

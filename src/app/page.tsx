@@ -3,6 +3,8 @@ import { Hero } from "@/components/site/Hero";
 import { TrustStrip } from "@/components/site/TrustStrip";
 import { ServicesIndex } from "@/components/site/ServicesIndex";
 import { MostBooked } from "@/components/site/MostBooked";
+import { Spotlight } from "@/components/site/Spotlight";
+import { Noteworthy } from "@/components/site/Noteworthy";
 import { WorkGallery } from "@/components/site/WorkGallery";
 import { BrandShowcase } from "@/components/site/BrandShowcase";
 import { Process } from "@/components/site/Process";
@@ -22,15 +24,17 @@ export default function Home() {
       <main className="flex-1">
         <Hero />
         <TrustStrip />
-        <ServicesIndex />
         <MostBooked />
+        <Spotlight />
+        <Noteworthy />
+        <WorkGallery />
+        <ServicesIndex />
         <BrandShowcase />
         <Process />
         <TrustBento />
         <Emergency />
         <Plans />
         <Reviews />
-        <WorkGallery />
         <Stats />
         <Faq />
         <Contact />

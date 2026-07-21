@@ -29,10 +29,7 @@ const PILLARS = [
 
 export function TrustStrip() {
   return (
-    <section
-      className="relative z-20 -mt-40 pb-16 pt-20 sm:-mt-48 sm:pb-24 sm:pt-24"
-      style={{ background: "linear-gradient(180deg, #2b3b78 0%, #24305f 100%)" }}
-    >
+    <section className="relative z-20 -mt-24 pb-6 pt-4 sm:-mt-32 sm:pb-8 sm:pt-6">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         <div className="grid gap-5 md:grid-cols-3">
           {PILLARS.map((p, i) => (
@@ -44,13 +41,6 @@ export function TrustStrip() {
               transition={{ duration: 0.7, delay: i * 0.1, ease }}
               className="group relative overflow-hidden rounded-[1.75rem] border border-border bg-surface p-7 shadow-premium-sm transition-all duration-500 hover:-translate-y-1.5 hover:shadow-premium-lg"
             >
-              {/* accent glow */}
-              <span
-                aria-hidden
-                className="pointer-events-none absolute -right-10 -top-10 size-32 rounded-full opacity-10 blur-2xl transition-opacity duration-500 group-hover:opacity-20"
-                style={{ background: p.tint }}
-              />
-
               <span
                 className="grid size-12 place-items-center rounded-2xl shadow-premium-sm"
                 style={{ background: `${p.tint}16`, color: p.tint }}

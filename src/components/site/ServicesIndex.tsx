@@ -21,7 +21,7 @@ export function ServicesIndex() {
   const svc = SERVICES[active];
 
   return (
-    <section id="services" className="relative scroll-mt-28 py-28 sm:py-36">
+    <section id="services" className="relative scroll-mt-28 pb-28 pt-10 sm:pb-36 sm:pt-14">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
