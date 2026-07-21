@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
+import { BrandMark } from "@/components/ui/Icons";
+import { BRANDS } from "@/lib/data";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -12,12 +14,14 @@ export function PageHeader({
   subtitle,
   stats,
   image,
+  logos,
 }: {
   crumb: string;
   title: React.ReactNode;
   subtitle: string;
   stats?: { value: string; label: string }[];
   image?: string;
+  logos?: boolean;
 }) {
   return (
     <header
@@ -62,7 +66,7 @@ export function PageHeader({
           <span className="text-ink">{crumb}</span>
         </motion.nav>
 
-        <div className={image ? "mt-10 max-w-2xl" : "mt-8 grid gap-8 lg:grid-cols-[1.5fr_1fr] lg:items-end"}>
+        <div className={image ? "mt-10 max-w-2xl" : "mt-8 grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-center"}>
           <div>
             <h1 className="font-display text-[3rem] leading-[1.02] tracking-[-0.03em] sm:text-[4.5rem]">
               <span className="block overflow-hidden pb-[0.14em] -mb-[0.1em]">
@@ -85,8 +89,8 @@ export function PageHeader({
               {subtitle}
             </motion.p>
 
-            {/* when an image is shown, stats sit under the copy as a row */}
-            {image && stats && (
+            {/* when an image or logos are shown, stats sit under the copy as a row */}
+            {(image || logos) && stats && (
               <motion.dl
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -103,7 +107,24 @@ export function PageHeader({
             )}
           </div>
 
-          {!image && stats && (
+          {/* brand-logo cards on the right */}
+          {!image && logos && (
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              {BRANDS.map((b, i) => (
+                <motion.div
+                  key={b.id}
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3 + i * 0.08, ease }}
+                  className="grid h-24 place-items-center rounded-2xl border border-white/70 bg-gradient-to-b from-white to-surface shadow-[0_14px_30px_-16px_rgba(23,21,15,0.18),inset_0_1.5px_0_rgba(255,255,255,0.9)] transition-transform duration-500 hover:-translate-y-1 sm:h-28"
+                >
+                  <BrandMark id={b.id} tone="brand" className="text-xl" />
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+          {!image && !logos && stats && (
             <motion.dl
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
