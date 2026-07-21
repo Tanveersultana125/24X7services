@@ -39,11 +39,14 @@ export function TrustStrip() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.7, delay: i * 0.1, ease }}
-              className="group relative overflow-hidden rounded-[1.75rem] border border-border bg-surface p-7 shadow-premium-sm transition-all duration-500 hover:-translate-y-1.5 hover:shadow-premium-lg"
+              className="group relative overflow-hidden rounded-[1.75rem] border border-white/70 bg-gradient-to-b from-white to-surface p-7 shadow-[0_18px_40px_-18px_rgba(23,21,15,0.2),inset_0_1.5px_0_rgba(255,255,255,0.95),inset_0_-16px_28px_-20px_rgba(23,21,15,0.12)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_38px_64px_-24px_rgba(23,21,15,0.32),inset_0_1.5px_0_rgba(255,255,255,0.95)]"
             >
+              {/* glossy top sheen */}
+              <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/60 to-transparent" />
+
               <span
-                className="grid size-12 place-items-center rounded-2xl shadow-premium-sm"
-                style={{ background: `${p.tint}16`, color: p.tint }}
+                className="relative grid size-12 place-items-center rounded-2xl shadow-[0_8px_16px_-4px_rgba(23,21,15,0.22),inset_0_1px_0_rgba(255,255,255,0.7)] transition-transform duration-500 group-hover:-translate-y-1 group-hover:scale-105"
+                style={{ background: `${p.tint}18`, color: p.tint }}
               >
                 <p.icon className="size-6" strokeWidth={1.8} />
               </span>
