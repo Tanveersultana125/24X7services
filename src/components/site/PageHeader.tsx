@@ -15,6 +15,7 @@ export function PageHeader({
   stats,
   image,
   logos,
+  collage,
 }: {
   crumb: string;
   title: React.ReactNode;
@@ -22,6 +23,7 @@ export function PageHeader({
   stats?: { value: string; label: string }[];
   image?: string;
   logos?: boolean;
+  collage?: string[];
 }) {
   return (
     <header
@@ -89,8 +91,8 @@ export function PageHeader({
               {subtitle}
             </motion.p>
 
-            {/* when an image or logos are shown, stats sit under the copy as a row */}
-            {(image || logos) && stats && (
+            {/* when an image, logos, or collage are shown, stats sit under the copy as a row */}
+            {(image || logos || collage) && stats && (
               <motion.dl
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -140,7 +142,21 @@ export function PageHeader({
             </div>
           )}
 
-          {!image && !logos && stats && (
+          {/* photo collage on the right */}
+          {!image && collage && collage.length >= 4 && (
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="flex flex-col gap-3 sm:gap-4">
+                <CollageShot src={collage[0]} ratio="aspect-square" delay={0.25} />
+                <CollageShot src={collage[1]} ratio="aspect-[4/5]" delay={0.4} />
+              </div>
+              <div className="flex flex-col gap-3 pt-8 sm:gap-4">
+                <CollageShot src={collage[2]} ratio="aspect-[4/5]" delay={0.3} />
+                <CollageShot src={collage[3]} ratio="aspect-square" delay={0.45} />
+              </div>
+            </div>
+          )}
+
+          {!image && !logos && !collage && stats && (
             <motion.dl
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
@@ -169,5 +185,19 @@ export function PageHeader({
         )}
       </div>
     </header>
+  );
+}
+
+function CollageShot({ src, ratio, delay }: { src: string; ratio: string; delay: number }) {
+  return (
+    <motion.figure
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7, delay, ease }}
+      className={`overflow-hidden rounded-2xl border border-white/70 shadow-premium-md ${ratio}`}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="24X7 technician on the job" className="h-full w-full object-cover" />
+    </motion.figure>
   );
 }
