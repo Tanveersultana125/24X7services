@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { ScanSearch, CalendarClock, Navigation, ShieldCheck } from "lucide-react";
 import { Kicker } from "./TextReveal";
 import { MagneticButton } from "./MagneticButton";
@@ -14,6 +15,10 @@ const STEPS = [
 ];
 
 export function Process() {
+  const listRef = useRef<HTMLOListElement>(null);
+  const { scrollYProgress } = useScroll({ target: listRef, offset: ["start 65%", "end 65%"] });
+  const lineScaleY = useTransform(scrollYProgress, [0, 1], [0.02, 1]);
+
   return (
     <section id="process" className="relative scroll-mt-28 bg-surface py-28 sm:py-36">
       <div className="mx-auto grid max-w-[92rem] gap-16 px-6 sm:px-10 lg:grid-cols-12">
@@ -41,16 +46,21 @@ export function Process() {
         </div>
 
         {/* Steps */}
-        <ol className="relative lg:col-span-7">
-          {/* gradient timeline */}
-          <span className="absolute left-[27px] top-6 hidden h-[calc(100%-6rem)] w-0.5 rounded-full bg-gradient-to-b from-royal-bright/40 via-royal-bright/15 to-transparent sm:block" />
-          {STEPS.map((s, i) => (
+        <ol ref={listRef} className="relative lg:col-span-7">
+          {/* timeline track + scroll-driven progress fill */}
+          <span className="absolute left-[27px] top-7 hidden h-[calc(100%-5.5rem)] w-0.5 rounded-full bg-border sm:block" />
+          <motion.span
+            aria-hidden
+            style={{ scaleY: lineScaleY }}
+            className="absolute left-[27px] top-7 hidden h-[calc(100%-5.5rem)] w-0.5 origin-top rounded-full bg-gradient-to-b from-royal-bright via-emerald to-amber sm:block"
+          />
+          {STEPS.map((s) => (
             <motion.li
               key={s.n}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
+              viewport={{ once: true, margin: "-35% 0px -35% 0px" }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               className="group relative flex gap-6 pb-6 last:pb-0 sm:gap-8"
             >
               {/* colored icon node */}
