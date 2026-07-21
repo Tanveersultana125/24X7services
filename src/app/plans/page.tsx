@@ -27,6 +27,7 @@ export default function PlansPage() {
             { value: "₹1,499", label: "From / year" },
             { value: "4", label: "Visits included" },
           ]}
+          bgImage="/work/family-ac.png"
         />
         <Plans />
         <PlansCompare />

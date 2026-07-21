@@ -16,6 +16,7 @@ export function PageHeader({
   image,
   logos,
   collage,
+  bgImage,
 }: {
   crumb: string;
   title: React.ReactNode;
@@ -24,15 +25,39 @@ export function PageHeader({
   image?: string;
   logos?: boolean;
   collage?: string[];
+  bgImage?: string;
 }) {
   return (
     <header
       className={
         "relative overflow-hidden border-b border-hairline pt-36 pb-16 sm:pt-40 sm:pb-20" +
-        (image ? " lg:min-h-[34rem]" : "")
+        (image ? " lg:min-h-[34rem]" : bgImage ? " lg:min-h-[32rem]" : "")
       }
     >
-      <div className="pointer-events-none absolute -top-24 left-1/2 size-[38rem] -translate-x-1/2 rounded-full bg-royal-bright/8 blur-[120px]" />
+      {!bgImage && (
+        <div className="pointer-events-none absolute -top-24 left-1/2 size-[38rem] -translate-x-1/2 rounded-full bg-royal-bright/8 blur-[120px]" />
+      )}
+
+      {/* full-bleed background photo with a light scrim for readable text */}
+      {bgImage && (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <motion.img
+            initial={{ scale: 1.06, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1.3, ease }}
+            src={bgImage}
+            alt=""
+            aria-hidden
+            className="absolute inset-0 h-full w-full object-cover object-center"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(100deg, rgba(245,243,238,0.95) 0%, rgba(245,243,238,0.82) 34%, rgba(245,243,238,0.35) 58%, rgba(245,243,238,0.05) 100%)" }}
+          />
+        </>
+      )}
 
       {/* full-bleed technician image (desktop) — sits on a soft blue wash so it blends */}
       {image && (
@@ -68,7 +93,7 @@ export function PageHeader({
           <span className="text-ink">{crumb}</span>
         </motion.nav>
 
-        <div className={image ? "mt-10 max-w-2xl" : "mt-8 grid gap-12 lg:grid-cols-[0.7fr_1.3fr] lg:items-center"}>
+        <div className={image || bgImage ? "mt-10 max-w-2xl" : "mt-8 grid gap-12 lg:grid-cols-[0.7fr_1.3fr] lg:items-center"}>
           <div className={logos || collage ? "lg:order-2" : undefined}>
             <h1 className="font-display text-[3rem] leading-[1.02] tracking-[-0.03em] sm:text-[4.5rem]">
               <span className="block overflow-hidden pb-[0.14em] -mb-[0.1em]">
@@ -91,8 +116,8 @@ export function PageHeader({
               {subtitle}
             </motion.p>
 
-            {/* when an image, logos, or collage are shown, stats sit under the copy as a row */}
-            {(image || logos || collage) && stats && (
+            {/* when an image, logos, collage, or bg-image are shown, stats sit under the copy as a row */}
+            {(image || logos || collage || bgImage) && stats && (
               <motion.dl
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -110,7 +135,7 @@ export function PageHeader({
           </div>
 
           {/* brand-logo cards */}
-          {!image && logos && (
+          {!image && !bgImage && logos && (
             <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:order-1">
               {BRANDS.map((b, i) => (
                 <motion.div
@@ -143,7 +168,7 @@ export function PageHeader({
           )}
 
           {/* photo collage */}
-          {!image && collage && collage.length >= 4 && (
+          {!image && !bgImage && collage && collage.length >= 4 && (
             <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:order-1">
               <div className="flex flex-col gap-3 sm:gap-4">
                 <CollageShot src={collage[0]} ratio="aspect-square" delay={0.25} />
@@ -156,7 +181,7 @@ export function PageHeader({
             </div>
           )}
 
-          {!image && !logos && !collage && stats && (
+          {!image && !bgImage && !logos && !collage && stats && (
             <motion.dl
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
