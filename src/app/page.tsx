@@ -7,7 +7,6 @@ import { Noteworthy } from "@/components/site/Noteworthy";
 import { CoolingSolutions } from "@/components/site/CoolingSolutions";
 import { ClimateExpertise } from "@/components/site/ClimateExpertise";
 import { BrandShowcase } from "@/components/site/BrandShowcase";
-import { Process } from "@/components/site/Process";
 import { TrustBento } from "@/components/site/TrustBento";
 import { Emergency } from "@/components/site/Emergency";
 import { Plans } from "@/components/site/Plans";
@@ -30,7 +29,6 @@ export default function Home() {
         <CoolingSolutions />
         <ClimateExpertise />
         <BrandShowcase />
-        <Process />
         <TrustBento />
         <Emergency />
         <Plans />
