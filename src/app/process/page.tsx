@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SiteNav } from "@/components/site/SiteNav";
 import { PageHeader } from "@/components/site/PageHeader";
 import { Process } from "@/components/site/Process";
+import { WorkGallery } from "@/components/site/WorkGallery";
 import { Guarantees } from "@/components/site/Guarantees";
 import { TrustBento } from "@/components/site/TrustBento";
 import { Contact } from "@/components/site/Contact";
@@ -29,6 +30,7 @@ export default function ProcessPage() {
           ]}
         />
         <Process />
+        <WorkGallery />
         <Guarantees />
         <TrustBento />
         <Contact />

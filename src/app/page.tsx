@@ -4,7 +4,6 @@ import { TrustStrip } from "@/components/site/TrustStrip";
 import { MostBooked } from "@/components/site/MostBooked";
 import { Spotlight } from "@/components/site/Spotlight";
 import { Noteworthy } from "@/components/site/Noteworthy";
-import { WorkGallery } from "@/components/site/WorkGallery";
 import { BrandShowcase } from "@/components/site/BrandShowcase";
 import { Process } from "@/components/site/Process";
 import { TrustBento } from "@/components/site/TrustBento";
@@ -26,7 +25,6 @@ export default function Home() {
         <MostBooked />
         <Spotlight />
         <Noteworthy />
-        <WorkGallery />
         <BrandShowcase />
         <Process />
         <TrustBento />
