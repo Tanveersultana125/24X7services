@@ -11,11 +11,13 @@ export function PageHeader({
   title,
   subtitle,
   stats,
+  image,
 }: {
   crumb: string;
   title: React.ReactNode;
   subtitle: string;
   stats?: { value: string; label: string }[];
+  image?: string;
 }) {
   return (
     <header className="relative overflow-hidden border-b border-hairline pt-36 pb-16 sm:pt-40 sm:pb-20">
@@ -56,22 +58,58 @@ export function PageHeader({
             >
               {subtitle}
             </motion.p>
+
+            {/* when an image is shown, stats sit under the copy as a row */}
+            {image && stats && (
+              <motion.dl
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.35, ease }}
+                className="mt-10 flex flex-wrap gap-x-10 gap-y-4"
+              >
+                {stats.map((s) => (
+                  <div key={s.label}>
+                    <dt className="font-display text-3xl tracking-tight sm:text-4xl">{s.value}</dt>
+                    <dd className="mt-1 text-xs text-muted">{s.label}</dd>
+                  </div>
+                ))}
+              </motion.dl>
+            )}
           </div>
 
-          {stats && (
-            <motion.dl
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.35, ease }}
-              className="grid grid-cols-3 gap-6 lg:justify-items-end"
+          {image ? (
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 1, delay: 0.3, ease }}
+              className="relative flex justify-center lg:justify-end"
             >
-              {stats.map((s) => (
-                <div key={s.label} className="lg:text-right">
-                  <dt className="font-display text-3xl tracking-tight sm:text-4xl">{s.value}</dt>
-                  <dd className="mt-1 text-xs text-muted">{s.label}</dd>
-                </div>
-              ))}
-            </motion.dl>
+              <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+                <div className="absolute left-1/2 top-1/2 size-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-royal-bright/15 blur-[90px]" />
+              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={image}
+                alt="24X7 certified service technician"
+                className="max-h-[22rem] w-auto drop-shadow-[0_24px_50px_rgba(0,0,0,0.25)]"
+              />
+            </motion.div>
+          ) : (
+            stats && (
+              <motion.dl
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.35, ease }}
+                className="grid grid-cols-3 gap-6 lg:justify-items-end"
+              >
+                {stats.map((s) => (
+                  <div key={s.label} className="lg:text-right">
+                    <dt className="font-display text-3xl tracking-tight sm:text-4xl">{s.value}</dt>
+                    <dd className="mt-1 text-xs text-muted">{s.label}</dd>
+                  </div>
+                ))}
+              </motion.dl>
+            )
           )}
         </div>
       </div>
