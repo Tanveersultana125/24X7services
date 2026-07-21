@@ -67,8 +67,8 @@ export function Process() {
               <div className="relative flex-1 overflow-hidden rounded-2xl border border-white/70 bg-gradient-to-b from-white to-surface p-6 shadow-[0_16px_36px_-18px_rgba(23,21,15,0.2),inset_0_1.5px_0_rgba(255,255,255,0.92),inset_0_-14px_26px_-20px_rgba(23,21,15,0.1)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_30px_54px_-22px_rgba(23,21,15,0.3),inset_0_1.5px_0_rgba(255,255,255,0.95)] sm:p-7">
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute -right-1 -top-3 font-display text-6xl font-medium sm:text-7xl"
-                  style={{ color: `${s.tint}14` }}
+                  className="pointer-events-none absolute right-5 top-4 font-display text-5xl font-bold leading-none sm:text-6xl"
+                  style={{ color: `${s.tint}18` }}
                 >
                   {s.n}
                 </span>
