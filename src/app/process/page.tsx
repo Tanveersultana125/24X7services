@@ -28,6 +28,7 @@ export default function ProcessPage() {
             { value: "< 90m", label: "Avg. arrival" },
             { value: "24×7", label: "Availability" },
           ]}
+          image="/work/ac-hero.png"
         />
         <Process />
         <WorkGallery />
