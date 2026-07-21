@@ -18,7 +18,7 @@ function Card({ i, className, children }: { i: number; className?: string; child
       initial="hidden"
       whileInView="show"
       viewport={{ once: true, margin: "-60px" }}
-      className={cn("relative overflow-hidden rounded-[1.75rem]", className)}
+      className={cn("group relative overflow-hidden rounded-[1.75rem] transition-all duration-500 hover:-translate-y-1.5", className)}
     >
       {children}
     </motion.div>
@@ -40,7 +40,7 @@ export function TrustBento() {
 
         <div className="mt-14 grid auto-rows-[minmax(11rem,auto)] grid-cols-2 gap-4 lg:grid-cols-4">
           {/* A — hero warranty (dark royal) */}
-          <Card i={0} className="col-span-2 row-span-2 bg-royal p-9 text-white lg:row-span-2">
+          <Card i={0} className="col-span-2 row-span-2 bg-gradient-to-br from-royal-bright to-royal p-9 text-white shadow-[0_32px_60px_-24px_rgba(37,71,208,0.55),inset_0_1.5px_0_rgba(255,255,255,0.15)] lg:row-span-2">
             <div className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-royal-bright/40 blur-3xl" />
             <div className="relative flex h-full flex-col justify-between">
               <ShieldCheck className="size-8 text-white/90" strokeWidth={1.5} />
@@ -58,7 +58,7 @@ export function TrustBento() {
           </Card>
 
           {/* B — verified technicians */}
-          <Card i={1} className="col-span-2 border border-border bg-surface p-8">
+          <Card i={1} className="col-span-2 border border-white/70 bg-gradient-to-b from-white to-surface shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_rgba(255,255,255,0.9)] hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)] p-8">
             <div className="flex h-full flex-col justify-between">
               <div className="flex items-center justify-between">
                 <BadgeCheck className="size-7 text-emerald" strokeWidth={1.6} />
@@ -82,7 +82,7 @@ export function TrustBento() {
           </Card>
 
           {/* C — genuine parts (emerald) */}
-          <Card i={2} className="border border-emerald/20 bg-emerald/8 p-7">
+          <Card i={2} className="border border-emerald/25 bg-gradient-to-b from-emerald/12 to-emerald/[0.04] p-7 shadow-[0_16px_36px_-18px_rgba(11,154,99,0.22)] hover:shadow-[0_30px_54px_-22px_rgba(11,154,99,0.3)]">
             <div className="flex h-full flex-col justify-between">
               <Package className="size-7 text-emerald" strokeWidth={1.6} />
               <div>
@@ -93,7 +93,7 @@ export function TrustBento() {
           </Card>
 
           {/* D — rating */}
-          <Card i={3} className="border border-border bg-surface p-7">
+          <Card i={3} className="border border-white/70 bg-gradient-to-b from-white to-surface shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_rgba(255,255,255,0.9)] hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)] p-7">
             <div className="flex h-full flex-col justify-between">
               <div className="flex gap-0.5">
                 {Array.from({ length: 5 }).map((_, i) => (
@@ -108,7 +108,7 @@ export function TrustBento() {
           </Card>
 
           {/* E — 24/7 support (glass, live) */}
-          <Card i={4} className="col-span-2 border border-border bg-surface p-8">
+          <Card i={4} className="col-span-2 border border-white/70 bg-gradient-to-b from-white to-surface shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_rgba(255,255,255,0.9)] hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)] p-8">
             <div className="flex h-full items-center gap-6">
               <div className="relative grid size-16 shrink-0 place-items-center rounded-2xl bg-ink text-background">
                 <Headset className="size-7" strokeWidth={1.5} />
@@ -125,7 +125,7 @@ export function TrustBento() {
           </Card>
 
           {/* F — same-day */}
-          <Card i={5} className="col-span-2 border border-border bg-gradient-to-br from-surface to-surface-2 p-8">
+          <Card i={5} className="col-span-2 border border-white/70 bg-gradient-to-br from-white to-surface-2 p-8 shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_rgba(255,255,255,0.9)] hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)]">
             <div className="flex h-full items-center gap-6">
               <div className="grid size-16 shrink-0 place-items-center rounded-2xl bg-amber/12 text-amber">
                 <Wrench className="size-7" strokeWidth={1.5} />
