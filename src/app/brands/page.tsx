@@ -26,6 +26,7 @@ export default function BrandsPage() {
             { value: "100%", label: "Genuine parts" },
             { value: "12k+", label: "Certified pros" },
           ]}
+          image="/work/ac-hero.png"
         />
         <BrandShowcase />
         <BrandsDetail />
