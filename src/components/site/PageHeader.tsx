@@ -43,7 +43,7 @@ export function PageHeader({
             transition={{ duration: 1.1, delay: 0.2, ease }}
             src={image}
             alt="24X7 certified technician on the job"
-            className="pointer-events-none absolute right-[6%] top-[62%] hidden w-[52%] max-w-[46rem] -translate-y-1/2 [-webkit-mask-image:linear-gradient(to_right,transparent_0%,#000_36%)] [mask-image:linear-gradient(to_right,transparent_0%,#000_36%)] lg:block"
+            className="pointer-events-none absolute bottom-0 right-0 hidden w-[46%] max-w-[40rem] object-contain object-bottom [-webkit-mask-image:linear-gradient(to_right,transparent_0%,#000_38%)] [mask-image:linear-gradient(to_right,transparent_0%,#000_38%)] lg:block"
           />
         </>
       )}
