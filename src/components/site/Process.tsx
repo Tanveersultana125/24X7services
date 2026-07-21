@@ -7,10 +7,10 @@ import { MagneticButton } from "./MagneticButton";
 import { ArrowUpRight } from "lucide-react";
 
 const STEPS = [
-  { n: "01", icon: ScanSearch, title: "Describe it, or let AI diagnose", body: "Snap a photo or pick the symptom. Our model predicts the fault and the exact part before anyone knocks on your door." },
-  { n: "02", icon: CalendarClock, title: "Choose a time that suits you", body: "Same-day and next-day windows down to the hour. No 9-to-5 blocks, no waiting around, no vague promises." },
-  { n: "03", icon: Navigation, title: "Watch your expert arrive", body: "A certified, brand-authorised technician — police-verified — tracked live on the map with a real ETA." },
-  { n: "04", icon: ShieldCheck, title: "Fixed, invoiced, warrantied", body: "Genuine parts, a transparent digital invoice, and a 90-day warranty registered automatically. Done." },
+  { n: "01", icon: ScanSearch, tint: "#2547d0", title: "Describe it, or let AI diagnose", body: "Snap a photo or pick the symptom. Our model predicts the fault and the exact part before anyone knocks on your door." },
+  { n: "02", icon: CalendarClock, tint: "#0b9a63", title: "Choose a time that suits you", body: "Same-day and next-day windows down to the hour. No 9-to-5 blocks, no waiting around, no vague promises." },
+  { n: "03", icon: Navigation, tint: "#d9821b", title: "Watch your expert arrive", body: "A certified, brand-authorised technician — police-verified — tracked live on the map with a real ETA." },
+  { n: "04", icon: ShieldCheck, tint: "#2547d0", title: "Fixed, invoiced, warrantied", body: "Genuine parts, a transparent digital invoice, and a 90-day warranty registered automatically. Done." },
 ];
 
 export function Process() {
@@ -42,7 +42,8 @@ export function Process() {
 
         {/* Steps */}
         <ol className="relative lg:col-span-7">
-          <span className="absolute left-[27px] top-4 hidden h-[calc(100%-4rem)] w-px bg-border sm:block" />
+          {/* gradient timeline */}
+          <span className="absolute left-[27px] top-6 hidden h-[calc(100%-6rem)] w-0.5 rounded-full bg-gradient-to-b from-royal-bright/40 via-royal-bright/15 to-transparent sm:block" />
           {STEPS.map((s, i) => (
             <motion.li
               key={s.n}
@@ -50,17 +51,32 @@ export function Process() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.7, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
-              className="relative flex gap-6 pb-14 last:pb-0 sm:gap-10"
+              className="group relative flex gap-6 pb-6 last:pb-0 sm:gap-8"
             >
+              {/* colored icon node */}
               <div className="relative z-10 hidden sm:block">
-                <div className="grid size-14 place-items-center rounded-2xl border border-border bg-surface shadow-premium-sm">
-                  <s.icon className="size-6 text-royal-bright" strokeWidth={1.6} />
+                <div
+                  className="grid size-14 place-items-center rounded-2xl text-white shadow-[0_12px_22px_-6px_rgba(23,21,15,0.35),inset_0_1.5px_0_rgba(255,255,255,0.4)] transition-transform duration-500 group-hover:-translate-y-1 group-hover:scale-105"
+                  style={{ background: `linear-gradient(145deg, ${s.tint}, ${s.tint}cc)` }}
+                >
+                  <s.icon className="size-6" strokeWidth={1.7} />
                 </div>
               </div>
-              <div className="flex-1 border-b border-hairline pb-14 last:border-0">
-                <span className="font-display text-5xl text-border-strong sm:text-6xl">{s.n}</span>
-                <h3 className="mt-3 text-2xl font-semibold tracking-tight">{s.title}</h3>
-                <p className="mt-3 max-w-lg text-pretty leading-relaxed text-muted">{s.body}</p>
+
+              {/* 3D card */}
+              <div className="relative flex-1 overflow-hidden rounded-2xl border border-white/70 bg-gradient-to-b from-white to-surface p-6 shadow-[0_16px_36px_-18px_rgba(23,21,15,0.2),inset_0_1.5px_0_rgba(255,255,255,0.92),inset_0_-14px_26px_-20px_rgba(23,21,15,0.1)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_30px_54px_-22px_rgba(23,21,15,0.3),inset_0_1.5px_0_rgba(255,255,255,0.95)] sm:p-7">
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -right-1 -top-3 font-display text-6xl font-medium sm:text-7xl"
+                  style={{ color: `${s.tint}14` }}
+                >
+                  {s.n}
+                </span>
+                <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/60 to-transparent" />
+                <h3 className="relative text-xl font-semibold tracking-tight sm:text-2xl">{s.title}</h3>
+                <p className="relative mt-3 max-w-lg text-pretty leading-relaxed text-muted">{s.body}</p>
+                {/* accent rule */}
+                <span className="relative mt-5 block h-1 w-10 rounded-full transition-all duration-500 group-hover:w-16" style={{ background: s.tint }} />
               </div>
             </motion.li>
           ))}
