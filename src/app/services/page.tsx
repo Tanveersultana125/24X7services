@@ -26,7 +26,7 @@ export default function ServicesPage() {
             { value: "free", label: "Diagnosis" },
             { value: "90-day", label: "Warranty" },
           ]}
-          image="/work/technician.png"
+          image="/work/ac-service.png"
         />
         <ServicesIndex />
         <ServicesDetail />

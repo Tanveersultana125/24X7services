@@ -85,14 +85,16 @@ export function PageHeader({
               className="relative flex justify-center lg:justify-end"
             >
               <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-                <div className="absolute left-1/2 top-1/2 size-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-royal-bright/15 blur-[90px]" />
+                <div className="absolute left-1/2 top-1/2 size-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-royal-bright/15 blur-[90px]" />
               </div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={image}
-                alt="24X7 certified service technician"
-                className="max-h-[22rem] w-auto drop-shadow-[0_24px_50px_rgba(0,0,0,0.25)]"
-              />
+              <div className="w-full max-w-md overflow-hidden rounded-[1.5rem] border-[6px] border-white shadow-premium-xl">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={image}
+                  alt="24X7 certified technician on the job"
+                  className="h-64 w-full object-cover sm:h-80"
+                />
+              </div>
             </motion.div>
           ) : (
             stats && (
