@@ -17,17 +17,14 @@ export function Hero() {
     <section
       ref={ref}
       className="relative overflow-hidden pt-28 sm:pt-32"
-      style={{ background: "linear-gradient(100deg, #ffffff 0%, #eef2fd 40%, #3f53a0 60%, #2e3f82 100%)" }}
+      style={{ background: "var(--background)" }}
     >
       {/* dotted texture */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.06]"
-        style={{ backgroundImage: "radial-gradient(#ffffff 1px, transparent 1px)", backgroundSize: "22px 22px" }}
+        className="pointer-events-none absolute inset-0 opacity-[0.05]"
+        style={{ backgroundImage: "radial-gradient(currentColor 1px, transparent 1px)", backgroundSize: "22px 22px" }}
       />
-      {/* ambient glows */}
-      <div aria-hidden className="pointer-events-none absolute -right-40 -top-20 size-[38rem] rounded-full blur-[130px]" style={{ background: `${RED}33` }} />
-      <div aria-hidden className="pointer-events-none absolute -left-32 bottom-0 size-[30rem] rounded-full bg-royal-bright/15 blur-[130px]" />
       <div className="relative mx-auto max-w-[92rem] px-6 pb-40 sm:px-10 sm:pb-48">
         {/* eyebrow */}
         <motion.div
@@ -37,7 +34,7 @@ export function Hero() {
           className="flex items-center gap-3"
         >
           <span className="h-px w-8" style={{ background: RED }} />
-          <span className="text-[0.7rem] font-semibold uppercase tracking-[0.26em]" style={{ color: "#ff6b6b" }}>
+          <span className="text-[0.7rem] font-semibold uppercase tracking-[0.26em]" style={{ color: RED }}>
             Fast · Certified · 24×7
           </span>
         </motion.div>
@@ -48,7 +45,7 @@ export function Hero() {
             <h1 className="font-display text-[3.4rem] leading-[1.03] tracking-[-0.03em] sm:text-[5rem] lg:text-[6.2rem]">
               <Line delay={0.05}>Broken today.</Line>
               <Line delay={0.14}>
-                <span className="italic" style={{ color: "#ff5c5c" }}>Flawless</span>
+                <span className="italic" style={{ color: RED }}>Flawless</span>
               </Line>
               <Line delay={0.22}>by evening.</Line>
             </h1>
@@ -83,8 +80,8 @@ export function Hero() {
                 className="group inline-flex items-center gap-2 rounded-full border border-black/15 px-6 py-3.5 text-[0.95rem] font-medium text-ink transition-colors hover:bg-black/5"
               >
                 <span className="relative grid size-2 place-items-center">
-                  <span className="absolute size-2 animate-ping rounded-full" style={{ background: "#ff6b6b" }} />
-                  <span className="size-2 rounded-full" style={{ background: "#ff6b6b" }} />
+                  <span className="absolute size-2 animate-ping rounded-full" style={{ background: RED }} />
+                  <span className="size-2 rounded-full" style={{ background: RED }} />
                 </span>
                 Emergency repair
                 <span className="transition-transform group-hover:translate-x-0.5">→</span>
@@ -102,7 +99,7 @@ export function Hero() {
               <span className="hidden h-8 w-px bg-black/10 sm:block" />
               <Proof icon={<ShieldCheck className="size-4 text-emerald-bright" />} big="90 days" small="repair warranty" />
               <span className="hidden h-8 w-px bg-black/10 sm:block" />
-              <Proof icon={<Clock className="size-4" style={{ color: "#ff6b6b" }} />} big="< 90 min" small="avg. arrival" />
+              <Proof icon={<Clock className="size-4" style={{ color: RED }} />} big="< 90 min" small="avg. arrival" />
             </motion.div>
           </motion.div>
 
@@ -114,17 +111,16 @@ export function Hero() {
             className="relative flex justify-center self-stretch items-end lg:col-span-6 lg:justify-end"
           >
             <div className="relative w-full max-w-[34rem]">
-              {/* blue glow backdrop */}
+              {/* soft backdrop */}
               <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-                <div className="absolute left-1/2 top-1/2 size-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#6f8bff]/35 blur-[120px]" />
-                <div className="absolute bottom-10 left-1/2 size-72 -translate-x-1/2 rounded-full bg-white/10 blur-[90px]" />
+                <div className="absolute left-1/2 top-1/2 size-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/50 blur-[120px]" />
               </div>
 
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/work/technician.png"
                 alt="24X7 certified service technician"
-                className="w-full drop-shadow-[0_36px_70px_rgba(0,0,0,0.6)]"
+                className="w-full drop-shadow-[0_28px_50px_rgba(60,52,40,0.25)]"
               />
 
               {/* floating brand-authorised chip — near the pointing hand */}

@@ -22,6 +22,8 @@ export default function ReviewsPage() {
           crumb="Reviews"
           title="Customer Reviews"
           subtitle="Verified, unfiltered and earned one visit at a time — see exactly why three million homes rate us 4.9 out of 5."
+          bgImage="/work/ac-outdoor-service.png"
+          bgDark
           stats={[
             { value: "4.9", label: "Average rating" },
             { value: "128k", label: "Reviews" },
