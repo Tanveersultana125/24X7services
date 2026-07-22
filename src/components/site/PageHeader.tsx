@@ -35,7 +35,7 @@ export function PageHeader({
   return (
     <header
       className={
-        "relative overflow-hidden border-b border-hairline pt-36 pb-16 sm:pt-40 sm:pb-20" +
+        "relative overflow-hidden border-b border-hairline pt-32 pb-14 sm:pt-40 sm:pb-20" +
         (image ? " lg:min-h-[34rem]" : bgImage ? " lg:min-h-[26rem] lg:pb-14" : "")
       }
     >
@@ -65,6 +65,13 @@ export function PageHeader({
                 ? "linear-gradient(100deg, rgba(18,20,24,0.88) 0%, rgba(18,20,24,0.74) 34%, rgba(18,20,24,0.34) 60%, rgba(18,20,24,0.12) 100%)"
                 : "linear-gradient(100deg, rgba(245,243,238,0.95) 0%, rgba(245,243,238,0.82) 34%, rgba(245,243,238,0.35) 58%, rgba(245,243,238,0.05) 100%)",
             }}
+          />
+          {/* the scrim above fades left-to-right, which leaves nothing to read against on a
+              narrow screen — lay an even veil under the copy below lg */}
+          <div
+            aria-hidden
+            className="absolute inset-0 lg:hidden"
+            style={{ background: onDark ? "rgba(18,20,24,0.6)" : "rgba(245,243,238,0.74)" }}
           />
         </>
       )}
@@ -105,7 +112,7 @@ export function PageHeader({
 
         <div className={image || bgImage ? "mt-10 max-w-2xl" : "mt-8 grid gap-12 lg:grid-cols-[0.7fr_1.3fr] lg:items-center"}>
           <div className={logos || collage ? "lg:order-2" : undefined}>
-            <h1 className={"font-display text-[3rem] leading-[1.02] tracking-[-0.03em] sm:text-[4.5rem]" + (onDark ? " text-white" : "")}>
+            <h1 className={"font-display text-[2.5rem] leading-[1.04] tracking-[-0.03em] sm:text-[4.5rem]" + (onDark ? " text-white" : "")}>
               <span className="block overflow-hidden pb-[0.14em] -mb-[0.1em]">
                 <motion.span
                   className="block"
@@ -196,7 +203,7 @@ export function PageHeader({
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.35, ease }}
-              className="grid grid-cols-3 gap-6 lg:justify-items-end"
+              className="grid grid-cols-3 gap-x-4 gap-y-6 sm:gap-6 lg:justify-items-end"
             >
               {stats.map((s) => (
                 <div key={s.label} className="lg:text-right">

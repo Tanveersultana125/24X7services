@@ -46,7 +46,7 @@ export function TrustBento() {
               <ShieldCheck className="size-8 text-white/90" strokeWidth={1.5} />
               <div>
                 <div className="flex items-end gap-3">
-                  <span className="font-display text-[5.5rem] leading-[0.8] tracking-tighter">90</span>
+                  <span className="font-display text-[4rem] leading-[0.8] tracking-tighter sm:text-[5.5rem]">90</span>
                   <span className="mb-3 text-lg text-white/80">day warranty</span>
                 </div>
                 <p className="mt-5 max-w-sm text-pretty text-white/85">

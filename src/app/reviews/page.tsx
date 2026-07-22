@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/site/PageHeader";
 import { Reviews } from "@/components/site/Reviews";
 import { RatingBreakdown } from "@/components/site/RatingBreakdown";
 import { Stats } from "@/components/site/Stats";
+import { QuickEstimate } from "@/components/site/QuickEstimate";
 import { Contact } from "@/components/site/Contact";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
@@ -33,6 +34,7 @@ export default function ReviewsPage() {
         <RatingBreakdown />
         <Reviews />
         <Stats />
+        <QuickEstimate />
         <Contact />
       </main>
       <SiteFooter />

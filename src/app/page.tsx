@@ -10,7 +10,7 @@ import { BrandShowcase } from "@/components/site/BrandShowcase";
 import { TrustBento } from "@/components/site/TrustBento";
 import { Emergency } from "@/components/site/Emergency";
 import { Plans } from "@/components/site/Plans";
-import { Reviews } from "@/components/site/Reviews";
+import { Testimonials } from "@/components/site/Testimonials";
 import { Stats } from "@/components/site/Stats";
 import { Faq } from "@/components/site/Faq";
 import { Contact } from "@/components/site/Contact";
@@ -32,7 +32,7 @@ export default function Home() {
         <TrustBento />
         <Emergency />
         <Plans />
-        <Reviews />
+        <Testimonials />
         <Stats />
         <Faq />
         <Contact />

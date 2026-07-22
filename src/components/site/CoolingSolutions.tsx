@@ -20,7 +20,7 @@ export function CoolingSolutions() {
   const [open, setOpen] = useState(2);
 
   return (
-    <section className="relative py-20 sm:py-28">
+    <section className="relative py-12 sm:py-28">
       <div className="mx-auto grid max-w-[92rem] gap-12 px-6 sm:px-10 lg:grid-cols-2 lg:items-center lg:gap-16">
         {/* accordion */}
         <div>
@@ -87,7 +87,9 @@ export function CoolingSolutions() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.7, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute -bottom-6 left-4 rounded-2xl border border-white/70 bg-white/95 p-5 shadow-premium-xl backdrop-blur sm:left-8 sm:p-6"
+            /* on phones the card is nearly as wide as the photo, so it hid the whole scene —
+               keep it in flow there and only float it once there is room to overlap */
+            className="relative mt-4 rounded-2xl border border-white/70 bg-white/95 p-5 shadow-premium-xl backdrop-blur sm:absolute sm:-bottom-6 sm:left-8 sm:mt-0 sm:p-6"
           >
             <ul className="space-y-2.5">
               {PERKS.map((p) => (

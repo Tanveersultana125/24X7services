@@ -25,7 +25,7 @@ export function Hero() {
         className="pointer-events-none absolute inset-0 opacity-[0.05]"
         style={{ backgroundImage: "radial-gradient(currentColor 1px, transparent 1px)", backgroundSize: "22px 22px" }}
       />
-      <div className="relative mx-auto max-w-[92rem] px-6 pb-40 sm:px-10 sm:pb-48">
+      <div className="relative mx-auto max-w-[92rem] px-6 pb-12 sm:px-10 sm:pb-48">
         {/* eyebrow */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -39,37 +39,44 @@ export function Hero() {
           </span>
         </motion.div>
 
-        <div className="mt-8 grid grid-cols-1 items-center gap-6 lg:grid-cols-12">
-          {/* Headline */}
-          <motion.div style={{ y: yType }} className="relative z-10 lg:col-span-6">
-            <h1 className="font-display text-[3.4rem] leading-[1.03] tracking-[-0.03em] sm:text-[5rem] lg:text-[6.2rem]">
+        <div className="mt-6 grid grid-cols-12 items-end gap-x-4 gap-y-5 sm:mt-8 sm:gap-y-7 lg:grid-rows-[auto_auto_1fr] lg:items-start lg:gap-y-0">
+          {/* Headline — sits beside the technician on every screen */}
+          <motion.div
+            style={{ y: yType }}
+            className="relative z-10 col-span-7 self-start lg:col-span-6 lg:row-start-1"
+          >
+            <h1 className="font-display text-[1.75rem] leading-[1.06] tracking-[-0.03em] sm:text-[3.2rem] md:text-[4rem] lg:text-[6.2rem]">
               <Line delay={0.05}>Broken today.</Line>
               <Line delay={0.14}>
                 <span className="italic" style={{ color: RED }}>Flawless</span>
               </Line>
               <Line delay={0.22}>by evening.</Line>
             </h1>
+          </motion.div>
 
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.5, ease }}
-              className="mt-8 max-w-md text-pretty text-lg leading-relaxed text-muted"
-            >
-              Certified doorstep repair, installation and maintenance for Samsung, LG,
-              IFB &amp; Bosch — genuine parts, a 90-day warranty, and a technician you can
-              actually track.
-            </motion.p>
+          {/* Supporting copy — still beside the technician, under the headline */}
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5, ease }}
+            className="col-span-7 col-start-1 row-start-2 max-w-md self-start text-pretty text-[0.875rem] leading-relaxed text-muted sm:text-base lg:col-span-6 lg:mt-8 lg:text-lg"
+          >
+            Certified doorstep repair, installation and maintenance for Samsung, LG,
+            IFB &amp; Bosch — genuine parts, a 90-day warranty, and a technician you can
+            actually track.
+          </motion.p>
 
+          {/* CTAs and proof — full width below the technician */}
+          <div className="col-span-12 col-start-1 row-start-3 lg:col-span-6 lg:self-start">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.62, ease }}
-              className="mt-10 flex flex-wrap items-center gap-3"
+              className="flex flex-wrap items-center gap-2.5 sm:gap-3 lg:mt-10"
             >
               <Link
                 href="/book"
-                className="group inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-[0.95rem] font-semibold text-white shadow-lg transition-transform hover:scale-[1.03]"
+                className="group inline-flex items-center gap-2 rounded-full px-5 py-3 text-[0.875rem] font-semibold text-white shadow-lg transition-transform hover:scale-[1.03] sm:px-6 sm:py-3.5 sm:text-[0.95rem]"
                 style={{ background: RED, boxShadow: `0 16px 40px -12px ${RED}99` }}
               >
                 Book a service
@@ -77,7 +84,7 @@ export function Hero() {
               </Link>
               <Link
                 href="/book?emergency=1"
-                className="group inline-flex items-center gap-2 rounded-full border border-black/15 px-6 py-3.5 text-[0.95rem] font-medium text-ink transition-colors hover:bg-black/5"
+                className="group inline-flex items-center gap-2 rounded-full border border-black/15 px-5 py-3 text-[0.875rem] font-medium text-ink transition-colors hover:bg-black/5 sm:px-6 sm:py-3.5 sm:text-[0.95rem]"
               >
                 <span className="relative grid size-2 place-items-center">
                   <span className="absolute size-2 animate-ping rounded-full" style={{ background: RED }} />
@@ -93,7 +100,7 @@ export function Hero() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
-              className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-4"
+              className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 sm:mt-12 sm:gap-x-8 sm:gap-y-4"
             >
               <Proof icon={<Star className="size-4 fill-amber text-amber" />} big="4.9/5" small="128k reviews" />
               <span className="hidden h-8 w-px bg-black/10 sm:block" />
@@ -101,16 +108,18 @@ export function Hero() {
               <span className="hidden h-8 w-px bg-black/10 sm:block" />
               <Proof icon={<Clock className="size-4" style={{ color: RED }} />} big="< 90 min" small="avg. arrival" />
             </motion.div>
-          </motion.div>
+          </div>
 
           {/* Technician cutout — points toward the headline */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, delay: 0.3, ease }}
-            className="relative flex justify-center self-stretch items-end lg:col-span-6 lg:justify-end"
+            className="relative col-span-5 col-start-8 row-span-2 row-start-1 flex items-end justify-center self-end lg:col-span-6 lg:col-start-7 lg:row-span-3 lg:justify-end lg:self-stretch"
           >
-            <div className="relative w-full max-w-[34rem]">
+            {/* on phones the cutout runs a little wider than its column so the technician
+                reads at a confident size instead of a small floating figure */}
+            <div className="relative -mr-[8%] w-[150%] max-w-none sm:mr-0 sm:w-full sm:max-w-[34rem]">
               {/* soft backdrop */}
               <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
                 <div className="absolute left-1/2 top-1/2 size-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/50 blur-[120px]" />
@@ -127,7 +136,7 @@ export function Hero() {
               <motion.div
                 animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -left-4 top-20 flex items-center gap-2 rounded-full bg-white/95 px-3.5 py-2 shadow-premium-lg backdrop-blur sm:-left-10"
+                className="absolute -left-4 top-20 hidden items-center gap-2 rounded-full bg-white/95 px-3.5 py-2 shadow-premium-lg backdrop-blur sm:-left-10 sm:flex"
               >
                 <ShieldCheck className="size-4 text-emerald" />
                 <span className="text-xs font-semibold text-ink">Brand-authorised pro</span>
@@ -137,7 +146,7 @@ export function Hero() {
               <motion.div
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute -left-6 bottom-24 rounded-2xl border border-white/70 bg-white px-4 py-3 shadow-premium-xl sm:-left-12"
+                className="absolute -left-6 bottom-24 hidden rounded-2xl border border-white/70 bg-white px-4 py-3 shadow-premium-xl sm:-left-12 sm:block"
               >
                 <div className="flex items-center gap-2">
                   <span className="relative flex size-2.5">
@@ -173,11 +182,11 @@ function Line({ children, delay }: { children: React.ReactNode; delay: number })
 
 function Proof({ icon, big, small }: { icon: React.ReactNode; big: string; small: string }) {
   return (
-    <div className="flex items-center gap-2.5">
+    <div className="flex items-center gap-2 sm:gap-2.5">
       {icon}
       <div className="leading-none">
-        <p className="text-base font-semibold text-ink">{big}</p>
-        <p className="mt-1 text-xs text-muted">{small}</p>
+        <p className="text-sm font-semibold text-ink sm:text-base">{big}</p>
+        <p className="mt-1 text-[0.65rem] text-muted sm:text-xs">{small}</p>
       </div>
     </div>
   );
