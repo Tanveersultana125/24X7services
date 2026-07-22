@@ -78,8 +78,10 @@ export function CoolingSolutions() {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="overflow-hidden rounded-[2rem] border border-white/70 shadow-premium-xl"
           >
+            {/* squarer crop on phones so the floating card covers a similar share of the
+                frame as it does on desktop */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/work/family-ac.png" alt="A family enjoying cool comfort at home" className="aspect-[4/3] w-full object-cover" />
+            <img src="/work/family-ac.png" alt="A family enjoying cool comfort at home" className="aspect-square w-full object-cover sm:aspect-[4/3]" />
           </motion.div>
 
           <motion.div
@@ -87,15 +89,13 @@ export function CoolingSolutions() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.7, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            /* on phones the card is nearly as wide as the photo, so it hid the whole scene —
-               keep it in flow there and only float it once there is room to overlap */
-            className="relative mt-4 rounded-2xl border border-white/70 bg-white/95 p-5 shadow-premium-xl backdrop-blur sm:absolute sm:-bottom-6 sm:left-8 sm:mt-0 sm:p-6"
+            className="absolute bottom-4 left-3 w-[82%] rounded-2xl border border-white/70 bg-white/95 p-4 shadow-premium-xl backdrop-blur sm:-bottom-6 sm:left-8 sm:w-auto sm:p-6"
           >
-            <ul className="space-y-2.5">
+            <ul className="space-y-2 sm:space-y-2.5">
               {PERKS.map((p) => (
-                <li key={p} className="flex items-center gap-2.5 text-sm font-medium text-ink">
-                  <span className="grid size-6 place-items-center rounded-full bg-emerald/12 text-emerald">
-                    <BadgeCheck className="size-3.5" />
+                <li key={p} className="flex items-center gap-2.5 text-[0.78rem] font-medium text-ink sm:text-sm">
+                  <span className="grid size-5 shrink-0 place-items-center rounded-full bg-emerald/12 text-emerald sm:size-6">
+                    <BadgeCheck className="size-3 sm:size-3.5" />
                   </span>
                   {p}
                 </li>
