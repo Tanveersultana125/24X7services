@@ -110,13 +110,13 @@ export function Contact() {
                 <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </Link>
 
-              {/* shield mark, tucked beside the copy once there is room */}
+              {/* shield mark, sitting beside the headline where the column is empty */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/work/promise-shield-cut.png"
                 alt=""
                 aria-hidden
-                className="pointer-events-none absolute -bottom-4 right-0 hidden w-52 opacity-90 xl:block"
+                className="pointer-events-none absolute right-0 top-10 hidden w-44 opacity-95 lg:block xl:top-8 xl:w-56"
               />
             </motion.div>
 
