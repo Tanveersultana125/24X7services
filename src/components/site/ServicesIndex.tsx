@@ -97,22 +97,36 @@ function Preview({ svc }: { svc: Service }) {
     <div className="relative">
       {/* photo band — the service's own work, fading into the card surface */}
       <div className="relative h-40 w-full overflow-hidden sm:h-52">
-        {/* each shot frames its subject differently, so the crop point is per service */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={svc.image}
-          alt={svc.title}
-          style={{ objectPosition: svc.imagePos }}
-          className="size-full object-cover transition-transform duration-[1.4s] ease-out"
-        />
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(to bottom, rgba(23,21,15,0.18) 0%, rgba(23,21,15,0.04) 40%, var(--surface) 100%)",
-          }}
-        />
+        {svc.image ? (
+          <>
+            {/* each shot frames its subject differently, so the crop point is per service */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={svc.image}
+              alt={svc.title}
+              style={{ objectPosition: svc.imagePos }}
+              className="size-full object-cover transition-transform duration-[1.4s] ease-out"
+            />
+            <div
+              aria-hidden
+              className="absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(to bottom, rgba(23,21,15,0.18) 0%, rgba(23,21,15,0.04) 40%, var(--surface) 100%)",
+              }}
+            />
+          </>
+        ) : (
+          // no photo on file yet — an accent header reads as deliberate, a wrong photo does not
+          <div
+            aria-hidden
+            className="size-full"
+            style={{
+              background:
+                "radial-gradient(120% 120% at 20% 0%, rgba(37,71,208,0.22), transparent 60%), radial-gradient(100% 100% at 90% 10%, rgba(11,154,99,0.16), transparent 62%), linear-gradient(to bottom, var(--surface-2), var(--surface))",
+            }}
+          />
+        )}
         <span className="absolute right-5 top-5 rounded-full bg-white/90 px-3 py-1 text-xs font-medium uppercase tracking-wider text-ink backdrop-blur">
           {svc.kind}
         </span>

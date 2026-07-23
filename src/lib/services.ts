@@ -10,10 +10,10 @@ export interface Service {
   price: string;
   eta: string;
   tags: string[];
-  /** Background photo for the service preview card. */
-  image: string;
+  /** Background photo for the service preview card. Omit to fall back to the accent header. */
+  image?: string;
   /** object-position for that photo — each shot frames its subject differently. */
-  imagePos: string;
+  imagePos?: string;
 }
 
 /** The eight premium services, presented as an editorial index. */
@@ -36,7 +36,7 @@ export const SERVICES: Service[] = [
   {
     no: "04", id: "oven", title: "Oven Repair", kind: "repair", appliance: "oven",
     desc: "Heating elements, thermostats, fans and smart panels calibrated to perfection.",
-    price: "from ₹249", eta: "40–75 min", tags: ["Thermostat", "Element", "Fan"], image: "/work/gallery/microwave-2.png", imagePos: "60% 42%",
+    price: "from ₹249", eta: "40–75 min", tags: ["Thermostat", "Element", "Fan"],
   },
   {
     no: "05", id: "installation", title: "Installation", kind: "care",
