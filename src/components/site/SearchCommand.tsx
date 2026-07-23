@@ -76,12 +76,11 @@ export function SearchTrigger({ variant = "pill" }: { variant?: "pill" | "icon" 
       {variant === "pill" ? (
         <button
           onClick={() => setOpen(true)}
-          className="group hidden items-center gap-2 rounded-full border border-border-strong/60 bg-surface/50 py-2 pl-3.5 pr-2 text-sm text-muted transition-colors hover:border-ink/30 hover:text-ink xl:inline-flex"
+          className="group hidden items-center gap-2 rounded-full border border-border-strong/60 bg-surface/50 px-4 py-2 text-sm text-muted transition-colors hover:border-ink/30 hover:text-ink xl:inline-flex"
           aria-label="Search"
         >
           <Search className="size-4" />
-          <span className="pr-6">Search services…</span>
-          <kbd className="rounded-md border border-border bg-background px-1.5 py-0.5 font-mono text-[0.65rem] text-muted-2">⌘K</kbd>
+          <span className="pr-2">Search services…</span>
         </button>
       ) : (
         <button
