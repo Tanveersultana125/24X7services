@@ -189,19 +189,23 @@ export function ServicesDetail() {
                   before you confirm.
                 </p>
 
-                <div className="mt-7 flex flex-wrap items-center gap-x-8 gap-y-5">
+                <div className="mt-7 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-center sm:gap-x-8 sm:gap-y-5">
                   {PRICING_PROOF.map((p, i) => (
-                    <div key={p.title} className="flex items-center gap-3">
+                    <div key={p.title} className="flex items-center gap-2.5 sm:gap-3">
                       {i > 0 && <span aria-hidden className="mr-5 hidden h-10 w-px bg-hairline sm:block" />}
                       <span
-                        className="grid size-11 shrink-0 place-items-center rounded-xl"
+                        className="grid size-9 shrink-0 place-items-center rounded-lg sm:size-11 sm:rounded-xl"
                         style={{ background: `${p.tint}16`, color: p.tint }}
                       >
-                        <p.icon className="size-5" strokeWidth={1.8} />
+                        <p.icon className="size-[1.05rem] sm:size-5" strokeWidth={1.8} />
                       </span>
-                      <span className="leading-none">
-                        <span className="block text-[0.88rem] font-semibold tracking-tight">{p.title}</span>
-                        <span className="mt-1.5 block text-[0.76rem] text-muted">{p.desc}</span>
+                      <span className="min-w-0 leading-none">
+                        <span className="block text-[0.76rem] font-semibold leading-tight tracking-tight sm:text-[0.88rem]">
+                          {p.title}
+                        </span>
+                        <span className="mt-1.5 block text-[0.66rem] leading-snug text-muted sm:text-[0.76rem]">
+                          {p.desc}
+                        </span>
                       </span>
                     </div>
                   ))}
