@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, BadgeCheck } from "lucide-react";
+import { ArrowUpRight, BadgeCheck, ChevronDown } from "lucide-react";
 import { Kicker } from "./TextReveal";
 import { BrandMark } from "@/components/ui/Icons";
 import { BRANDS } from "@/lib/data";
@@ -18,6 +18,8 @@ const DETAIL: Record<string, { services: string[]; note: string }> = {
 
 export function BrandShowcase() {
   const [active, setActive] = useState<number | null>(null);
+  // separate from `active`, which the desktop panels drive on hover
+  const [tapped, setTapped] = useState<number | null>(0);
 
   return (
     <section id="brands" className="relative scroll-mt-28 py-28 sm:py-36">
@@ -136,23 +138,96 @@ export function BrandShowcase() {
           })}
         </div>
 
-        {/* Mobile: stacked cards */}
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:hidden">
-          {BRANDS.map((b, i) => (
-            <Link
-              key={b.id}
-              href={`/book?brand=${b.id}`}
-              className="relative overflow-hidden rounded-3xl p-7 text-white"
-              style={{ background: `linear-gradient(150deg, ${b.accent}, ${shade(b.accent)})` }}
-            >
-              <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/70">{`0${i + 1}`}</span>
-              <div className="mt-8">
-                <BrandMark id={b.id} tone="white" className="text-3xl" />
+        {/* Mobile: tap to expand — the same reveal the desktop panels give on hover */}
+        <div className="mt-10 grid gap-3 lg:hidden">
+          {BRANDS.map((b, i) => {
+            const open = tapped === i;
+            const d = DETAIL[b.id];
+            return (
+              <div
+                key={b.id}
+                className={cn(
+                  "overflow-hidden rounded-[1.5rem] border transition-colors duration-500",
+                  open ? "border-transparent" : "border-white/60"
+                )}
+                style={
+                  open
+                    ? {
+                        background: `linear-gradient(150deg, ${b.accent}, ${shade(b.accent)})`,
+                        boxShadow: `0 24px 48px -20px ${rgba(b.accent, 0.5)}, var(--shadow-lg)`,
+                      }
+                    : {
+                        background: `
+                          radial-gradient(135% 90% at 50% -12%, ${rgba(b.accent, 0.16)}, transparent 58%),
+                          linear-gradient(180deg, #ffffff, var(--surface))
+                        `,
+                        boxShadow:
+                          "var(--shadow-lg), inset 0 1.5px 0 rgba(255,255,255,0.95), inset 0 -20px 34px -22px rgba(23,21,15,0.16)",
+                      }
+                }
+              >
+                <button
+                  onClick={() => setTapped(open ? null : i)}
+                  aria-expanded={open}
+                  className="flex w-full items-center gap-4 px-5 py-5 text-left"
+                >
+                  <span
+                    className={cn(
+                      "text-[0.68rem] font-medium uppercase tracking-[0.2em] transition-colors",
+                      open ? "text-white/70" : "text-muted"
+                    )}
+                  >
+                    {`0${i + 1}`}
+                  </span>
+                  <span className="flex flex-1 items-center">
+                    <BrandMark id={b.id} tone={open ? "white" : "brand"} className="text-lg" />
+                  </span>
+                  <BadgeCheck className={cn("size-5 transition-colors", open ? "text-white" : "text-emerald")} />
+                  <ChevronDown
+                    className={cn(
+                      "size-5 shrink-0 transition-all duration-500",
+                      open ? "rotate-180 text-white/80" : "text-muted"
+                    )}
+                  />
+                </button>
+
+                <AnimatePresence initial={false}>
+                  {open && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-5 pb-6">
+                        <p className="text-[0.88rem] text-white/85">{d.note}</p>
+
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          {d.services.map((s) => (
+                            <span
+                              key={s}
+                              className="rounded-full bg-white/15 px-3 py-1.5 text-[0.75rem] text-white backdrop-blur"
+                            >
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+
+                        <Link
+                          href={`/book?brand=${b.id}`}
+                          className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-[0.82rem] font-medium text-ink"
+                        >
+                          Book {b.name} service
+                          <ArrowUpRight className="size-4" />
+                        </Link>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-              <p className="mt-2 text-sm text-white/80">{DETAIL[b.id].note}</p>
-              <ArrowUpRight className="absolute right-6 top-6 size-5" />
-            </Link>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
