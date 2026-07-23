@@ -11,9 +11,6 @@ import {
   Clock,
   PackageCheck,
   Star,
-  Users,
-  Wrench,
-  MapPin,
   MessageSquareText,
   Mail,
   ArrowUpRight,
@@ -45,13 +42,6 @@ const PROMISES = [
   { icon: UserRoundCheck, title: "Certified Technicians", desc: "Trained, verified & background checked" },
   { icon: Clock, title: "24/7 Support", desc: "We're available anytime, anywhere" },
   { icon: PackageCheck, title: "Genuine Parts", desc: "100% original parts from trusted brands" },
-];
-
-const STATS = [
-  { icon: Users, value: "100K+", label: "Happy Customers" },
-  { icon: Wrench, value: "500+", label: "Expert Technicians" },
-  { icon: MapPin, value: "25+", label: "Cities Covered" },
-  { icon: ShieldCheck, value: "4.9 ★", label: "Average Rating" },
 ];
 
 export function Faq() {
@@ -270,26 +260,6 @@ export function Faq() {
           </ul>
         </div>
 
-        {/* ---------- stats bar ---------- */}
-        <motion.dl
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, ease }}
-          className="relative z-10 mt-16 grid grid-cols-2 gap-y-6 rounded-[1.5rem] xl:mt-28 border border-border bg-surface px-6 py-7 shadow-premium-md sm:rounded-[1.75rem] sm:px-10 lg:grid-cols-4 lg:divide-x lg:divide-hairline"
-        >
-          {STATS.map((s) => (
-            <div key={s.label} className="flex items-center gap-3.5 lg:justify-center">
-              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-royal-bright text-white shadow-premium-sm">
-                <s.icon className="size-5" strokeWidth={1.8} />
-              </span>
-              <div className="leading-none">
-                <dt className="font-display text-2xl tracking-tight sm:text-[1.6rem]">{s.value}</dt>
-                <dd className="mt-1.5 text-[0.72rem] text-muted">{s.label}</dd>
-              </div>
-            </div>
-          ))}
-        </motion.dl>
       </div>
 
       {/* floating reassurance card over the photo */}
@@ -298,7 +268,7 @@ export function Faq() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7, delay: 0.2, ease }}
-        className="absolute bottom-[17rem] right-8 hidden w-[17rem] rounded-2xl border border-border bg-surface p-5 shadow-premium-xl xl:block"
+        className="absolute bottom-20 right-8 hidden w-[17rem] rounded-2xl border border-border bg-surface p-5 shadow-premium-xl xl:block"
       >
         <div className="flex items-start gap-3">
           <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-royal-bright/10 text-royal-bright">
