@@ -275,17 +275,17 @@ export function ServicesDetail() {
               transition={{ duration: 0.35 }}
               className="mt-4 overflow-hidden rounded-[1.75rem] border border-white/70 bg-white shadow-premium-md"
             >
-              <div className="relative flex min-h-[7.5rem] items-center gap-4 overflow-hidden border-b border-hairline p-6 sm:min-h-[9.5rem]">
-                <ApplianceTile id={appliance.id} size="lg" />
-                <div className="relative">
-                  <h3 className="font-display text-2xl tracking-tight">{appliance.name}</h3>
-                  <p className="text-sm text-muted">{appliance.blurb}</p>
+              <div className="relative flex min-h-[8.5rem] items-center gap-3 overflow-hidden border-b border-hairline p-5 sm:min-h-[9.5rem] sm:gap-4 sm:p-6">
+                <ApplianceTile id={appliance.id} size="lg" className="size-12 shrink-0 sm:size-16" />
+                <div className="relative max-w-[58%] sm:max-w-none">
+                  <h3 className="font-display text-xl tracking-tight sm:text-2xl">{appliance.name}</h3>
+                  <p className="mt-1 text-[0.78rem] leading-snug text-muted sm:mt-0 sm:text-sm">{appliance.blurb}</p>
                 </div>
                 {/* the unit itself, bleeding in from the right of the header band */}
                 {APPLIANCE_UNIT[appliance.id] && (
                   <span
                     aria-hidden
-                    className="pointer-events-none absolute inset-y-0 right-0 hidden w-1/2 sm:block lg:w-2/5"
+                    className="pointer-events-none absolute inset-y-0 right-0 w-[42%] sm:w-1/2 lg:w-2/5"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
