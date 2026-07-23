@@ -154,23 +154,23 @@ export function Faq() {
             <div className="mt-3 grid grid-cols-2 gap-3">
               <Link
                 href="/book"
-                className="group rounded-2xl border border-border bg-surface p-4 shadow-premium-sm transition-transform duration-500 hover:-translate-y-0.5"
+                className="group rounded-2xl border border-emerald/25 bg-gradient-to-b from-emerald/12 to-emerald/[0.04] p-4 shadow-premium-sm transition-transform duration-500 hover:-translate-y-0.5"
               >
-                <span className="grid size-8 place-items-center rounded-lg bg-surface-2 text-ink transition-colors group-hover:bg-emerald group-hover:text-white">
+                <span className="grid size-8 place-items-center rounded-lg bg-emerald text-white shadow-[0_6px_14px_-4px_rgba(11,154,99,0.55)] transition-transform duration-500 group-hover:scale-105">
                   <MessageSquareText className="size-4" strokeWidth={1.7} />
                 </span>
-                <span className="mt-3 block text-[0.62rem] uppercase tracking-[0.16em] text-muted">Chat with AI</span>
+                <span className="mt-3 block text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-emerald">Chat with AI</span>
                 <span className="mt-1.5 block text-[0.8rem] font-semibold tracking-tight">Replies in seconds</span>
               </Link>
 
               <a
                 href="mailto:care@24x7services.in"
-                className="group rounded-2xl border border-border bg-surface p-4 shadow-premium-sm transition-transform duration-500 hover:-translate-y-0.5"
+                className="group rounded-2xl border border-royal-bright/25 bg-gradient-to-b from-royal-bright/12 to-royal-bright/[0.04] p-4 shadow-premium-sm transition-transform duration-500 hover:-translate-y-0.5"
               >
-                <span className="grid size-8 place-items-center rounded-lg bg-surface-2 text-ink transition-colors group-hover:bg-royal-bright group-hover:text-white">
+                <span className="grid size-8 place-items-center rounded-lg bg-royal-bright text-white shadow-[0_6px_14px_-4px_rgba(37,71,208,0.55)] transition-transform duration-500 group-hover:scale-105">
                   <Mail className="size-4" strokeWidth={1.7} />
                 </span>
-                <span className="mt-3 block text-[0.62rem] uppercase tracking-[0.16em] text-muted">Email</span>
+                <span className="mt-3 block text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-royal-bright">Email</span>
                 <span className="mt-1.5 block break-all text-[0.8rem] font-semibold tracking-tight">care@24x7services.in</span>
               </a>
             </div>
