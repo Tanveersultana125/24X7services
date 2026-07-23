@@ -13,7 +13,7 @@ const STATS = [
 
 export function Stats() {
   return (
-    <section className="relative border-y border-hairline py-14 sm:py-32">
+    <section className="relative border-y border-hairline py-14 sm:py-20">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         <Kicker>By the numbers</Kicker>
         <div className="mt-12 grid gap-y-14 sm:grid-cols-2 lg:grid-cols-4">

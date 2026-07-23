@@ -50,7 +50,7 @@ export function Testimonials() {
   };
 
   return (
-    <section id="reviews" className="relative scroll-mt-28 py-14 sm:py-32">
+    <section id="reviews" className="relative scroll-mt-28 py-14 sm:py-20">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         {/* heading */}
         <motion.div

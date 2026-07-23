@@ -22,7 +22,7 @@ export function BrandShowcase() {
   const [tapped, setTapped] = useState<number | null>(0);
 
   return (
-    <section id="brands" className="relative scroll-mt-28 py-14 sm:py-36">
+    <section id="brands" className="relative scroll-mt-28 py-14 sm:py-20">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         <div className="max-w-2xl">
           <Kicker>Authorised partners</Kicker>

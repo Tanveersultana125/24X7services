@@ -13,7 +13,7 @@ const PROMISES = [
 
 export function Guarantees() {
   return (
-    <section className="py-14 sm:py-28">
+    <section className="py-14 sm:py-20">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         <div className="max-w-2xl">
           <Kicker>Our promises</Kicker>

@@ -54,7 +54,7 @@ export function Faq() {
   const [open, setOpen] = useState<number | null>(3);
 
   return (
-    <section id="faq" className="relative scroll-mt-28 overflow-hidden pb-12 pt-20 sm:pb-14 sm:pt-28">
+    <section id="faq" className="relative scroll-mt-28 overflow-hidden pb-12 pt-14 sm:pb-14 sm:pt-20">
       {/* technician photo rail — only once there is room for three columns */}
       <div aria-hidden className="absolute inset-y-0 right-0 hidden w-[26%] xl:block">
         {/* eslint-disable-next-line @next/next/no-img-element */}
