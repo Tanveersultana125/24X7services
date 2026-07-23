@@ -214,7 +214,7 @@ export function ChatAssistant() {
             </div>
 
             {/* Messages */}
-            <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto bg-background/40 px-4 py-4">
+            <div ref={scrollRef} data-lenis-prevent className="flex-1 space-y-3 overflow-y-auto bg-background/40 px-4 py-4">
               {messages.map((m) => (
                 <Bubble key={m.id} m={m} onAction={() => setOpen(false)} />
               ))}

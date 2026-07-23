@@ -190,7 +190,8 @@ function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) 
 
             <div className="h-px bg-hairline" />
 
-            <div ref={listRef} className="max-h-[54vh] overflow-y-auto p-2.5">
+            {/* Lenis owns the wheel — let this list keep its own scrolling */}
+            <div ref={listRef} data-lenis-prevent className="max-h-[54vh] overflow-y-auto p-2.5">
               {grouped.length === 0 ? (
                 <p className="px-4 py-16 text-center text-sm text-muted">
                   No matches for &ldquo;<span className="font-medium text-ink">{query}</span>&rdquo;

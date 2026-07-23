@@ -16,6 +16,9 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       touchMultiplier: 1.6,
       wheelMultiplier: 0.95,
+      // hand the wheel back to any scrollable panel under the cursor — without this
+      // Lenis swallows it and dialogs/lists never scroll
+      allowNestedScroll: true,
     });
 
     let raf = 0;
