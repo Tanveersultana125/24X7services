@@ -36,7 +36,7 @@ export function ServicesDetail() {
             What&apos;s included in <span className="italic text-royal-bright">every</span> service.
           </h2>
 
-          <div className="mt-14 grid gap-px overflow-hidden rounded-[1.75rem] border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 sm:mt-14 grid gap-px overflow-hidden rounded-[1.75rem] border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
             {INCLUDES.map((f, i) => (
               <motion.div
                 key={f.title}

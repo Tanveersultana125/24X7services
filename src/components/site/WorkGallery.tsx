@@ -34,7 +34,7 @@ export function WorkGallery() {
         </div>
 
         {/* masonry */}
-        <div className="mt-14 gap-4 [column-fill:_balance] sm:columns-2 lg:columns-3">
+        <div className="mt-10 sm:mt-14 gap-4 [column-fill:_balance] sm:columns-2 lg:columns-3">
           {SHOTS.map((s, i) => (
             <motion.figure
               key={s.src}

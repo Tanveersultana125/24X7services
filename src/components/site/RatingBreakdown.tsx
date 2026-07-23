@@ -28,7 +28,7 @@ export function RatingBreakdown() {
           Rated 4.9, and here&apos;s why.
         </h2>
 
-        <div className="mt-14 grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+        <div className="mt-10 sm:mt-14 grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
           {/* Overall + distribution */}
           <div className="rounded-[1.75rem] border border-border bg-surface p-8 sm:p-10">
             <div className="flex items-center gap-8">

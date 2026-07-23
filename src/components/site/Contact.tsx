@@ -12,7 +12,7 @@ const CHANNELS = [
 
 export function Contact() {
   return (
-    <section id="contact" className="relative scroll-mt-28 pb-16 pt-12 sm:pb-24 sm:pt-20">
+    <section id="contact" className="relative scroll-mt-28 pb-14 pt-12 sm:pb-20 sm:pt-20">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         <div className="relative overflow-hidden rounded-[2.5rem] border border-border bg-surface px-8 py-16 sm:px-16 sm:py-24">
           <div className="pointer-events-none absolute -left-24 -top-24 size-96 rounded-full bg-emerald/10 blur-3xl" />

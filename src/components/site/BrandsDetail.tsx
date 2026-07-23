@@ -31,7 +31,7 @@ export function BrandsDetail() {
             What we service, brand by brand.
           </h2>
 
-          <div className="mt-14 grid gap-5 md:grid-cols-2">
+          <div className="mt-10 sm:mt-14 grid gap-5 md:grid-cols-2">
             {BRANDS.map((b, i) => {
               const c = COVERAGE[b.id];
               return (
@@ -94,7 +94,7 @@ export function BrandsDetail() {
               Authorised isn&apos;t a label. It&apos;s a standard.
             </h2>
           </div>
-          <div className="mt-14 grid gap-6 lg:grid-cols-3">
+          <div className="mt-10 sm:mt-14 grid gap-6 lg:grid-cols-3">
             {WHY.map((w, i) => (
               <motion.div
                 key={w.title}

@@ -43,7 +43,7 @@ export function Reviews() {
         </div>
       </div>
 
-      <div className="mt-16 flex flex-col gap-5">
+      <div className="mt-10 sm:mt-16 flex flex-col gap-5">
         <Marquee>
           {rowA.map((t, i) => <ReviewCard key={`a${i}`} t={t} />)}
         </Marquee>

@@ -14,7 +14,7 @@ const FEATURES = [
 
 export function ClimateExpertise() {
   return (
-    <section className="relative py-12 sm:py-16">
+    <section className="relative py-14 sm:py-20">
       <div className="mx-auto grid max-w-[92rem] gap-12 px-6 sm:px-10 lg:grid-cols-2 lg:items-center lg:gap-16">
         {/* image */}
         <motion.div

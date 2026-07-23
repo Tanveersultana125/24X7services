@@ -16,7 +16,7 @@ const SOCIALS = [Instagram, Twitter, Linkedin, Youtube];
 
 export function SiteFooter() {
   return (
-    <footer className="relative bg-[#08080a] pt-24 text-white">
+    <footer className="relative bg-[#08080a] pt-14 text-white sm:pt-16">
       {/* oversized wordmark marquee */}
       <div className="border-b border-white/10 pb-14">
         <Marquee fade={false}>
@@ -79,7 +79,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-sm text-white/40 sm:flex-row">
+        <div className="mt-10 sm:mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-sm text-white/40 sm:flex-row">
           <p>© {new Date().getFullYear()} 24X7 Services Pvt. Ltd.</p>
           <p>Designed &amp; built in India.</p>
         </div>

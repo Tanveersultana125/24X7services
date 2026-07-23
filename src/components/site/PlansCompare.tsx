@@ -28,7 +28,7 @@ export function PlansCompare() {
           Every plan, side by side.
         </h2>
 
-        <div className="mt-14 overflow-x-auto">
+        <div className="mt-10 sm:mt-14 overflow-x-auto">
           <div className="min-w-[44rem]">
             {/* header */}
             <div className="grid grid-cols-[1.6fr_1fr_1fr_1fr] items-end gap-4 border-b border-border pb-5">

@@ -28,7 +28,7 @@ export function CoolingSolutions() {
   const [open, setOpen] = useState(2);
 
   return (
-    <section className="relative py-12 sm:py-16">
+    <section className="relative py-14 sm:py-20">
       <div className="mx-auto grid max-w-[92rem] grid-cols-12 gap-x-4 gap-y-8 px-6 sm:px-10 lg:grid-rows-[auto_1fr] lg:items-center lg:gap-x-16">
         {/* heading — shares the first row with the photo on every screen */}
         <div className="col-span-7 row-start-1 self-center lg:col-span-6 lg:self-end">

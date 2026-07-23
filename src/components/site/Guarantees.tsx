@@ -22,7 +22,7 @@ export function Guarantees() {
           </h2>
         </div>
 
-        <div className="mt-14 grid gap-5 sm:grid-cols-2">
+        <div className="mt-10 sm:mt-14 grid gap-5 sm:grid-cols-2">
           {PROMISES.map((p, i) => (
             <motion.div
               key={p.title}

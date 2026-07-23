@@ -105,7 +105,7 @@ export function MostBooked() {
         </div>
 
         {/* carousel — floating edge arrows slide one card at a time */}
-        <div className="relative mt-14">
+        <div className="relative mt-10 sm:mt-14">
           <button
             type="button"
             aria-label="Previous"

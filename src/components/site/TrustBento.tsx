@@ -38,7 +38,7 @@ export function TrustBento() {
           </h2>
         </div>
 
-        <div className="mt-14 grid auto-rows-[minmax(11rem,auto)] grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="mt-10 sm:mt-14 grid auto-rows-[minmax(11rem,auto)] grid-cols-2 gap-4 lg:grid-cols-4">
           {/* A — hero warranty (dark royal) */}
           <Card i={0} className="col-span-2 row-span-2 bg-gradient-to-br from-royal-bright to-royal p-9 text-white shadow-[0_32px_60px_-24px_rgba(37,71,208,0.55),inset_0_1.5px_0_rgba(255,255,255,0.15)] lg:row-span-2">
             <div className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-royal-bright/40 blur-3xl" />

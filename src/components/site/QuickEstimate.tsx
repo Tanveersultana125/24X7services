@@ -34,7 +34,7 @@ export function QuickEstimate() {
         />
       </div>
 
-      <div className="relative mx-auto max-w-[92rem] px-6 py-16 sm:px-10 sm:py-24">
+      <div className="relative mx-auto max-w-[92rem] px-6 py-14 sm:px-10 sm:py-20">
         <div className="grid items-center gap-10 lg:grid-cols-[1fr_27rem] lg:gap-16">
           {/* copy */}
           <motion.div

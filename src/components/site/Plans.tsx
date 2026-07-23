@@ -34,7 +34,7 @@ export function Plans() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="relative mt-14 overflow-hidden rounded-[2rem] bg-royal p-9 text-white sm:p-12"
+          className="relative mt-10 sm:mt-14 overflow-hidden rounded-[2rem] bg-royal p-9 text-white sm:p-12"
         >
           <div className="pointer-events-none absolute -right-24 -top-24 size-96 rounded-full bg-royal-bright/40 blur-3xl" />
           <div className="relative grid gap-10 lg:grid-cols-[1fr_1.2fr] lg:items-center">
