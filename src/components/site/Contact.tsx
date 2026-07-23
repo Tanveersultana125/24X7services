@@ -88,7 +88,7 @@ export function Contact() {
                 </span>
               </span>
 
-              <h2 className="font-display mt-6 text-[2.6rem] leading-[0.98] tracking-[-0.03em] sm:text-[3.8rem]">
+              <h2 className="font-display mt-6 text-[2.1rem] leading-[1] tracking-[-0.03em] sm:text-[3rem] lg:text-[3.8rem]">
                 Let&apos;s get it
                 <br />
                 <span className="italic text-royal-bright">fixed.</span>
@@ -116,7 +116,7 @@ export function Contact() {
                 src="/work/promise-shield-cut.png"
                 alt=""
                 aria-hidden
-                className="pointer-events-none absolute right-0 top-10 hidden w-44 opacity-95 lg:block xl:top-8 xl:w-56"
+                className="pointer-events-none absolute right-0 top-12 w-24 opacity-95 sm:top-14 sm:w-32 lg:top-10 lg:w-44 xl:top-8 xl:w-56"
               />
             </motion.div>
 
