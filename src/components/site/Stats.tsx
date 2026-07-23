@@ -8,7 +8,7 @@ const STATS = [
   { to: 3.2, decimals: 1, prefix: "", suffix: "M", label: "Services completed", sub: "since 2019" },
   { to: 12, decimals: 0, prefix: "", suffix: "k+", label: "Certified technicians", sub: "police-verified" },
   { to: 4.9, decimals: 1, prefix: "", suffix: "★", label: "Average rating", sub: "128k reviews" },
-  { to: 38, decimals: 0, prefix: "", suffix: "", label: "Cities served", sub: "and counting" },
+  { to: 33, decimals: 0, prefix: "", suffix: "", label: "Telangana districts", sub: "fully covered" },
 ];
 
 export function Stats() {

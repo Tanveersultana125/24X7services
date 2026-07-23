@@ -44,7 +44,7 @@ export function SiteFooter() {
               <Logo />
             </div>
             <p className="mt-5 max-w-xs text-pretty text-sm leading-relaxed text-white/50">
-              India&apos;s premium doorstep appliance service. Certified experts, genuine
+              Telangana&apos;s premium doorstep appliance service. Certified experts, genuine
               parts, and a warranty on every repair — 24×7.
             </p>
             <div className="mt-6 flex gap-2.5">
@@ -81,7 +81,7 @@ export function SiteFooter() {
 
         <div className="mt-10 sm:mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-sm text-white/40 sm:flex-row">
           <p>© {new Date().getFullYear()} 24X7 Services Pvt. Ltd.</p>
-          <p>Designed &amp; built in India.</p>
+          <p>Designed &amp; built in Hyderabad.</p>
         </div>
       </div>
     </footer>

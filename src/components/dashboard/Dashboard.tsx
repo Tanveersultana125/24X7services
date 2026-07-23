@@ -163,8 +163,8 @@ export function Dashboard() {
         {tab === "Addresses" && (
           <div className="grid gap-4 sm:grid-cols-2">
             {[
-              { tag: "Home", addr: "Flat 402, Prestige Residency, Indiranagar, Bengaluru 560038" },
-              { tag: "Office", addr: "5th Floor, WeWork Galaxy, Residency Road, Bengaluru 560025" },
+              { tag: "Home", addr: "Flat 402, Aparna Residency, Kondapur, Hyderabad 500084" },
+              { tag: "Office", addr: "5th Floor, Cyber Towers, HITEC City, Hyderabad 500081" },
             ].map((a) => (
               <div key={a.tag} className="flex items-start gap-4 rounded-2xl border border-border bg-surface p-5 shadow-premium-sm">
                 <div className="grid size-11 place-items-center rounded-xl bg-surface-2 text-primary"><MapPin className="size-5" /></div>

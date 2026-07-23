@@ -7,9 +7,9 @@ import { TESTIMONIALS, type Testimonial } from "@/lib/content";
 
 // A few extra to make the wall feel full
 const EXTRA: Testimonial[] = [
-  { name: "Devika S.", city: "Pune", rating: 5, appliance: "Bosch Washer", quote: "Booked at midnight, fixed by noon. The tracking alone is worth it.", initials: "DS", color: "#2547d0" },
-  { name: "Arjun T.", city: "Kochi", rating: 5, appliance: "LG Fridge", quote: "Transparent quote, genuine part, spotless cleanup. Rare these days.", initials: "AT", color: "#0b9a63" },
-  { name: "Sana K.", city: "Jaipur", rating: 5, appliance: "IFB Microwave", quote: "The AI told me the fault before the technician even arrived. Wild.", initials: "SK", color: "#d9821b" },
+  { name: "Devika S.", city: "Karimnagar", rating: 5, appliance: "Bosch Washer", quote: "Booked at midnight, fixed by noon. The tracking alone is worth it.", initials: "DS", color: "#2547d0" },
+  { name: "Arjun T.", city: "Khammam", rating: 5, appliance: "LG Fridge", quote: "Transparent quote, genuine part, spotless cleanup. Rare these days.", initials: "AT", color: "#0b9a63" },
+  { name: "Sana K.", city: "Nalgonda", rating: 5, appliance: "IFB Microwave", quote: "The AI told me the fault before the technician even arrived. Wild.", initials: "SK", color: "#d9821b" },
 ];
 
 const ALL = [...TESTIMONIALS, ...EXTRA];

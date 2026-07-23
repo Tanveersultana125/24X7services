@@ -7,9 +7,9 @@ import { MagneticButton } from "./MagneticButton";
 const ease = [0.16, 1, 0.3, 1] as const;
 
 const LIVE = [
-  { city: "Bengaluru", job: "fridge", status: "dispatched 2m ago", tint: "#d64545" },
-  { city: "Mumbai", job: "washer", status: "en route", tint: "#d9821b" },
-  { city: "Delhi", job: "microwave", status: "completed", tint: "#0b9a63" },
+  { city: "Hyderabad", job: "fridge", status: "dispatched 2m ago", tint: "#d64545" },
+  { city: "Warangal", job: "washer", status: "en route", tint: "#d9821b" },
+  { city: "Secunderabad", job: "microwave", status: "completed", tint: "#0b9a63" },
 ];
 
 export function Emergency() {

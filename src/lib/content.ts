@@ -33,7 +33,7 @@ export const STATS = [
   { value: "3.2M+", label: "Services completed" },
   { value: "12,000+", label: "Certified technicians" },
   { value: "4.9", label: "Average rating" },
-  { value: "38", label: "Cities live" },
+  { value: "33", label: "Telangana districts" },
 ];
 
 export interface Testimonial {
@@ -49,7 +49,7 @@ export interface Testimonial {
 export const TESTIMONIALS: Testimonial[] = [
   {
     name: "Ananya Rao",
-    city: "Bengaluru",
+    city: "Hyderabad",
     rating: 5,
     appliance: "Samsung Refrigerator",
     quote:
@@ -59,7 +59,7 @@ export const TESTIMONIALS: Testimonial[] = [
   },
   {
     name: "Rohit Mehta",
-    city: "Mumbai",
+    city: "Warangal",
     rating: 5,
     appliance: "IFB Washing Machine",
     quote:
@@ -79,7 +79,7 @@ export const TESTIMONIALS: Testimonial[] = [
   },
   {
     name: "Karan Singh",
-    city: "Delhi NCR",
+    city: "Secunderabad",
     rating: 5,
     appliance: "Bosch Oven",
     quote:
@@ -89,7 +89,7 @@ export const TESTIMONIALS: Testimonial[] = [
   },
   {
     name: "Meera Iyer",
-    city: "Chennai",
+    city: "Nizamabad",
     rating: 5,
     appliance: "Samsung Washing Machine",
     quote:
