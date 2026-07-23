@@ -18,7 +18,7 @@ const rowB = ALL.slice(4).concat(ALL.slice(0, 2));
 
 export function Reviews() {
   return (
-    <section id="reviews" className="relative scroll-mt-28 overflow-hidden py-28 sm:py-36">
+    <section id="reviews" className="relative scroll-mt-28 overflow-hidden py-14 sm:py-36">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-end">
           <div className="max-w-2xl">

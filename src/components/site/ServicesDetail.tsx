@@ -29,7 +29,7 @@ export function ServicesDetail() {
   return (
     <>
       {/* What's included */}
-      <section className="py-24 sm:py-28">
+      <section className="py-14 sm:py-28">
         <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
           <Kicker>Every visit, guaranteed</Kicker>
           <h2 className="font-display mt-6 max-w-2xl text-[2.4rem] leading-[1.05] tracking-[-0.03em] sm:text-5xl">
@@ -58,7 +58,7 @@ export function ServicesDetail() {
       </section>
 
       {/* Problems & pricing */}
-      <section className="bg-surface py-24 sm:py-28">
+      <section className="bg-surface py-14 sm:py-28">
         <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>

@@ -27,7 +27,7 @@ function Card({ i, className, children }: { i: number; className?: string; child
 
 export function TrustBento() {
   return (
-    <section className="relative py-28 sm:py-36">
+    <section className="relative py-14 sm:py-36">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         <div className="max-w-2xl">
           <Kicker>Why 24X7</Kicker>

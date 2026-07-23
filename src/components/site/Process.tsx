@@ -15,7 +15,7 @@ const STEPS = [
 
 export function Process() {
   return (
-    <section id="process" className="relative scroll-mt-28 bg-surface py-28 sm:py-36">
+    <section id="process" className="relative scroll-mt-28 bg-surface py-14 sm:py-36">
       <div className="mx-auto grid max-w-[92rem] gap-16 px-6 sm:px-10 lg:grid-cols-12">
         {/* Sticky heading */}
         <div className="lg:col-span-5">

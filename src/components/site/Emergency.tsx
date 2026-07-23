@@ -6,7 +6,7 @@ import { MagneticButton } from "./MagneticButton";
 
 export function Emergency() {
   return (
-    <section className="relative overflow-hidden bg-[#08080a] py-28 text-white sm:py-40">
+    <section className="relative overflow-hidden bg-[#08080a] py-16 text-white sm:py-40">
       {/* animated glow */}
       <motion.div
         aria-hidden

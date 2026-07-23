@@ -22,7 +22,7 @@ const SHOTS: Shot[] = [
 
 export function WorkGallery() {
   return (
-    <section id="work" className="relative scroll-mt-28 py-28 sm:py-36">
+    <section id="work" className="relative scroll-mt-28 py-14 sm:py-36">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         <div className="max-w-2xl">
           <Kicker>Real repairs, real homes</Kicker>

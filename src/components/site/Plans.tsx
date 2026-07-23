@@ -11,7 +11,7 @@ export function Plans() {
   const rest = AMC_PLANS.filter((p) => !p.highlight);
 
   return (
-    <section id="plans" className="relative scroll-mt-28 bg-surface py-28 sm:py-36">
+    <section id="plans" className="relative scroll-mt-28 bg-surface py-14 sm:py-36">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
