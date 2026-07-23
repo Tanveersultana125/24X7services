@@ -40,7 +40,24 @@ export function TrustBento() {
 
         <div className="mt-10 sm:mt-14 grid auto-rows-[minmax(11rem,auto)] grid-cols-2 gap-4 lg:grid-cols-4">
           {/* A — hero warranty (dark royal) */}
-          <Card i={0} className="col-span-2 row-span-2 bg-gradient-to-br from-royal-bright to-royal p-9 text-white shadow-[0_32px_60px_-24px_rgba(37,71,208,0.55),inset_0_1.5px_0_rgba(255,255,255,0.15)] lg:row-span-2">
+          <Card i={0} className="col-span-2 row-span-2 bg-royal p-7 text-white shadow-[0_32px_60px_-24px_rgba(37,71,208,0.55),inset_0_1.5px_0_rgba(255,255,255,0.15)] sm:p-9 lg:row-span-2">
+            {/* technician at work behind a royal scrim — keeps the tile human without
+                costing any contrast on the copy */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/work/ac-hero.png"
+              alt=""
+              aria-hidden
+              className="pointer-events-none absolute inset-0 size-full object-cover object-[70%_center] opacity-45 mix-blend-luminosity transition-transform duration-[1.2s] group-hover:scale-105"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(160deg, rgba(37,71,208,0.86) 0%, rgba(37,71,208,0.7) 42%, rgba(20,34,105,0.92) 100%)",
+              }}
+            />
             <div className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-royal-bright/40 blur-3xl" />
             <div className="relative flex h-full flex-col justify-between">
               <ShieldCheck className="size-8 text-white/90" strokeWidth={1.5} />
