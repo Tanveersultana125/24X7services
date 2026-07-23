@@ -260,7 +260,7 @@ export function ServicesDetail() {
               transition={{ duration: 0.35 }}
               className="mt-4 overflow-hidden rounded-[1.75rem] border border-white/70 bg-white shadow-premium-md"
             >
-              <div className="relative flex items-center gap-4 overflow-hidden border-b border-hairline p-6">
+              <div className="relative flex min-h-[7.5rem] items-center gap-4 overflow-hidden border-b border-hairline p-6 sm:min-h-[9.5rem]">
                 <ApplianceTile id={appliance.id} size="lg" />
                 <div className="relative">
                   <h3 className="font-display text-2xl tracking-tight">{appliance.name}</h3>
@@ -276,19 +276,16 @@ export function ServicesDetail() {
                     <img
                       src={APPLIANCE_UNIT[appliance.id].src}
                       alt=""
-                      style={{ objectPosition: APPLIANCE_UNIT[appliance.id].pos }}
                       className={cn(
-                        "size-full",
-                        APPLIANCE_UNIT[appliance.id].fit === "contain"
-                          ? "object-contain object-right p-2"
-                          : "object-cover"
+                        "size-full object-contain object-right",
+                        APPLIANCE_UNIT[appliance.id].fit === "contain" ? "p-3" : ""
                       )}
                     />
                     <span
                       className="absolute inset-0"
                       style={{
                         background:
-                          "linear-gradient(90deg, #ffffff 0%, rgba(255,255,255,0.92) 26%, rgba(255,255,255,0.45) 58%, rgba(255,255,255,0.12) 100%)",
+                          "linear-gradient(90deg, #ffffff 0%, rgba(255,255,255,0.88) 22%, rgba(255,255,255,0.25) 52%, rgba(255,255,255,0) 78%)",
                       }}
                     />
                   </span>
