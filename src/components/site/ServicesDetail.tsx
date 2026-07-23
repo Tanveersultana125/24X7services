@@ -123,7 +123,7 @@ export function ServicesDetail() {
             </div>
           </div>
 
-          <div className="mt-10 grid grid-cols-2 gap-3 sm:mt-14 sm:gap-4 lg:grid-cols-3">
+          <div className="mt-10 grid grid-cols-3 gap-2.5 sm:mt-14 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
             {INCLUDES.map((f, i) => (
               <motion.div
                 key={f.title}
@@ -131,23 +131,24 @@ export function ServicesDetail() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.6, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
-                className="group rounded-[1.25rem] border border-white/70 bg-gradient-to-b from-white to-surface p-4 shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_rgba(255,255,255,0.9)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)] sm:rounded-[1.5rem] sm:p-7"
+                className="group rounded-[1.1rem] border border-white/70 bg-gradient-to-b from-white to-surface p-3 text-center shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_rgba(255,255,255,0.9)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)] sm:rounded-[1.5rem] sm:p-7 sm:text-left"
               >
                 <span
-                  className="grid size-11 place-items-center rounded-xl transition-transform duration-500 group-hover:-translate-y-0.5 sm:size-14 sm:rounded-2xl"
+                  className="mx-auto grid size-9 place-items-center rounded-lg transition-transform duration-500 group-hover:-translate-y-0.5 sm:mx-0 sm:size-14 sm:rounded-2xl"
                   style={{ background: `${f.tint}16`, color: f.tint }}
                 >
-                  <f.icon className="size-5 sm:size-6" strokeWidth={1.7} />
+                  <f.icon className="size-[1.05rem] sm:size-6" strokeWidth={1.7} />
                 </span>
-                <h3 className="mt-4 text-[0.92rem] font-semibold leading-tight tracking-tight sm:mt-5 sm:text-lg">
+                <h3 className="mt-3 hyphens-auto text-[0.7rem] font-semibold leading-tight tracking-tight sm:mt-5 sm:text-lg">
                   {f.title}
                 </h3>
-                <p className="mt-2 text-[0.75rem] leading-snug text-muted sm:text-[0.9rem] sm:leading-relaxed">
+                {/* no room for the blurb in a three-up column — it returns at sm */}
+                <p className="hidden text-muted sm:mt-2 sm:block sm:text-[0.9rem] sm:leading-relaxed">
                   {f.desc}
                 </p>
                 <span
                   aria-hidden
-                  className="mt-4 block h-0.5 w-6 rounded-full transition-all duration-500 group-hover:w-14 sm:mt-5 sm:w-8"
+                  className="mx-auto mt-3 block h-0.5 w-5 rounded-full transition-all duration-500 group-hover:w-14 sm:mx-0 sm:mt-5 sm:w-8"
                   style={{ background: f.tint }}
                 />
               </motion.div>
