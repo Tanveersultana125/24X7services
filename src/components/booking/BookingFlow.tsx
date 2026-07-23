@@ -187,10 +187,16 @@ function BrandStep({ draft, setDraft }: StepProps) {
             selected={draft.brand === b.id}
             onClick={() => setDraft((d) => ({ ...d, brand: b.id }))}
           >
-            <div className="grid size-12 place-items-center rounded-xl bg-surface-2">
-              <BrandMark id={b.id} className="text-sm" />
+            {/* wordmarks are much wider than they are tall — give the tile a fixed
+                landscape box so SAMSUNG/BOSCH cannot spill over the label */}
+            <div className="grid h-12 w-[5.25rem] shrink-0 place-items-center overflow-hidden rounded-xl bg-surface-2 px-2">
+              <BrandMark
+                id={b.id}
+                tone="brand"
+                className={b.id === "lg" ? "text-2xl" : "text-[0.7rem]"}
+              />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="font-semibold">{b.name}</p>
               <p className="text-sm text-muted">{b.tagline}</p>
             </div>
