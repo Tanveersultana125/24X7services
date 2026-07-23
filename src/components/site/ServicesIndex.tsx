@@ -48,9 +48,10 @@ export function ServicesIndex() {
                   onMouseEnter={() => setActive(i)}
                   onFocus={() => setActive(i)}
                   onClick={(e) => {
-                    // no hover on a touch screen: the first tap opens the detail,
-                    // the second follows the link
-                    if (typeof window !== "undefined" && window.matchMedia("(hover: none)").matches && active !== i) {
+                    // below lg the row is the accordion control, not the link — booking
+                    // is the button inside the panel it opens. Keyed off width rather
+                    // than hover support, so a narrow desktop window behaves the same.
+                    if (typeof window !== "undefined" && window.innerWidth < 1024) {
                       e.preventDefault();
                       setActive(i);
                     }
