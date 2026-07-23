@@ -96,12 +96,14 @@ function Preview({ svc }: { svc: Service }) {
   return (
     <div className="relative">
       {/* photo band — the service's own work, fading into the card surface */}
-      <div className="relative h-44 w-full overflow-hidden sm:h-48">
+      <div className="relative h-48 w-full overflow-hidden sm:h-52">
+        {/* anchor to the top — these photos put the technician's head near the top edge,
+            so a centred crop decapitates them */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={svc.image}
           alt={svc.title}
-          className="size-full object-cover object-center transition-transform duration-[1.4s] ease-out"
+          className="size-full object-cover object-top transition-transform duration-[1.4s] ease-out"
         />
         <div
           aria-hidden
