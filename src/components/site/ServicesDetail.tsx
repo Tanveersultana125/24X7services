@@ -68,13 +68,15 @@ export function ServicesDetail() {
               </p>
             </div>
 
-            {/* promise mark */}
-            <div
-              aria-hidden
-              className="relative w-full max-w-md shrink-0 overflow-hidden rounded-[1.75rem] border border-white/70 shadow-premium-md lg:w-[26rem]"
-            >
+            {/* promise mark — the artwork has a pale backdrop, so multiply it into the page
+                and fade the edges instead of boxing it in a card */}
+            <div aria-hidden className="relative w-full max-w-md shrink-0 lg:w-[28rem]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/work/promise-shield.png" alt="" className="w-full" />
+              <img
+                src="/work/promise-shield.png"
+                alt=""
+                className="w-full mix-blend-multiply [-webkit-mask-image:radial-gradient(78%_78%_at_52%_50%,#000_52%,transparent_100%)] [mask-image:radial-gradient(78%_78%_at_52%_50%,#000_52%,transparent_100%)] dark:opacity-90 dark:mix-blend-normal"
+              />
             </div>
           </div>
 
