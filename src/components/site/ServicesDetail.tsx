@@ -266,10 +266,11 @@ export function ServicesDetail() {
                   <h3 className="font-display text-2xl tracking-tight">{appliance.name}</h3>
                   <p className="text-sm text-muted">{appliance.blurb}</p>
                 </div>
+                {/* the unit itself, bleeding in from the right of the header band */}
                 {APPLIANCE_UNIT[appliance.id] && (
                   <span
                     aria-hidden
-                    className="ml-auto hidden h-20 w-36 shrink-0 overflow-hidden rounded-xl border border-hairline bg-surface-2 sm:block"
+                    className="pointer-events-none absolute inset-y-0 right-0 hidden w-1/2 sm:block lg:w-2/5"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -278,8 +279,17 @@ export function ServicesDetail() {
                       style={{ objectPosition: APPLIANCE_UNIT[appliance.id].pos }}
                       className={cn(
                         "size-full",
-                        APPLIANCE_UNIT[appliance.id].fit === "contain" ? "object-contain p-1.5" : "object-cover"
+                        APPLIANCE_UNIT[appliance.id].fit === "contain"
+                          ? "object-contain object-right p-2"
+                          : "object-cover"
                       )}
+                    />
+                    <span
+                      className="absolute inset-0"
+                      style={{
+                        background:
+                          "linear-gradient(90deg, #ffffff 0%, rgba(255,255,255,0.92) 26%, rgba(255,255,255,0.45) 58%, rgba(255,255,255,0.12) 100%)",
+                      }}
                     />
                   </span>
                 )}
