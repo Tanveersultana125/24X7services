@@ -96,14 +96,14 @@ function Preview({ svc }: { svc: Service }) {
   return (
     <div className="relative">
       {/* photo band — the service's own work, fading into the card surface */}
-      <div className="relative h-48 w-full overflow-hidden sm:h-52">
-        {/* anchor to the top — these photos put the technician's head near the top edge,
-            so a centred crop decapitates them */}
+      <div className="relative h-40 w-full overflow-hidden sm:h-52">
+        {/* each shot frames its subject differently, so the crop point is per service */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={svc.image}
           alt={svc.title}
-          className="size-full object-cover object-top transition-transform duration-[1.4s] ease-out"
+          style={{ objectPosition: svc.imagePos }}
+          className="size-full object-cover transition-transform duration-[1.4s] ease-out"
         />
         <div
           aria-hidden
@@ -118,7 +118,7 @@ function Preview({ svc }: { svc: Service }) {
         </span>
       </div>
 
-      <div className="relative -mt-9 px-8 pb-8">
+      <div className="relative -mt-9 px-6 pb-7 sm:px-8 sm:pb-8">
         {svc.appliance ? (
           <ApplianceTile id={svc.appliance} size="lg" />
         ) : (
@@ -127,8 +127,8 @@ function Preview({ svc }: { svc: Service }) {
           </span>
         )}
 
-        <h3 className="font-display mt-5 text-3xl tracking-[-0.02em]">{svc.title}</h3>
-        <p className="mt-3 text-pretty leading-relaxed text-muted">{svc.desc}</p>
+        <h3 className="font-display mt-5 text-[1.7rem] tracking-[-0.02em] sm:text-3xl">{svc.title}</h3>
+        <p className="mt-3 text-pretty text-[0.92rem] leading-relaxed text-muted sm:text-base">{svc.desc}</p>
 
         <div className="mt-6 flex flex-wrap gap-2">
           {svc.tags.map((t) => (
