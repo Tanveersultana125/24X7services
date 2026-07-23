@@ -146,6 +146,9 @@ export function BrandShowcase() {
             return (
               <div
                 key={b.id}
+                // pointer devices get the same hover reveal as the desktop panels;
+                // the button below still handles taps on touch screens
+                onMouseEnter={() => setTapped(i)}
                 className={cn(
                   "overflow-hidden rounded-[1.5rem] border transition-colors duration-500",
                   open ? "border-transparent" : "border-white/60"
