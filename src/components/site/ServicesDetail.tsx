@@ -75,7 +75,7 @@ export function ServicesDetail() {
                 style={{ background: "radial-gradient(circle, rgba(37,71,208,0.10), transparent 68%)" }}
               />
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/work/promise-shield.png" alt="" className="w-full" />
+              <img src="/work/promise-shield-cut.png" alt="" className="w-full" />
             </div>
           </div>
 
