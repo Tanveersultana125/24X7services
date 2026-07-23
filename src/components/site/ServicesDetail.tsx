@@ -68,15 +68,14 @@ export function ServicesDetail() {
               </p>
             </div>
 
-            {/* promise mark — the artwork has a pale backdrop, so multiply it into the page
-                and fade the edges instead of boxing it in a card */}
-            <div aria-hidden className="relative w-full max-w-md shrink-0 lg:w-[28rem]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/work/promise-shield.png"
-                alt=""
-                className="w-full mix-blend-multiply [-webkit-mask-image:radial-gradient(78%_78%_at_52%_50%,#000_52%,transparent_100%)] [mask-image:radial-gradient(78%_78%_at_52%_50%,#000_52%,transparent_100%)] dark:opacity-90 dark:mix-blend-normal"
+            {/* promise mark — background keyed out, so it sits straight on the page */}
+            <div aria-hidden className="relative w-full max-w-sm shrink-0 lg:w-[24rem]">
+              <span
+                className="pointer-events-none absolute inset-0 -z-10 rounded-full blur-3xl"
+                style={{ background: "radial-gradient(circle, rgba(37,71,208,0.10), transparent 68%)" }}
               />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/work/promise-shield.png" alt="" className="w-full" />
             </div>
           </div>
 
