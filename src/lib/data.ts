@@ -80,6 +80,25 @@ export const APPLIANCES: Appliance[] = [
       { id: "installation", label: "Installation", price: [399, 899], eta: "45 min" },
     ],
   },
+  {
+    id: "ac",
+    name: "Air Conditioner",
+    blurb: "Cooling loss, gas charging, deep-clean & installation for split and window units.",
+    startingPrice: 499,
+    serviceTime: "45–120 min",
+    rating: 4.9,
+    bookings: "890K+",
+    problems: [
+      { id: "not-cooling", label: "Not Cooling", price: [599, 1999], eta: "60 min", common: true },
+      { id: "gas-filling", label: "Gas Charging", price: [1999, 3999], eta: "90 min", common: true },
+      { id: "deep-clean", label: "Foam-jet Deep Clean", price: [699, 1299], eta: "60 min" },
+      { id: "water-leakage", label: "Water Leakage", price: [499, 1199], eta: "50 min" },
+      { id: "noise", label: "Noise / Vibration", price: [399, 999], eta: "45 min" },
+      { id: "pcb-issue", label: "PCB / Remote Fault", price: [999, 2999], eta: "70 min" },
+      { id: "installation", label: "Installation", price: [1499, 2499], eta: "120 min" },
+      { id: "uninstallation", label: "Uninstallation", price: [699, 999], eta: "60 min" },
+    ],
+  },
 ];
 
 export const AMC_PLANS: AmcPlan[] = [

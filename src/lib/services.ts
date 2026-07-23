@@ -39,22 +39,28 @@ export const SERVICES: Service[] = [
     price: "from ₹249", eta: "40–75 min", tags: ["Thermostat", "Element", "Fan"],
   },
   {
-    no: "05", id: "installation", title: "Installation", kind: "care",
+    no: "05", id: "ac", title: "AC Service & Repair", kind: "repair", appliance: "ac",
+    image: "/work/gallery/ac-3.png", imagePos: "center 22%",
+    desc: "Cooling loss, gas charging, foam-jet deep clean and installation for split & window units.",
+    price: "from ₹499", eta: "45–120 min", tags: ["Cooling", "Gas", "Deep clean"],
+  },
+  {
+    no: "06", id: "installation", title: "Installation", kind: "care",
     desc: "White-glove setup, levelling, testing and a walkthrough — done once, done right.",
     price: "from ₹399", eta: "45 min", tags: ["Setup", "Levelling", "Demo"], image: "/work/ac-hero.png", imagePos: "center 22%",
   },
   {
-    no: "06", id: "uninstallation", title: "Uninstallation", kind: "care",
+    no: "07", id: "uninstallation", title: "Uninstallation", kind: "care",
     desc: "Safe disconnection, draining and packing for a move — zero damage, guaranteed.",
     price: "from ₹299", eta: "40 min", tags: ["Disconnect", "Drain", "Pack"], image: "/work/gallery/ac-2.png", imagePos: "center 30%",
   },
   {
-    no: "07", id: "amc", title: "Annual Maintenance", kind: "care",
+    no: "08", id: "amc", title: "Annual Maintenance", kind: "care",
     desc: "Scheduled health checks and priority care that quietly keep everything running.",
     price: "from ₹1,499/yr", eta: "Ongoing", tags: ["Preventive", "Priority", "Genuine"], image: "/work/family-ac.png", imagePos: "center 35%",
   },
   {
-    no: "08", id: "emergency", title: "Emergency Repair", kind: "care",
+    no: "09", id: "emergency", title: "Emergency Repair", kind: "care",
     desc: "A certified expert dispatched with priority — any appliance, any hour, 24×7.",
     price: "express +₹199", eta: "< 90 min", tags: ["Priority", "24×7", "Rapid"], image: "/work/ac-outdoor-service.png", imagePos: "center 25%",
   },

@@ -1,6 +1,6 @@
 "use client";
 
-import { Refrigerator, WashingMachine, Microwave, CookingPot, type LucideIcon } from "lucide-react";
+import { Refrigerator, WashingMachine, Microwave, CookingPot, AirVent, type LucideIcon } from "lucide-react";
 import type { ApplianceId, BrandId } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -9,6 +9,7 @@ export const APPLIANCE_ICONS: Record<ApplianceId, LucideIcon> = {
   "washing-machine": WashingMachine,
   microwave: Microwave,
   oven: CookingPot,
+  ac: AirVent,
 };
 
 const APPLIANCE_GRADIENTS: Record<ApplianceId, string> = {
@@ -16,6 +17,7 @@ const APPLIANCE_GRADIENTS: Record<ApplianceId, string> = {
   "washing-machine": "from-[#0b9a63] to-[#0f766e]",
   microwave: "from-[#d9821b] to-[#b45309]",
   oven: "from-[#334155] to-[#1e293b]",
+  ac: "from-[#0ea5e9] to-[#0369a1]",
 };
 
 export function ApplianceTile({

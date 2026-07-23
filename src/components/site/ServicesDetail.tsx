@@ -7,7 +7,7 @@ import {
   ShieldCheck, Package, ClipboardCheck, Sparkles, Receipt, Timer, Clock,
   Headset, ThumbsUp, ChevronRight, Wrench, Tag, Snowflake, Droplets, Fuel, DoorOpen,
   Cog, Volume2, Flame, Zap, Thermometer, Fan, RotateCw, MonitorSmartphone, Power,
-  Lock, Disc3,
+  Lock, Disc3, Cpu, PackageOpen,
 } from "lucide-react";
 import { ApplianceTile } from "@/components/ui/Icons";
 import { APPLIANCES } from "@/lib/data";
@@ -53,6 +53,9 @@ const PROBLEM_ICONS: Record<string, typeof Wrench> = {
   spark: Zap,
   thermostat: Thermometer,
   "fan-issue": Fan,
+  "deep-clean": Sparkles,
+  "pcb-issue": Cpu,
+  uninstallation: PackageOpen,
 };
 
 /** A shot of the actual unit, shown beside the appliance name. */
@@ -61,6 +64,7 @@ const APPLIANCE_UNIT: Record<string, { src: string; fit: "cover" | "contain"; po
   "washing-machine": { src: "/work/unit-washing-machine.png", fit: "cover", pos: "center 40%" },
   microwave: { src: "/work/gallery/microwave-2.png", fit: "cover", pos: "62% 55%" },
   oven: { src: "/work/unit-oven.png", fit: "cover", pos: "38% center" },
+  ac: { src: "/work/unit-ac.png", fit: "cover" },
 };
 
 const PRICING_PROOF = [

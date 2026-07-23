@@ -1,6 +1,6 @@
 export type BrandId = "samsung" | "lg" | "ifb" | "bosch";
 
-export type ApplianceId = "refrigerator" | "washing-machine" | "microwave" | "oven";
+export type ApplianceId = "refrigerator" | "washing-machine" | "microwave" | "oven" | "ac";
 
 export interface Brand {
   id: BrandId;
