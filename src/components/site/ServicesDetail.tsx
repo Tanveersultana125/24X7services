@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ShieldCheck, Package, ClipboardCheck, Sparkles, Receipt, Timer, ArrowUpRight, Clock,
-  BadgeCheck, Headset, Lock, ThumbsUp, Wrench,
+  BadgeCheck, Headset, Lock, ThumbsUp,
 } from "lucide-react";
 import { Kicker } from "./TextReveal";
 import { ApplianceTile } from "@/components/ui/Icons";
@@ -69,16 +69,12 @@ export function ServicesDetail() {
             </div>
 
             {/* promise mark */}
-            <div aria-hidden className="relative hidden shrink-0 lg:block">
-              <span className="absolute -inset-10 rounded-full bg-royal-bright/[0.06]" />
-              <div className="relative flex items-end gap-4">
-                <span className="grid size-28 place-items-center rounded-[2rem] bg-gradient-to-br from-[#7d97ff] to-royal-bright text-white shadow-[0_28px_50px_-18px_rgba(37,71,208,0.55)]">
-                  <ShieldCheck className="size-14" strokeWidth={1.6} />
-                </span>
-                <span className="mb-2 grid size-16 place-items-center rounded-2xl border border-border bg-surface text-royal-bright shadow-premium-md">
-                  <Wrench className="size-7" strokeWidth={1.7} />
-                </span>
-              </div>
+            <div
+              aria-hidden
+              className="relative w-full max-w-md shrink-0 overflow-hidden rounded-[1.75rem] border border-white/70 shadow-premium-md lg:w-[26rem]"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/work/promise-shield.png" alt="" className="w-full" />
             </div>
           </div>
 
