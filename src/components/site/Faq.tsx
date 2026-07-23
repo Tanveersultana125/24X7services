@@ -14,7 +14,11 @@ import {
   Users,
   Wrench,
   MapPin,
+  MessageSquareText,
+  Mail,
+  ArrowUpRight,
 } from "lucide-react";
+import Link from "next/link";
 import { BrandMark } from "@/components/ui/Icons";
 import { BRANDS } from "@/lib/data";
 import { TESTIMONIALS } from "@/lib/content";
@@ -145,6 +149,39 @@ export function Faq() {
                 </div>
               </div>
             </div>
+
+            {/* the other two channels, so this block is the one place to reach us */}
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <Link
+                href="/book"
+                className="group rounded-2xl border border-border bg-surface p-4 shadow-premium-sm transition-transform duration-500 hover:-translate-y-0.5"
+              >
+                <span className="grid size-8 place-items-center rounded-lg bg-surface-2 text-ink transition-colors group-hover:bg-emerald group-hover:text-white">
+                  <MessageSquareText className="size-4" strokeWidth={1.7} />
+                </span>
+                <span className="mt-3 block text-[0.62rem] uppercase tracking-[0.16em] text-muted">Chat with AI</span>
+                <span className="mt-1.5 block text-[0.8rem] font-semibold tracking-tight">Replies in seconds</span>
+              </Link>
+
+              <a
+                href="mailto:care@24x7services.in"
+                className="group rounded-2xl border border-border bg-surface p-4 shadow-premium-sm transition-transform duration-500 hover:-translate-y-0.5"
+              >
+                <span className="grid size-8 place-items-center rounded-lg bg-surface-2 text-ink transition-colors group-hover:bg-royal-bright group-hover:text-white">
+                  <Mail className="size-4" strokeWidth={1.7} />
+                </span>
+                <span className="mt-3 block text-[0.62rem] uppercase tracking-[0.16em] text-muted">Email</span>
+                <span className="mt-1.5 block break-all text-[0.8rem] font-semibold tracking-tight">care@24x7services.in</span>
+              </a>
+            </div>
+
+            <Link
+              href="/book"
+              className="group mt-3 flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3.5 text-[0.9rem] font-medium text-background transition-transform hover:scale-[1.01]"
+            >
+              Book a service
+              <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </Link>
           </aside>
 
           {/* ---------- accordion ---------- */}

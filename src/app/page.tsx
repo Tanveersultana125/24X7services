@@ -12,7 +12,6 @@ import { Emergency } from "@/components/site/Emergency";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Stats } from "@/components/site/Stats";
 import { Faq } from "@/components/site/Faq";
-import { Contact } from "@/components/site/Contact";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
 export default function Home() {
@@ -33,7 +32,6 @@ export default function Home() {
         <Testimonials />
         <Stats />
         <Faq />
-        <Contact />
       </main>
       <SiteFooter />
     </>
