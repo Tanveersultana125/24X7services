@@ -153,7 +153,7 @@ export function ServicesDetail() {
               style={{ background: "radial-gradient(circle, rgba(37,71,208,0.14), transparent 64%)" }}
             />
 
-            <div className="relative grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-center lg:gap-12">
+            <div className="relative grid gap-8 lg:grid-cols-[1.15fr_0.95fr_0.72fr] lg:items-center lg:gap-8">
               <div>
                 <span className="inline-flex items-center gap-2.5 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-royal-bright">
                   <span aria-hidden className="h-0.5 w-6 rounded-full bg-royal-bright" />
@@ -192,7 +192,13 @@ export function ServicesDetail() {
                 </div>
               </div>
 
-              {/* promise note + mark */}
+              {/* the range we service, on its plinth */}
+              <div aria-hidden className="relative mx-auto w-full max-w-sm lg:max-w-none">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/work/appliance-lineup.png" alt="" className="w-full" />
+              </div>
+
+              {/* promise note */}
               <div className="relative">
                 <div className="relative z-10 overflow-hidden rounded-[1.5rem] border border-white/70 bg-white p-6 shadow-premium-md">
                   <span className="grid size-11 place-items-center rounded-xl bg-royal-bright/10 text-royal-bright">
@@ -213,13 +219,6 @@ export function ServicesDetail() {
                     <path d="M0 34c48-26 96 22 150 6s102-30 150-4v24H0z" fill="currentColor" />
                   </svg>
                 </div>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/work/promise-shield-cut.png"
-                  alt=""
-                  aria-hidden
-                  className="pointer-events-none absolute -left-24 -top-10 hidden w-48 opacity-90 xl:block"
-                />
               </div>
             </div>
           </div>
