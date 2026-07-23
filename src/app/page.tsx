@@ -9,7 +9,6 @@ import { ClimateExpertise } from "@/components/site/ClimateExpertise";
 import { BrandShowcase } from "@/components/site/BrandShowcase";
 import { TrustBento } from "@/components/site/TrustBento";
 import { Emergency } from "@/components/site/Emergency";
-import { Plans } from "@/components/site/Plans";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Stats } from "@/components/site/Stats";
 import { Faq } from "@/components/site/Faq";
@@ -31,7 +30,6 @@ export default function Home() {
         <BrandShowcase />
         <TrustBento />
         <Emergency />
-        <Plans />
         <Testimonials />
         <Stats />
         <Faq />
