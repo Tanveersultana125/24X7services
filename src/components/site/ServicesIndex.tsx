@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, Wrench, Clock, Sparkles, Settings2, PackageOpen, CalendarHeart, Siren } from "lucide-react";
+import { ArrowUpRight, Wrench, Clock, Sparkles, Settings2, PackageOpen, CalendarHeart, Siren, ChevronDown } from "lucide-react";
 import { Kicker } from "./TextReveal";
 import { ApplianceTile } from "@/components/ui/Icons";
 import { SERVICES, type Service } from "@/lib/services";
@@ -38,38 +38,72 @@ export function ServicesIndex() {
           </p>
         </div>
 
-        <div className="mt-10 sm:mt-16 grid gap-12 lg:grid-cols-12">
+        <div className="mt-10 grid gap-12 sm:mt-16 lg:grid-cols-12">
           {/* Index list */}
           <ol className="lg:col-span-7">
             {SERVICES.map((s, i) => (
-              <li key={s.id}>
+              <li key={s.id} className="border-b border-hairline">
                 <Link
                   href={s.appliance ? `/book?appliance=${s.appliance}` : "/book"}
                   onMouseEnter={() => setActive(i)}
                   onFocus={() => setActive(i)}
+                  onClick={(e) => {
+                    // no hover on a touch screen: the first tap opens the detail,
+                    // the second follows the link
+                    if (typeof window !== "undefined" && window.matchMedia("(hover: none)").matches && active !== i) {
+                      e.preventDefault();
+                      setActive(i);
+                    }
+                  }}
                   className={cn(
-                    "group flex items-center gap-5 border-b border-hairline py-6 transition-colors sm:gap-8",
+                    "group flex items-center gap-4 py-5 transition-colors sm:gap-8 sm:py-6",
                     active === i ? "text-ink" : "text-muted"
                   )}
                 >
-                  <span className="w-10 shrink-0 font-mono text-sm tabular-nums">{s.no}</span>
-                  <span className="font-display flex-1 text-2xl tracking-[-0.02em] transition-transform duration-500 group-hover:translate-x-2 sm:text-[2.1rem]">
+                  <span className="w-8 shrink-0 font-mono text-xs tabular-nums sm:w-10 sm:text-sm">{s.no}</span>
+                  <span className="font-display flex-1 text-[1.5rem] tracking-[-0.02em] transition-transform duration-500 group-hover:translate-x-2 sm:text-[2.1rem]">
                     {s.title}
                   </span>
                   <span className="hidden shrink-0 text-sm text-muted sm:block">{s.price}</span>
+                  {/* the list is a menu on touch, so show open/closed state there */}
+                  <ChevronDown
+                    className={cn(
+                      "size-5 shrink-0 transition-transform duration-500 lg:hidden",
+                      active === i ? "rotate-180 text-royal-bright" : "text-muted-2"
+                    )}
+                  />
                   <ArrowUpRight
                     className={cn(
-                      "size-6 shrink-0 transition-all duration-500",
-                      active === i ? "translate-x-0 translate-y-0 opacity-100 text-royal-bright" : "-translate-x-2 translate-y-2 opacity-0"
+                      "hidden size-6 shrink-0 transition-all duration-500 lg:block",
+                      active === i
+                        ? "translate-x-0 translate-y-0 text-royal-bright opacity-100"
+                        : "-translate-x-2 translate-y-2 opacity-0"
                     )}
                   />
                 </Link>
+
+                {/* below lg the detail opens inline, right under the service tapped */}
+                <AnimatePresence initial={false}>
+                  {active === i && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                      className="overflow-hidden lg:hidden"
+                    >
+                      <div className="overflow-hidden rounded-[1.5rem] border border-border bg-surface shadow-premium-md mb-6">
+                        <Preview svc={s} />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </li>
             ))}
           </ol>
 
-          {/* Sticky preview */}
-          <div className="lg:col-span-5">
+          {/* Sticky preview — desktop only */}
+          <div className="hidden lg:col-span-5 lg:block">
             <div className="lg:sticky lg:top-28">
               <AnimatePresence mode="wait">
                 <motion.div
@@ -152,7 +186,7 @@ function Preview({ svc }: { svc: Service }) {
           ))}
         </div>
 
-        <div className="mt-8 flex items-center justify-between border-t border-hairline pt-6 text-sm">
+        <div className="mt-7 flex items-center justify-between border-t border-hairline pt-5 text-sm">
           <span className="flex items-center gap-2 text-muted">
             <Wrench className="size-4 text-royal-bright" /> {svc.price}
           </span>
@@ -160,6 +194,14 @@ function Preview({ svc }: { svc: Service }) {
             <Clock className="size-4 text-emerald" /> {svc.eta}
           </span>
         </div>
+
+        <Link
+          href={svc.appliance ? `/book?appliance=${svc.appliance}` : "/book"}
+          className="group mt-5 flex items-center justify-center gap-2 rounded-full bg-ink py-3.5 text-[0.9rem] font-medium text-background transition-transform hover:scale-[1.01]"
+        >
+          Book {svc.title.replace(" Repair", "").replace(" Service & Repair", "")}
+          <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        </Link>
       </div>
     </div>
   );
