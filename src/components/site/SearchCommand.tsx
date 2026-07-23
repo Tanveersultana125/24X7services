@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Search, CornerDownLeft, ArrowUp, ArrowDown, Zap, Siren, Navigation,
+  Search, CornerDownLeft, X, Zap, Siren, Navigation,
   LayoutDashboard, LogIn, Wrench, Sparkles, FileText,
 } from "lucide-react";
 import { SERVICES } from "@/lib/services";
@@ -97,24 +97,12 @@ export function SearchTrigger({ variant = "pill" }: { variant?: "pill" | "icon" 
   );
 }
 
-function Kbd({ children, sm }: { children: React.ReactNode; sm?: boolean }) {
-  return (
-    <kbd
-      className={cn(
-        "inline-grid place-items-center rounded-md border border-border bg-background font-mono text-muted",
-        sm ? "size-5 text-[0.6rem]" : "min-w-7 px-1.5 py-1 text-[0.65rem]"
-      )}
-    >
-      {children}
-    </kbd>
-  );
-}
-
 function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -131,19 +119,20 @@ function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) 
     return [...map.entries()].filter(([, items]) => items.length);
   }, [results]);
 
-  // reset when opening
-  useEffect(() => {
-    if (open) {
-      setQuery("");
-      setActive(0);
-      setTimeout(() => inputRef.current?.focus(), 40);
-    }
-  }, [open]);
+  // reset on the way out rather than in an open effect, so no setState during render
+  const close = () => {
+    setQuery("");
+    setActive(0);
+    onClose();
+  };
 
-  useEffect(() => setActive(0), [query]);
+  // the arrow keys move `active` past the fold, so pull the row into view
+  useEffect(() => {
+    listRef.current?.querySelector<HTMLElement>(`[data-idx="${active}"]`)?.scrollIntoView({ block: "nearest" });
+  }, [active]);
 
   const go = (href: string) => {
-    onClose();
+    close();
     router.push(href);
   };
 
@@ -151,7 +140,7 @@ function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) 
     if (e.key === "ArrowDown") { e.preventDefault(); setActive((a) => Math.min(a + 1, results.length - 1)); }
     else if (e.key === "ArrowUp") { e.preventDefault(); setActive((a) => Math.max(a - 1, 0)); }
     else if (e.key === "Enter") { e.preventDefault(); if (results[active]) go(results[active].href); }
-    else if (e.key === "Escape") { onClose(); }
+    else if (e.key === "Escape") { close(); }
   };
 
   let flatIndex = -1;
@@ -166,7 +155,7 @@ function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) 
           className="fixed inset-0 z-[80] flex items-start justify-center px-4 pt-[12vh]"
           onKeyDown={onKeyDown}
         >
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-md" onClick={onClose} />
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-md" onClick={close} />
 
           <motion.div
             initial={{ opacity: 0, y: 16, scale: 0.98 }}
@@ -179,18 +168,29 @@ function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) 
               <Search className="size-5 shrink-0 text-muted" />
               <input
                 ref={inputRef}
+                autoFocus
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setActive(0);
+                }}
                 placeholder="Search services, brands, actions…"
                 style={{ outline: "none", boxShadow: "none" }}
                 className="w-full bg-transparent py-[1.15rem] text-[0.95rem] outline-none focus:outline-none focus-visible:outline-none placeholder:text-muted-2"
               />
-              <Kbd>esc</Kbd>
+              <button
+                type="button"
+                onClick={close}
+                aria-label="Close search"
+                className="grid size-8 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-surface-2 hover:text-ink"
+              >
+                <X className="size-4" />
+              </button>
             </div>
 
             <div className="h-px bg-hairline" />
 
-            <div className="max-h-[54vh] overflow-y-auto p-2.5">
+            <div ref={listRef} className="max-h-[54vh] overflow-y-auto p-2.5">
               {grouped.length === 0 ? (
                 <p className="px-4 py-16 text-center text-sm text-muted">
                   No matches for &ldquo;<span className="font-medium text-ink">{query}</span>&rdquo;
@@ -208,6 +208,7 @@ function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) 
                       return (
                         <button
                           key={it.href + it.label}
+                          data-idx={idx}
                           onMouseEnter={() => setActive(idx)}
                           onClick={() => go(it.href)}
                           className={cn(
@@ -236,12 +237,6 @@ function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) 
                   </div>
                 ))
               )}
-            </div>
-
-            <div className="flex items-center gap-5 border-t border-hairline bg-surface-2/40 px-5 py-3 text-xs text-muted">
-              <span className="flex items-center gap-1.5"><Kbd sm><ArrowUp className="size-3" /></Kbd><Kbd sm><ArrowDown className="size-3" /></Kbd> navigate</span>
-              <span className="flex items-center gap-1.5"><Kbd sm><CornerDownLeft className="size-3" /></Kbd> open</span>
-              <span className="ml-auto font-medium tracking-tight">24X7 Search</span>
             </div>
           </motion.div>
         </motion.div>
