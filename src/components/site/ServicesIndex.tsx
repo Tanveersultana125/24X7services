@@ -78,9 +78,8 @@ export function ServicesIndex() {
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                   exit={{ opacity: 0, y: -12, filter: "blur(6px)" }}
                   transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                  className="relative overflow-hidden rounded-[2rem] border border-border bg-surface p-8 shadow-premium-lg"
+                  className="relative overflow-hidden rounded-[2rem] border border-border bg-surface shadow-premium-lg"
                 >
-                  <div className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-royal-bright/10 blur-3xl" />
                   <Preview svc={svc} />
                 </motion.div>
               </AnimatePresence>
@@ -96,7 +95,28 @@ function Preview({ svc }: { svc: Service }) {
   const CareIcon = CARE_ICONS[svc.id] ?? Sparkles;
   return (
     <div className="relative">
-      <div className="flex items-start justify-between">
+      {/* photo band — the service's own work, fading into the card surface */}
+      <div className="relative h-44 w-full overflow-hidden sm:h-48">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={svc.image}
+          alt={svc.title}
+          className="size-full object-cover object-center transition-transform duration-[1.4s] ease-out"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(23,21,15,0.18) 0%, rgba(23,21,15,0.04) 40%, var(--surface) 100%)",
+          }}
+        />
+        <span className="absolute right-5 top-5 rounded-full bg-white/90 px-3 py-1 text-xs font-medium uppercase tracking-wider text-ink backdrop-blur">
+          {svc.kind}
+        </span>
+      </div>
+
+      <div className="relative -mt-9 px-8 pb-8">
         {svc.appliance ? (
           <ApplianceTile id={svc.appliance} size="lg" />
         ) : (
@@ -104,29 +124,26 @@ function Preview({ svc }: { svc: Service }) {
             <CareIcon className="size-8" strokeWidth={1.6} />
           </span>
         )}
-        <span className="rounded-full bg-surface-2 px-3 py-1 text-xs font-medium uppercase tracking-wider text-muted">
-          {svc.kind}
-        </span>
-      </div>
 
-      <h3 className="font-display mt-6 text-3xl tracking-[-0.02em]">{svc.title}</h3>
-      <p className="mt-3 text-pretty leading-relaxed text-muted">{svc.desc}</p>
+        <h3 className="font-display mt-5 text-3xl tracking-[-0.02em]">{svc.title}</h3>
+        <p className="mt-3 text-pretty leading-relaxed text-muted">{svc.desc}</p>
 
-      <div className="mt-6 flex flex-wrap gap-2">
-        {svc.tags.map((t) => (
-          <span key={t} className="rounded-full border border-border px-3 py-1 text-xs font-medium">
-            {t}
+        <div className="mt-6 flex flex-wrap gap-2">
+          {svc.tags.map((t) => (
+            <span key={t} className="rounded-full border border-border px-3 py-1 text-xs font-medium">
+              {t}
+            </span>
+          ))}
+        </div>
+
+        <div className="mt-8 flex items-center justify-between border-t border-hairline pt-6 text-sm">
+          <span className="flex items-center gap-2 text-muted">
+            <Wrench className="size-4 text-royal-bright" /> {svc.price}
           </span>
-        ))}
-      </div>
-
-      <div className="mt-8 flex items-center justify-between border-t border-hairline pt-6 text-sm">
-        <span className="flex items-center gap-2 text-muted">
-          <Wrench className="size-4 text-royal-bright" /> {svc.price}
-        </span>
-        <span className="flex items-center gap-2 text-muted">
-          <Clock className="size-4 text-emerald" /> {svc.eta}
-        </span>
+          <span className="flex items-center gap-2 text-muted">
+            <Clock className="size-4 text-emerald" /> {svc.eta}
+          </span>
+        </div>
       </div>
     </div>
   );
