@@ -206,7 +206,7 @@ export function ServicesDetail() {
               {/* the range we service, on its plinth */}
               <div aria-hidden className="relative mx-auto w-full max-w-sm lg:max-w-none">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/work/appliance-lineup.png" alt="" className="w-full" />
+                <img src="/work/appliance-lineup-v2.png" alt="" className="w-full" />
               </div>
 
               {/* promise note */}
