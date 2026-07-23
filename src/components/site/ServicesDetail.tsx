@@ -5,7 +5,9 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ShieldCheck, Package, ClipboardCheck, Sparkles, Receipt, Timer, Clock,
-  Headset, ThumbsUp, ChevronRight, Wrench, Tag,
+  Headset, ThumbsUp, ChevronRight, Wrench, Tag, Snowflake, Droplets, Fuel, DoorOpen,
+  Cog, Volume2, Flame, Zap, Thermometer, Fan, RotateCw, MonitorSmartphone, Power,
+  Lock, Disc3, Waves,
 } from "lucide-react";
 import { ApplianceTile } from "@/components/ui/Icons";
 import { APPLIANCES } from "@/lib/data";
@@ -26,6 +28,32 @@ const INCLUDES = [
   { icon: Receipt, tint: ROYAL, title: "Digital invoice", desc: "A transparent, itemised GST invoice sent instantly." },
   { icon: Timer, tint: EMERALD, title: "On-time promise", desc: "Live ETA tracking and a slot you actually choose." },
 ];
+
+/** Each fault gets its own glyph — a repeated wrench made every row look identical. */
+const PROBLEM_ICONS: Record<string, typeof Wrench> = {
+  "not-cooling": Snowflake,
+  "water-leakage": Droplets,
+  "gas-filling": Fuel,
+  "door-issue": DoorOpen,
+  "door-lock": Lock,
+  compressor: Cog,
+  "ice-build-up": Snowflake,
+  noise: Volume2,
+  installation: Wrench,
+  "drum-issue": Disc3,
+  "spin-issue": RotateCw,
+  "motor-problem": Cog,
+  "not-starting": Power,
+  "power-problem": Zap,
+  "display-issue": MonitorSmartphone,
+  "display-problem": MonitorSmartphone,
+  "heating-issue": Flame,
+  "not-heating": Flame,
+  "plate-not-rotating": RotateCw,
+  spark: Zap,
+  thermostat: Thermometer,
+  "fan-issue": Fan,
+};
 
 const PRICING_PROOF = [
   { icon: ShieldCheck, tint: ROYAL, title: "Certified Professionals", desc: "Skilled & verified experts" },
@@ -166,7 +194,7 @@ export function ServicesDetail() {
 
               {/* promise note + mark */}
               <div className="relative">
-                <div className="relative z-10 rounded-[1.5rem] border border-white/70 bg-white p-6 shadow-premium-md">
+                <div className="relative z-10 overflow-hidden rounded-[1.5rem] border border-white/70 bg-white p-6 shadow-premium-md">
                   <span className="grid size-11 place-items-center rounded-xl bg-royal-bright/10 text-royal-bright">
                     <Receipt className="size-5" strokeWidth={1.8} />
                   </span>
@@ -176,6 +204,14 @@ export function ServicesDetail() {
                   <p className="mt-2 text-[0.85rem] leading-relaxed text-muted">
                     You&apos;ll always see an exact estimate before you confirm.
                   </p>
+                  <svg
+                    aria-hidden
+                    viewBox="0 0 300 60"
+                    preserveAspectRatio="none"
+                    className="pointer-events-none absolute inset-x-0 bottom-0 h-12 w-full text-royal-bright/10"
+                  >
+                    <path d="M0 34c48-26 96 22 150 6s102-30 150-4v24H0z" fill="currentColor" />
+                  </svg>
                 </div>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -217,12 +253,20 @@ export function ServicesDetail() {
               transition={{ duration: 0.35 }}
               className="mt-4 overflow-hidden rounded-[1.75rem] border border-white/70 bg-white shadow-premium-md"
             >
-              <div className="flex items-center gap-4 border-b border-hairline p-6">
+              <div className="relative flex items-center gap-4 overflow-hidden border-b border-hairline p-6">
                 <ApplianceTile id={appliance.id} size="lg" />
-                <div>
+                <div className="relative">
                   <h3 className="font-display text-2xl tracking-tight">{appliance.name}</h3>
                   <p className="text-sm text-muted">{appliance.blurb}</p>
                 </div>
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute right-6 top-1/2 hidden -translate-y-1/2 items-center gap-5 lg:flex"
+                >
+                  <Snowflake className="size-6 text-royal-bright/25" />
+                  <Waves className="size-11 text-royal-bright/15" />
+                  <Snowflake className="size-4 text-royal-bright/20" />
+                </span>
               </div>
 
               <ul className="divide-y divide-hairline">
@@ -233,7 +277,10 @@ export function ServicesDetail() {
                       className="group flex items-center gap-3 px-5 py-4 transition-colors hover:bg-surface-2/40 sm:gap-4 sm:px-6"
                     >
                       <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-royal-bright/10 text-royal-bright">
-                        <Wrench className="size-4" strokeWidth={1.9} />
+                        {(() => {
+                          const Glyph = PROBLEM_ICONS[p.id] ?? Wrench;
+                          return <Glyph className="size-4" strokeWidth={1.9} />;
+                        })()}
                       </span>
 
                       <span className="min-w-0 flex-1 font-medium">
