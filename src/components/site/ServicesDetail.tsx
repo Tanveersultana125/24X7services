@@ -9,7 +9,7 @@ import {
   Cog, Volume2, Flame, Zap, Thermometer, Fan, RotateCw, MonitorSmartphone, Power,
   Lock, Disc3, Cpu, PackageOpen,
 } from "lucide-react";
-import { ApplianceTile } from "@/components/ui/Icons";
+import { ApplianceTile, APPLIANCE_ACCENT } from "@/components/ui/Icons";
 import { APPLIANCES } from "@/lib/data";
 import { formatRange } from "@/lib/utils";
 import type { ApplianceId } from "@/lib/types";
@@ -240,14 +240,22 @@ export function ServicesDetail() {
               <button
                 key={a.id}
                 onClick={() => setActive(a.id)}
+                style={
+                  active === a.id
+                    ? {
+                        background: APPLIANCE_ACCENT[a.id],
+                        boxShadow: `0 14px 30px -12px ${APPLIANCE_ACCENT[a.id]}99`,
+                      }
+                    : undefined
+                }
                 className={cn(
                   "flex items-center gap-2.5 rounded-full border px-4 py-2.5 text-sm font-medium transition-all",
                   active === a.id
-                    ? "border-transparent bg-royal-bright text-white shadow-[0_14px_30px_-12px_rgba(37,71,208,0.6)]"
+                    ? "border-transparent text-white"
                     : "border-white/70 bg-white text-ink shadow-premium-sm hover:-translate-y-0.5"
                 )}
               >
-                <ApplianceTile id={a.id} size="sm" />
+                <ApplianceTile id={a.id} size="sm" onAccent={active === a.id} />
                 {a.name}
               </button>
             ))}

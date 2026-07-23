@@ -11,6 +11,14 @@ export const APPLIANCE_ICONS: Record<ApplianceId, LucideIcon> = {
   ac: AirVent,
 };
 
+/** Flat accent per appliance — used where a whole surface takes its colour. */
+export const APPLIANCE_ACCENT: Record<ApplianceId, string> = {
+  refrigerator: "#2547d0",
+  "washing-machine": "#0b9a63",
+  microwave: "#d9821b",
+  ac: "#0ea5e9",
+};
+
 const APPLIANCE_GRADIENTS: Record<ApplianceId, string> = {
   refrigerator: "from-[#2547d0] to-[#1e3a8a]",
   "washing-machine": "from-[#0b9a63] to-[#0f766e]",
@@ -21,10 +29,13 @@ const APPLIANCE_GRADIENTS: Record<ApplianceId, string> = {
 export function ApplianceTile({
   id,
   size = "md",
+  onAccent = false,
   className,
 }: {
   id: ApplianceId;
   size?: "sm" | "md" | "lg";
+  /** Sitting on the appliance's own accent — drop the gradient so the two do not clash. */
+  onAccent?: boolean;
   className?: string;
 }) {
   const Icon = APPLIANCE_ICONS[id];
@@ -33,14 +44,17 @@ export function ApplianceTile({
   return (
     <div
       className={cn(
-        "relative grid place-items-center rounded-2xl bg-gradient-to-br text-white shadow-premium-md",
-        APPLIANCE_GRADIENTS[id],
+        "relative grid place-items-center rounded-2xl text-white",
+        onAccent
+          ? "bg-white/20 ring-1 ring-inset ring-white/30"
+          : cn("bg-gradient-to-br shadow-premium-md", APPLIANCE_GRADIENTS[id]),
         dims,
         className
       )}
     >
-      <div className="absolute inset-0 rounded-2xl bg-white/20 opacity-0 mix-blend-overlay" />
-      <div className="absolute inset-x-2 top-1 h-1/3 rounded-full bg-white/40 blur-md" />
+      {!onAccent && (
+        <div className="absolute inset-x-2 top-1 h-1/3 rounded-full bg-white/40 blur-md" />
+      )}
       <Icon className={cn("relative", icon)} strokeWidth={1.6} />
     </div>
   );
