@@ -322,33 +322,41 @@ export function ServicesDetail() {
                   <li key={p.id}>
                     <Link
                       href={`/book?appliance=${appliance.id}&problem=${p.id}`}
-                      className="group flex items-center gap-3 px-5 py-4 transition-colors hover:bg-surface-2/40 sm:gap-4 sm:px-6"
+                      className="group flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-surface-2/40 sm:gap-4 sm:px-6 sm:py-4"
                     >
-                      <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-royal-bright/10 text-royal-bright">
+                      <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-royal-bright/10 text-royal-bright sm:size-9">
                         {(() => {
                           const Glyph = PROBLEM_ICONS[p.id] ?? Wrench;
                           return <Glyph className="size-4" strokeWidth={1.9} />;
                         })()}
                       </span>
 
-                      <span className="min-w-0 flex-1 font-medium">
-                        {p.label}
-                        {p.common && (
-                          <span className="ml-2 rounded-full bg-royal-bright/12 px-2 py-0.5 align-middle text-[10px] font-bold tracking-wider text-royal-bright">
-                            POPULAR
+                      <span className="min-w-0 flex-1">
+                        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                          <span className="text-[0.88rem] font-medium leading-snug sm:text-base">
+                            {p.label}
                           </span>
-                        )}
+                          {p.common && (
+                            <span className="rounded-full bg-royal-bright/12 px-2 py-0.5 text-[9px] font-bold tracking-wider text-royal-bright sm:text-[10px]">
+                              POPULAR
+                            </span>
+                          )}
+                        </span>
+                        {/* the eta column is desktop-only, so carry it under the label here */}
+                        <span className="mt-1 flex items-center gap-1.5 text-[0.7rem] text-muted sm:hidden">
+                          <Clock className="size-3 text-royal-bright" /> {p.eta}
+                        </span>
                       </span>
 
                       <span className="hidden items-center gap-1.5 text-sm text-muted sm:flex">
                         <Clock className="size-3.5 text-royal-bright" /> {p.eta}
                       </span>
 
-                      <span className="w-28 text-right text-sm font-bold tracking-tight sm:w-40 sm:text-base">
+                      <span className="shrink-0 whitespace-nowrap text-right text-[0.82rem] font-bold tracking-tight sm:w-40 sm:text-base">
                         {formatRange(p.price[0], p.price[1])}
                       </span>
 
-                      <span className="grid size-8 shrink-0 place-items-center rounded-full border border-border text-muted transition-all group-hover:border-royal-bright group-hover:bg-royal-bright group-hover:text-white">
+                      <span className="grid size-7 shrink-0 place-items-center rounded-full border border-border text-muted transition-all group-hover:border-royal-bright group-hover:bg-royal-bright group-hover:text-white sm:size-8">
                         <ChevronRight className="size-4" />
                       </span>
                     </Link>
