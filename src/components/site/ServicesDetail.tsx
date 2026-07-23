@@ -277,15 +277,20 @@ export function ServicesDetail() {
             >
               <div className="relative flex min-h-[8.5rem] items-center gap-3 overflow-hidden border-b border-hairline p-5 sm:min-h-[9.5rem] sm:gap-4 sm:p-6">
                 <ApplianceTile id={appliance.id} size="lg" className="size-12 shrink-0 sm:size-16" />
-                <div className="relative max-w-[58%] sm:max-w-none">
-                  <h3 className="font-display text-xl tracking-tight sm:text-2xl">{appliance.name}</h3>
-                  <p className="mt-1 text-[0.78rem] leading-snug text-muted sm:mt-0 sm:text-sm">{appliance.blurb}</p>
+                {/* reserve the strip the photo occupies so the copy wraps instead of clipping */}
+                <div className="relative min-w-0 flex-1 pr-[36%] sm:pr-0">
+                  <h3 className="font-display text-pretty text-[1.15rem] leading-tight tracking-tight sm:text-2xl">
+                    {appliance.name}
+                  </h3>
+                  <p className="mt-1.5 text-pretty text-[0.75rem] leading-snug text-muted sm:mt-0 sm:text-sm">
+                    {appliance.blurb}
+                  </p>
                 </div>
                 {/* the unit itself, bleeding in from the right of the header band */}
                 {APPLIANCE_UNIT[appliance.id] && (
                   <span
                     aria-hidden
-                    className="pointer-events-none absolute inset-y-0 right-0 w-[42%] sm:w-1/2 lg:w-2/5"
+                    className="pointer-events-none absolute inset-y-0 right-0 w-[38%] sm:w-1/2 lg:w-2/5"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
