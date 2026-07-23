@@ -265,18 +265,23 @@ export function Faq() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease }}
-          className="relative z-10 mt-8 flex flex-col gap-6 overflow-hidden rounded-[1.5rem] bg-ink px-6 py-7 text-background shadow-premium-xl sm:rounded-[1.75rem] sm:px-9 lg:flex-row lg:items-center lg:justify-between xl:mr-[24%]"
+          className="relative z-10 mt-8 flex flex-col gap-6 overflow-hidden rounded-[1.5rem] px-6 py-7 text-white shadow-[0_28px_60px_-24px_rgba(37,71,208,0.55)] sm:rounded-[1.75rem] sm:px-9 lg:flex-row lg:items-center lg:justify-between xl:mr-[24%]"
+          style={{ background: "linear-gradient(105deg, #2f56e0 0%, #2547d0 45%, #1a2f8f 100%)" }}
         >
           <span
             aria-hidden
-            className="pointer-events-none absolute -left-16 -top-16 size-64 rounded-full bg-royal-bright/25 blur-3xl"
+            className="pointer-events-none absolute -right-16 -top-20 size-64 rounded-full bg-emerald/25 blur-3xl"
+          />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -left-20 bottom-[-6rem] size-64 rounded-full bg-white/10 blur-3xl"
           />
 
           <div className="relative">
             <p className="font-display text-xl tracking-tight sm:text-2xl">
               Still not sure what&apos;s wrong?
             </p>
-            <p className="mt-2 max-w-md text-[0.88rem] leading-relaxed text-background/60">
+            <p className="mt-2 max-w-md text-[0.88rem] leading-relaxed text-white/75">
               Book a free diagnosis — a certified technician identifies the fault and quotes
               before any work begins.
             </p>
@@ -285,14 +290,14 @@ export function Faq() {
           <div className="relative flex flex-wrap items-center gap-3">
             <Link
               href="/book"
-              className="group inline-flex items-center gap-2 rounded-full bg-background px-6 py-3 text-[0.88rem] font-semibold text-ink transition-transform hover:scale-[1.02]"
+              className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[0.88rem] font-semibold text-royal transition-transform hover:scale-[1.02]"
             >
               Book a service
               <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </Link>
             <Link
               href="/services"
-              className="inline-flex items-center gap-2 rounded-full border border-background/25 px-6 py-3 text-[0.88rem] font-medium text-background transition-colors hover:bg-background/10"
+              className="inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3 text-[0.88rem] font-medium text-white transition-colors hover:bg-white/10"
             >
               Browse all services
             </Link>
