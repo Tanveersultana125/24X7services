@@ -239,7 +239,7 @@ export function ServicesDetail() {
           </div>
 
           {/* ---------- appliance tabs ---------- */}
-          <div className="mt-8 flex flex-wrap gap-2.5">
+          <div className="mt-8 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap">
             {APPLIANCES.map((a) => (
               <button
                 key={a.id}
@@ -253,14 +253,19 @@ export function ServicesDetail() {
                     : undefined
                 }
                 className={cn(
-                  "flex items-center gap-2.5 rounded-full border px-4 py-2.5 text-sm font-medium transition-all",
+                  "flex min-w-0 items-center gap-2 rounded-full border px-3 py-2 text-[0.78rem] font-medium transition-all sm:gap-2.5 sm:px-4 sm:py-2.5 sm:text-sm",
                   active === a.id
                     ? "border-transparent text-white"
                     : "border-white/70 bg-white text-ink shadow-premium-sm hover:-translate-y-0.5"
                 )}
               >
-                <ApplianceTile id={a.id} size="sm" onAccent={active === a.id} />
-                {a.name}
+                <ApplianceTile
+                  id={a.id}
+                  size="sm"
+                  onAccent={active === a.id}
+                  className="size-9 shrink-0 rounded-xl sm:size-11 sm:rounded-2xl"
+                />
+                <span className="truncate">{a.name}</span>
               </button>
             ))}
           </div>
