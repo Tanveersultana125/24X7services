@@ -34,7 +34,7 @@ export const SERVICES: Service[] = [
     price: "from ₹199", eta: "30–60 min", tags: ["Heating", "Magnetron", "Display"], image: "/work/gallery/microwave-1.png", imagePos: "center 30%",
   },
   {
-    no: "04", id: "oven", title: "Oven Repair", kind: "repair", appliance: "oven",
+    no: "04", id: "oven", title: "Oven Repair", kind: "repair", appliance: "oven", image: "/work/unit-oven.png", imagePos: "38% center",
     desc: "Heating elements, thermostats, fans and smart panels calibrated to perfection.",
     price: "from ₹249", eta: "40–75 min", tags: ["Thermostat", "Element", "Fan"],
   },

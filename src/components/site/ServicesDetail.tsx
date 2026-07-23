@@ -7,7 +7,7 @@ import {
   ShieldCheck, Package, ClipboardCheck, Sparkles, Receipt, Timer, Clock,
   Headset, ThumbsUp, ChevronRight, Wrench, Tag, Snowflake, Droplets, Fuel, DoorOpen,
   Cog, Volume2, Flame, Zap, Thermometer, Fan, RotateCw, MonitorSmartphone, Power,
-  Lock, Disc3, Waves,
+  Lock, Disc3,
 } from "lucide-react";
 import { ApplianceTile } from "@/components/ui/Icons";
 import { APPLIANCES } from "@/lib/data";
@@ -53,6 +53,14 @@ const PROBLEM_ICONS: Record<string, typeof Wrench> = {
   spark: Zap,
   thermostat: Thermometer,
   "fan-issue": Fan,
+};
+
+/** A shot of the actual unit, shown beside the appliance name. */
+const APPLIANCE_UNIT: Record<string, { src: string; fit: "cover" | "contain"; pos?: string }> = {
+  refrigerator: { src: "/work/unit-refrigerator.png", fit: "contain" },
+  "washing-machine": { src: "/work/unit-washing-machine.png", fit: "cover", pos: "center 40%" },
+  microwave: { src: "/work/gallery/microwave-2.png", fit: "cover", pos: "62% 55%" },
+  oven: { src: "/work/unit-oven.png", fit: "cover", pos: "38% center" },
 };
 
 const PRICING_PROOF = [
@@ -258,14 +266,23 @@ export function ServicesDetail() {
                   <h3 className="font-display text-2xl tracking-tight">{appliance.name}</h3>
                   <p className="text-sm text-muted">{appliance.blurb}</p>
                 </div>
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute right-6 top-1/2 hidden -translate-y-1/2 items-center gap-5 lg:flex"
-                >
-                  <Snowflake className="size-6 text-royal-bright/25" />
-                  <Waves className="size-11 text-royal-bright/15" />
-                  <Snowflake className="size-4 text-royal-bright/20" />
-                </span>
+                {APPLIANCE_UNIT[appliance.id] && (
+                  <span
+                    aria-hidden
+                    className="ml-auto hidden h-20 w-36 shrink-0 overflow-hidden rounded-xl border border-hairline bg-surface-2 sm:block"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={APPLIANCE_UNIT[appliance.id].src}
+                      alt=""
+                      style={{ objectPosition: APPLIANCE_UNIT[appliance.id].pos }}
+                      className={cn(
+                        "size-full",
+                        APPLIANCE_UNIT[appliance.id].fit === "contain" ? "object-contain p-1.5" : "object-cover"
+                      )}
+                    />
+                  </span>
+                )}
               </div>
 
               <ul className="divide-y divide-hairline">
