@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Search, CornerDownLeft, X, Zap, Siren, Navigation,
+  Search, X, Zap, Siren, Navigation,
   LayoutDashboard, LogIn, Wrench, Sparkles, FileText,
 } from "lucide-react";
 import { SERVICES } from "@/lib/services";
@@ -226,11 +226,6 @@ function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) 
                             <span className="block truncate text-sm font-medium">{it.label}</span>
                             {it.hint && <span className="block truncate text-xs text-muted">{it.hint}</span>}
                           </span>
-                          {isActive && (
-                            <span className="grid size-6 shrink-0 place-items-center rounded-md bg-background text-muted ring-1 ring-border">
-                              <CornerDownLeft className="size-3.5" />
-                            </span>
-                          )}
                         </button>
                       );
                     })}
