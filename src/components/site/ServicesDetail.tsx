@@ -275,10 +275,10 @@ export function ServicesDetail() {
               transition={{ duration: 0.35 }}
               className="mt-4 overflow-hidden rounded-[1.75rem] border border-white/70 bg-white shadow-premium-md"
             >
-              <div className="relative flex min-h-[8.5rem] items-center gap-3 overflow-hidden border-b border-hairline p-5 sm:min-h-[9.5rem] sm:gap-4 sm:p-6">
-                <ApplianceTile id={appliance.id} size="lg" className="size-12 shrink-0 sm:size-16" />
+              <div className="relative flex min-h-[8.5rem] flex-col items-start gap-3 overflow-hidden border-b border-hairline p-5 sm:min-h-[9.5rem] sm:flex-row sm:items-center sm:gap-4 sm:p-6">
+                <ApplianceTile id={appliance.id} size="lg" className="size-11 shrink-0 sm:size-16" />
                 {/* reserve the strip the photo occupies so the copy wraps instead of clipping */}
-                <div className="relative min-w-0 flex-1 pr-[36%] sm:pr-0">
+                <div className="relative w-full min-w-0 pr-[40%] sm:w-auto sm:flex-1 sm:pr-0">
                   <h3 className="font-display text-pretty text-[1.15rem] leading-tight tracking-tight sm:text-2xl">
                     {appliance.name}
                   </h3>
@@ -290,7 +290,7 @@ export function ServicesDetail() {
                 {APPLIANCE_UNIT[appliance.id] && (
                   <span
                     aria-hidden
-                    className="pointer-events-none absolute inset-y-0 right-0 w-[38%] sm:w-1/2 lg:w-2/5"
+                    className="pointer-events-none absolute inset-y-0 right-0 w-[42%] sm:w-1/2 lg:w-2/5"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
