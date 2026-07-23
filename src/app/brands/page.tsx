@@ -19,7 +19,7 @@ export default function BrandsPage() {
       <main className="flex-1">
         <PageHeader
           crumb="Brands"
-          title="Authorised Brands"
+          title={<>Authorised<br /><span className="text-amber">Brands</span></>}
           subtitle="We're certified for the brands you own — with model-specific training and genuine spare parts, so every repair keeps your warranty intact."
           stats={[
             { value: "4", label: "Authorised brands" },
