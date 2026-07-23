@@ -4,10 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ShieldCheck, Package, ClipboardCheck, Sparkles, Receipt, Timer, ArrowUpRight, Clock,
-  BadgeCheck, Headset, Lock, ThumbsUp,
+  ShieldCheck, Package, ClipboardCheck, Sparkles, Receipt, Timer, Clock,
+  Headset, ThumbsUp, ChevronRight, Wrench, Tag,
 } from "lucide-react";
-import { Kicker } from "./TextReveal";
 import { ApplianceTile } from "@/components/ui/Icons";
 import { APPLIANCES } from "@/lib/data";
 import { formatRange } from "@/lib/utils";
@@ -17,6 +16,7 @@ import { cn } from "@/lib/utils";
 const ROYAL = "#2547d0";
 const EMERALD = "#0b9a63";
 const AMBER = "#d9821b";
+const VIOLET = "#6d5ae0";
 
 const INCLUDES = [
   { icon: ClipboardCheck, tint: ROYAL, title: "Free diagnosis", desc: "A full inspection and honest assessment before any charge." },
@@ -27,11 +27,16 @@ const INCLUDES = [
   { icon: Timer, tint: EMERALD, title: "On-time promise", desc: "Live ETA tracking and a slot you actually choose." },
 ];
 
-const ASSURANCES = [
-  { icon: BadgeCheck, title: "Trusted & Verified", desc: "Background-checked professionals" },
-  { icon: Headset, title: "24 × 7 Support", desc: "Real humans. Always." },
-  { icon: Lock, title: "Secure & Safe", desc: "Your safety is our priority" },
-  { icon: ThumbsUp, title: "100% Satisfaction", desc: "We're not happy till you are" },
+const PRICING_PROOF = [
+  { icon: ShieldCheck, tint: ROYAL, title: "Certified Professionals", desc: "Skilled & verified experts" },
+  { icon: Tag, tint: VIOLET, title: "Transparent Pricing", desc: "No hidden charges, ever" },
+];
+
+const PRICING_ASSURANCES = [
+  { icon: ShieldCheck, tint: ROYAL, title: "90-Day Warranty", desc: "On all repairs & parts" },
+  { icon: Tag, tint: EMERALD, title: "Upfront Pricing", desc: "You approve before we start" },
+  { icon: Headset, tint: AMBER, title: "Quick Support", desc: "We're here when you need us" },
+  { icon: ThumbsUp, tint: ROYAL, title: "Satisfaction Guaranteed", desc: "Quality service, always" },
 ];
 
 export function ServicesDetail() {
@@ -106,48 +111,85 @@ export function ServicesDetail() {
             ))}
           </div>
 
-          {/* assurance strip */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-4 grid grid-cols-1 gap-6 rounded-[1.5rem] border border-white/70 bg-gradient-to-b from-white to-surface px-6 py-6 shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_rgba(255,255,255,0.9)] sm:grid-cols-2 sm:px-8 lg:grid-cols-4 lg:divide-x lg:divide-hairline"
-          >
-            {ASSURANCES.map((a) => (
-              <div key={a.title} className="flex items-center gap-3.5 lg:justify-center lg:px-4">
-                <span className="grid size-11 shrink-0 place-items-center rounded-full bg-royal-bright/10 text-royal-bright">
-                  <a.icon className="size-5" strokeWidth={1.9} />
-                </span>
-                <span className="min-w-0 leading-none">
-                  <span className="block text-[0.88rem] font-semibold tracking-tight text-royal-bright">{a.title}</span>
-                  <span className="mt-1.5 block text-[0.75rem] text-muted">{a.desc}</span>
-                </span>
-              </div>
-            ))}
-          </motion.div>
         </div>
       </section>
 
       {/* Problems & pricing */}
       <section className="bg-surface py-14 sm:py-20">
         <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
-          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-            <div>
-              <Kicker>Transparent pricing</Kicker>
-              <h2 className="font-display mt-6 text-[2.4rem] leading-[1.05] tracking-[-0.03em] sm:text-5xl">
-                Faults we fix — and
-                <br />
-                what they cost.
-              </h2>
+          {/* ---------- intro panel ---------- */}
+          <div className="relative overflow-hidden rounded-[1.75rem] border border-white/70 bg-gradient-to-br from-white to-[#f1f3fc] px-6 py-8 shadow-premium-md sm:rounded-[2rem] sm:px-10 sm:py-10">
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -right-24 -top-24 size-80 rounded-full"
+              style={{ background: "radial-gradient(circle, rgba(37,71,208,0.14), transparent 64%)" }}
+            />
+
+            <div className="relative grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-center lg:gap-12">
+              <div>
+                <span className="inline-flex items-center gap-2.5 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-royal-bright">
+                  <span aria-hidden className="h-0.5 w-6 rounded-full bg-royal-bright" />
+                  Transparent pricing
+                </span>
+
+                <h2 className="font-display mt-4 text-[2.2rem] leading-[1.05] tracking-[-0.03em] sm:text-[3.2rem]">
+                  Faults we fix —
+                  <br />
+                  and what they <span className="italic text-royal-bright">cost.</span>
+                </h2>
+
+                <span aria-hidden className="mt-5 block h-1 w-14 rounded-full bg-royal-bright" />
+
+                <p className="mt-5 max-w-md text-pretty leading-relaxed text-muted">
+                  Real price bands for real problems. You&apos;ll always see an exact estimate
+                  before you confirm.
+                </p>
+
+                <div className="mt-7 flex flex-wrap items-center gap-x-8 gap-y-5">
+                  {PRICING_PROOF.map((p, i) => (
+                    <div key={p.title} className="flex items-center gap-3">
+                      {i > 0 && <span aria-hidden className="mr-5 hidden h-10 w-px bg-hairline sm:block" />}
+                      <span
+                        className="grid size-11 shrink-0 place-items-center rounded-xl"
+                        style={{ background: `${p.tint}16`, color: p.tint }}
+                      >
+                        <p.icon className="size-5" strokeWidth={1.8} />
+                      </span>
+                      <span className="leading-none">
+                        <span className="block text-[0.88rem] font-semibold tracking-tight">{p.title}</span>
+                        <span className="mt-1.5 block text-[0.76rem] text-muted">{p.desc}</span>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* promise note + mark */}
+              <div className="relative">
+                <div className="relative z-10 rounded-[1.5rem] border border-white/70 bg-white p-6 shadow-premium-md">
+                  <span className="grid size-11 place-items-center rounded-xl bg-royal-bright/10 text-royal-bright">
+                    <Receipt className="size-5" strokeWidth={1.8} />
+                  </span>
+                  <p className="mt-4 text-[1.05rem] font-semibold leading-snug tracking-tight">
+                    Real price bands for real problems.
+                  </p>
+                  <p className="mt-2 text-[0.85rem] leading-relaxed text-muted">
+                    You&apos;ll always see an exact estimate before you confirm.
+                  </p>
+                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/work/promise-shield-cut.png"
+                  alt=""
+                  aria-hidden
+                  className="pointer-events-none absolute -left-24 -top-10 hidden w-48 opacity-90 xl:block"
+                />
+              </div>
             </div>
-            <p className="max-w-xs text-pretty text-muted md:text-right">
-              Real price bands for real problems. You&apos;ll always see an exact estimate before you confirm.
-            </p>
           </div>
 
-          {/* appliance tabs */}
-          <div className="mt-12 flex flex-wrap gap-2.5">
+          {/* ---------- appliance tabs ---------- */}
+          <div className="mt-8 flex flex-wrap gap-2.5">
             {APPLIANCES.map((a) => (
               <button
                 key={a.id}
@@ -155,8 +197,8 @@ export function ServicesDetail() {
                 className={cn(
                   "flex items-center gap-2.5 rounded-full border px-4 py-2.5 text-sm font-medium transition-all",
                   active === a.id
-                    ? "border-transparent bg-ink text-background"
-                    : "border-border bg-background text-muted hover:border-border-strong hover:text-ink"
+                    ? "border-transparent bg-royal-bright text-white shadow-[0_14px_30px_-12px_rgba(37,71,208,0.6)]"
+                    : "border-white/70 bg-white text-ink shadow-premium-sm hover:-translate-y-0.5"
                 )}
               >
                 <ApplianceTile id={a.id} size="sm" />
@@ -165,6 +207,7 @@ export function ServicesDetail() {
             ))}
           </div>
 
+          {/* ---------- price list ---------- */}
           <AnimatePresence mode="wait">
             <motion.div
               key={active}
@@ -172,7 +215,7 @@ export function ServicesDetail() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.35 }}
-              className="mt-10 overflow-hidden rounded-[1.75rem] border border-border bg-background"
+              className="mt-4 overflow-hidden rounded-[1.75rem] border border-white/70 bg-white shadow-premium-md"
             >
               <div className="flex items-center gap-4 border-b border-hairline p-6">
                 <ApplianceTile id={appliance.id} size="lg" />
@@ -181,30 +224,62 @@ export function ServicesDetail() {
                   <p className="text-sm text-muted">{appliance.blurb}</p>
                 </div>
               </div>
+
               <ul className="divide-y divide-hairline">
                 {appliance.problems.map((p) => (
                   <li key={p.id}>
                     <Link
                       href={`/book?appliance=${appliance.id}&problem=${p.id}`}
-                      className="group flex items-center gap-4 px-6 py-4 transition-colors hover:bg-surface-2/40"
+                      className="group flex items-center gap-3 px-5 py-4 transition-colors hover:bg-surface-2/40 sm:gap-4 sm:px-6"
                     >
-                      <span className="flex-1 font-medium">
+                      <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-royal-bright/10 text-royal-bright">
+                        <Wrench className="size-4" strokeWidth={1.9} />
+                      </span>
+
+                      <span className="min-w-0 flex-1 font-medium">
                         {p.label}
                         {p.common && (
-                          <span className="ml-2 rounded-full bg-amber/15 px-1.5 py-0.5 text-[10px] font-bold text-amber align-middle">POPULAR</span>
+                          <span className="ml-2 rounded-full bg-royal-bright/12 px-2 py-0.5 align-middle text-[10px] font-bold tracking-wider text-royal-bright">
+                            POPULAR
+                          </span>
                         )}
                       </span>
+
                       <span className="hidden items-center gap-1.5 text-sm text-muted sm:flex">
-                        <Clock className="size-3.5" /> {p.eta}
+                        <Clock className="size-3.5 text-royal-bright" /> {p.eta}
                       </span>
-                      <span className="w-32 text-right text-sm font-semibold sm:w-40">{formatRange(p.price[0], p.price[1])}</span>
-                      <ArrowUpRight className="size-4 shrink-0 text-muted-2 transition-all group-hover:translate-x-0.5 group-hover:text-royal-bright" />
+
+                      <span className="w-28 text-right text-sm font-bold tracking-tight sm:w-40 sm:text-base">
+                        {formatRange(p.price[0], p.price[1])}
+                      </span>
+
+                      <span className="grid size-8 shrink-0 place-items-center rounded-full border border-border text-muted transition-all group-hover:border-royal-bright group-hover:bg-royal-bright group-hover:text-white">
+                        <ChevronRight className="size-4" />
+                      </span>
                     </Link>
                   </li>
                 ))}
               </ul>
             </motion.div>
           </AnimatePresence>
+
+          {/* ---------- pricing assurances ---------- */}
+          <div className="mt-4 grid grid-cols-1 gap-6 rounded-[1.75rem] border border-white/70 bg-white px-5 py-6 shadow-premium-sm sm:grid-cols-2 sm:px-7 lg:grid-cols-4 lg:divide-x lg:divide-hairline">
+            {PRICING_ASSURANCES.map((a) => (
+              <div key={a.title} className="flex items-center gap-3.5 lg:justify-center lg:px-4">
+                <span
+                  className="grid size-11 shrink-0 place-items-center rounded-full"
+                  style={{ background: `${a.tint}16`, color: a.tint }}
+                >
+                  <a.icon className="size-5" strokeWidth={1.9} />
+                </span>
+                <span className="min-w-0 leading-none">
+                  <span className="block text-[0.88rem] font-semibold tracking-tight">{a.title}</span>
+                  <span className="mt-1.5 block text-[0.75rem] leading-snug text-muted">{a.desc}</span>
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </>
