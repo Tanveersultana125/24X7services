@@ -108,7 +108,7 @@ export function SiteNav() {
                 <X className="size-5" />
               </button>
             </div>
-            <div className="flex flex-col px-6 pt-8">
+            <div className="flex flex-col px-6 pt-6">
               {LINKS.map((l, i) => (
                 <motion.div
                   key={l.href}
@@ -119,24 +119,24 @@ export function SiteNav() {
                   <Link
                     href={l.href}
                     onClick={() => setOpen(false)}
-                    className="font-display block border-b border-hairline py-5 text-4xl tracking-tight"
+                    className="font-display block border-b border-hairline py-4 text-[1.75rem] tracking-tight"
                   >
                     {l.label}
                   </Link>
                 </motion.div>
               ))}
-              <div className="mt-10 flex flex-col gap-3">
+              <div className="mt-8 flex flex-col gap-2.5">
                 <Link
                   href="/book"
                   onClick={() => setOpen(false)}
-                  className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-ink text-base font-medium text-background"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink text-[0.95rem] font-medium text-background"
                 >
                   Book a service <ArrowUpRight className="size-5" />
                 </Link>
                 <Link
                   href="/login"
                   onClick={() => setOpen(false)}
-                  className="inline-flex h-14 items-center justify-center gap-2 rounded-full border border-border-strong text-base font-medium text-ink"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-border-strong text-[0.95rem] font-medium text-ink"
                 >
                   <UserRound className="size-5" /> Log in
                 </Link>
