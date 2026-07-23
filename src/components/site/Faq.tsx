@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 const ease = [0.16, 1, 0.3, 1] as const;
 
 const FAQS: { q: string; a: string; brands?: boolean }[] = [
-  { q: "How fast can a technician reach me?", a: "Book by 2 PM for same-day service. Emergency requests are prioritised and average under 90 minutes in serviced cities." },
+  { q: "How fast can a technician reach me?", a: "Book by 2 PM for same-day service. Emergency requests are prioritised and average under 90 minutes across Hyderabad and Secunderabad." },
   { q: "Are the spare parts genuine?", a: "Always. We use only brand-approved, traceable components — and every part is covered by our 90-day warranty alongside the repair." },
   { q: "What does the 90-day warranty cover?", a: "If the same issue recurs within 90 days of the visit, we return and fix it at no cost — parts and labour included, no questions asked." },
   {

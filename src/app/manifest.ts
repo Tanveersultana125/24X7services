@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "24X7 Services — Home Appliance Repair",
     short_name: "24X7 Services",
     description:
-      "Book certified doorstep repair, installation & AMC for Samsung, LG, IFB & Bosch appliances. 24×7.",
+      "Book certified doorstep repair, installation & AMC for Samsung, LG, IFB & Bosch appliances across Telangana. 24×7.",
     start_url: "/",
     display: "standalone",
     orientation: "portrait",

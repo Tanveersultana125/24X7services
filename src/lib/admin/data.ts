@@ -23,7 +23,7 @@ export const BOOKINGS: Booking[] = [
   { id: "BK-2037", customer: "Priya Nair", phone: "88790 55667", appliance: "Refrigerator", problem: "Water Leakage", city: "Khammam", date: "2026-07-16", price: 499, status: "completed", tech: "Deepak M." },
   { id: "BK-2036", customer: "Arjun Das", phone: "97410 99887", appliance: "Oven", problem: "Thermostat", city: "Hyderabad", date: "2026-07-16", price: 1199, status: "cancelled" },
   { id: "BK-2035", customer: "Meera Joshi", phone: "96320 12121", appliance: "Washing Machine", problem: "Not Starting", city: "Warangal", date: "2026-07-15", price: 699, status: "completed", tech: "Imran S." },
-  { id: "BK-2034", customer: "Karan Malhotra", phone: "90000 65432", appliance: "AC", problem: "Deep Clean", city: "Gurugram", date: "2026-07-15", price: 599, status: "completed", tech: "Deepak M." },
+  { id: "BK-2034", customer: "Karan Malhotra", phone: "90000 65432", appliance: "AC", problem: "Deep Clean", city: "Ramagundam", date: "2026-07-15", price: 599, status: "completed", tech: "Deepak M." },
 ];
 
 export const TECHNICIANS = ["Ravi K.", "Imran S.", "Deepak M.", "Sunil P."];

@@ -9,7 +9,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const metadata: Metadata = {
   title: "Premium Services",
   description:
-    "Eight premium appliance services — refrigerator, washing machine, microwave & oven repair, plus installation, uninstallation, annual maintenance and 24×7 emergency repair. Transparent pricing and a 90-day warranty.",
+    "Eight premium appliance services across Telangana — refrigerator, washing machine, microwave & oven repair, plus installation, uninstallation, annual maintenance and 24×7 emergency repair. Transparent pricing and a 90-day warranty.",
 };
 
 export default function ServicesPage() {

@@ -8,7 +8,7 @@ import { BookingFlow } from "@/components/booking/BookingFlow";
 
 export const metadata: Metadata = {
   title: "Book a Service",
-  description: "Book certified doorstep appliance repair in under 60 seconds.",
+  description: "Book certified doorstep appliance repair anywhere in Telangana in under 60 seconds.",
 };
 
 export default function BookPage() {

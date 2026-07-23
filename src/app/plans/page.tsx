@@ -10,7 +10,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const metadata: Metadata = {
   title: "AMC Plans",
   description:
-    "Annual maintenance plans that pay for themselves — preventive visits, priority dispatch and genuine parts. Compare Essential, Premium and Business side by side.",
+    "Annual maintenance plans for homes across Telangana — preventive visits, priority dispatch and genuine parts. Compare Essential, Premium and Business side by side.",
 };
 
 export default function PlansPage() {

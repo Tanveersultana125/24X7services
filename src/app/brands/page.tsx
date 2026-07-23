@@ -9,7 +9,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const metadata: Metadata = {
   title: "Authorised Brands",
   description:
-    "Brand-certified technicians and genuine parts for Samsung, LG, IFB and Bosch — with model-specific training and warranty-safe service.",
+    "Brand-certified technicians and genuine parts for Samsung, LG, IFB and Bosch across Telangana — with model-specific training and warranty-safe service.",
 };
 
 export default function BrandsPage() {
