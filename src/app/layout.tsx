@@ -24,7 +24,7 @@ const SITE = {
   name: "24X7 Services",
   title: "24X7 Services — Home Appliance Repair Across Telangana, Same Day",
   description:
-    "Book certified doorstep repair, installation, maintenance & AMC for Samsung, LG, IFB & Bosch refrigerators, washing machines, microwaves and ovens — across Hyderabad, Secunderabad and all 33 Telangana districts. Genuine parts, 90-day warranty, live tracking, 24×7.",
+    "Book certified doorstep repair, installation, maintenance & AMC for Samsung, LG, IFB & Bosch air conditioners, refrigerators, washing machines, microwaves and ovens — across Hyderabad, Secunderabad and all 33 Telangana districts. Genuine parts, 90-day warranty, live tracking, 24×7.",
   url: "https://24x7services.example.com",
 };
 
@@ -37,10 +37,13 @@ export const metadata: Metadata = {
   description: SITE.description,
   applicationName: SITE.name,
   keywords: [
+    "AC repair Hyderabad",
+    "AC service Telangana",
     "appliance repair Hyderabad",
     "appliance repair Telangana",
     "washing machine repair Secunderabad",
     "appliance repair",
+    "air conditioner repair",
     "refrigerator repair",
     "washing machine service",
     "microwave repair",

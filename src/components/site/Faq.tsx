@@ -30,7 +30,7 @@ const FAQS: { q: string; a: string; brands?: boolean }[] = [
   { q: "What does the 90-day warranty cover?", a: "If the same issue recurs within 90 days of the visit, we return and fix it at no cost — parts and labour included, no questions asked." },
   {
     q: "Which brands and appliances do you service?",
-    a: "We service a wide range of leading brands including Samsung, LG, IFB and Bosch — across refrigerators, washing machines, microwaves, ovens and other major appliances. This includes installation, uninstallation and annual maintenance.",
+    a: "We service a wide range of leading brands including Samsung, LG, IFB and Bosch — across air conditioners, refrigerators, washing machines, microwaves and ovens. This includes installation, uninstallation and annual maintenance.",
     brands: true,
   },
   { q: "How is pricing decided?", a: "You see a transparent estimate before booking, tuned to your brand, model and city. There are no surprise charges — the technician confirms the final quote on site before any work begins." },

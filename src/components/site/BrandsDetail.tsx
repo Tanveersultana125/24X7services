@@ -8,10 +8,10 @@ import { BrandMark } from "@/components/ui/Icons";
 import { BRANDS } from "@/lib/data";
 
 const COVERAGE: Record<string, { appliances: string[]; specialties: string[] }> = {
-  samsung: { appliances: ["Refrigerator", "Washing Machine", "Microwave", "Oven"], specialties: ["Digital Inverter", "Twin Cooling", "SmartThings panels"] },
-  lg: { appliances: ["Refrigerator", "Washing Machine", "Microwave", "Oven"], specialties: ["Direct Drive", "Linear Compressor", "InstaView"] },
-  ifb: { appliances: ["Washing Machine", "Microwave", "Oven"], specialties: ["Front-load drums", "Aqua energie", "Built-in modular"] },
-  bosch: { appliances: ["Refrigerator", "Washing Machine", "Oven"], specialties: ["EcoSilence motors", "VarioInverter", "German precision"] },
+  samsung: { appliances: ["Refrigerator", "Washing Machine", "Microwave & Oven", "Air Conditioner"], specialties: ["Digital Inverter", "Twin Cooling", "SmartThings panels"] },
+  lg: { appliances: ["Refrigerator", "Washing Machine", "Microwave & Oven", "Air Conditioner"], specialties: ["Direct Drive", "Linear Compressor", "InstaView"] },
+  ifb: { appliances: ["Washing Machine", "Microwave & Oven", "Air Conditioner"], specialties: ["Front-load drums", "Aqua energie", "Built-in modular"] },
+  bosch: { appliances: ["Refrigerator", "Washing Machine", "Microwave & Oven", "Air Conditioner"], specialties: ["EcoSilence motors", "VarioInverter", "German precision"] },
 };
 
 const WHY = [

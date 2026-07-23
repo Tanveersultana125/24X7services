@@ -10,10 +10,10 @@ import { BRANDS } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
 const DETAIL: Record<string, { services: string[]; note: string }> = {
-  samsung: { services: ["Refrigerator", "Washing Machine", "Microwave", "Oven"], note: "Digital Inverter & Twin Cooling specialists" },
-  lg: { services: ["Refrigerator", "Washing Machine", "Microwave", "Oven"], note: "Direct Drive & Linear Compressor certified" },
-  ifb: { services: ["Washing Machine", "Microwave", "Oven"], note: "Front-load & built-in modular experts" },
-  bosch: { services: ["Refrigerator", "Washing Machine", "Oven"], note: "German-engineered precision servicing" },
+  samsung: { services: ["Refrigerator", "Washing Machine", "Microwave & Oven", "AC"], note: "Digital Inverter & Twin Cooling specialists" },
+  lg: { services: ["Refrigerator", "Washing Machine", "Microwave & Oven", "AC"], note: "Direct Drive & Linear Compressor certified" },
+  ifb: { services: ["Washing Machine", "Microwave & Oven", "AC"], note: "Front-load & built-in modular experts" },
+  bosch: { services: ["Refrigerator", "Washing Machine", "Microwave & Oven", "AC"], note: "German-engineered precision servicing" },
 };
 
 export function BrandShowcase() {

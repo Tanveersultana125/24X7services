@@ -21,7 +21,7 @@ export const BOOKINGS: Booking[] = [
   { id: "BK-2039", customer: "Sneha Iyer", phone: "90080 77112", appliance: "Microwave", problem: "Not Heating", city: "Nizamabad", date: "2026-07-17", price: 599, status: "in-progress", tech: "Imran S." },
   { id: "BK-2038", customer: "Vikram Singh", phone: "70420 33445", appliance: "AC", problem: "Gas Refill", city: "Secunderabad", date: "2026-07-17", price: 1499, status: "completed", tech: "Ravi K." },
   { id: "BK-2037", customer: "Priya Nair", phone: "88790 55667", appliance: "Refrigerator", problem: "Water Leakage", city: "Khammam", date: "2026-07-16", price: 499, status: "completed", tech: "Deepak M." },
-  { id: "BK-2036", customer: "Arjun Das", phone: "97410 99887", appliance: "Oven", problem: "Thermostat", city: "Hyderabad", date: "2026-07-16", price: 1199, status: "cancelled" },
+  { id: "BK-2036", customer: "Arjun Das", phone: "97410 99887", appliance: "Microwave & Oven", problem: "Thermostat", city: "Hyderabad", date: "2026-07-16", price: 1199, status: "cancelled" },
   { id: "BK-2035", customer: "Meera Joshi", phone: "96320 12121", appliance: "Washing Machine", problem: "Not Starting", city: "Warangal", date: "2026-07-15", price: 699, status: "completed", tech: "Imran S." },
   { id: "BK-2034", customer: "Karan Malhotra", phone: "90000 65432", appliance: "AC", problem: "Deep Clean", city: "Ramagundam", date: "2026-07-15", price: 599, status: "completed", tech: "Deepak M." },
 ];
@@ -64,7 +64,7 @@ export const REVIEWS: AdminReview[] = [
   { id: "RV-117", name: "Rahul Mehta", city: "Karimnagar", rating: 5, text: "Booked a washing machine repair at night, done by next morning. Loved the live tracking.", appliance: "Washing Machine", date: "2026-07-17", status: "published" },
   { id: "RV-116", name: "Sneha Iyer", city: "Nizamabad", rating: 4, text: "Good service, slightly delayed but the microwave works perfectly now.", appliance: "Microwave", date: "2026-07-16", status: "pending" },
   { id: "RV-115", name: "Vikram Singh", city: "Secunderabad", rating: 5, text: "Foam-jet AC service was thorough. Cooling improved a lot.", appliance: "AC", date: "2026-07-15", status: "published" },
-  { id: "RV-114", name: "Arjun Das", city: "Hyderabad", rating: 3, text: "Oven fixed but had to follow up once. Support was responsive.", appliance: "Oven", date: "2026-07-14", status: "pending" },
+  { id: "RV-114", name: "Arjun Das", city: "Hyderabad", rating: 3, text: "Oven fixed but had to follow up once. Support was responsive.", appliance: "Microwave & Oven", date: "2026-07-14", status: "pending" },
 ];
 
 export type GalleryItem = { id: string; src: string; label: string; category: string };

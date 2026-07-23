@@ -62,8 +62,7 @@ const PROBLEM_ICONS: Record<string, typeof Wrench> = {
 const APPLIANCE_UNIT: Record<string, { src: string; fit: "cover" | "contain"; pos?: string }> = {
   refrigerator: { src: "/work/unit-refrigerator.png", fit: "contain" },
   "washing-machine": { src: "/work/unit-washing-machine.png", fit: "cover", pos: "center 40%" },
-  microwave: { src: "/work/gallery/microwave-2.png", fit: "cover", pos: "62% 55%" },
-  oven: { src: "/work/unit-oven.png", fit: "cover", pos: "38% center" },
+  microwave: { src: "/work/unit-oven.png", fit: "cover", pos: "38% center" },
   ac: { src: "/work/unit-ac.png", fit: "cover" },
 };
 

@@ -61,7 +61,12 @@ function getReply(raw: string): { text: string; actions?: Action[] } {
   if (has("oven", "thermostat", "baking"))
     return {
       text: "Oven issues are usually the heating element, thermostat, or fan. We calibrate and test before leaving. Repairs run ₹499–₹1,899.",
-      actions: [{ label: "Book oven repair", href: "/book?appliance=oven" }],
+      actions: [{ label: "Book oven repair", href: "/book?appliance=microwave" }],
+    };
+  if (has("ac", "air condition", "cooling", "gas charg", "split"))
+    return {
+      text: "AC trouble is usually low gas, a choked filter, or a fan/PCB fault. A foam-jet deep clean is ₹699–₹1,299 and gas charging ₹1,999–₹3,999. Installation is ₹1,499–₹2,499.",
+      actions: [{ label: "Book AC service", href: "/book?appliance=ac" }],
     };
   if (has("leak", "leakage", "water"))
     return {

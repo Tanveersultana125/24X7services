@@ -75,7 +75,7 @@ export function GalleryManager() {
                   onChange={(e) => setDraft({ ...draft, category: e.target.value })}
                   className="mt-1 w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm outline-none focus:border-royal-bright"
                 >
-                  {["AC", "Refrigerator", "Washing Machine", "Microwave", "Oven"].map((c) => (
+                  {["AC", "Refrigerator", "Washing Machine", "Microwave & Oven"].map((c) => (
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </select>

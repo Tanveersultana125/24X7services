@@ -27,7 +27,7 @@ export function ServicesIndex() {
           <div>
             <Kicker>The work</Kicker>
             <h2 className="font-display mt-6 max-w-xl text-[2.6rem] leading-[1.05] tracking-[-0.03em] sm:text-6xl">
-              Nine services.
+              Eight services.
               <br />
               <span className="italic text-muted">One standard.</span>
             </h2>

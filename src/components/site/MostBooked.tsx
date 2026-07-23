@@ -14,7 +14,6 @@ const PHOTO: Record<string, string> = {
   refrigerator: "/work/refrigerator.png",
   "washing-machine": "/work/washing-machine.png",
   microwave: "/work/microwave.png",
-  oven: "/work/unit-oven.png",
   ac: "/work/gallery/ac-3.png",
 };
 

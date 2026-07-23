@@ -101,7 +101,7 @@ export const TESTIMONIALS: Testimonial[] = [
 
 export const FOOTER_LINKS = {
   Company: ["About Us", "Careers", "Press", "Blog"],
-  Services: ["Refrigerator", "Washing Machine", "Microwave", "Oven"],
+  Services: ["AC Service", "Refrigerator", "Washing Machine", "Microwave & Oven"],
   Brands: ["Samsung", "LG", "IFB", "Bosch"],
   Support: ["Contact", "AMC Plans", "Track Service", "Help Center"],
   Legal: ["Privacy Policy", "Terms of Service", "Refund Policy", "Warranty"],
