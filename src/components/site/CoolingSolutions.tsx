@@ -16,22 +16,33 @@ const ITEMS = [
 
 const PERKS = ["Discounted AC repairs", "AMC maintenance specials", "Free on-site inspection", "Brand-certified technicians"];
 
+function Tick() {
+  return (
+    <span className="grid size-5 shrink-0 place-items-center rounded-full bg-emerald/12 text-emerald sm:size-6">
+      <BadgeCheck className="size-3 sm:size-3.5" />
+    </span>
+  );
+}
+
 export function CoolingSolutions() {
   const [open, setOpen] = useState(2);
 
   return (
     <section className="relative py-12 sm:py-16">
-      <div className="mx-auto grid max-w-[92rem] gap-12 px-6 sm:px-10 lg:grid-cols-2 lg:items-center lg:gap-16">
-        {/* accordion */}
-        <div>
+      <div className="mx-auto grid max-w-[92rem] grid-cols-12 gap-x-4 gap-y-8 px-6 sm:px-10 lg:grid-rows-[auto_1fr] lg:items-center lg:gap-x-16">
+        {/* heading — shares the first row with the photo on every screen */}
+        <div className="col-span-7 row-start-1 self-center lg:col-span-6 lg:self-end">
           <Kicker>Smart cooling</Kicker>
-          <h2 className="font-display mt-6 text-[2.4rem] leading-[1.05] tracking-[-0.03em] sm:text-5xl">
+          <h2 className="font-display mt-5 text-[1.5rem] leading-[1.08] tracking-[-0.03em] sm:mt-6 sm:text-[2.4rem] lg:text-5xl">
             Smart cooling solutions
             <br />
             for modern homes.
           </h2>
+        </div>
 
-          <div className="mt-8 border-t border-hairline">
+        {/* accordion */}
+        <div className="col-span-12 col-start-1 row-start-3 lg:col-span-6 lg:row-start-2 lg:self-start">
+          <div className="border-t border-hairline">
             {ITEMS.map((it, i) => (
               <div key={it.title} className="border-b border-hairline">
                 <button
@@ -70,7 +81,7 @@ export function CoolingSolutions() {
         </div>
 
         {/* image + floating perks card */}
-        <div className="relative">
+        <div className="relative col-span-5 col-start-8 row-start-1 self-center lg:col-span-6 lg:col-start-7 lg:row-span-2">
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -89,19 +100,30 @@ export function CoolingSolutions() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.7, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute bottom-4 left-3 w-[82%] rounded-2xl border border-white/70 bg-white/95 p-4 shadow-premium-xl backdrop-blur sm:-bottom-6 sm:left-8 sm:w-auto sm:p-6"
+            className="absolute -bottom-6 left-8 hidden rounded-2xl border border-white/70 bg-white/95 p-6 shadow-premium-xl backdrop-blur lg:block"
           >
-            <ul className="space-y-2 sm:space-y-2.5">
+            <ul className="space-y-2.5">
               {PERKS.map((p) => (
-                <li key={p} className="flex items-center gap-2.5 text-[0.78rem] font-medium text-ink sm:text-sm">
-                  <span className="grid size-5 shrink-0 place-items-center rounded-full bg-emerald/12 text-emerald sm:size-6">
-                    <BadgeCheck className="size-3 sm:size-3.5" />
-                  </span>
+                <li key={p} className="flex items-center gap-2.5 text-sm font-medium text-ink">
+                  <Tick />
                   {p}
                 </li>
               ))}
             </ul>
           </motion.div>
+        </div>
+
+        {/* below lg the photo column is too narrow to float a card over — run the perks
+            as a full-width strip between the heading row and the accordion instead */}
+        <div className="col-span-12 col-start-1 row-start-2 rounded-2xl border border-border bg-surface p-4 shadow-premium-sm lg:hidden">
+          <ul className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+            {PERKS.map((p) => (
+              <li key={p} className="flex items-center gap-2 text-[0.74rem] font-medium leading-tight text-ink">
+                <Tick />
+                {p}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>
