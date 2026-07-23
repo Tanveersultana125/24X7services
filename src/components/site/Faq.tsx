@@ -57,6 +57,11 @@ export function Faq() {
           className="absolute inset-0"
           style={{ background: "linear-gradient(90deg, var(--background) 0%, rgba(0,0,0,0) 30%)" }}
         />
+        {/* soften the hard cut where the rail meets the footer */}
+        <div
+          className="absolute inset-x-0 bottom-0 h-28"
+          style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0), var(--background))" }}
+        />
       </div>
 
       <div className="relative mx-auto max-w-[92rem] px-6 sm:px-10">
@@ -165,13 +170,6 @@ export function Faq() {
               </a>
             </div>
 
-            <Link
-              href="/book"
-              className="group mt-3 flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3.5 text-[0.9rem] font-medium text-background transition-transform hover:scale-[1.01]"
-            >
-              Book a service
-              <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </Link>
           </aside>
 
           {/* ---------- accordion ---------- */}
@@ -260,6 +258,46 @@ export function Faq() {
           </ul>
         </div>
 
+        {/* closing band — gives the page a deliberate ending and steps the palette
+            down into the dark footer instead of cutting straight to it */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, ease }}
+          className="relative z-10 mt-8 flex flex-col gap-6 overflow-hidden rounded-[1.5rem] bg-ink px-6 py-7 text-background shadow-premium-xl sm:rounded-[1.75rem] sm:px-9 lg:flex-row lg:items-center lg:justify-between xl:mr-[24%]"
+        >
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -left-16 -top-16 size-64 rounded-full bg-royal-bright/25 blur-3xl"
+          />
+
+          <div className="relative">
+            <p className="font-display text-xl tracking-tight sm:text-2xl">
+              Still not sure what&apos;s wrong?
+            </p>
+            <p className="mt-2 max-w-md text-[0.88rem] leading-relaxed text-background/60">
+              Book a free diagnosis — a certified technician identifies the fault and quotes
+              before any work begins.
+            </p>
+          </div>
+
+          <div className="relative flex flex-wrap items-center gap-3">
+            <Link
+              href="/book"
+              className="group inline-flex items-center gap-2 rounded-full bg-background px-6 py-3 text-[0.88rem] font-semibold text-ink transition-transform hover:scale-[1.02]"
+            >
+              Book a service
+              <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </Link>
+            <Link
+              href="/services"
+              className="inline-flex items-center gap-2 rounded-full border border-background/25 px-6 py-3 text-[0.88rem] font-medium text-background transition-colors hover:bg-background/10"
+            >
+              Browse all services
+            </Link>
+          </div>
+        </motion.div>
       </div>
 
       {/* floating reassurance card over the photo */}
