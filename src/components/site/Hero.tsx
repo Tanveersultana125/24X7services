@@ -59,7 +59,9 @@ export function Hero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5, ease }}
-            className="col-span-7 col-start-1 row-start-2 max-w-md self-start text-pretty text-[0.875rem] leading-relaxed text-muted sm:text-base lg:col-span-6 lg:mt-8 lg:text-lg"
+            /* justified on phones so the narrow column has a clean right edge;
+               hyphenation keeps the word gaps from opening up */
+            className="col-span-7 col-start-1 row-start-2 max-w-md hyphens-auto self-start text-justify text-[0.875rem] leading-relaxed text-muted sm:text-pretty sm:text-left sm:text-base lg:col-span-6 lg:mt-8 lg:text-lg"
           >
             Certified doorstep repair, installation and maintenance for Samsung, LG,
             IFB &amp; Bosch — genuine parts, a 90-day warranty, and a technician you can
