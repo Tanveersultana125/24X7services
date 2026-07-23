@@ -58,7 +58,7 @@ export function Contact() {
   return (
     <section id="contact" className="relative scroll-mt-28 pb-14 pt-12 sm:pb-20 sm:pt-20">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
-        <div className="relative overflow-hidden rounded-[1.75rem] border border-white/70 bg-gradient-to-br from-white via-surface to-[#eaeefb] px-6 py-10 shadow-premium-lg sm:rounded-[2.5rem] sm:px-12 sm:py-14">
+        <div className="relative overflow-hidden rounded-[1.75rem] border border-white/70 bg-gradient-to-br from-white via-surface to-[#eaeefb] px-4 py-9 shadow-premium-lg sm:rounded-[2.5rem] sm:px-12 sm:py-14">
           <span
             aria-hidden
             className="pointer-events-none absolute -left-24 -top-28 size-72 rounded-full"
@@ -126,19 +126,19 @@ export function Contact() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.12, ease }}
-              className="space-y-3 rounded-[1.5rem] border border-white/60 bg-white/55 p-3 shadow-premium-md backdrop-blur sm:rounded-[1.75rem] sm:p-4"
+              className="space-y-2.5 rounded-[1.5rem] border border-white/60 bg-white/55 p-2.5 shadow-premium-md backdrop-blur sm:space-y-3 sm:rounded-[1.75rem] sm:p-4"
             >
               {CHANNELS.map((c) => (
                 <Link
                   key={c.label}
                   href={c.href}
-                  className="group flex items-center gap-4 rounded-2xl border border-white/70 bg-white p-4 shadow-premium-sm transition-transform duration-500 hover:-translate-y-0.5 sm:gap-5 sm:p-5"
+                  className="group flex items-center gap-3 rounded-2xl border border-white/70 bg-white p-3.5 shadow-premium-sm transition-transform duration-500 hover:-translate-y-0.5 sm:gap-5 sm:p-5"
                 >
                   <span
-                    className="grid size-12 shrink-0 place-items-center rounded-2xl transition-transform duration-500 group-hover:scale-105 sm:size-14"
+                    className="grid size-10 shrink-0 place-items-center rounded-xl transition-transform duration-500 group-hover:scale-105 sm:size-14 sm:rounded-2xl"
                     style={{ background: `${c.tint}16`, color: c.tint }}
                   >
-                    <c.icon className="size-6" strokeWidth={1.8} />
+                    <c.icon className="size-5 sm:size-6" strokeWidth={1.8} />
                   </span>
 
                   <span className="min-w-0 flex-1 leading-none">
@@ -148,17 +148,18 @@ export function Contact() {
                     >
                       {c.label}
                     </span>
-                    <span className="mt-2 block truncate text-[1.05rem] font-semibold tracking-tight sm:text-[1.15rem]">
+                    {/* the email is one long token — wrap it rather than clip it */}
+                    <span className="mt-2 block break-words text-[0.92rem] font-semibold leading-snug tracking-tight sm:text-[1.15rem]">
                       {c.value}
                     </span>
-                    <span className="mt-2 block text-[0.78rem] text-muted">{c.sub}</span>
+                    <span className="mt-1.5 block text-[0.72rem] text-muted sm:mt-2 sm:text-[0.78rem]">{c.sub}</span>
                   </span>
 
                   <span
-                    className="grid size-10 shrink-0 place-items-center rounded-full transition-transform duration-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 sm:size-11"
+                    className="grid size-9 shrink-0 place-items-center rounded-full transition-transform duration-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 sm:size-11"
                     style={{ background: `${c.tint}14`, color: c.tint }}
                   >
-                    <ArrowUpRight className="size-5" />
+                    <ArrowUpRight className="size-4 sm:size-5" />
                   </span>
                 </Link>
               ))}
