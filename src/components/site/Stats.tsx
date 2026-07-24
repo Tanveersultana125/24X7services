@@ -68,33 +68,39 @@ function RotatingStat() {
   return (
     <div className="mt-8 sm:hidden">
       <div
-        className="relative flex min-h-[12rem] items-center overflow-hidden rounded-3xl border px-7 shadow-premium-md transition-colors duration-700"
-        style={{
-          borderColor: rgba(s.color, 0.3),
-          background: `linear-gradient(160deg, ${rgba(s.color, 0.1)}, var(--surface) 62%)`,
-        }}
+        className="relative flex min-h-[11rem] items-center overflow-hidden rounded-3xl border border-border bg-surface pl-8 pr-7 shadow-premium-md transition-colors duration-700"
+        style={{ borderColor: rgba(s.color, 0.28) }}
       >
+        {/* left accent bar — always the current stat's colour */}
+        <span
+          aria-hidden
+          className="absolute inset-y-0 left-0 w-1.5 transition-colors duration-700"
+          style={{ background: s.color }}
+        />
+        {/* soft colour glow */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -right-16 -top-16 size-44 rounded-full blur-3xl transition-colors duration-700"
+          style={{ background: rgba(s.color, 0.22) }}
+        />
         <AnimatePresence mode="wait">
           <motion.div
             key={index}
-            initial={{ opacity: 0, y: 18 }}
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -18 }}
-            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            exit={{ opacity: 0, y: -14 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="relative"
           >
-            {/* colour glow — crossfades with each stat */}
-            <span
-              aria-hidden
-              className="pointer-events-none absolute -right-16 -top-20 size-48 rounded-full blur-3xl"
-              style={{ background: rgba(s.color, 0.35) }}
-            />
-            <div className="relative font-display flex items-baseline text-[3.75rem] leading-none tracking-tighter">
+            <div
+              className="font-display flex items-baseline text-[3.75rem] font-semibold leading-none tracking-tighter"
+              style={{ color: s.color }}
+            >
               <MountCounter to={s.to} decimals={s.decimals} />
-              <span style={{ color: s.color }}>{s.suffix}</span>
+              <span>{s.suffix}</span>
             </div>
-            <p className="relative mt-4 text-lg font-medium">{s.label}</p>
-            <p className="relative text-sm text-muted">{s.sub}</p>
+            <p className="mt-4 text-lg font-semibold text-foreground">{s.label}</p>
+            <p className="text-sm text-muted">{s.sub}</p>
           </motion.div>
         </AnimatePresence>
       </div>
