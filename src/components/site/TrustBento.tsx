@@ -198,13 +198,13 @@ export function TrustBento() {
           {/* ---------- C — genuine parts ---------- */}
           <Card
             i={2}
-            className="col-span-2 border border-emerald/20 bg-gradient-to-b from-emerald/[0.10] to-emerald/[0.02] p-6 shadow-[0_16px_36px_-18px_rgba(11,154,99,0.22)] hover:shadow-[0_30px_54px_-22px_rgba(11,154,99,0.32)] sm:col-span-1 sm:p-7"
+            className="border border-emerald/20 bg-gradient-to-b from-emerald/[0.10] to-emerald/[0.02] p-4 shadow-[0_16px_36px_-18px_rgba(11,154,99,0.22)] hover:shadow-[0_30px_54px_-22px_rgba(11,154,99,0.32)] sm:p-7"
           >
-            <div className="flex h-full flex-col justify-between gap-6">
-              <Disc icon={PackageCheck} tint={EMERALD} className="bg-emerald/15" />
+            <div className="flex h-full flex-col justify-between gap-5 sm:gap-6">
+              <Disc icon={PackageCheck} tint={EMERALD} className="size-11 bg-emerald/15 sm:size-16" />
               <div>
-                <p className="text-lg font-semibold tracking-tight sm:text-xl">Genuine parts</p>
-                <p className="mt-2 text-[0.88rem] leading-snug text-muted">
+                <p className="text-[0.95rem] font-semibold tracking-tight sm:text-xl">Genuine parts</p>
+                <p className="mt-1.5 text-[0.8rem] leading-snug text-muted sm:mt-2 sm:text-[0.88rem]">
                   Only brand-approved, traceable components.
                 </p>
               </div>
@@ -214,20 +214,20 @@ export function TrustBento() {
           {/* ---------- D — rating ---------- */}
           <Card
             i={3}
-            className="col-span-2 border border-amber/25 bg-gradient-to-b from-amber/[0.12] to-amber/[0.02] p-6 shadow-[0_16px_36px_-18px_rgba(217,130,27,0.22)] hover:shadow-[0_30px_54px_-22px_rgba(217,130,27,0.32)] sm:col-span-1 sm:p-7"
+            className="border border-amber/25 bg-gradient-to-b from-amber/[0.12] to-amber/[0.02] p-4 shadow-[0_16px_36px_-18px_rgba(217,130,27,0.22)] hover:shadow-[0_30px_54px_-22px_rgba(217,130,27,0.32)] sm:p-7"
           >
-            <div className="flex h-full flex-col justify-between gap-6">
-              <div className="flex items-center gap-3">
-                <Disc icon={Star} tint={AMBER} className="bg-amber/18 [&_svg]:fill-amber" />
+            <div className="flex h-full flex-col justify-between gap-5 sm:gap-6">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <Disc icon={Star} tint={AMBER} className="size-11 bg-amber/18 sm:size-16 [&_svg]:fill-amber" />
                 <span className="flex gap-0.5">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="size-3.5 fill-amber text-amber sm:size-4" />
+                    <Star key={i} className="size-3 fill-amber text-amber sm:size-4" />
                   ))}
                 </span>
               </div>
               <div>
-                <p className="font-display text-[2.2rem] leading-none tracking-tight sm:text-4xl">4.9</p>
-                <p className="mt-2 text-[0.88rem] leading-snug text-muted">Across 128k verified reviews</p>
+                <p className="font-display text-[2rem] leading-none tracking-tight sm:text-4xl">4.9</p>
+                <p className="mt-1.5 text-[0.8rem] leading-snug text-muted sm:mt-2 sm:text-[0.88rem]">Across 128k verified reviews</p>
               </div>
             </div>
           </Card>
