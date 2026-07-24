@@ -64,7 +64,7 @@ export function SiteFooter() {
             {Object.entries(COLUMNS).map(([title, links], i) => (
               // Nudge the right mobile column (odd index) slightly right; no change from sm up.
               <div key={title} className={cn(i % 2 === 1 && "pl-16 sm:pl-0")}>
-                <h4 className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-2">{title}</h4>
+                <h4 className="text-xs font-bold uppercase tracking-[0.18em] text-foreground">{title}</h4>
                 <ul className="mt-5 space-y-3">
                   {links.map((l) => (
                     <li key={l}>
