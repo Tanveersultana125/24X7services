@@ -2,18 +2,20 @@
 
 import Link from "next/link";
 import { CalendarCheck, IndianRupee, Clock, Star, ArrowUpRight } from "lucide-react";
-import { BOOKINGS, REVIEWS, STATUS_META } from "@/lib/admin/data";
+import { REVIEWS, STATUS_META } from "@/lib/admin/data";
+import type { Booking } from "@/lib/bookings";
 
-export function Overview() {
-  const active = BOOKINGS.filter((b) => b.status !== "completed" && b.status !== "cancelled");
-  const revenue = BOOKINGS.filter((b) => b.status === "completed").reduce((s, b) => s + b.price, 0);
-  const pendingReviews = REVIEWS.filter((r) => r.status === "pending").length;
-  const avgRating = (REVIEWS.reduce((s, r) => s + r.rating, 0) / REVIEWS.length).toFixed(1);
+export function Overview({ bookings, customerCount = 0 }: { bookings: Booking[]; customerCount?: number }) {
+  const active = bookings.filter((b) => b.status !== "completed" && b.status !== "cancelled");
+  const revenue = bookings.filter((b) => b.status === "completed").reduce((s, b) => s + b.price, 0);
+  const avgRating = REVIEWS.length
+    ? (REVIEWS.reduce((s, r) => s + r.rating, 0) / REVIEWS.length).toFixed(1)
+    : "—";
 
   const stats = [
     { label: "Active bookings", value: active.length, icon: CalendarCheck, tint: "#2547d0" },
     { label: "Revenue (completed)", value: `₹${revenue.toLocaleString("en-IN")}`, icon: IndianRupee, tint: "#0b9a63" },
-    { label: "Pending reviews", value: pendingReviews, icon: Clock, tint: "#d9821b" },
+    { label: "Customers", value: customerCount, icon: Clock, tint: "#d9821b" },
     { label: "Avg. rating", value: avgRating, icon: Star, tint: "#7c3aed" },
   ];
 
@@ -44,11 +46,11 @@ export function Overview() {
           </Link>
         </div>
         <div className="divide-y divide-hairline">
-          {BOOKINGS.slice(0, 5).map((b) => (
+          {bookings.slice(0, 5).map((b) => (
             <div key={b.id} className="flex items-center justify-between gap-4 px-5 py-3.5 text-sm">
               <div className="min-w-0">
                 <p className="truncate font-medium">{b.customer}</p>
-                <p className="truncate text-muted">{b.appliance} · {b.problem} · {b.city}</p>
+                <p className="truncate text-muted">{b.appliance} · {b.problem || "—"} · {b.city}</p>
               </div>
               <span
                 className="shrink-0 rounded-full px-2.5 py-1 text-xs font-medium"
@@ -58,6 +60,9 @@ export function Overview() {
               </span>
             </div>
           ))}
+          {bookings.length === 0 && (
+            <p className="px-5 py-10 text-center text-sm text-muted">No bookings yet.</p>
+          )}
         </div>
       </div>
     </div>

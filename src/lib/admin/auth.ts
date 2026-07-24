@@ -3,9 +3,18 @@ import { cookies } from "next/headers";
 export const ADMIN_COOKIE = "admin_session";
 const SESSION_VALUE = "ok";
 
-/** Shared admin password. Set ADMIN_PASSWORD in .env.local for production. */
-export function adminPassword() {
-  return process.env.ADMIN_PASSWORD ?? "admin123";
+/** Google accounts allowed into the admin panel (from ADMIN_EMAILS). */
+export function adminEmails(): string[] {
+  return (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+/** True when the given Google email is on the admin allow-list. */
+export function isAdminEmail(email?: string | null): boolean {
+  if (!email) return false;
+  return adminEmails().includes(email.toLowerCase());
 }
 
 export async function isAuthenticated() {

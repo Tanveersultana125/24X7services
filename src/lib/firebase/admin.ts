@@ -1,5 +1,6 @@
 import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
 import { getAuth, type Auth } from "firebase-admin/auth";
+import { getFirestore, type Firestore } from "firebase-admin/firestore";
 
 /**
  * Firebase Admin SDK (server only). Requires a service-account credential —
@@ -32,4 +33,17 @@ function getAdminApp(): App {
 
 export function getAdminAuth(): Auth {
   return getAuth(getAdminApp());
+}
+
+let firestore: Firestore | null = null;
+
+/** Firestore (Admin) — reused across requests. Requires a Firestore database
+ * to exist in the Firebase project (Console → Firestore Database → Create). */
+export function getAdminDb(): Firestore {
+  if (!firestore) {
+    firestore = getFirestore(getAdminApp());
+    // Let Firestore silently drop `undefined` fields instead of throwing.
+    firestore.settings({ ignoreUndefinedProperties: true });
+  }
+  return firestore;
 }

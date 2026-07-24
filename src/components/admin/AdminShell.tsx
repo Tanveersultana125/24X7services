@@ -6,6 +6,7 @@ import { useState } from "react";
 import {
   LayoutDashboard,
   CalendarCheck,
+  Users,
   Wrench,
   Images,
   Star,
@@ -19,6 +20,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
   { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
+  { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/services", label: "Services & prices", icon: Wrench },
   { href: "/admin/gallery", label: "Gallery", icon: Images },
   { href: "/admin/reviews", label: "Reviews", icon: Star },

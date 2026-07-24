@@ -20,10 +20,10 @@ const TIMELINE = [
   { icon: Star, title: "Feedback", desc: "Rate your experience & help us improve.", state: "upcoming" },
 ];
 
-export function Confirmation({ draft, total }: { draft: BookingDraft; total: number }) {
+export function Confirmation({ draft, total, code }: { draft: BookingDraft; total: number; code?: string }) {
   const appliance = applianceLabel(draft);
   const brand = brandLabel(draft);
-  const id = `24X7-${String(Math.floor(100000 + Math.random() * 899999))}`;
+  const id = code ?? `24X7-${String(Math.floor(100000 + Math.random() * 899999))}`;
 
   return (
     <div className="mx-auto max-w-2xl">

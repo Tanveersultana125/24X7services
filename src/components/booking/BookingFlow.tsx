@@ -4,7 +4,7 @@ import { useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ArrowLeft, ArrowRight, Clock, MapPin, Calendar, Wrench, ShieldCheck,
+  ArrowLeft, ArrowRight, Clock, MapPin, Wrench, ShieldCheck,
   Sparkles, Zap, CheckCircle2, MoreHorizontal, PencilLine,
 } from "lucide-react";
 import { Stepper, type Step } from "./Stepper";
@@ -28,15 +28,23 @@ const STEPS: Step[] = [
 
 const VISIT_FEE = 99;
 
-export function BookingFlow() {
+export function BookingFlow({ customer }: { customer?: { name: string; email: string } }) {
   const params = useSearchParams();
   const emergency = params.get("emergency") === "1";
 
   const [step, setStep] = useState(0);
   const [dir, setDir] = useState(1);
-  const [draft, setDraft] = useState<BookingDraft>({ problems: [] });
+  const [draft, setDraft] = useState<BookingDraft>({
+    problems: [],
+    // Prefill the service address with the signed-in customer's name.
+    address: customer
+      ? { fullName: customer.name, phone: "", line1: "", pincode: "" }
+      : undefined,
+  });
   const [confirmed, setConfirmed] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [bookingCode, setBookingCode] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Prefill from query params
   useEffect(() => {
@@ -91,16 +99,57 @@ export function BookingFlow() {
     }
   };
 
-  const handlePay = () => {
+  const handlePay = async () => {
+    setError(null);
     setProcessing(true);
-    setTimeout(() => {
+
+    const problemSummary = [
+      ...selectedProblems.map((p) => p.label),
+      draft.problems.includes(OTHER_PROBLEM_ID) && draft.otherProblem ? draft.otherProblem : null,
+    ]
+      .filter(Boolean)
+      .join(", ");
+    const paymentLabel = PAYMENT_METHODS.find((m) => m.id === draft.payment)?.label ?? draft.payment ?? "";
+
+    try {
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          brand: brandLabel(draft),
+          appliance: applianceLabel(draft),
+          problem: problemSummary,
+          date: draft.date,
+          slot: draft.slot,
+          payment: paymentLabel,
+          price: total,
+          emergency,
+          address: draft.address,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || !data.ok) {
+        setProcessing(false);
+        setError(
+          data.error === "unauthenticated"
+            ? "Your session expired. Please log in again to book."
+            : "We couldn't save your booking. Please try again.",
+        );
+        return;
+      }
+
+      setBookingCode(data.code ?? null);
       setProcessing(false);
       setConfirmed(true);
       if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
-    }, 1600);
+    } catch {
+      setProcessing(false);
+      setError("Something went wrong. Please check your connection and try again.");
+    }
   };
 
-  if (confirmed) return <Confirmation draft={draft} total={total} />;
+  if (confirmed) return <Confirmation draft={draft} total={total} code={bookingCode ?? undefined} />;
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_20rem]">
@@ -142,6 +191,13 @@ export function BookingFlow() {
             </Button>
           )}
         </div>
+
+        {error && (
+          <div className="mt-6 flex items-start gap-2.5 rounded-2xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
+            <Zap className="mt-0.5 size-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
 
         <div className="relative mt-10 min-h-[24rem]">
           <AnimatePresence mode="wait" custom={dir}>
