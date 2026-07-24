@@ -146,10 +146,10 @@ export function BrandShowcase() {
             return (
               <motion.div
                 key={b.id}
-                // Hover opens the card, moving the cursor away closes it. (Scroll no
-                // longer auto-opens anything — that was the runaway behaviour.)
-                onMouseEnter={() => setTapped(i)}
-                onMouseLeave={() => setTapped((cur) => (cur === i ? null : cur))}
+                // Mouse: hover opens, leaving closes. Touch has no hover, so those
+                // pointer events are ignored there and the header tap (onClick) toggles.
+                onPointerEnter={(e) => { if (e.pointerType === "mouse") setTapped(i); }}
+                onPointerLeave={(e) => { if (e.pointerType === "mouse") setTapped((cur) => (cur === i ? null : cur)); }}
                 className={cn(
                   "overflow-hidden rounded-[1.5rem] border transition-colors duration-500",
                   open ? "border-transparent" : "border-white/60"
