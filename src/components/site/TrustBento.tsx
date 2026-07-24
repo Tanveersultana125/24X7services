@@ -198,7 +198,7 @@ export function TrustBento() {
           {/* ---------- C — genuine parts ---------- */}
           <Card
             i={2}
-            className="border border-emerald/20 bg-gradient-to-b from-emerald/[0.10] to-emerald/[0.02] p-6 shadow-[0_16px_36px_-18px_rgba(11,154,99,0.22)] hover:shadow-[0_30px_54px_-22px_rgba(11,154,99,0.32)] sm:p-7"
+            className="col-span-2 border border-emerald/20 bg-gradient-to-b from-emerald/[0.10] to-emerald/[0.02] p-6 shadow-[0_16px_36px_-18px_rgba(11,154,99,0.22)] hover:shadow-[0_30px_54px_-22px_rgba(11,154,99,0.32)] sm:col-span-1 sm:p-7"
           >
             <div className="flex h-full flex-col justify-between gap-6">
               <Disc icon={PackageCheck} tint={EMERALD} className="bg-emerald/15" />
@@ -214,7 +214,7 @@ export function TrustBento() {
           {/* ---------- D — rating ---------- */}
           <Card
             i={3}
-            className="border border-amber/25 bg-gradient-to-b from-amber/[0.12] to-amber/[0.02] p-6 shadow-[0_16px_36px_-18px_rgba(217,130,27,0.22)] hover:shadow-[0_30px_54px_-22px_rgba(217,130,27,0.32)] sm:p-7"
+            className="col-span-2 border border-amber/25 bg-gradient-to-b from-amber/[0.12] to-amber/[0.02] p-6 shadow-[0_16px_36px_-18px_rgba(217,130,27,0.22)] hover:shadow-[0_30px_54px_-22px_rgba(217,130,27,0.32)] sm:col-span-1 sm:p-7"
           >
             <div className="flex h-full flex-col justify-between gap-6">
               <div className="flex items-center gap-3">
