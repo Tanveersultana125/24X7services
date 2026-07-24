@@ -309,15 +309,27 @@ function DateStep({ draft, setDraft }: StepProps) {
             <button
               key={d.key}
               onClick={() => setDraft((s) => ({ ...s, date: d.label }))}
+              aria-pressed={selected}
               className={cn(
-                "flex flex-col items-center gap-0.5 rounded-2xl border-2 bg-surface p-3 transition-all hover:-translate-y-0.5",
-                selected ? "border-primary shadow-premium-md" : "border-border hover:border-border-strong"
+                "flex flex-col items-center gap-0.5 rounded-2xl border-2 p-3 transition-all hover:-translate-y-0.5",
+                selected
+                  ? "border-primary bg-primary text-white shadow-premium-md ring-2 ring-primary/25"
+                  : "border-border bg-surface hover:border-border-strong"
               )}
             >
-              <span className={cn("text-xs font-medium", selected ? "text-primary" : "text-muted")}>{d.day}</span>
+              <span className={cn("text-xs font-medium", selected ? "text-white/80" : "text-muted")}>{d.day}</span>
               <span className="text-xl font-bold">{d.date}</span>
-              <span className="text-xs text-muted">{d.month}</span>
-              {i <= 1 && <span className="mt-0.5 rounded-full bg-accent/15 px-1.5 text-[9px] font-bold text-accent">{i === 0 ? "TODAY" : "TOM"}</span>}
+              <span className={cn("text-xs", selected ? "text-white/80" : "text-muted")}>{d.month}</span>
+              {i <= 1 && (
+                <span
+                  className={cn(
+                    "mt-0.5 rounded-full px-1.5 text-[9px] font-bold",
+                    selected ? "bg-white/20 text-white" : "bg-accent/15 text-accent"
+                  )}
+                >
+                  {i === 0 ? "TODAY" : "TOM"}
+                </span>
+              )}
             </button>
           );
         })}
@@ -339,16 +351,20 @@ function TimeStep({ draft, setDraft }: StepProps) {
               key={slot}
               disabled={soldOut}
               onClick={() => setDraft((s) => ({ ...s, slot }))}
+              aria-pressed={selected}
               className={cn(
-                "flex items-center justify-between rounded-2xl border-2 bg-surface p-4 transition-all",
+                "flex items-center justify-between rounded-2xl border-2 p-4 transition-all",
                 soldOut && "cursor-not-allowed opacity-40",
-                selected ? "border-primary shadow-premium-md" : "border-border hover:border-border-strong hover:-translate-y-0.5"
+                selected
+                  ? "border-primary bg-primary text-white shadow-premium-md ring-2 ring-primary/25"
+                  : "border-border bg-surface hover:border-border-strong hover:-translate-y-0.5"
               )}
             >
               <span className="flex items-center gap-2.5 font-medium">
-                <Clock className={cn("size-5", selected ? "text-primary" : "text-muted")} />
+                <Clock className={cn("size-5", selected ? "text-white" : "text-muted")} />
                 {slot}
               </span>
+              {selected && <CheckCircle2 className="size-5" />}
               {soldOut && <span className="text-xs font-semibold text-danger">Full</span>}
             </button>
           );
