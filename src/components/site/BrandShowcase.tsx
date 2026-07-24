@@ -146,12 +146,8 @@ export function BrandShowcase() {
             return (
               <motion.div
                 key={b.id}
-                // pointer devices get the same hover reveal as the desktop panels
-                onMouseEnter={() => setTapped(i)}
-                // and on a touch screen, where there is no hover, the card opens as it
-                // reaches the middle of the viewport — scrolling reveals them in turn
-                onViewportEnter={() => setTapped(i)}
-                viewport={{ margin: "-45% 0px -45% 0px" }}
+                // Tap-only accordion — a card opens/closes only when its header is
+                // pressed, so closing one never auto-opens another.
                 className={cn(
                   "overflow-hidden rounded-[1.5rem] border transition-colors duration-500",
                   open ? "border-transparent" : "border-white/60"
