@@ -3,14 +3,21 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useInView, animate } from "framer-motion";
 import { Kicker } from "./TextReveal";
-import { cn } from "@/lib/utils";
 
 const STATS = [
-  { to: 3.2, decimals: 1, prefix: "", suffix: "M", label: "Services completed", sub: "since 2019" },
-  { to: 12, decimals: 0, prefix: "", suffix: "k+", label: "Certified technicians", sub: "police-verified" },
-  { to: 4.9, decimals: 1, prefix: "", suffix: "★", label: "Average rating", sub: "128k reviews" },
-  { to: 33, decimals: 0, prefix: "", suffix: "", label: "Telangana districts", sub: "fully covered" },
+  { to: 3.2, decimals: 1, prefix: "", suffix: "M", label: "Services completed", sub: "since 2019", color: "#2547d0" },
+  { to: 12, decimals: 0, prefix: "", suffix: "k+", label: "Certified technicians", sub: "police-verified", color: "#0b9a63" },
+  { to: 4.9, decimals: 1, prefix: "", suffix: "★", label: "Average rating", sub: "128k reviews", color: "#d9821b" },
+  { to: 33, decimals: 0, prefix: "", suffix: "", label: "Telangana districts", sub: "fully covered", color: "#7c3aed" },
 ];
+
+function rgba(hex: string, a: number) {
+  const n = hex.replace("#", "");
+  const r = parseInt(n.slice(0, 2), 16);
+  const g = parseInt(n.slice(2, 4), 16);
+  const b = parseInt(n.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
 
 export function Stats() {
   return (
@@ -60,7 +67,13 @@ function RotatingStat() {
 
   return (
     <div className="mt-8 sm:hidden">
-      <div className="relative flex min-h-[12rem] items-center overflow-hidden rounded-3xl border border-border bg-surface px-7 shadow-premium-sm">
+      <div
+        className="relative flex min-h-[12rem] items-center overflow-hidden rounded-3xl border px-7 shadow-premium-md transition-colors duration-700"
+        style={{
+          borderColor: rgba(s.color, 0.3),
+          background: `linear-gradient(160deg, ${rgba(s.color, 0.1)}, var(--surface) 62%)`,
+        }}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={index}
@@ -68,13 +81,20 @@ function RotatingStat() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -18 }}
             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            className="relative"
           >
-            <div className="font-display flex items-baseline text-[3.75rem] leading-none tracking-tighter">
+            {/* colour glow — crossfades with each stat */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -right-16 -top-20 size-48 rounded-full blur-3xl"
+              style={{ background: rgba(s.color, 0.35) }}
+            />
+            <div className="relative font-display flex items-baseline text-[3.75rem] leading-none tracking-tighter">
               <MountCounter to={s.to} decimals={s.decimals} />
-              <span className="text-royal-bright">{s.suffix}</span>
+              <span style={{ color: s.color }}>{s.suffix}</span>
             </div>
-            <p className="mt-4 text-lg font-medium">{s.label}</p>
-            <p className="text-sm text-muted">{s.sub}</p>
+            <p className="relative mt-4 text-lg font-medium">{s.label}</p>
+            <p className="relative text-sm text-muted">{s.sub}</p>
           </motion.div>
         </AnimatePresence>
       </div>
@@ -90,10 +110,11 @@ function RotatingStat() {
             }}
             aria-label={`Show ${st.label}`}
             aria-current={i === index}
-            className={cn(
-              "h-1.5 rounded-full transition-all duration-300",
-              i === index ? "w-6 bg-royal-bright" : "w-1.5 bg-border",
-            )}
+            className="h-1.5 rounded-full transition-all duration-300"
+            style={{
+              width: i === index ? "1.5rem" : "0.375rem",
+              background: i === index ? st.color : "var(--border)",
+            }}
           />
         ))}
       </div>
