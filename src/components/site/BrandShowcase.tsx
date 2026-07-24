@@ -146,10 +146,10 @@ export function BrandShowcase() {
             return (
               <motion.div
                 key={b.id}
-                // Mouse: hover opens, leaving closes. Touch has no hover, so those
-                // pointer events are ignored there and the header tap (onClick) toggles.
-                onPointerEnter={(e) => { if (e.pointerType === "mouse") setTapped(i); }}
-                onPointerLeave={(e) => { if (e.pointerType === "mouse") setTapped((cur) => (cur === i ? null : cur)); }}
+                // Hover opens the card (desktop). Closing is done by tapping the header
+                // (onClick toggles) — works on both mouse and touch. No mouse-leave close,
+                // which on touch fired right after a tap and slammed the card shut.
+                onMouseEnter={() => setTapped(i)}
                 className={cn(
                   "overflow-hidden rounded-[1.5rem] border transition-colors duration-500",
                   open ? "border-transparent" : "border-white/60"
