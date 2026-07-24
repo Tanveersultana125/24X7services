@@ -1,6 +1,6 @@
 "use client";
 
-import { Refrigerator, WashingMachine, Microwave, AirVent, type LucideIcon } from "lucide-react";
+import { Refrigerator, WashingMachine, Microwave, AirVent, Wrench, type LucideIcon } from "lucide-react";
 import type { ApplianceId, BrandId } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -9,6 +9,7 @@ export const APPLIANCE_ICONS: Record<ApplianceId, LucideIcon> = {
   "washing-machine": WashingMachine,
   microwave: Microwave,
   ac: AirVent,
+  other: Wrench,
 };
 
 /** Flat accent per appliance — used where a whole surface takes its colour. */
@@ -17,6 +18,7 @@ export const APPLIANCE_ACCENT: Record<ApplianceId, string> = {
   "washing-machine": "#0b9a63",
   microwave: "#d9821b",
   ac: "#0ea5e9",
+  other: "#64748b",
 };
 
 const APPLIANCE_GRADIENTS: Record<ApplianceId, string> = {
@@ -24,6 +26,7 @@ const APPLIANCE_GRADIENTS: Record<ApplianceId, string> = {
   "washing-machine": "from-[#0b9a63] to-[#0f766e]",
   microwave: "from-[#d9821b] to-[#b45309]",
   ac: "from-[#0ea5e9] to-[#0369a1]",
+  other: "from-[#64748b] to-[#475569]",
 };
 
 export function ApplianceTile({

@@ -12,7 +12,7 @@ import { OptionCard } from "./OptionCard";
 import { Confirmation } from "./Confirmation";
 import { Button } from "@/components/ui/Button";
 import { ApplianceTile, BrandMark } from "@/components/ui/Icons";
-import { APPLIANCES, BRANDS, TIME_SLOTS, PAYMENT_METHODS, getAppliance, brandLabel } from "@/lib/data";
+import { APPLIANCES, BRANDS, TIME_SLOTS, PAYMENT_METHODS, getAppliance, brandLabel, applianceLabel } from "@/lib/data";
 import { formatINR, formatRange, cn } from "@/lib/utils";
 import { OTHER_PROBLEM_ID, type BookingDraft, type BrandId, type ApplianceId } from "@/lib/types";
 
@@ -79,7 +79,7 @@ export function BookingFlow() {
   const canProceed = () => {
     switch (STEPS[step].id) {
       case "brand": return !!draft.brand && (draft.brand !== "other" || !!draft.otherBrand?.trim());
-      case "appliance": return !!draft.appliance;
+      case "appliance": return !!draft.appliance && (draft.appliance !== "other" || !!draft.otherAppliance?.trim());
       case "problem":
         return draft.problems.length > 0 && (!draft.problems.includes(OTHER_PROBLEM_ID) || !!draft.otherProblem?.trim());
       case "date": return !!draft.date;
@@ -165,7 +165,7 @@ export function BookingFlow() {
         </div>
       </div>
 
-      <SummaryCard draft={draft} appliance={appliance} estimate={estimate} total={total} emergency={emergency} />
+      <SummaryCard draft={draft} estimate={estimate} total={total} emergency={emergency} />
     </div>
   );
 }
@@ -246,9 +246,10 @@ function BrandStep({ draft, setDraft }: StepProps) {
 }
 
 function ApplianceStep({ draft, setDraft }: StepProps) {
+  const isOther = draft.appliance === "other";
   return (
     <div>
-      <StepTitle title="Which appliance needs care?" hint="Pick the appliance you'd like serviced." />
+      <StepTitle title="Which appliance needs care?" hint="Pick the appliance — or add your own if it's not listed." />
       <div className="grid gap-4 sm:grid-cols-2">
         {APPLIANCES.map((a) => (
           <OptionCard
@@ -263,14 +264,42 @@ function ApplianceStep({ draft, setDraft }: StepProps) {
             </div>
           </OptionCard>
         ))}
+
+        {/* Other — for any appliance we don't list yet */}
+        <OptionCard
+          selected={isOther}
+          onClick={() => setDraft((d) => ({ ...d, appliance: "other", problems: [] }))}
+        >
+          <div className="grid size-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#64748b] to-[#475569] text-white">
+            <MoreHorizontal className="size-6" />
+          </div>
+          <div>
+            <p className="font-semibold">Other appliance</p>
+            <p className="text-sm text-muted">Priced after diagnosis</p>
+          </div>
+        </OptionCard>
       </div>
+
+      {isOther && (
+        <div className="mt-4">
+          <label className="mb-2 block text-sm font-medium">Which appliance is it?</label>
+          <input
+            autoFocus
+            value={draft.otherAppliance ?? ""}
+            onChange={(e) => setDraft((d) => ({ ...d, otherAppliance: e.target.value }))}
+            placeholder="e.g. Dishwasher, Water purifier, Chimney, Geyser…"
+            className="w-full rounded-2xl border border-border bg-surface px-4 py-3.5 text-sm outline-none transition-colors placeholder:text-muted-2 focus:border-primary focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
+      )}
     </div>
   );
 }
 
 function ProblemStep({ draft, setDraft }: StepProps) {
+  if (!draft.appliance) return null;
   const appliance = getAppliance(draft.appliance);
-  if (!appliance) return null;
+  const presetProblems = appliance?.problems ?? [];
   const toggle = (id: string) =>
     setDraft((d) => ({
       ...d,
@@ -287,7 +316,7 @@ function ProblemStep({ draft, setDraft }: StepProps) {
         <p><span className="font-semibold">AI Diagnosis:</span> Not sure? Describe it and we&apos;ll detect the fault. Popular issues are marked below.</p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
-        {appliance.problems.map((p) => (
+        {presetProblems.map((p) => (
           <OptionCard key={p.id} multi selected={draft.problems.includes(p.id)} onClick={() => toggle(p.id)}>
             <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-surface-2 text-primary">
               <Wrench className="size-5" />
@@ -505,10 +534,9 @@ function PaymentStep({ draft, setDraft, total }: StepProps & { total: number }) 
 /* ---------------- Summary ---------------- */
 
 function SummaryCard({
-  draft, appliance, estimate, total, emergency,
+  draft, estimate, total, emergency,
 }: {
   draft: BookingDraft;
-  appliance?: ReturnType<typeof getAppliance>;
   estimate: { min: number; max: number };
   total: number;
   emergency: boolean;
@@ -520,7 +548,7 @@ function SummaryCard({
 
         <dl className="mt-5 space-y-3.5 text-sm">
           <Row label="Brand" value={brandLabel(draft)} />
-          <Row label="Appliance" value={appliance?.name} />
+          <Row label="Appliance" value={applianceLabel(draft)} />
           <Row label="Problems" value={draft.problems.length ? `${draft.problems.length} selected` : undefined} />
           <Row label="Date" value={draft.date} />
           <Row label="Slot" value={draft.slot} />

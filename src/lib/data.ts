@@ -151,6 +151,13 @@ export function getAppliance(id?: string) {
   return APPLIANCES.find((a) => a.id === id);
 }
 
+/** Display name for a chosen appliance, resolving the free-text "other" case. */
+export function applianceLabel(draft: { appliance?: string; otherAppliance?: string }) {
+  if (!draft.appliance) return undefined;
+  if (draft.appliance === "other") return draft.otherAppliance?.trim() || "Other appliance";
+  return getAppliance(draft.appliance)?.name;
+}
+
 export function getBrand(id?: string) {
   return BRANDS.find((b) => b.id === id);
 }
