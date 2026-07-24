@@ -113,8 +113,7 @@ export function BookingFlow() {
 
         <Stepper steps={STEPS} current={step} />
 
-        {/* Nav toolbar — sits above the step, divider separates it from the form.
-            Continue goes full-width on phones so the action is unmistakable. */}
+        {/* Nav toolbar — sits above the step, divider separates it from the form. */}
         <div className="mt-8 flex items-center gap-3 border-b border-border/60 pb-6">
           <Button
             variant="ghost"
@@ -124,16 +123,16 @@ export function BookingFlow() {
             <ArrowLeft className="size-4" /> Back
           </Button>
 
-          <span className="ml-auto hidden text-sm text-muted sm:block">
+          <span className="mx-auto hidden text-sm text-muted sm:block">
             Step {step + 1} of {STEPS.length}
           </span>
 
           {step < STEPS.length - 1 ? (
-            <Button onClick={() => go(1)} disabled={!canProceed()} size="lg" className="flex-1 sm:flex-none">
+            <Button onClick={() => go(1)} disabled={!canProceed()} size="lg" className="ml-auto shrink-0">
               Continue <ArrowRight className="size-4" />
             </Button>
           ) : (
-            <Button onClick={handlePay} disabled={!canProceed() || processing} size="lg" variant="accent" className="flex-1 sm:flex-none">
+            <Button onClick={handlePay} disabled={!canProceed() || processing} size="lg" variant="accent" className="ml-auto shrink-0">
               {processing ? (
                 <><span className="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white" /> Processing…</>
               ) : (
