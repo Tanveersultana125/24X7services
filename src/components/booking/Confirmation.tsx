@@ -6,7 +6,7 @@ import {
   CheckCircle2, UserCheck, Navigation, Wrench, FileText, ShieldCheck, Star, PartyPopper,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { getAppliance, getBrand } from "@/lib/data";
+import { getAppliance, brandLabel } from "@/lib/data";
 import { formatINR } from "@/lib/utils";
 import type { BookingDraft } from "@/lib/types";
 
@@ -22,7 +22,7 @@ const TIMELINE = [
 
 export function Confirmation({ draft, total }: { draft: BookingDraft; total: number }) {
   const appliance = getAppliance(draft.appliance);
-  const brand = getBrand(draft.brand);
+  const brand = brandLabel(draft);
   const id = `24X7-${String(Math.floor(100000 + Math.random() * 899999))}`;
 
   return (
@@ -39,7 +39,7 @@ export function Confirmation({ draft, total }: { draft: BookingDraft; total: num
         </div>
         <h1 className="mt-6 text-3xl font-extrabold tracking-tight sm:text-4xl">Booking Confirmed!</h1>
         <p className="mt-3 text-balance text-muted">
-          Your {brand?.name} {appliance?.name} service is booked for{" "}
+          Your {brand} {appliance?.name} service is booked for{" "}
           <span className="font-semibold text-foreground">{draft.date}</span> ·{" "}
           <span className="font-semibold text-foreground">{draft.slot}</span>.
         </p>

@@ -5,16 +5,16 @@ import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft, ArrowRight, Clock, MapPin, Calendar, Wrench, ShieldCheck,
-  Sparkles, Zap, CheckCircle2,
+  Sparkles, Zap, CheckCircle2, MoreHorizontal, PencilLine,
 } from "lucide-react";
 import { Stepper, type Step } from "./Stepper";
 import { OptionCard } from "./OptionCard";
 import { Confirmation } from "./Confirmation";
 import { Button } from "@/components/ui/Button";
 import { ApplianceTile, BrandMark } from "@/components/ui/Icons";
-import { APPLIANCES, BRANDS, TIME_SLOTS, PAYMENT_METHODS, getAppliance, getBrand } from "@/lib/data";
+import { APPLIANCES, BRANDS, TIME_SLOTS, PAYMENT_METHODS, getAppliance, brandLabel } from "@/lib/data";
 import { formatINR, formatRange, cn } from "@/lib/utils";
-import type { BookingDraft, BrandId, ApplianceId } from "@/lib/types";
+import { OTHER_PROBLEM_ID, type BookingDraft, type BrandId, type ApplianceId } from "@/lib/types";
 
 const STEPS: Step[] = [
   { id: "brand", label: "Brand" },
@@ -78,9 +78,10 @@ export function BookingFlow() {
 
   const canProceed = () => {
     switch (STEPS[step].id) {
-      case "brand": return !!draft.brand;
+      case "brand": return !!draft.brand && (draft.brand !== "other" || !!draft.otherBrand?.trim());
       case "appliance": return !!draft.appliance;
-      case "problem": return draft.problems.length > 0;
+      case "problem":
+        return draft.problems.length > 0 && (!draft.problems.includes(OTHER_PROBLEM_ID) || !!draft.otherProblem?.trim());
       case "date": return !!draft.date;
       case "time": return !!draft.slot;
       case "address":
@@ -186,9 +187,10 @@ function StepTitle({ title, hint }: { title: string; hint?: string }) {
 }
 
 function BrandStep({ draft, setDraft }: StepProps) {
+  const isOther = draft.brand === "other";
   return (
     <div>
-      <StepTitle title="Choose your brand" hint="Select the manufacturer of your appliance." />
+      <StepTitle title="Choose your brand" hint="Select the manufacturer — or add your own if it's not listed." />
       <div className="grid gap-4 sm:grid-cols-2">
         {BRANDS.map((b) => (
           <OptionCard
@@ -211,7 +213,34 @@ function BrandStep({ draft, setDraft }: StepProps) {
             </div>
           </OptionCard>
         ))}
+
+        {/* Other — for any brand we don't list yet */}
+        <OptionCard
+          selected={isOther}
+          onClick={() => setDraft((d) => ({ ...d, brand: "other" }))}
+        >
+          <div className="grid h-12 w-[5.25rem] shrink-0 place-items-center rounded-xl bg-surface-2 text-muted">
+            <MoreHorizontal className="size-6" />
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold">Other brand</p>
+            <p className="text-sm text-muted">Type your appliance&apos;s brand</p>
+          </div>
+        </OptionCard>
       </div>
+
+      {isOther && (
+        <div className="mt-4">
+          <label className="mb-2 block text-sm font-medium">Which brand is it?</label>
+          <input
+            autoFocus
+            value={draft.otherBrand ?? ""}
+            onChange={(e) => setDraft((d) => ({ ...d, otherBrand: e.target.value }))}
+            placeholder="e.g. Whirlpool, Godrej, Haier, Voltas…"
+            className="w-full rounded-2xl border border-border bg-surface px-4 py-3.5 text-sm outline-none transition-colors placeholder:text-muted-2 focus:border-primary focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -248,9 +277,11 @@ function ProblemStep({ draft, setDraft }: StepProps) {
       problems: d.problems.includes(id) ? d.problems.filter((p) => p !== id) : [...d.problems, id],
     }));
 
+  const otherSelected = draft.problems.includes(OTHER_PROBLEM_ID);
+
   return (
     <div>
-      <StepTitle title="What's the problem?" hint="Select one or more symptoms — you can add multiple." />
+      <StepTitle title="What's the problem?" hint="Select one or more symptoms — or describe your own below." />
       <div className="mb-5 flex items-center gap-2.5 rounded-2xl border border-primary/30 bg-primary/5 p-3.5 text-sm">
         <Sparkles className="size-5 shrink-0 text-primary" />
         <p><span className="font-semibold">AI Diagnosis:</span> Not sure? Describe it and we&apos;ll detect the fault. Popular issues are marked below.</p>
@@ -270,7 +301,32 @@ function ProblemStep({ draft, setDraft }: StepProps) {
             </div>
           </OptionCard>
         ))}
+
+        {/* Other — describe an issue that isn't listed */}
+        <OptionCard multi selected={otherSelected} onClick={() => toggle(OTHER_PROBLEM_ID)}>
+          <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-surface-2 text-primary">
+            <PencilLine className="size-5" />
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold">Other issue</p>
+            <p className="text-sm text-muted">Describe it — priced after diagnosis</p>
+          </div>
+        </OptionCard>
       </div>
+
+      {otherSelected && (
+        <div className="mt-4">
+          <label className="mb-2 block text-sm font-medium">Describe the problem</label>
+          <textarea
+            autoFocus
+            rows={3}
+            value={draft.otherProblem ?? ""}
+            onChange={(e) => setDraft((d) => ({ ...d, otherProblem: e.target.value }))}
+            placeholder="e.g. Strange noise while spinning, water leaking from the bottom…"
+            className="w-full resize-none rounded-2xl border border-border bg-surface px-4 py-3.5 text-sm outline-none transition-colors placeholder:text-muted-2 focus:border-primary focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -457,14 +513,13 @@ function SummaryCard({
   total: number;
   emergency: boolean;
 }) {
-  const brand = getBrand(draft.brand);
   return (
     <aside className="lg:sticky lg:top-24 lg:h-fit">
       <div className="rounded-3xl border border-border bg-surface p-6 shadow-premium-md">
         <h3 className="text-lg font-bold tracking-tight">Booking summary</h3>
 
         <dl className="mt-5 space-y-3.5 text-sm">
-          <Row label="Brand" value={brand?.name} />
+          <Row label="Brand" value={brandLabel(draft)} />
           <Row label="Appliance" value={appliance?.name} />
           <Row label="Problems" value={draft.problems.length ? `${draft.problems.length} selected` : undefined} />
           <Row label="Date" value={draft.date} />

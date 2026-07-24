@@ -66,6 +66,7 @@ export const BRAND_COLOR: Record<BrandId, string> = {
   lg: "#A50034",
   ifb: "#005EB8",
   bosch: "#EA0016",
+  other: "#64748B",
 };
 
 /**
@@ -91,6 +92,7 @@ export function BrandMark({
     lg: { label: "LG", className: "tracking-tight font-extrabold text-2xl" },
     ifb: { label: "IFB", className: "tracking-[0.15em] font-extrabold" },
     bosch: { label: "BOSCH", className: "tracking-[0.22em] font-bold" },
+    other: { label: "OTHER", className: "tracking-[0.12em] font-bold" },
   };
 
   // LG's identity is the circular face mark, not a wordmark — render it when on-brand.

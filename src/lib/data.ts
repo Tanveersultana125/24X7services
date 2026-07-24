@@ -154,3 +154,10 @@ export function getAppliance(id?: string) {
 export function getBrand(id?: string) {
   return BRANDS.find((b) => b.id === id);
 }
+
+/** Display name for a chosen brand, resolving the free-text "other" case. */
+export function brandLabel(draft: { brand?: string; otherBrand?: string }) {
+  if (!draft.brand) return undefined;
+  if (draft.brand === "other") return draft.otherBrand?.trim() || "Other brand";
+  return getBrand(draft.brand)?.name;
+}

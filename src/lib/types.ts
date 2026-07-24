@@ -1,4 +1,7 @@
-export type BrandId = "samsung" | "lg" | "ifb" | "bosch";
+export type BrandId = "samsung" | "lg" | "ifb" | "bosch" | "other";
+
+/** Sentinel problem id used when the customer types their own issue. */
+export const OTHER_PROBLEM_ID = "other";
 
 export type ApplianceId = "refrigerator" | "washing-machine" | "microwave" | "ac";
 
@@ -52,8 +55,12 @@ export type BookingStepId =
 
 export interface BookingDraft {
   brand?: BrandId;
+  /** Free-text brand name when `brand === "other"`. */
+  otherBrand?: string;
   appliance?: ApplianceId;
   problems: string[];
+  /** Free-text problem description when `problems` includes `OTHER_PROBLEM_ID`. */
+  otherProblem?: string;
   date?: string;
   slot?: string;
   address?: {
