@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, Menu, X, UserRound } from "lucide-react";
+import { ArrowUpRight, Menu, X, UserRound, ChevronRight } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { Logo } from "@/components/ui/Logo";
 import { SearchTrigger } from "./SearchCommand";
@@ -119,9 +119,10 @@ export function SiteNav() {
                   <Link
                     href={l.href}
                     onClick={() => setOpen(false)}
-                    className="font-display block border-b border-hairline py-3.5 text-[1.35rem] tracking-tight"
+                    className="group flex items-center justify-between border-b border-hairline py-3 text-[1.05rem] font-medium tracking-tight text-foreground transition-colors hover:text-primary"
                   >
                     {l.label}
+                    <ChevronRight className="size-4 text-muted-2 transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
                   </Link>
                 </motion.div>
               ))}
