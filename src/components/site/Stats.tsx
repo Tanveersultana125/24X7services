@@ -16,7 +16,7 @@ export function Stats() {
     <section className="relative border-y border-hairline py-14 sm:py-20">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         <Kicker>By the numbers</Kicker>
-        <div className="mt-12 grid gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid grid-cols-2 gap-x-5 gap-y-10 sm:mt-12 sm:gap-x-8 sm:gap-y-14 lg:grid-cols-4">
           {STATS.map((s, i) => (
             <motion.div
               key={s.label}
@@ -24,14 +24,14 @@ export function Stats() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
-              className="border-l border-border pl-6"
+              className="border-l border-border pl-4 sm:pl-6"
             >
-              <div className="font-display flex items-baseline text-[3.5rem] leading-none tracking-tighter sm:text-[4.5rem]">
+              <div className="font-display flex items-baseline text-[2.5rem] leading-none tracking-tighter sm:text-[4.5rem]">
                 <Counter to={s.to} decimals={s.decimals} />
                 <span className="text-royal-bright">{s.suffix}</span>
               </div>
-              <p className="mt-5 text-lg font-medium">{s.label}</p>
-              <p className="text-sm text-muted">{s.sub}</p>
+              <p className="mt-3 text-[0.95rem] font-medium sm:mt-5 sm:text-lg">{s.label}</p>
+              <p className="text-[0.8rem] text-muted sm:text-sm">{s.sub}</p>
             </motion.div>
           ))}
         </div>
