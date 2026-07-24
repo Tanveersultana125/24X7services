@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   CalendarClock, FileText, ShieldCheck, Sparkles, Navigation, Plus, Star,
-  Download, MapPin, Heart, Bell, CreditCard, Wrench, ChevronRight,
+  Download, MapPin, Heart, Bell, CreditCard, Wrench, ChevronRight, LogOut,
 } from "lucide-react";
 import { StaggerGroup, staggerItem } from "@/components/ui/Reveal";
 import { Button } from "@/components/ui/Button";
@@ -27,21 +27,47 @@ const HISTORY = [
 
 const TABS = ["Overview", "Bookings", "Invoices", "Warranty", "Addresses"] as const;
 
-export function Dashboard() {
+type DashboardUser = { name: string; email: string; picture?: string };
+
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/).slice(0, 2);
+  return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "U";
+}
+
+export function Dashboard({ user }: { user?: DashboardUser }) {
   const [tab, setTab] = useState<(typeof TABS)[number]>("Overview");
+  const name = user?.name ?? "there";
 
   return (
     <div>
       {/* Header */}
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
         <div className="flex items-center gap-4">
-          <div className="grid size-14 place-items-center rounded-2xl bg-gradient-to-br from-primary to-secondary text-lg font-bold text-white shadow-premium-md">AR</div>
+          {user?.picture ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={user.picture} alt="" className="size-14 rounded-2xl object-cover shadow-premium-md" />
+          ) : (
+            <div className="grid size-14 place-items-center rounded-2xl bg-gradient-to-br from-primary to-secondary text-lg font-bold text-white shadow-premium-md">
+              {initials(name)}
+            </div>
+          )}
           <div>
             <p className="text-sm text-muted">Welcome back,</p>
-            <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Ananya Rao</h1>
+            <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{name}</h1>
+            {user?.email && <p className="text-sm text-muted">{user.email}</p>}
           </div>
         </div>
-        <Button href="/book" size="md"><Plus className="size-4" /> New Booking</Button>
+        <div className="flex items-center gap-2.5">
+          <form action="/api/auth/logout" method="post">
+            <button
+              type="submit"
+              className="inline-flex h-11 items-center gap-2 rounded-full border border-border-strong px-4 text-sm font-medium text-ink transition-colors hover:bg-surface-2"
+            >
+              <LogOut className="size-4" /> Log out
+            </button>
+          </form>
+          <Button href="/book" size="md"><Plus className="size-4" /> New Booking</Button>
+        </div>
       </div>
 
       {/* Stats */}

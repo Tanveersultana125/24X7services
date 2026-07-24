@@ -62,6 +62,34 @@ npm run dev      # http://localhost:3000
 npm run build    # production build
 ```
 
+## 🔐 Customer login (Google OAuth)
+
+`/login` uses **Google Sign-In** as the only customer login method. Sessions are
+stateless — the signed-in user is stored in an HMAC-signed, `httpOnly` cookie
+(`src/lib/customer/auth.ts`), so no database is required. `/dashboard` is gated and
+redirects to `/login` when there's no session.
+
+**Flow:** `/api/auth/google` → Google consent → `/api/auth/google/callback`
+(exchanges the code, reads `id_token`, sets the session) → `/dashboard`.
+Log out via a `POST /api/auth/logout`.
+
+**Setup:**
+
+1. In [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+   create an **OAuth 2.0 Client ID** (type: Web application).
+2. Add the authorized redirect URI:
+   - Dev: `http://localhost:3000/api/auth/google/callback`
+   - Prod: `https://YOUR_DOMAIN/api/auth/google/callback`
+3. Copy `.env.local` values:
+
+   ```bash
+   GOOGLE_CLIENT_ID=...
+   GOOGLE_CLIENT_SECRET=...
+   SESSION_SECRET=$(openssl rand -base64 32)
+   ```
+
+Without these, `/login` shows a friendly "not configured" message instead of crashing.
+
 ## 🗺️ Roadmap (documented for follow-up)
 
 The frontend is designed to drop onto a real backend. Suggested next milestones:
