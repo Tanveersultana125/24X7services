@@ -119,7 +119,7 @@ export function SiteNav() {
                   <Link
                     href={l.href}
                     onClick={() => setOpen(false)}
-                    className="font-display block border-b border-hairline py-4 text-[1.75rem] tracking-tight"
+                    className="font-display block border-b border-hairline py-3.5 text-[1.35rem] tracking-tight"
                   >
                     {l.label}
                   </Link>
