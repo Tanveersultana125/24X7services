@@ -113,17 +113,21 @@ export function BookingFlow() {
 
         <Stepper steps={STEPS} current={step} />
 
-        {/* Nav buttons */}
-        <div className="mt-10 flex items-center justify-between gap-4">
-          <Button variant="ghost" onClick={() => go(-1)} className={step === 0 ? "invisible" : ""}>
+        {/* Nav buttons — full-width primary on phones so the action is unmistakable */}
+        <div className="mt-10 flex items-center gap-3">
+          <Button
+            variant="ghost"
+            onClick={() => go(-1)}
+            className={cn("shrink-0", step === 0 && "invisible")}
+          >
             <ArrowLeft className="size-4" /> Back
           </Button>
           {step < STEPS.length - 1 ? (
-            <Button onClick={() => go(1)} disabled={!canProceed()} size="lg">
+            <Button onClick={() => go(1)} disabled={!canProceed()} size="lg" className="flex-1 sm:flex-none sm:ml-auto">
               Continue <ArrowRight className="size-4" />
             </Button>
           ) : (
-            <Button onClick={handlePay} disabled={!canProceed() || processing} size="lg" variant="accent">
+            <Button onClick={handlePay} disabled={!canProceed() || processing} size="lg" variant="accent" className="flex-1 sm:flex-none sm:ml-auto">
               {processing ? (
                 <><span className="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white" /> Processing…</>
               ) : (
