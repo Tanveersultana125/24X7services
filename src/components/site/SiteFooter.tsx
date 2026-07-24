@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Instagram, Twitter, Linkedin, Youtube } from "lucide-react";
 import { Marquee } from "./Marquee";
 import { Logo } from "@/components/ui/Logo";
+import { cn } from "@/lib/utils";
 
 const COLUMNS = {
   Services: ["Refrigerator Repair", "Washing Machine Repair", "Microwave Repair", "Oven Repair", "Installation", "Annual Maintenance"],
@@ -62,8 +63,10 @@ export function SiteFooter() {
           </div>
 
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
-            {Object.entries(COLUMNS).map(([title, links]) => (
-              <div key={title}>
+            {Object.entries(COLUMNS).map(([title, links], i) => (
+              // On the 2-col mobile layout, the right column (odd index) aligns
+              // right so both edges are flush; from sm up everything is left-aligned.
+              <div key={title} className={cn(i % 2 === 1 && "text-right sm:text-left")}>
                 <h4 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/40">{title}</h4>
                 <ul className="mt-5 space-y-3">
                   {links.map((l) => (
