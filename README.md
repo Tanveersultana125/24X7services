@@ -62,31 +62,40 @@ npm run dev      # http://localhost:3000
 npm run build    # production build
 ```
 
-## 🔐 Customer login (Google OAuth)
+## 🔐 Customer login (Firebase — Google Sign-In)
 
-`/login` uses **Google Sign-In** as the only customer login method. Sessions are
-stateless — the signed-in user is stored in an HMAC-signed, `httpOnly` cookie
-(`src/lib/customer/auth.ts`), so no database is required. `/dashboard` is gated and
-redirects to `/login` when there's no session.
+`/login` uses **Firebase Authentication** with Google as the only customer login
+method, and secure **server-side session cookies** (Firebase's recommended SSR
+pattern). `/dashboard` is gated server-side and redirects to `/login` when there's
+no valid session.
 
-**Flow:** `/api/auth/google` → Google consent → `/api/auth/google/callback`
-(exchanges the code, reads `id_token`, sets the session) → `/dashboard`.
-Log out via a `POST /api/auth/logout`.
+**Flow:**
+
+1. Browser signs in with Google via the Firebase Web SDK (`signInWithPopup`) and
+   gets a Firebase **ID token** — `src/lib/firebase/client.ts`, `LoginCard.tsx`.
+2. The token is POSTed to `POST /api/auth/session`, where the **Admin SDK**
+   verifies it and mints an httpOnly **session cookie** — `src/lib/firebase/admin.ts`.
+3. Server Components verify that cookie via `getCustomerSession()`
+   (`src/lib/customer/auth.ts`). Log out with `POST /api/auth/logout`.
 
 **Setup:**
 
-1. In [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
-   create an **OAuth 2.0 Client ID** (type: Web application).
-2. Add the authorized redirect URI:
-   - Dev: `http://localhost:3000/api/auth/google/callback`
-   - Prod: `https://YOUR_DOMAIN/api/auth/google/callback`
-3. Copy `.env.local` values:
+1. In the [Firebase Console](https://console.firebase.google.com/): **Authentication
+   → Sign-in method → Google → Enable**. Add `localhost` (and your prod domain) under
+   **Authentication → Settings → Authorized domains**.
+2. **Web SDK config** (public): Project settings → General → *Your apps* → Web app →
+   *SDK setup and config*. Fill the `NEXT_PUBLIC_FIREBASE_*` values in `.env.local`.
+3. **Admin service account** (secret): Project settings → *Service accounts* →
+   **Generate new private key**. From the downloaded JSON set:
 
    ```bash
-   GOOGLE_CLIENT_ID=...
-   GOOGLE_CLIENT_SECRET=...
-   SESSION_SECRET=$(openssl rand -base64 32)
+   FIREBASE_PROJECT_ID=<project_id>
+   FIREBASE_CLIENT_EMAIL=<client_email>
+   # one line, keep the literal \n sequences, wrapped in quotes:
+   FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
    ```
+
+4. Restart `npm run dev` (env is read at startup).
 
 Without these, `/login` shows a friendly "not configured" message instead of crashing.
 

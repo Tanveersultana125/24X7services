@@ -10,12 +10,7 @@ export const metadata: Metadata = {
   description: "Log in to 24X7 Services to manage bookings, invoices, warranty and AMC plans.",
 };
 
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ error?: string }>;
-}) {
-  const { error } = await searchParams;
+export default function LoginPage() {
   return (
     <div className="grid min-h-dvh lg:grid-cols-2">
       {/* Left — editorial brand panel */}
@@ -59,7 +54,7 @@ export default async function LoginPage({
         </div>
 
         <div className="flex flex-1 items-center justify-center px-6 py-12">
-          <LoginCard error={error} />
+          <LoginCard />
         </div>
 
         <p className="px-6 pb-8 text-center text-xs text-muted">
