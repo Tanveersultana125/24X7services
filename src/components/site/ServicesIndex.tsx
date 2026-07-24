@@ -17,8 +17,8 @@ const CARE_ICONS: Record<string, typeof Settings2> = {
 };
 
 export function ServicesIndex() {
-  const [active, setActive] = useState(0);
-  const svc = SERVICES[active];
+  const [active, setActive] = useState<number | null>(0);
+  const svc = SERVICES[active ?? 0];
 
   return (
     <section id="services" className="relative scroll-mt-28 pb-14 pt-10 sm:pb-20 sm:pt-14">
@@ -45,15 +45,16 @@ export function ServicesIndex() {
               <li key={s.id} className="border-b border-hairline">
                 <Link
                   href={s.appliance ? `/book?appliance=${s.appliance}` : "/book"}
-                  onMouseEnter={() => setActive(i)}
+                  onPointerEnter={(e) => { if (e.pointerType === "mouse") setActive(i); }}
                   onFocus={() => setActive(i)}
                   onClick={(e) => {
                     // below lg the row is the accordion control, not the link — booking
                     // is the button inside the panel it opens. Keyed off width rather
                     // than hover support, so a narrow desktop window behaves the same.
+                    // Tapping the open row again closes it.
                     if (typeof window !== "undefined" && window.innerWidth < 1024) {
                       e.preventDefault();
-                      setActive(i);
+                      setActive((cur) => (cur === i ? null : i));
                     }
                   }}
                   className={cn(
