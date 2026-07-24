@@ -149,12 +149,6 @@ export function TrustBento() {
                 <p className="font-display text-[4.5rem] leading-[0.82] tracking-tighter sm:text-[6rem]">90</p>
                 <p className="mt-2 text-lg font-semibold uppercase tracking-[0.08em] sm:text-xl">Day warranty</p>
 
-                {/* progress rule */}
-                <span aria-hidden className="mt-5 flex items-center gap-1.5">
-                  <span className="h-1 w-10 rounded-full bg-[#4f74ff] transition-all duration-500 group-hover:w-16" />
-                  <span className="h-1 w-20 rounded-full bg-white/15" />
-                </span>
-
                 <p className="mt-5 max-w-sm text-pretty text-[0.92rem] leading-relaxed text-white/80">
                   If it breaks again within 90 days, we fix it free. Everything we do is backed
                   in writing — parts, labour and peace of mind.
