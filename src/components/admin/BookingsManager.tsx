@@ -2,12 +2,13 @@
 
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
-import { BOOKINGS, TECHNICIANS, STATUS_META, type Booking, type BookingStatus } from "@/lib/admin/data";
+import { TECHNICIANS, STATUS_META, type BookingStatus } from "@/lib/admin/data";
+import type { Booking } from "@/lib/bookings";
 
 const STATUSES: BookingStatus[] = ["new", "assigned", "in-progress", "completed", "cancelled"];
 
-export function BookingsManager() {
-  const [rows, setRows] = useState<Booking[]>(BOOKINGS);
+export function BookingsManager({ initial }: { initial: Booking[] }) {
+  const [rows, setRows] = useState<Booking[]>(initial);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<BookingStatus | "all">("all");
 
@@ -15,14 +16,29 @@ export function BookingsManager() {
     return rows.filter((b) => {
       const matchesQuery =
         !query ||
-        [b.customer, b.id, b.appliance, b.city, b.phone].some((v) => v.toLowerCase().includes(query.toLowerCase()));
+        [b.customer, b.code, b.appliance, b.city, b.phone, b.email].some((v) =>
+          (v ?? "").toLowerCase().includes(query.toLowerCase()),
+        );
       const matchesFilter = filter === "all" || b.status === filter;
       return matchesQuery && matchesFilter;
     });
   }, [rows, query, filter]);
 
-  const update = (id: string, patch: Partial<Booking>) =>
-    setRows((prev) => prev.map((b) => (b.id === id ? { ...b, ...patch } : b)));
+  // Optimistically apply, persist to Firestore, revert on failure.
+  const update = async (id: string, patch: Partial<Booking>) => {
+    const prev = rows;
+    setRows((r) => r.map((b) => (b.id === id ? { ...b, ...patch } : b)));
+    try {
+      const res = await fetch("/api/admin/bookings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status: patch.status, tech: patch.tech ?? null }),
+      });
+      if (!res.ok) throw new Error("failed");
+    } catch {
+      setRows(prev); // revert
+    }
+  };
 
   return (
     <div>
@@ -38,7 +54,7 @@ export function BookingsManager() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search name, ID, city…"
+            placeholder="Search name, ID, city, email…"
             className="w-full bg-transparent py-2.5 text-sm outline-none"
           />
         </div>
@@ -74,11 +90,12 @@ export function BookingsManager() {
               <tr key={b.id} className="hover:bg-surface-2/50">
                 <td className="px-4 py-3">
                   <p className="font-medium">{b.customer}</p>
-                  <p className="text-xs text-muted">{b.id} · {b.phone}</p>
+                  <p className="text-xs text-muted">{b.code} · {b.phone}</p>
+                  <p className="text-xs text-muted-2">{b.email}</p>
                 </td>
                 <td className="px-4 py-3">
-                  <p>{b.appliance}</p>
-                  <p className="text-xs text-muted">{b.problem} · {b.city}</p>
+                  <p>{b.brand ? `${b.brand} ` : ""}{b.appliance}</p>
+                  <p className="text-xs text-muted">{b.problem || "—"} · {b.city}</p>
                 </td>
                 <td className="px-4 py-3 tabular-nums">₹{b.price.toLocaleString("en-IN")}</td>
                 <td className="px-4 py-3">
@@ -108,12 +125,12 @@ export function BookingsManager() {
               </tr>
             ))}
             {filtered.length === 0 && (
-              <tr><td colSpan={5} className="px-4 py-10 text-center text-muted">No bookings match.</td></tr>
+              <tr><td colSpan={5} className="px-4 py-10 text-center text-muted">No bookings yet.</td></tr>
             )}
           </tbody>
         </table>
       </div>
-      <p className="mt-3 text-xs text-muted">Changes are in-memory for now — reset on refresh. Wire to a database to persist.</p>
+      <p className="mt-3 text-xs text-muted">Live from Firestore · changes save automatically.</p>
     </div>
   );
 }

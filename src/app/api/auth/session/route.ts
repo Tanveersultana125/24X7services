@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAdminAuth, adminConfigured } from "@/lib/firebase/admin";
 import { CUSTOMER_COOKIE, SESSION_MAX_AGE, sessionCookieOptions } from "@/lib/customer/auth";
+import { upsertCustomer } from "@/lib/bookings";
 
 /**
  * Exchange a freshly-minted Firebase ID token for an httpOnly session cookie.
@@ -27,6 +28,15 @@ export async function POST(request: Request) {
     const sessionCookie = await auth.createSessionCookie(idToken, {
       expiresIn: SESSION_MAX_AGE * 1000,
     });
+
+    // Record the customer so they show up in the admin panel (best-effort —
+    // never block sign-in if Firestore is momentarily unavailable).
+    await upsertCustomer({
+      uid: decoded.uid,
+      email: decoded.email ?? "",
+      name: (decoded.name as string | undefined) ?? decoded.email ?? "Customer",
+      picture: decoded.picture as string | undefined,
+    }).catch(() => {});
 
     const res = NextResponse.json({ ok: true });
     res.cookies.set(CUSTOMER_COOKIE, sessionCookie, sessionCookieOptions());

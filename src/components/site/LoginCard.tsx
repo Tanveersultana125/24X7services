@@ -17,7 +17,7 @@ function GoogleG({ className }: { className?: string }) {
   );
 }
 
-export function LoginCard() {
+export function LoginCard({ next = "/dashboard" }: { next?: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,7 +53,7 @@ export function LoginCard() {
       }
 
       // Full navigation so the server picks up the new session cookie.
-      window.location.assign("/dashboard");
+      window.location.assign(next);
     } catch (err) {
       const code = err instanceof FirebaseError ? err.code : "";
       if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
