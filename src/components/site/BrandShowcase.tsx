@@ -146,8 +146,10 @@ export function BrandShowcase() {
             return (
               <motion.div
                 key={b.id}
-                // Tap-only accordion — a card opens/closes only when its header is
-                // pressed, so closing one never auto-opens another.
+                // Hover opens the card, moving the cursor away closes it. (Scroll no
+                // longer auto-opens anything — that was the runaway behaviour.)
+                onMouseEnter={() => setTapped(i)}
+                onMouseLeave={() => setTapped((cur) => (cur === i ? null : cur))}
                 className={cn(
                   "overflow-hidden rounded-[1.5rem] border transition-colors duration-500",
                   open ? "border-transparent" : "border-white/60"
