@@ -113,6 +113,26 @@ export function BookingFlow() {
 
         <Stepper steps={STEPS} current={step} />
 
+        {/* Nav buttons */}
+        <div className="mt-10 flex items-center justify-between gap-4">
+          <Button variant="ghost" onClick={() => go(-1)} className={step === 0 ? "invisible" : ""}>
+            <ArrowLeft className="size-4" /> Back
+          </Button>
+          {step < STEPS.length - 1 ? (
+            <Button onClick={() => go(1)} disabled={!canProceed()} size="lg">
+              Continue <ArrowRight className="size-4" />
+            </Button>
+          ) : (
+            <Button onClick={handlePay} disabled={!canProceed() || processing} size="lg" variant="accent">
+              {processing ? (
+                <><span className="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white" /> Processing…</>
+              ) : (
+                <>Pay {formatINR(total)} <CheckCircle2 className="size-4" /></>
+              )}
+            </Button>
+          )}
+        </div>
+
         <div className="relative mt-10 min-h-[24rem]">
           <AnimatePresence mode="wait" custom={dir}>
             <motion.div
@@ -132,26 +152,6 @@ export function BookingFlow() {
               {STEPS[step].id === "payment" && <PaymentStep draft={draft} setDraft={setDraft} total={total} />}
             </motion.div>
           </AnimatePresence>
-        </div>
-
-        {/* Nav buttons */}
-        <div className="mt-10 flex items-center justify-between gap-4">
-          <Button variant="ghost" onClick={() => go(-1)} className={step === 0 ? "invisible" : ""}>
-            <ArrowLeft className="size-4" /> Back
-          </Button>
-          {step < STEPS.length - 1 ? (
-            <Button onClick={() => go(1)} disabled={!canProceed()} size="lg">
-              Continue <ArrowRight className="size-4" />
-            </Button>
-          ) : (
-            <Button onClick={handlePay} disabled={!canProceed() || processing} size="lg" variant="accent">
-              {processing ? (
-                <><span className="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white" /> Processing…</>
-              ) : (
-                <>Pay {formatINR(total)} <CheckCircle2 className="size-4" /></>
-              )}
-            </Button>
-          )}
         </div>
       </div>
 
