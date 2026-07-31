@@ -36,17 +36,29 @@ export function QuickEstimate() {
 
   return (
     <section className="relative overflow-hidden border-y border-hairline">
-      {/* photo panel — right edge on desktop */}
-      <div aria-hidden className="absolute inset-y-0 right-0 hidden w-[40%] overflow-hidden lg:block">
+      {/* photo panel — a contained, rounded frame inset from the edges so the
+          technician is never sliced at the screen edge */}
+      <div
+        aria-hidden
+        className="absolute inset-y-8 right-6 z-0 hidden w-[36%] overflow-hidden rounded-[2rem] shadow-premium-lg ring-1 ring-hairline lg:block xl:right-10 xl:w-[34%]"
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/work/ac-tech-tablet.png" alt="" className="h-full w-full object-cover object-center" />
+        <img
+          src="/work/ac-tech-tablet.png"
+          alt=""
+          className="h-full w-full object-cover object-[58%_28%]"
+        />
+        {/* left fade blends the frame under the form card; most of it sits behind the card */}
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(90deg, var(--background) 0%, rgba(0,0,0,0) 34%)" }}
+          style={{
+            background:
+              "linear-gradient(90deg, var(--background) 0%, rgba(242,240,234,0.45) 26%, rgba(0,0,0,0) 55%)",
+          }}
         />
       </div>
 
-      <div className="relative mx-auto max-w-[92rem] px-6 py-14 sm:px-10 sm:py-20">
+      <div className="relative z-10 mx-auto max-w-[92rem] px-6 py-14 sm:px-10 sm:py-20">
         <div className="grid items-center gap-10 lg:grid-cols-[1fr_27rem] lg:gap-16">
           {/* copy */}
           <motion.div
