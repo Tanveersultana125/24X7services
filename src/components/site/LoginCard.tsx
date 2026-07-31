@@ -49,6 +49,7 @@ export function LoginCard({ next = "/dashboard" }: { next?: string }) {
             : "We couldn't complete your sign-in. Please try again.",
         );
         await auth.signOut().catch(() => {});
+        setLoading(false);
         return;
       }
 
