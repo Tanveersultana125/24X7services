@@ -36,25 +36,17 @@ export function QuickEstimate() {
 
   return (
     <section className="relative overflow-hidden border-y border-hairline">
-      {/* photo panel — a contained, rounded frame inset from the edges so the
-          technician is never sliced at the screen edge */}
-      <div
-        aria-hidden
-        className="absolute inset-y-8 right-6 z-0 hidden w-[36%] overflow-hidden rounded-[2rem] shadow-premium-lg ring-1 ring-hairline lg:block xl:right-10 xl:w-[34%]"
-      >
+      {/* photo panel — full-bleed on the right, fading into the page on the left */}
+      <div aria-hidden className="absolute inset-y-0 right-0 z-0 hidden w-[42%] overflow-hidden lg:block">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/work/ac-tech-tablet.png"
           alt=""
-          className="h-full w-full object-cover object-[58%_28%]"
+          className="h-full w-full object-cover object-[42%_center]"
         />
-        {/* left fade blends the frame under the form card; most of it sits behind the card */}
         <div
           className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(90deg, var(--background) 0%, rgba(242,240,234,0.45) 26%, rgba(0,0,0,0) 55%)",
-          }}
+          style={{ background: "linear-gradient(90deg, var(--background) 0%, rgba(0,0,0,0) 38%)" }}
         />
       </div>
 
