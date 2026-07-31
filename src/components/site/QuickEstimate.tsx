@@ -42,7 +42,7 @@ export function QuickEstimate() {
         <img
           src="/work/ac-tech-tablet.png"
           alt=""
-          className="h-full w-full object-cover object-[42%_center]"
+          className="h-full w-full object-cover object-[85%_center]"
         />
         <div
           className="absolute inset-0"
