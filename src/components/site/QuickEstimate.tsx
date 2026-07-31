@@ -2,7 +2,19 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ChevronsRight, Star, Check } from "lucide-react";
+import {
+  ChevronsRight,
+  Star,
+  Check,
+  User,
+  Phone,
+  Mail,
+  MapPin,
+  Wrench,
+  ChevronDown,
+  ArrowRight,
+  ShieldCheck,
+} from "lucide-react";
 import { APPLIANCES } from "@/lib/data";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -94,7 +106,7 @@ export function QuickEstimate() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.15, ease }}
-            className="rounded-[1.75rem] border border-white/70 bg-white p-5 shadow-premium-xl sm:p-8"
+            className="overflow-hidden rounded-[1.75rem] border border-hairline bg-surface shadow-premium-xl"
           >
             {/* the side photo is desktop-only — show it above the form on small screens */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -102,75 +114,87 @@ export function QuickEstimate() {
               src="/work/ac-tech-tablet.png"
               alt=""
               aria-hidden
-              className="mb-6 aspect-[16/10] w-full rounded-2xl object-cover object-[center_28%] lg:hidden"
+              className="aspect-[16/9] w-full object-cover object-[center_28%] lg:hidden"
             />
-            <h3 className="text-center font-display text-2xl tracking-tight text-ink">Get in touch</h3>
 
-            {sent ? (
-              <div className="mt-8 flex flex-col items-center py-10 text-center">
-                <span className="grid size-12 place-items-center rounded-full bg-emerald/12 text-emerald">
-                  <Check className="size-6" />
-                </span>
-                <p className="mt-5 text-base font-semibold text-ink">Request received</p>
-                <p className="mt-2 max-w-xs text-sm text-muted">
-                  A service advisor will call you within 10 minutes with your free estimate.
+            <div className="p-6 sm:p-7">
+              <div className="text-center">
+                <h3 className="font-display text-[1.7rem] leading-tight tracking-tight text-ink">
+                  Book your free estimate
+                </h3>
+                <p className="mt-2 text-[0.82rem] leading-relaxed text-muted">
+                  Tell us what&apos;s wrong — an advisor calls back in
+                  <span className="font-semibold text-ink"> under 10 minutes.</span>
                 </p>
               </div>
-            ) : (
-              <form
-                className="mt-6 space-y-3"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setSent(true);
-                }}
-              >
-                <Field name="name" placeholder="Name" autoComplete="name" required />
-                <Field name="phone" type="tel" placeholder="Phone number" autoComplete="tel" required />
-                <Field name="email" type="email" placeholder="Email" autoComplete="email" />
-                <select
-                  name="service"
-                  required
-                  defaultValue=""
-                  className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-royal-bright"
-                >
-                  <option value="" disabled>
-                    Select service
-                  </option>
-                  {APPLIANCES.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.name}
-                    </option>
-                  ))}
-                </select>
-                <Field name="address" placeholder="Street address" autoComplete="street-address" />
-                <textarea
-                  name="message"
-                  rows={4}
-                  placeholder="Describe the problem"
-                  className="w-full resize-none rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-muted-2 focus:border-royal-bright"
-                />
-                <button
-                  type="submit"
-                  className="w-full rounded-xl bg-royal-bright py-3.5 text-sm font-semibold text-white transition-transform hover:scale-[1.01]"
-                >
-                  Get a free estimate
-                </button>
-              </form>
-            )}
 
-            <div className="mt-6 flex items-center justify-between border-t border-hairline pt-5">
-              {RATINGS.map((r) => (
-                <div key={r.source} className="text-center">
-                  <div className="flex justify-center">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} className="size-2.5 fill-amber text-amber" />
-                    ))}
-                  </div>
-                  <p className="mt-1.5 text-[0.6rem] uppercase tracking-[0.12em] text-muted">
-                    {r.score} · {r.source}
+              {sent ? (
+                <div className="flex flex-col items-center py-12 text-center">
+                  <span className="grid size-12 place-items-center rounded-full bg-emerald/12 text-emerald">
+                    <Check className="size-6" />
+                  </span>
+                  <p className="mt-5 text-base font-semibold text-ink">Request received</p>
+                  <p className="mt-2 max-w-xs text-sm text-muted">
+                    A service advisor will call you within 10 minutes with your free estimate.
                   </p>
                 </div>
-              ))}
+              ) : (
+                <form
+                  className="mt-6 space-y-2.5"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setSent(true);
+                  }}
+                >
+                  <Field icon={<User />} name="name" placeholder="Full name" autoComplete="name" required />
+                  <Field icon={<Phone />} name="phone" type="tel" placeholder="Phone number" autoComplete="tel" required />
+                  <Field icon={<Mail />} name="email" type="email" placeholder="Email address" autoComplete="email" />
+
+                  <div className="relative">
+                    <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-2">
+                      <Wrench className="size-[1.05rem]" />
+                    </span>
+                    <select
+                      name="service"
+                      required
+                      defaultValue=""
+                      className="w-full appearance-none rounded-xl border border-border bg-background py-3.5 pl-11 pr-10 text-sm text-ink outline-none transition-colors focus:border-royal-bright focus:ring-2 focus:ring-royal-bright/15 [&:invalid]:text-muted-2"
+                    >
+                      <option value="" disabled>
+                        Select a service
+                      </option>
+                      {APPLIANCES.map((a) => (
+                        <option key={a.id} value={a.id} className="text-ink">
+                          {a.name}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-2">
+                      <ChevronDown className="size-4" />
+                    </span>
+                  </div>
+
+                  <Field icon={<MapPin />} name="address" placeholder="Street address" autoComplete="street-address" />
+                  <textarea
+                    name="message"
+                    rows={3}
+                    placeholder="Briefly describe the problem"
+                    className="w-full resize-none rounded-xl border border-border bg-background px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-muted-2 focus:border-royal-bright focus:ring-2 focus:ring-royal-bright/15"
+                  />
+                  <button
+                    type="submit"
+                    className="group mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-royal-bright py-4 text-sm font-semibold text-white shadow-[0_14px_30px_-10px_var(--royal-bright)] transition-all hover:brightness-105"
+                  >
+                    Get a free estimate
+                    <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+                  </button>
+                </form>
+              )}
+
+              <p className="mt-5 flex items-center justify-center gap-1.5 border-t border-hairline pt-5 text-[0.72rem] text-muted">
+                <ShieldCheck className="size-3.5 text-emerald" />
+                Your details stay private — no spam, no obligation.
+              </p>
             </div>
           </motion.div>
         </div>
@@ -179,11 +203,20 @@ export function QuickEstimate() {
   );
 }
 
-function Field(props: React.InputHTMLAttributes<HTMLInputElement>) {
+function Field({ icon, ...props }: React.InputHTMLAttributes<HTMLInputElement> & { icon?: React.ReactNode }) {
   return (
-    <input
-      {...props}
-      className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm text-ink outline-none transition-colors placeholder:text-muted-2 focus:border-royal-bright"
-    />
+    <div className="relative">
+      {icon && (
+        <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-2 [&>svg]:size-[1.05rem]">
+          {icon}
+        </span>
+      )}
+      <input
+        {...props}
+        className={`w-full rounded-xl border border-border bg-background py-3.5 text-sm text-ink outline-none transition-colors placeholder:text-muted-2 focus:border-royal-bright focus:ring-2 focus:ring-royal-bright/15 ${
+          icon ? "pl-11 pr-4" : "px-4"
+        }`}
+      />
+    </div>
   );
 }
