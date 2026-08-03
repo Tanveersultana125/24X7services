@@ -14,7 +14,7 @@ const EXTRA: Testimonial[] = [
 
 const ALL = [...TESTIMONIALS, ...EXTRA];
 const rowA = ALL.slice(0, 4);
-const rowB = ALL.slice(4).concat(ALL.slice(0, 2));
+const rowB = ALL.slice(4);
 
 export function Reviews() {
   return (
@@ -43,11 +43,11 @@ export function Reviews() {
         </div>
       </div>
 
-      <div className="mt-10 sm:mt-16 flex flex-col gap-5">
-        <Marquee>
+      <div className="mt-10 flex flex-col gap-5 sm:mt-16 sm:gap-6">
+        <Marquee trackClassName="items-stretch gap-5 pr-5 sm:gap-6 sm:pr-6">
           {rowA.map((t, i) => <ReviewCard key={`a${i}`} t={t} />)}
         </Marquee>
-        <Marquee reverse>
+        <Marquee reverse trackClassName="items-stretch gap-5 pr-5 sm:gap-6 sm:pr-6">
           {rowB.map((t, i) => <ReviewCard key={`b${i}`} t={t} />)}
         </Marquee>
       </div>
@@ -57,22 +57,37 @@ export function Reviews() {
 
 function ReviewCard({ t }: { t: Testimonial }) {
   return (
-    <figure className="flex w-[22rem] shrink-0 flex-col gap-4 rounded-[1.5rem] border border-border bg-surface p-6 shadow-premium-sm">
+    <figure className="flex h-[18.5rem] w-[20.5rem] shrink-0 flex-col rounded-[1.5rem] border border-border bg-surface p-6 shadow-premium-sm transition-colors duration-300 hover:border-border-strong sm:h-[19rem] sm:w-[23rem] sm:p-7">
       <div className="flex items-center gap-1">
-        {Array.from({ length: t.rating }).map((_, i) => (
-          <Star key={i} className="size-4 fill-amber text-amber" />
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Star
+            key={i}
+            className={
+              i < t.rating ? "size-4 fill-amber text-amber" : "size-4 fill-border text-border"
+            }
+          />
         ))}
       </div>
-      <blockquote className="text-pretty leading-relaxed text-ink-soft">&ldquo;{t.quote}&rdquo;</blockquote>
-      <figcaption className="mt-auto flex items-center gap-3 pt-2">
-        <span className="grid size-10 place-items-center rounded-full text-xs font-semibold text-white" style={{ background: t.color }}>
+
+      <blockquote className="mt-5 line-clamp-5 text-pretty text-[0.95rem] leading-[1.65] text-ink-soft">
+        &ldquo;{t.quote}&rdquo;
+      </blockquote>
+
+      <figcaption className="mt-auto flex items-center gap-3 border-t border-hairline pt-5">
+        <span
+          className="grid size-10 shrink-0 place-items-center rounded-full text-xs font-semibold text-white"
+          style={{ background: t.color }}
+        >
           {t.initials}
         </span>
-        <div>
+        <div className="min-w-0">
           <p className="flex items-center gap-1.5 text-sm font-semibold">
-            {t.name} <BadgeCheck className="size-3.5 text-emerald" />
+            <span className="truncate">{t.name}</span>
+            <BadgeCheck className="size-3.5 shrink-0 text-emerald" />
           </p>
-          <p className="text-xs text-muted">{t.appliance} · {t.city}</p>
+          <p className="mt-0.5 truncate text-xs text-muted">
+            {t.appliance} · {t.city}
+          </p>
         </div>
       </figcaption>
     </figure>

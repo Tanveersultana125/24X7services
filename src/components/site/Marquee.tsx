@@ -6,11 +6,14 @@ export function Marquee({
   children,
   reverse = false,
   className,
+  trackClassName,
   fade = true,
 }: {
   children: React.ReactNode;
   reverse?: boolean;
   className?: string;
+  /** Overrides on the moving track — e.g. `items-stretch` for equal-height cards. */
+  trackClassName?: string;
   fade?: boolean;
 }) {
   return (
@@ -26,7 +29,8 @@ export function Marquee({
         className={cn(
           "flex shrink-0 items-center gap-16 pr-16",
           reverse ? "animate-marquee-rev" : "animate-marquee",
-          "group-hover:[animation-play-state:paused]"
+          "group-hover:[animation-play-state:paused]",
+          trackClassName
         )}
       >
         {children}
