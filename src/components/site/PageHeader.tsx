@@ -54,10 +54,7 @@ export function PageHeader({
         <div className="pointer-events-none absolute -top-24 left-1/2 size-[38rem] -translate-x-1/2 rounded-full bg-royal-bright/8 blur-[120px]" />
       )}
 
-      {/* full-bleed background photo with a scrim for readable text — lg and up only.
-          The scrim fades left-to-right, which needs width to work; on a phone it
-          either swallowed the photo or left the copy sitting on top of faces, so
-          below lg the photo moves to its own band under the copy instead. */}
+      {/* full-bleed background photo with a light scrim for readable text */}
       {bgImage && (
         <>
           <motion.img
@@ -67,20 +64,25 @@ export function PageHeader({
             src={bgImage}
             alt=""
             aria-hidden
-            className="absolute inset-0 hidden h-full w-full object-cover object-center lg:block"
+            className="absolute inset-0 h-full w-full object-cover object-center"
           />
+          {/* scrim on the copy side so the text stays readable */}
           <div
             aria-hidden
-            className="absolute inset-0 hidden lg:block"
+            className="absolute inset-0"
             style={{
               background: onDark
                 ? "linear-gradient(100deg, rgba(18,20,24,0.88) 0%, rgba(18,20,24,0.74) 34%, rgba(18,20,24,0.34) 60%, rgba(18,20,24,0.12) 100%)"
                 : "linear-gradient(100deg, rgba(245,243,238,0.95) 0%, rgba(245,243,238,0.82) 34%, rgba(245,243,238,0.35) 58%, rgba(245,243,238,0.05) 100%)",
             }}
           />
-          {/* dark headers keep their dark surface below lg, or the white copy would
-              land on the light page background */}
-          {onDark && <div aria-hidden className="absolute inset-0 bg-[#121418] lg:hidden" />}
+          {/* the scrim above fades left-to-right, which leaves nothing to read against on a
+              narrow screen — lay an even veil under the copy below lg */}
+          <div
+            aria-hidden
+            className="absolute inset-0 lg:hidden"
+            style={{ background: onDark ? "rgba(18,20,24,0.6)" : "rgba(245,243,238,0.74)" }}
+          />
         </>
       )}
 
@@ -185,7 +187,7 @@ export function PageHeader({
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.35, ease }}
-                className="mt-9 flex flex-wrap gap-x-8 gap-y-5 sm:mt-12 sm:gap-x-12"
+                className="mt-12 flex flex-wrap gap-x-12 gap-y-4"
               >
                 {stats.map((st) => (
                   <div key={st.label}>
@@ -296,19 +298,6 @@ export function PageHeader({
               </div>
             ))}
           </motion.div>
-        )}
-
-        {/* the background photo, shown properly on phones instead of behind the copy */}
-        {bgImage && (
-          <motion.img
-            initial={{ opacity: 0, scale: 1.04 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.3, ease }}
-            src={bgImage}
-            alt=""
-            aria-hidden
-            className="mt-10 aspect-[16/10] w-full rounded-2xl object-cover object-center sm:aspect-[21/9] lg:hidden"
-          />
         )}
 
         {/* stacked image on mobile */}
