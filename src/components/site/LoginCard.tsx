@@ -49,9 +49,18 @@ export function LoginCard({ next = "/dashboard" }: { next?: string }) {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
+        if (data.error === "server_not_configured") {
+          // Distinct from the client-side guard above: the browser config is fine,
+          // it's the server's service-account credentials that are missing.
+          console.warn(
+            "[24X7] customer login: the server is missing its Firebase Admin " +
+              "credentials — FIREBASE_PROJECT_ID / FIREBASE_CLIENT_EMAIL / FIREBASE_PRIVATE_KEY. " +
+              "Note these are server-only and must NOT carry a NEXT_PUBLIC_ prefix.",
+          );
+        }
         setError(
           data.error === "server_not_configured"
-            ? "Google sign-in isn't configured yet. Please contact support."
+            ? "Sign-in is unavailable right now (server not configured). Please contact support."
             : "We couldn't complete your sign-in. Please try again.",
         );
         await auth.signOut().catch(() => {});

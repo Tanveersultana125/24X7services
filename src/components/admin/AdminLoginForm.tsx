@@ -51,11 +51,20 @@ export function AdminLoginForm() {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
+        if (data.error === "server_not_configured") {
+          // Distinct from the client-side guard above: the browser config is fine,
+          // it's the server's service-account credentials that are missing.
+          console.warn(
+            "[24X7] admin login: the server is missing its Firebase Admin " +
+              "credentials — FIREBASE_PROJECT_ID / FIREBASE_CLIENT_EMAIL / FIREBASE_PRIVATE_KEY. " +
+              "Note these are server-only and must NOT carry a NEXT_PUBLIC_ prefix.",
+          );
+        }
         setError(
           data.error === "not_admin"
             ? "This Google account isn't authorised for admin access."
             : data.error === "server_not_configured"
-              ? "Admin sign-in isn't configured yet."
+              ? "Admin sign-in is unavailable right now (server not configured)."
               : "We couldn't sign you in. Please try again.",
         );
         // Not an admin (or failed) — drop the Firebase session so we don't leave
