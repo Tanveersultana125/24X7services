@@ -121,7 +121,7 @@ export function Hero() {
           >
             {/* on phones the cutout runs a little wider than its column so the technician
                 reads at a confident size instead of a small floating figure */}
-            <div className="relative -mr-[8%] w-[150%] max-w-none sm:mr-0 sm:w-full sm:max-w-[34rem]">
+            <div className="relative -mr-[16%] w-[180%] max-w-none sm:mr-0 sm:w-full sm:max-w-[34rem]">
               {/* soft backdrop */}
               <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
                 <div className="absolute left-1/2 top-1/2 size-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/50 blur-[120px]" />
