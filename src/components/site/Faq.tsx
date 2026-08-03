@@ -80,6 +80,18 @@ export function Faq() {
               you get answers instantly — anytime, day or night.
             </p>
 
+            {/* Same technician photo as the desktop rail, framed as a card — the
+                right-hand strip has no room to exist below three columns. */}
+            <div className="relative mt-7 aspect-[5/4] overflow-hidden rounded-2xl border border-border shadow-premium-sm sm:aspect-[16/9] xl:hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/work/ac-faq-technician.png"
+                alt="A 24X7 technician servicing a split air conditioner"
+                loading="lazy"
+                className="size-full object-cover object-[center_32%]"
+              />
+            </div>
+
             {/* promise cards */}
             <div className="mt-7 grid grid-cols-2 gap-3">
               {PROMISES.map((p) => (
