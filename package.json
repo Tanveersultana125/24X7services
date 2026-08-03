@@ -9,6 +9,10 @@
     "start": "next start",
     "lint": "eslint"
   },
+  "//engines": "firebase-admin@14 requires Node >= 22. On an older runtime it fails to load, so every route that touches it (auth, /book, /dashboard, admin) returns a 500 while prerendered pages keep working. Hosts read this field to pick the runtime.",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "clsx": "^2.1.1",
