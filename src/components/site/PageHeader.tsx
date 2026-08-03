@@ -68,7 +68,7 @@ export function PageHeader({
             // image itself there rather than thinning the veil any further
             className={
               "absolute inset-0 h-full w-full object-cover object-center" +
-              (onDark ? "" : " brightness-90 lg:brightness-100")
+              (onDark ? "" : " brightness-[0.84] lg:brightness-100")
             }
           />
           {/* scrim on the copy side so the text stays readable */}
@@ -86,7 +86,7 @@ export function PageHeader({
           <div
             aria-hidden
             className="absolute inset-0 lg:hidden"
-            style={{ background: onDark ? "rgba(18,20,24,0.6)" : "rgba(245,243,238,0.62)" }}
+            style={{ background: onDark ? "rgba(18,20,24,0.6)" : "rgba(245,243,238,0.54)" }}
           />
         </>
       )}
