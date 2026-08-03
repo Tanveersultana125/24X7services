@@ -43,9 +43,9 @@ export default async function ReviewsPage() {
         />
         <RatingBreakdown summary={summary} />
         <Reviews reviews={cards} count={summary.count} average={summary.average} />
-        <LeaveReviewCta />
         <Stats />
         <QuickEstimate />
+        <LeaveReviewCta />
         <Contact />
       </main>
       <SiteFooter />
