@@ -1,4 +1,4 @@
-import { grantSession, isAdminEmail } from "@/lib/admin/auth";
+import { grantSession, isAdminEmail, adminEmails } from "@/lib/admin/auth";
 import { getAdminAuth, adminConfigured } from "@/lib/firebase/admin";
 
 /**
@@ -25,7 +25,16 @@ export async function POST(request: Request) {
     }
 
     if (!isAdminEmail(decoded.email)) {
-      return Response.json({ ok: false, error: "not_admin" }, { status: 403 });
+      // Which account was refused is the one thing needed to fix this, and the
+      // caller just proved they own it — so name it instead of a blank refusal.
+      console.warn(
+        `[24X7] admin login refused for ${decoded.email ?? "(token carried no email)"} — ` +
+          `not in ADMIN_EMAILS (${adminEmails().length} account(s) allowed).`,
+      );
+      return Response.json(
+        { ok: false, error: "not_admin", email: decoded.email ?? null },
+        { status: 403 },
+      );
     }
 
     await grantSession();

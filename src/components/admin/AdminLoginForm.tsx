@@ -62,7 +62,7 @@ export function AdminLoginForm() {
         }
         setError(
           data.error === "not_admin"
-            ? "This Google account isn't authorised for admin access."
+            ? `${data.email ?? "That Google account"} isn't on the admin list. Click again to pick a different account.`
             : data.error === "server_not_configured"
               ? "Admin sign-in is unavailable right now (server not configured)."
               : "We couldn't sign you in. Please try again.",
