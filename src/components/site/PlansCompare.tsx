@@ -1,14 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Check, Minus } from "lucide-react";
+import { Check, Minus, ArrowUpRight } from "lucide-react";
 import { Kicker } from "./TextReveal";
-import { cn } from "@/lib/utils";
+import { AMC_PLANS } from "@/lib/data";
+import { formatINR, cn } from "@/lib/utils";
 
-const PLANS = ["Essential", "Premium", "Business"];
+const ease = [0.16, 1, 0.3, 1] as const;
+
+/** Index of the plan we badge as popular, within AMC_PLANS. */
 const POPULAR = 1;
 
 type Cell = boolean | string;
+
+/** Each `values` tuple is ordered to match AMC_PLANS — essential, premium, business. */
 const ROWS: { label: string; values: [Cell, Cell, Cell] }[] = [
   { label: "Preventive maintenance visits", values: ["2 / year", "4 / year", "8 / year"] },
   { label: "Priority same-day support", values: [true, true, "4-hour SLA"] },
@@ -46,6 +52,9 @@ function PopularBadge({ className }: { className?: string }) {
 }
 
 export function PlansCompare() {
+  const [active, setActive] = useState(POPULAR);
+  const plan = AMC_PLANS[active];
+
   return (
     <section className="py-14 sm:py-20">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
@@ -54,38 +63,69 @@ export function PlansCompare() {
           Every plan, side by side.
         </h2>
 
-        {/* Below lg the four-column table can't fit a phone, so each plan becomes
-            its own card with the same rows read top to bottom. */}
-        <div className="mt-10 space-y-4 lg:hidden">
-          {PLANS.map((plan, col) => (
-            <motion.div
-              key={plan}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: col * 0.06 }}
-              className={cn(
-                "rounded-[1.5rem] border bg-surface p-5 shadow-premium-sm sm:p-6",
-                col === POPULAR ? "border-royal-bright/40 bg-royal-bright/[0.04]" : "border-border",
-              )}
-            >
-              <div className="flex items-center gap-3">
-                <p className="font-display text-2xl tracking-tight">{plan}</p>
-                {col === POPULAR && <PopularBadge />}
-              </div>
+        {/* Below lg a four-column table can't fit a phone, and stacking all three
+            plans would repeat every label three times — so you pick one instead. */}
+        <div className="mt-10 lg:hidden">
+          <div className="flex items-center gap-1 rounded-full border border-border bg-surface p-1 shadow-premium-sm">
+            {AMC_PLANS.map((p, i) => {
+              const on = i === active;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setActive(i)}
+                  aria-pressed={on}
+                  className="relative flex-1 rounded-full px-2 py-2.5 text-[0.82rem] font-medium transition-colors"
+                >
+                  {on && (
+                    <motion.span
+                      layoutId="compare-tab"
+                      className="absolute inset-0 rounded-full bg-ink"
+                      transition={{ duration: 0.35, ease }}
+                    />
+                  )}
+                  <span className={cn("relative", on ? "text-white" : "text-muted")}>{p.name}</span>
+                </button>
+              );
+            })}
+          </div>
 
-              <dl className="mt-3 divide-y divide-hairline">
-                {ROWS.map((row) => (
-                  <div key={row.label} className="flex items-center justify-between gap-5 py-3">
-                    <dt className="text-sm text-ink-soft">{row.label}</dt>
-                    <dd className="flex shrink-0 justify-end text-right">
-                      <Value v={row.values[col]} />
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </motion.div>
-          ))}
+          <div className="mt-5 rounded-[1.5rem] border border-border bg-surface p-5 shadow-premium-sm sm:p-6">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+              <div className="flex items-center gap-2.5">
+                <p className="font-display text-2xl tracking-tight">{plan.name}</p>
+                {active === POPULAR && <PopularBadge />}
+              </div>
+              <p className="text-lg font-semibold">
+                {formatINR(plan.price)}
+                <span className="text-sm font-normal text-muted">{plan.period}</span>
+              </p>
+            </div>
+
+            <dl className="mt-4 divide-y divide-hairline">
+              {ROWS.map((row) => (
+                <div key={row.label} className="flex items-center justify-between gap-5 py-3">
+                  <dt className="text-sm text-ink-soft">{row.label}</dt>
+                  {/* re-keyed on the plan so each value animates in on switch */}
+                  <motion.dd
+                    key={active}
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.28, ease }}
+                    className="flex shrink-0 justify-end text-right"
+                  >
+                    <Value v={row.values[active]} />
+                  </motion.dd>
+                </div>
+              ))}
+            </dl>
+
+            <a
+              href={`/book?amc=${plan.id}`}
+              className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            >
+              Choose {plan.name} <ArrowUpRight className="size-4" />
+            </a>
+          </div>
         </div>
 
         {/* lg and up: the real side-by-side table */}
@@ -93,10 +133,10 @@ export function PlansCompare() {
           {/* header */}
           <div className="grid grid-cols-[1.6fr_1fr_1fr_1fr] items-end gap-4 border-b border-border pb-5">
             <span className="text-sm font-medium text-muted">What&apos;s included</span>
-            {PLANS.map((p, col) => (
-              <div key={p} className="text-center">
+            {AMC_PLANS.map((p, col) => (
+              <div key={p.id} className="text-center">
                 {col === POPULAR && <PopularBadge className="mb-2" />}
-                <p className="font-display text-xl tracking-tight">{p}</p>
+                <p className="font-display text-xl tracking-tight">{p.name}</p>
               </div>
             ))}
           </div>
