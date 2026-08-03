@@ -15,6 +15,26 @@ export function adminConfigured() {
   );
 }
 
+/**
+ * The browser signs into NEXT_PUBLIC_FIREBASE_PROJECT_ID; the server verifies with
+ * the FIREBASE_PROJECT_ID service account. If those differ, every ID token is
+ * rejected for the right reason but with a useless message — so name it.
+ * Returns null when they agree (or when either is unset).
+ */
+export function projectMismatch(): { web: string; admin: string } | null {
+  const web = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+  const admin = process.env.FIREBASE_PROJECT_ID;
+  if (!web || !admin || web === admin) return null;
+  return { web, admin };
+}
+
+/** Short, loggable description of a Firebase Admin failure — never includes credentials. */
+export function describeAuthError(err: unknown): string {
+  const code = (err as { code?: string })?.code;
+  const message = err instanceof Error ? err.message : String(err);
+  return code ? `${code} — ${message}` : message;
+}
+
 function getAdminApp(): App {
   const existing = getApps();
   if (existing.length) return existing[0];

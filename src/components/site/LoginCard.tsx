@@ -22,6 +22,26 @@ function GoogleG({ className }: { className?: string }) {
   );
 }
 
+/** What the visitor is told, per failure reason from /api/auth/session. */
+const SESSION_ERROR: Record<string, string> = {
+  server_not_configured: "Sign-in is unavailable right now (server not configured). Please contact support.",
+  project_mismatch: "Sign-in is misconfigured on our side. Please contact support.",
+  session_mint_failed: "We couldn't start your session. Please contact support.",
+  stale_token: "That took too long. Please try signing in again.",
+  invalid_token: "We couldn't verify your Google sign-in. Please try again.",
+};
+
+/** What the developer is told in the console — the actual thing to go fix. */
+const SESSION_HINT: Record<string, string> = {
+  server_not_configured:
+    "Set FIREBASE_PROJECT_ID / FIREBASE_CLIENT_EMAIL / FIREBASE_PRIVATE_KEY on the server (no NEXT_PUBLIC_ prefix) and redeploy.",
+  project_mismatch:
+    "NEXT_PUBLIC_FIREBASE_PROJECT_ID and FIREBASE_PROJECT_ID point at different Firebase projects.",
+  session_mint_failed:
+    "The service account can verify tokens but can't mint session cookies — grant it the 'Service Account Token Creator' role in Google Cloud IAM.",
+  stale_token: "The ID token was older than 5 minutes by the time it reached the server.",
+};
+
 export function LoginCard({ next = "/dashboard" }: { next?: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,20 +69,14 @@ export function LoginCard({ next = "/dashboard" }: { next?: string }) {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        if (data.error === "server_not_configured") {
-          // Distinct from the client-side guard above: the browser config is fine,
-          // it's the server's service-account credentials that are missing.
-          console.warn(
-            "[24X7] customer login: the server is missing its Firebase Admin " +
-              "credentials — FIREBASE_PROJECT_ID / FIREBASE_CLIENT_EMAIL / FIREBASE_PRIVATE_KEY. " +
-              "Note these are server-only and must NOT carry a NEXT_PUBLIC_ prefix.",
-          );
-        }
-        setError(
-          data.error === "server_not_configured"
-            ? "Sign-in is unavailable right now (server not configured). Please contact support."
-            : "We couldn't complete your sign-in. Please try again.",
+        const reason = (data.error as string) ?? "unknown";
+        // The old catch-all message hid which half was broken; name it in the
+        // console so a live deployment can be diagnosed without server logs.
+        console.warn(
+          `[24X7] customer login: /api/auth/session responded ${res.status} — ${reason}. ` +
+            (SESSION_HINT[reason] ?? "Check the server logs for the underlying Firebase error."),
         );
+        setError(SESSION_ERROR[reason] ?? "We couldn't complete your sign-in. Please try again.");
         await auth.signOut().catch(() => {});
         setLoading(false);
         return;

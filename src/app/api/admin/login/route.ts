@@ -1,5 +1,10 @@
 import { grantSession, isAdminEmail, adminEmails } from "@/lib/admin/auth";
-import { getAdminAuth, adminConfigured } from "@/lib/firebase/admin";
+import {
+  getAdminAuth,
+  adminConfigured,
+  projectMismatch,
+  describeAuthError,
+} from "@/lib/firebase/admin";
 
 /**
  * Admin sign-in via Google. The browser signs in with Firebase and posts its
@@ -9,6 +14,16 @@ import { getAdminAuth, adminConfigured } from "@/lib/firebase/admin";
 export async function POST(request: Request) {
   if (!adminConfigured()) {
     return Response.json({ ok: false, error: "server_not_configured" }, { status: 503 });
+  }
+
+  const mismatch = projectMismatch();
+  if (mismatch) {
+    console.error(
+      `[24X7] admin login: the browser signs into Firebase project "${mismatch.web}" but the ` +
+        `service account belongs to "${mismatch.admin}". Every token will be rejected until ` +
+        "NEXT_PUBLIC_FIREBASE_PROJECT_ID and FIREBASE_PROJECT_ID name the same project.",
+    );
+    return Response.json({ ok: false, error: "project_mismatch" }, { status: 500 });
   }
 
   const { idToken } = await request.json().catch(() => ({ idToken: "" }));
@@ -39,7 +54,8 @@ export async function POST(request: Request) {
 
     await grantSession();
     return Response.json({ ok: true });
-  } catch {
+  } catch (err) {
+    console.error("[24X7] admin token verification failed:", describeAuthError(err));
     return Response.json({ ok: false, error: "invalid_token" }, { status: 401 });
   }
 }

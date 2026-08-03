@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { getAdminAuth, adminConfigured } from "@/lib/firebase/admin";
+import {
+  getAdminAuth,
+  adminConfigured,
+  projectMismatch,
+  describeAuthError,
+} from "@/lib/firebase/admin";
 import { CUSTOMER_COOKIE, SESSION_MAX_AGE, sessionCookieOptions } from "@/lib/customer/auth";
 import { upsertCustomer } from "@/lib/bookings";
 
@@ -10,6 +15,16 @@ import { upsertCustomer } from "@/lib/bookings";
 export async function POST(request: Request) {
   if (!adminConfigured()) {
     return NextResponse.json({ ok: false, error: "server_not_configured" }, { status: 503 });
+  }
+
+  const mismatch = projectMismatch();
+  if (mismatch) {
+    console.error(
+      `[24X7] session: the browser signs into Firebase project "${mismatch.web}" but the ` +
+        `service account belongs to "${mismatch.admin}". Every token will be rejected until ` +
+        "NEXT_PUBLIC_FIREBASE_PROJECT_ID and FIREBASE_PROJECT_ID name the same project.",
+    );
+    return NextResponse.json({ ok: false, error: "project_mismatch" }, { status: 500 });
   }
 
   const { idToken } = await request.json().catch(() => ({ idToken: "" }));
@@ -41,7 +56,17 @@ export async function POST(request: Request) {
     const res = NextResponse.json({ ok: true });
     res.cookies.set(CUSTOMER_COOKIE, sessionCookie, sessionCookieOptions());
     return res;
-  } catch {
+  } catch (err) {
+    // A bare `invalid_token` hid real causes here — a service account missing the
+    // Service Account Token Creator role fails only at createSessionCookie, and
+    // looks identical to a bad token from the outside. Log the code, and separate
+    // "your token is bad" from "this server can't mint sessions".
+    const code = (err as { code?: string })?.code ?? "";
+    console.error("[24X7] session exchange failed:", describeAuthError(err));
+
+    if (code.includes("insufficient-permission") || code.includes("internal-error")) {
+      return NextResponse.json({ ok: false, error: "session_mint_failed" }, { status: 500 });
+    }
     return NextResponse.json({ ok: false, error: "invalid_token" }, { status: 401 });
   }
 }

@@ -65,7 +65,9 @@ export function AdminLoginForm() {
             ? `${data.email ?? "That Google account"} isn't on the admin list. Click again to pick a different account.`
             : data.error === "server_not_configured"
               ? "Admin sign-in is unavailable right now (server not configured)."
-              : "We couldn't sign you in. Please try again.",
+              : data.error === "project_mismatch"
+                ? "Admin sign-in is misconfigured (Firebase project mismatch)."
+                : "We couldn't sign you in. Please try again.",
         );
         // Not an admin (or failed) — drop the Firebase session so we don't leave
         // them half-signed-in on the admin surface.
