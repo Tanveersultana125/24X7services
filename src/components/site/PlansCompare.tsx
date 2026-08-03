@@ -6,6 +6,7 @@ import { Kicker } from "./TextReveal";
 import { cn } from "@/lib/utils";
 
 const PLANS = ["Essential", "Premium", "Business"];
+const POPULAR = 1;
 
 type Cell = boolean | string;
 const ROWS: { label: string; values: [Cell, Cell, Cell] }[] = [
@@ -19,6 +20,31 @@ const ROWS: { label: string; values: [Cell, Cell, Cell] }[] = [
   { label: "Consolidated GST invoicing", values: [true, true, true] },
 ];
 
+/** Included / not included / a specific limit — the same mark in both layouts. */
+function Value({ v }: { v: Cell }) {
+  if (typeof v !== "boolean") return <span className="text-sm font-medium">{v}</span>;
+  return v ? (
+    <span className="grid size-6 place-items-center rounded-full bg-emerald/15 text-emerald">
+      <Check className="size-4" strokeWidth={2.5} />
+    </span>
+  ) : (
+    <Minus className="size-4 text-muted-2" />
+  );
+}
+
+function PopularBadge({ className }: { className?: string }) {
+  return (
+    <span
+      className={cn(
+        "inline-block rounded-full bg-royal-bright px-2.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-white",
+        className,
+      )}
+    >
+      Popular
+    </span>
+  );
+}
+
 export function PlansCompare() {
   return (
     <section className="py-14 sm:py-20">
@@ -28,52 +54,77 @@ export function PlansCompare() {
           Every plan, side by side.
         </h2>
 
-        <div className="mt-10 sm:mt-14 overflow-x-auto">
-          <div className="min-w-[44rem]">
-            {/* header */}
-            <div className="grid grid-cols-[1.6fr_1fr_1fr_1fr] items-end gap-4 border-b border-border pb-5">
-              <span className="text-sm font-medium text-muted">What&apos;s included</span>
-              {PLANS.map((p) => (
-                <div key={p} className={cn("text-center", p === "Premium" && "relative")}>
-                  {p === "Premium" && (
-                    <span className="mb-2 inline-block rounded-full bg-royal-bright px-2.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wider text-white">
-                      Popular
-                    </span>
-                  )}
-                  <p className="font-display text-xl tracking-tight">{p}</p>
-                </div>
-              ))}
-            </div>
+        {/* Below lg the four-column table can't fit a phone, so each plan becomes
+            its own card with the same rows read top to bottom. */}
+        <div className="mt-10 space-y-4 lg:hidden">
+          {PLANS.map((plan, col) => (
+            <motion.div
+              key={plan}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: col * 0.06 }}
+              className={cn(
+                "rounded-[1.5rem] border bg-surface p-5 shadow-premium-sm sm:p-6",
+                col === POPULAR ? "border-royal-bright/40 bg-royal-bright/[0.04]" : "border-border",
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <p className="font-display text-2xl tracking-tight">{plan}</p>
+                {col === POPULAR && <PopularBadge />}
+              </div>
 
-            {/* rows */}
-            {ROWS.map((row, i) => (
-              <motion.div
-                key={row.label}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.03 }}
-                className="grid grid-cols-[1.6fr_1fr_1fr_1fr] items-center gap-4 border-b border-hairline py-4"
-              >
-                <span className="text-sm text-ink-soft">{row.label}</span>
-                {row.values.map((v, j) => (
-                  <div key={j} className={cn("flex justify-center text-center", j === 1 && "rounded-xl bg-royal-bright/5 py-1")}>
-                    {typeof v === "boolean" ? (
-                      v ? (
-                        <span className="grid size-6 place-items-center rounded-full bg-emerald/15 text-emerald">
-                          <Check className="size-4" strokeWidth={2.5} />
-                        </span>
-                      ) : (
-                        <Minus className="size-4 text-muted-2" />
-                      )
-                    ) : (
-                      <span className="text-sm font-medium">{v}</span>
-                    )}
+              <dl className="mt-3 divide-y divide-hairline">
+                {ROWS.map((row) => (
+                  <div key={row.label} className="flex items-center justify-between gap-5 py-3">
+                    <dt className="text-sm text-ink-soft">{row.label}</dt>
+                    <dd className="flex shrink-0 justify-end text-right">
+                      <Value v={row.values[col]} />
+                    </dd>
                   </div>
                 ))}
-              </motion.div>
+              </dl>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* lg and up: the real side-by-side table */}
+        <div className="mt-14 hidden lg:block">
+          {/* header */}
+          <div className="grid grid-cols-[1.6fr_1fr_1fr_1fr] items-end gap-4 border-b border-border pb-5">
+            <span className="text-sm font-medium text-muted">What&apos;s included</span>
+            {PLANS.map((p, col) => (
+              <div key={p} className="text-center">
+                {col === POPULAR && <PopularBadge className="mb-2" />}
+                <p className="font-display text-xl tracking-tight">{p}</p>
+              </div>
             ))}
           </div>
+
+          {/* rows */}
+          {ROWS.map((row, i) => (
+            <motion.div
+              key={row.label}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.03 }}
+              className="grid grid-cols-[1.6fr_1fr_1fr_1fr] items-center gap-4 border-b border-hairline py-4"
+            >
+              <span className="text-sm text-ink-soft">{row.label}</span>
+              {row.values.map((v, j) => (
+                <div
+                  key={j}
+                  className={cn(
+                    "flex justify-center text-center",
+                    j === POPULAR && "rounded-xl bg-royal-bright/5 py-1",
+                  )}
+                >
+                  <Value v={v} />
+                </div>
+              ))}
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
