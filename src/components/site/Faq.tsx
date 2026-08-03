@@ -45,7 +45,8 @@ const PROMISES = [
 ];
 
 export function Faq() {
-  const [open, setOpen] = useState<number | null>(3);
+  // Everything starts collapsed — an answer opens only when its row is clicked.
+  const [open, setOpen] = useState<number | null>(null);
 
   return (
     <section id="faq" className="relative scroll-mt-28 overflow-hidden pb-12 pt-14 sm:pb-14 sm:pt-20">
