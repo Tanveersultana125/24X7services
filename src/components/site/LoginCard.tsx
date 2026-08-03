@@ -4,7 +4,12 @@ import { useState } from "react";
 import { signInWithPopup } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { ShieldCheck, Loader2, AlertCircle } from "lucide-react";
-import { getFirebaseAuth, createGoogleProvider, firebaseConfigured } from "@/lib/firebase/client";
+import {
+  getFirebaseAuth,
+  createGoogleProvider,
+  firebaseConfigured,
+  logFirebaseConfigProblem,
+} from "@/lib/firebase/client";
 
 function GoogleG({ className }: { className?: string }) {
   return (
@@ -25,6 +30,7 @@ export function LoginCard({ next = "/dashboard" }: { next?: string }) {
     setError(null);
 
     if (!firebaseConfigured) {
+      logFirebaseConfigProblem("customer login");
       setError("Google sign-in isn't configured yet. Please contact support.");
       return;
     }

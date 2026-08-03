@@ -19,6 +19,36 @@ export const firebaseConfigured = Boolean(
   firebaseConfig.apiKey && firebaseConfig.authDomain && firebaseConfig.projectId && firebaseConfig.appId,
 );
 
+/**
+ * Names of the required NEXT_PUBLIC_FIREBASE_* vars that were missing when this
+ * bundle was built.
+ *
+ * These values are inlined at build time, so an empty result here means the
+ * build didn't see them — adding them to the host afterwards changes nothing
+ * until you rebuild. Only names are reported, never values.
+ */
+export function missingFirebaseConfig(): string[] {
+  const required = {
+    NEXT_PUBLIC_FIREBASE_API_KEY: firebaseConfig.apiKey,
+    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: firebaseConfig.authDomain,
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID: firebaseConfig.projectId,
+    NEXT_PUBLIC_FIREBASE_APP_ID: firebaseConfig.appId,
+  };
+  return Object.entries(required)
+    .filter(([, v]) => !v)
+    .map(([k]) => k);
+}
+
+/** Log exactly what's missing, so a live deployment can be diagnosed from the console. */
+export function logFirebaseConfigProblem(where: string) {
+  const missing = missingFirebaseConfig();
+  console.error(
+    `[24X7] ${where}: Firebase Web config missing from this build — ${missing.join(", ")}. ` +
+      "NEXT_PUBLIC_* values are baked in at build time, so set them on the host " +
+      "for this environment (Production AND Preview) and redeploy.",
+  );
+}
+
 /** Lazily initialise (or reuse) the Firebase app and return its Auth instance. */
 export function getFirebaseAuth(): Auth {
   const app = getApps().length ? getApp() : initializeApp(firebaseConfig);

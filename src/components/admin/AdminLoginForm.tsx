@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import { signInWithPopup } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import { ShieldCheck, Loader2, AlertCircle } from "lucide-react";
-import { getFirebaseAuth, createGoogleProvider, firebaseConfigured } from "@/lib/firebase/client";
+import {
+  getFirebaseAuth,
+  createGoogleProvider,
+  firebaseConfigured,
+  logFirebaseConfigProblem,
+} from "@/lib/firebase/client";
 
 function GoogleG({ className }: { className?: string }) {
   return (
@@ -27,7 +32,8 @@ export function AdminLoginForm() {
     setError(null);
 
     if (!firebaseConfigured) {
-      setError("Google sign-in isn't configured yet.");
+      logFirebaseConfigProblem("admin login");
+      setError("Google sign-in isn't configured yet. (See the browser console for details.)");
       return;
     }
 
