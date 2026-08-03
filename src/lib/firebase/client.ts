@@ -39,13 +39,19 @@ export function missingFirebaseConfig(): string[] {
     .map(([k]) => k);
 }
 
-/** Log exactly what's missing, so a live deployment can be diagnosed from the console. */
+/**
+ * Log exactly what's missing, so a live deployment can be diagnosed from the console.
+ *
+ * Deliberately `console.warn`: the Next dev overlay turns `console.error` into a
+ * full-screen error, which makes a missing local `.env.local` look like a crash.
+ */
 export function logFirebaseConfigProblem(where: string) {
   const missing = missingFirebaseConfig();
-  console.error(
+  console.warn(
     `[24X7] ${where}: Firebase Web config missing from this build — ${missing.join(", ")}. ` +
-      "NEXT_PUBLIC_* values are baked in at build time, so set them on the host " +
-      "for this environment (Production AND Preview) and redeploy.",
+      "NEXT_PUBLIC_* values are baked in at build time, so set them locally in " +
+      ".env.local (then restart the dev server), or on the host for this " +
+      "environment (Production AND Preview) and redeploy.",
   );
 }
 
