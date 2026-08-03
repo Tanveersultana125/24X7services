@@ -2,14 +2,23 @@
 
 import Link from "next/link";
 import { CalendarCheck, IndianRupee, Clock, Star, ArrowUpRight } from "lucide-react";
-import { REVIEWS, STATUS_META } from "@/lib/admin/data";
+import { STATUS_META } from "@/lib/admin/data";
 import type { Booking } from "@/lib/bookings";
+import type { Review } from "@/lib/reviews";
 
-export function Overview({ bookings, customerCount = 0 }: { bookings: Booking[]; customerCount?: number }) {
+export function Overview({
+  bookings,
+  customerCount = 0,
+  reviews = [],
+}: {
+  bookings: Booking[];
+  customerCount?: number;
+  reviews?: Review[];
+}) {
   const active = bookings.filter((b) => b.status !== "completed" && b.status !== "cancelled");
   const revenue = bookings.filter((b) => b.status === "completed").reduce((s, b) => s + b.price, 0);
-  const avgRating = REVIEWS.length
-    ? (REVIEWS.reduce((s, r) => s + r.rating, 0) / REVIEWS.length).toFixed(1)
+  const avgRating = reviews.length
+    ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1)
     : "—";
 
   const stats = [

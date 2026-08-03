@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import { Kicker } from "./TextReveal";
 
-const DIST = [
+/** Shown until enough real reviews are published to draw a meaningful curve. */
+const SEEDED_DIST = [
   { stars: 5, pct: 92 },
   { stars: 4, pct: 6 },
   { stars: 3, pct: 1.4 },
@@ -19,13 +20,29 @@ const CATEGORIES = [
   { label: "Value for money", value: 4.7 },
 ];
 
-export function RatingBreakdown() {
+/** A handful of reviews can't carry a percentage breakdown honestly. */
+const MIN_FOR_REAL_DIST = 10;
+
+type Summary = {
+  count: number;
+  average: number;
+  distribution: { stars: number; pct: number }[];
+};
+
+export function RatingBreakdown({ summary }: { summary?: Summary }) {
+  const real = Boolean(summary && summary.count >= MIN_FOR_REAL_DIST);
+  const dist = real ? summary!.distribution : SEEDED_DIST;
+  const average = real ? summary!.average.toFixed(1) : "4.9";
+  const countLabel = real
+    ? `${summary!.count.toLocaleString("en-IN")} review${summary!.count === 1 ? "" : "s"}`
+    : "128,400 reviews";
+
   return (
     <section className="py-14 sm:py-20">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         <Kicker>The numbers behind the stars</Kicker>
         <h2 className="font-display mt-6 max-w-2xl text-[2.4rem] leading-[1.05] tracking-[-0.03em] sm:text-5xl">
-          Rated 4.9, and here&apos;s why.
+          Rated {average}, and here&apos;s why.
         </h2>
 
         <div className="mt-10 sm:mt-14 grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
@@ -33,16 +50,16 @@ export function RatingBreakdown() {
           <div className="rounded-[1.75rem] border border-border bg-surface p-8 sm:p-10">
             <div className="flex items-center gap-8">
               <div className="text-center">
-                <p className="font-display text-6xl tracking-tighter">4.9</p>
+                <p className="font-display text-6xl tracking-tighter">{average}</p>
                 <div className="mt-2 flex justify-center gap-0.5">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star key={i} className="size-4 fill-amber text-amber" />
                   ))}
                 </div>
-                <p className="mt-2 text-xs text-muted">128,400 reviews</p>
+                <p className="mt-2 text-xs text-muted">{countLabel}</p>
               </div>
               <div className="flex-1 space-y-2.5">
-                {DIST.map((d) => (
+                {dist.map((d) => (
                   <div key={d.stars} className="flex items-center gap-3">
                     <span className="flex w-8 items-center gap-1 text-xs text-muted">
                       {d.stars} <Star className="size-3 fill-muted-2 text-muted-2" />

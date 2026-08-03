@@ -2,8 +2,8 @@
 
 import { useCallback, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Star, ArrowLeft, ArrowRight } from "lucide-react";
-import { TESTIMONIALS, type Testimonial } from "@/lib/content";
+import { Star, ArrowLeft, ArrowRight, BadgeCheck } from "lucide-react";
+import { TESTIMONIALS, type Testimonial, type ReviewCard } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -15,8 +15,10 @@ const SOURCES: Record<Source, { label: string; mark: string; tint: string }> = {
   justdial: { label: "Justdial", mark: "J", tint: "#0b9a63" },
 };
 
-/** The base testimonials carry no review-platform metadata — attach it here. */
-const REVIEWS: (Testimonial & { source: Source; ago: string })[] = TESTIMONIALS.map((t, i) => ({
+type Card = Testimonial & { source?: Source; ago: string };
+
+/** The seeded testimonials carry no review-platform metadata — attach it here. */
+const SEEDED: Card[] = TESTIMONIALS.map((t, i) => ({
   ...t,
   source: i % 2 === 0 ? "google" : "justdial",
   ago: ["1 month ago", "14 days ago", "24 days ago", "2 months ago", "5 days ago"][i] ?? "recently",
@@ -28,13 +30,33 @@ const FILTERS: { id: "all" | Source; label: string }[] = [
   { id: "justdial", label: "Justdial" },
 ];
 
-export function Testimonials() {
+/** "3 days ago" / "2 months ago" from an epoch-millis timestamp. */
+function timeAgo(ms: number): string {
+  if (!ms) return "recently";
+  const days = Math.floor((Date.now() - ms) / 86_400_000);
+  if (days <= 0) return "today";
+  if (days === 1) return "yesterday";
+  if (days < 30) return `${days} days ago`;
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months} month${months === 1 ? "" : "s"} ago`;
+  const years = Math.floor(months / 12);
+  return `${years} year${years === 1 ? "" : "s"} ago`;
+}
+
+export function Testimonials({ reviews }: { reviews?: ReviewCard[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [filter, setFilter] = useState<"all" | Source>("all");
   const [page, setPage] = useState(0);
   const [pages, setPages] = useState(1);
 
-  const items = REVIEWS.filter((r) => filter === "all" || r.source === filter);
+  // Real reviews come from our own booking flow, so the Google/Justdial
+  // filter only applies to the seeded platform copy.
+  const real = reviews && reviews.length > 0;
+  const cards: Card[] = real
+    ? reviews.map((r) => ({ ...r, ago: timeAgo(r.createdAt) }))
+    : SEEDED;
+
+  const items = real ? cards : cards.filter((r) => filter === "all" || r.source === filter);
 
   const onScroll = useCallback(() => {
     const el = trackRef.current;
@@ -68,8 +90,8 @@ export function Testimonials() {
           </h2>
         </motion.div>
 
-        {/* source tabs */}
-        <div className="mt-8 flex justify-center">
+        {/* source tabs — only meaningful for the seeded platform copy */}
+        <div className={cn("mt-8 flex justify-center", real && "hidden")}>
           <div className="flex items-center gap-1 rounded-full border border-border bg-surface p-1 shadow-premium-sm">
             {FILTERS.map((f) => {
               const active = filter === f.id;
@@ -109,9 +131,9 @@ export function Testimonials() {
           onScroll={onScroll}
           className="mt-12 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          {items.map((r) => (
+          {items.map((r, idx) => (
             <article
-              key={r.name}
+              key={`${r.name}-${idx}`}
               className="flex min-h-full shrink-0 basis-[86%] snap-start flex-col rounded-[1.5rem] border border-border bg-surface p-6 shadow-premium-sm sm:basis-[47%] lg:basis-[calc(33.333%-0.834rem)]"
             >
               <header className="flex items-center gap-3">
@@ -138,12 +160,26 @@ export function Testimonials() {
               </blockquote>
 
               <footer className="mt-6 flex items-center gap-2.5 border-t border-hairline pt-4">
-                <SourceMark source={r.source} className="size-7 text-xs" />
-                <div className="leading-none">
-                  <p className="text-[0.65rem] text-muted">Posted on</p>
-                  <p className="mt-1 text-[0.72rem] font-semibold text-ink">{SOURCES[r.source].label}</p>
-                </div>
-                <span className="ml-auto text-[0.65rem] text-muted-2">{r.city}</span>
+                {r.source ? (
+                  <>
+                    <SourceMark source={r.source} className="size-7 text-xs" />
+                    <div className="leading-none">
+                      <p className="text-[0.65rem] text-muted">Posted on</p>
+                      <p className="mt-1 text-[0.72rem] font-semibold text-ink">{SOURCES[r.source].label}</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <span className="grid size-7 shrink-0 place-items-center rounded-full bg-emerald/12 text-emerald">
+                      <BadgeCheck className="size-4" />
+                    </span>
+                    <div className="min-w-0 leading-none">
+                      <p className="text-[0.65rem] text-muted">Verified booking</p>
+                      <p className="mt-1 truncate text-[0.72rem] font-semibold text-ink">{r.appliance}</p>
+                    </div>
+                  </>
+                )}
+                <span className="ml-auto shrink-0 pl-2 text-[0.65rem] text-muted-2">{r.city}</span>
               </footer>
             </article>
           ))}

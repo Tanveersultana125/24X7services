@@ -1,5 +1,9 @@
 import { ReviewsManager } from "@/components/admin/ReviewsManager";
+import { listReviews } from "@/lib/reviews";
 
-export default function AdminReviewsPage() {
-  return <ReviewsManager />;
+export const dynamic = "force-dynamic";
+
+export default async function AdminReviewsPage() {
+  const reviews = await listReviews().catch(() => []);
+  return <ReviewsManager initial={reviews} />;
 }

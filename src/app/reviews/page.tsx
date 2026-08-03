@@ -3,10 +3,12 @@ import { SiteNav } from "@/components/site/SiteNav";
 import { PageHeader } from "@/components/site/PageHeader";
 import { Reviews } from "@/components/site/Reviews";
 import { RatingBreakdown } from "@/components/site/RatingBreakdown";
+import { LeaveReviewCta } from "@/components/site/LeaveReviewCta";
 import { Stats } from "@/components/site/Stats";
 import { QuickEstimate } from "@/components/site/QuickEstimate";
 import { Contact } from "@/components/site/Contact";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { listPublishedReviews, summarise, toTestimonial } from "@/lib/reviews";
 
 export const metadata: Metadata = {
   title: "Customer Reviews",
@@ -14,7 +16,15 @@ export const metadata: Metadata = {
     "Three million homes, one quiet standard. Read verified reviews, the rating breakdown, and the numbers behind 24X7 Services.",
 };
 
-export default function ReviewsPage() {
+// Prerendered and refreshed every 5 minutes; admin approvals revalidate it
+// immediately via revalidatePath in /api/admin/reviews.
+export const revalidate = 300;
+
+export default async function ReviewsPage() {
+  const reviews = await listPublishedReviews(48).catch(() => []);
+  const summary = summarise(reviews);
+  const cards = reviews.map(toTestimonial);
+
   return (
     <>
       <SiteNav />
@@ -31,8 +41,9 @@ export default function ReviewsPage() {
             { value: "92%", label: "Five-star" },
           ]}
         />
-        <RatingBreakdown />
-        <Reviews />
+        <RatingBreakdown summary={summary} />
+        <Reviews reviews={cards} count={summary.count} average={summary.average} />
+        <LeaveReviewCta />
         <Stats />
         <QuickEstimate />
         <Contact />

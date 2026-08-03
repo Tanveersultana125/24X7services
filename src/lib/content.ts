@@ -46,6 +46,13 @@ export interface Testimonial {
   color: string;
 }
 
+/**
+ * A published customer review in card shape. Lives here rather than in
+ * `lib/reviews.ts` so Client Components can import the type without pulling in
+ * that module's `server-only` guard.
+ */
+export type ReviewCard = Testimonial & { createdAt: number };
+
 export const TESTIMONIALS: Testimonial[] = [
   {
     name: "Ananya Rao",

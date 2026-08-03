@@ -12,11 +12,33 @@ const EXTRA: Testimonial[] = [
   { name: "Sana K.", city: "Nalgonda", rating: 5, appliance: "IFB Microwave", quote: "The AI told me the fault before the technician even arrived. Wild.", initials: "SK", color: "#d9821b" },
 ];
 
-const ALL = [...TESTIMONIALS, ...EXTRA];
-const rowA = ALL.slice(0, 4);
-const rowB = ALL.slice(4);
+/** Shown until enough real reviews are published, so the wall is never sparse. */
+const SEEDED = [...TESTIMONIALS, ...EXTRA];
 
-export function Reviews() {
+/** The marquee needs a few cards per row to read as a wall rather than a list. */
+const MIN_CARDS = 6;
+
+export function Reviews({
+  reviews,
+  count,
+  average,
+}: {
+  /** Published customer reviews. Falls back to the seeded copy when there aren't enough yet. */
+  reviews?: Testimonial[];
+  count?: number;
+  average?: number;
+}) {
+  const all = reviews && reviews.length >= MIN_CARDS ? reviews : SEEDED;
+  const half = Math.ceil(all.length / 2);
+  const rowA = all.slice(0, half);
+  const rowB = all.slice(half);
+
+  const ratingLabel = average && average > 0 ? average.toFixed(1) : "4.9";
+  const countLabel =
+    count && count > 0
+      ? `${count.toLocaleString("en-IN")} verified review${count === 1 ? "" : "s"}`
+      : "128,400 verified reviews";
+
   return (
     <section id="reviews" className="relative scroll-mt-28 overflow-hidden py-14 sm:py-20">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
@@ -36,8 +58,8 @@ export function Reviews() {
               ))}
             </div>
             <div>
-              <p className="font-semibold">4.9 / 5</p>
-              <p className="text-xs text-muted">128,400 verified reviews</p>
+              <p className="font-semibold">{ratingLabel} / 5</p>
+              <p className="text-xs text-muted">{countLabel}</p>
             </div>
           </div>
         </div>

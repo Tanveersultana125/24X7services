@@ -48,24 +48,7 @@ export const SERVICES: AdminService[] = APPLIANCES.map((a) => ({
   active: true,
 }));
 
-export type AdminReview = {
-  id: string;
-  name: string;
-  city: string;
-  rating: number;
-  text: string;
-  appliance: string;
-  date: string;
-  status: "published" | "pending";
-};
-
-export const REVIEWS: AdminReview[] = [
-  { id: "RV-118", name: "Ananya Rao", city: "Hyderabad", rating: 5, text: "Technician arrived in 40 minutes and fixed the cooling issue same day. Genuine parts, clean work.", appliance: "Refrigerator", date: "2026-07-18", status: "published" },
-  { id: "RV-117", name: "Rahul Mehta", city: "Karimnagar", rating: 5, text: "Booked a washing machine repair at night, done by next morning. Loved the live tracking.", appliance: "Washing Machine", date: "2026-07-17", status: "published" },
-  { id: "RV-116", name: "Sneha Iyer", city: "Nizamabad", rating: 4, text: "Good service, slightly delayed but the microwave works perfectly now.", appliance: "Microwave", date: "2026-07-16", status: "pending" },
-  { id: "RV-115", name: "Vikram Singh", city: "Secunderabad", rating: 5, text: "Foam-jet AC service was thorough. Cooling improved a lot.", appliance: "AC", date: "2026-07-15", status: "published" },
-  { id: "RV-114", name: "Arjun Das", city: "Hyderabad", rating: 3, text: "Oven fixed but had to follow up once. Support was responsive.", appliance: "Microwave & Oven", date: "2026-07-14", status: "pending" },
-];
+// Reviews are real data now — see `src/lib/reviews.ts` for the Firestore layer.
 
 export type GalleryItem = { id: string; src: string; label: string; category: string };
 

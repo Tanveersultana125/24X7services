@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { StaggerGroup, staggerItem } from "@/components/ui/Reveal";
 import { Button } from "@/components/ui/Button";
+import { ReviewDialog, type ReviewTarget } from "./ReviewDialog";
 import { formatINR, cn } from "@/lib/utils";
 import type { Booking } from "@/lib/bookings";
 
@@ -29,12 +30,24 @@ function initials(name: string) {
   return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "U";
 }
 
-export function Dashboard({ user, bookings = [] }: { user?: DashboardUser; bookings?: Booking[] }) {
+export function Dashboard({
+  user,
+  bookings = [],
+  reviewedBookingIds = [],
+}: {
+  user?: DashboardUser;
+  bookings?: Booking[];
+  /** Booking ids this customer has already reviewed — those rows show "Rated". */
+  reviewedBookingIds?: string[];
+}) {
   const [tab, setTab] = useState<(typeof TABS)[number]>("Overview");
+  const [rated, setRated] = useState<string[]>(reviewedBookingIds);
+  const [reviewing, setReviewing] = useState<ReviewTarget | null>(null);
   const name = user?.name ?? "there";
 
   const history = bookings.map((b) => ({
     id: b.code,
+    bookingId: b.id,
     appliance: `${b.brand ? `${b.brand} ` : ""}${b.appliance}`,
     problem: b.problem || "Service",
     date: b.slot ? `${b.date} · ${b.slot}` : b.date,
@@ -42,6 +55,9 @@ export function Dashboard({ user, bookings = [] }: { user?: DashboardUser; booki
     amount: b.price,
     tone: b.status === "completed" ? "accent" : b.status === "cancelled" ? "danger" : "primary",
     address: [b.address?.line1, b.address?.line2, b.city, b.address?.pincode].filter(Boolean).join(", "),
+    // Only a finished job can be rated, and only once.
+    canReview: b.status === "completed" && !rated.includes(b.id),
+    isRated: rated.includes(b.id),
   }));
 
   const completed = bookings.filter((b) => b.status === "completed");
@@ -157,7 +173,7 @@ export function Dashboard({ user, bookings = [] }: { user?: DashboardUser; booki
                       <p className="text-sm text-muted">{h.problem} · {h.id}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-5 sm:gap-8">
+                  <div className="flex flex-wrap items-center gap-4 sm:gap-6">
                     <div className="text-sm text-muted">
                       <p className="flex items-center gap-1.5"><CalendarClock className="size-3.5" /> {h.date}</p>
                       <p className="mt-0.5 font-semibold text-foreground">{formatINR(h.amount)}</p>
@@ -168,6 +184,20 @@ export function Dashboard({ user, bookings = [] }: { user?: DashboardUser; booki
                         : h.tone === "danger" ? "bg-danger/15 text-danger"
                         : "bg-primary/15 text-primary"
                     )}>{h.status}</span>
+
+                    {h.canReview && (
+                      <button
+                        onClick={() => setReviewing({ bookingId: h.bookingId, code: h.id, appliance: h.appliance })}
+                        className="inline-flex h-9 items-center gap-1.5 rounded-full border border-border-strong px-4 text-xs font-semibold transition-colors hover:border-warning hover:text-warning"
+                      >
+                        <Star className="size-3.5" /> Rate service
+                      </button>
+                    )}
+                    {h.isRated && (
+                      <span className="inline-flex h-9 items-center gap-1.5 rounded-full bg-warning/12 px-4 text-xs font-semibold text-warning">
+                        <Star className="size-3.5 fill-warning" /> Rated
+                      </span>
+                    )}
                   </div>
                 </div>
               ))}
@@ -257,6 +287,12 @@ export function Dashboard({ user, bookings = [] }: { user?: DashboardUser; booki
       <div className="mt-6 flex items-center justify-center gap-1.5 text-sm text-muted">
         <Star className="size-4 fill-warning text-warning" /> Thanks for choosing 24X7 Services
       </div>
+
+      <ReviewDialog
+        target={reviewing}
+        onClose={() => setReviewing(null)}
+        onSubmitted={(bookingId) => setRated((prev) => [...prev, bookingId])}
+      />
     </div>
   );
 }

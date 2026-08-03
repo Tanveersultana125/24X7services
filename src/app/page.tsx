@@ -13,8 +13,16 @@ import { Testimonials } from "@/components/site/Testimonials";
 import { Stats } from "@/components/site/Stats";
 import { Faq } from "@/components/site/Faq";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { listPublishedReviews, toTestimonial } from "@/lib/reviews";
 
-export default function Home() {
+// Prerendered and refreshed every 5 minutes; admin approvals revalidate it
+// immediately via revalidatePath in /api/admin/reviews.
+export const revalidate = 300;
+
+export default async function Home() {
+  const reviews = await listPublishedReviews(12).catch(() => []);
+  const cards = reviews.map(toTestimonial);
+
   return (
     <>
       <SiteNav />
@@ -29,7 +37,7 @@ export default function Home() {
         <BrandShowcase />
         <TrustBento />
         <Emergency />
-        <Testimonials />
+        <Testimonials reviews={cards} />
         <Stats />
         <Faq />
       </main>
