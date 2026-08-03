@@ -64,7 +64,12 @@ export function PageHeader({
             src={bgImage}
             alt=""
             aria-hidden
-            className="absolute inset-0 h-full w-full object-cover object-center"
+            // on light headers the phone veil washes the photo out, so deepen the
+            // image itself there rather than thinning the veil any further
+            className={
+              "absolute inset-0 h-full w-full object-cover object-center" +
+              (onDark ? "" : " brightness-90 lg:brightness-100")
+            }
           />
           {/* scrim on the copy side so the text stays readable */}
           <div
@@ -81,7 +86,7 @@ export function PageHeader({
           <div
             aria-hidden
             className="absolute inset-0 lg:hidden"
-            style={{ background: onDark ? "rgba(18,20,24,0.6)" : "rgba(245,243,238,0.74)" }}
+            style={{ background: onDark ? "rgba(18,20,24,0.6)" : "rgba(245,243,238,0.62)" }}
           />
         </>
       )}
