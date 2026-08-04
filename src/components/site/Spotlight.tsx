@@ -56,7 +56,7 @@ export function Spotlight() {
             onClick={() => slide(-1)}
             disabled={atStart}
             className={cn(
-              "absolute left-1 top-1/2 z-10 grid size-10 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:left-0 sm:-translate-x-1/2",
+              "absolute -left-1 top-1/2 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:left-0 sm:size-10 sm:-translate-x-1/2",
               atStart && "pointer-events-none opacity-30"
             )}
           >
@@ -68,13 +68,16 @@ export function Spotlight() {
             onClick={() => slide(1)}
             disabled={atEnd}
             className={cn(
-              "absolute right-1 top-1/2 z-10 grid size-10 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:right-0 sm:translate-x-1/2",
+              "absolute -right-1 top-1/2 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:right-0 sm:size-10 sm:translate-x-1/2",
               atEnd && "pointer-events-none opacity-30"
             )}
           >
             <ChevronRight className="size-4" />
           </button>
 
+          {/* One card between the arrows on phones — the wrapper is exactly a
+              card wide, so neighbours are clipped rather than half-shown. */}
+          <div className="mx-9 overflow-hidden sm:mx-0 sm:overflow-visible">
           <div
             ref={scroller}
             onScroll={update}
@@ -86,7 +89,7 @@ export function Spotlight() {
                 key={s.title}
                 href={s.href}
                 data-spot
-                className="group relative h-60 w-[86%] shrink-0 snap-start overflow-hidden rounded-[1.5rem] sm:h-72 sm:w-[56%] lg:w-[41%]"
+                className="group relative h-60 w-full shrink-0 snap-start overflow-hidden rounded-[1.5rem] sm:h-72 sm:w-[56%] lg:w-[41%]"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -112,6 +115,7 @@ export function Spotlight() {
                 </div>
               </Link>
             ))}
+          </div>
           </div>
         </div>
       </div>
