@@ -147,7 +147,7 @@ export function MostBooked() {
             onClick={() => slide(-1)}
             disabled={atStart}
             className={cn(
-              "absolute left-0 top-[38%] z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:left-0 sm:top-[42%] sm:size-10 sm:-translate-x-1/2",
+              "absolute -left-1 top-[38%] z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:left-0 sm:top-[42%] sm:size-10 sm:-translate-x-1/2",
               atStart && "pointer-events-none opacity-30"
             )}
           >
@@ -159,7 +159,7 @@ export function MostBooked() {
             onClick={() => slide(1)}
             disabled={atEnd}
             className={cn(
-              "absolute right-0 top-[38%] z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:right-0 sm:top-[42%] sm:size-10 sm:translate-x-1/2",
+              "absolute -right-1 top-[38%] z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:right-0 sm:top-[42%] sm:size-10 sm:translate-x-1/2",
               atEnd && "pointer-events-none opacity-30"
             )}
           >
@@ -169,7 +169,7 @@ export function MostBooked() {
           {/* Margins, not padding: the scroller is exactly one card wide on a
               phone, so it clips the neighbours instead of letting them peek
               into the arrows' lane. */}
-          <div className="mx-11 overflow-hidden sm:mx-0 sm:overflow-visible">
+          <div className="mx-9 overflow-hidden sm:mx-0 sm:overflow-visible">
           <div
             ref={scroller}
             onScroll={update}
