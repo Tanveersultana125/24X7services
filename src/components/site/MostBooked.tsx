@@ -113,7 +113,7 @@ export function MostBooked() {
             onClick={() => slide(-1)}
             disabled={atStart}
             className={cn(
-              "absolute left-1 top-[40%] z-10 grid size-10 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:left-0 sm:top-[42%] sm:-translate-x-1/2",
+              "absolute left-0 top-[38%] z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:left-0 sm:top-[42%] sm:size-10 sm:-translate-x-1/2",
               atStart && "pointer-events-none opacity-30"
             )}
           >
@@ -125,17 +125,19 @@ export function MostBooked() {
             onClick={() => slide(1)}
             disabled={atEnd}
             className={cn(
-              "absolute right-1 top-[40%] z-10 grid size-10 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:right-0 sm:top-[42%] sm:translate-x-1/2",
+              "absolute right-0 top-[38%] z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:right-0 sm:top-[42%] sm:size-10 sm:translate-x-1/2",
               atEnd && "pointer-events-none opacity-30"
             )}
           >
             <ChevronRight className="size-4" />
           </button>
 
+          {/* The side padding on phones is the arrows' lane: one card fills the
+              space between them, so nothing sits on top of the photo. */}
           <div
             ref={scroller}
             onScroll={update}
-            className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-px-11 px-11 pb-4 [scrollbar-width:none] sm:scroll-px-0 sm:px-0 [&::-webkit-scrollbar]:hidden"
           >
           {CARDS.map((c, i) => (
             <motion.div
@@ -145,7 +147,7 @@ export function MostBooked() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.7, delay: i * 0.08, ease }}
-              className="w-[76%] shrink-0 grow-0 snap-start sm:w-[44%] lg:w-[30%]"
+              className="w-full shrink-0 grow-0 snap-start sm:w-[44%] lg:w-[30%]"
             >
               <Link
                 href={c.href}
