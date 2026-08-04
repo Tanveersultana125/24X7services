@@ -39,11 +39,14 @@ export function Hero() {
           </span>
         </motion.div>
 
+        {/* Phones stack: seven of twelve columns is ~200px on a 400px screen,
+            which squeezes the copy into justified slivers and pushes the proof
+            row off the edge. The side-by-side layout starts at sm. */}
         <div className="mt-6 grid grid-cols-12 items-end gap-x-4 gap-y-5 sm:mt-8 sm:gap-y-7 lg:grid-rows-[auto_auto_1fr] lg:items-start lg:gap-y-0">
-          {/* Headline — sits beside the technician on every screen */}
+          {/* Headline — beside the technician from sm up */}
           <motion.div
             style={{ y: yType }}
-            className="relative z-10 col-span-7 self-start lg:col-span-6 lg:row-start-1"
+            className="relative z-10 col-span-12 self-start sm:col-span-7 lg:col-span-6 lg:row-start-1"
           >
             <h1 className="font-display text-[1.75rem] leading-[1.06] tracking-[-0.03em] sm:text-[3.2rem] md:text-[4rem] lg:text-[6.2rem]">
               <Line delay={0.05}>Broken today.</Line>
@@ -59,9 +62,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5, ease }}
-            /* justified on phones so the narrow column has a clean right edge;
-               hyphenation keeps the word gaps from opening up */
-            className="col-span-7 col-start-1 row-start-2 max-w-md hyphens-auto self-start text-justify text-[0.875rem] leading-relaxed text-muted sm:text-pretty sm:text-left sm:text-base lg:col-span-6 lg:mt-8 lg:text-lg"
+            className="col-span-12 col-start-1 row-start-2 max-w-md self-start text-pretty text-[0.925rem] leading-relaxed text-muted sm:col-span-7 sm:text-base lg:col-span-6 lg:mt-8 lg:text-lg"
           >
             Certified doorstep repair, installation and maintenance for Samsung, LG,
             IFB &amp; Bosch — genuine parts, a 90-day warranty, and a technician you can
@@ -102,7 +103,7 @@ export function Hero() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
-              className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 sm:mt-12 sm:gap-x-8 sm:gap-y-4"
+              className="mt-7 grid grid-cols-2 gap-x-4 gap-y-4 sm:mt-12 sm:flex sm:flex-wrap sm:items-center sm:gap-x-8 sm:gap-y-4"
             >
               <Proof icon={<Star className="size-4 fill-amber text-amber" />} big="4.9/5" small="128k reviews" />
               <span className="hidden h-8 w-px bg-black/10 sm:block" />
@@ -117,11 +118,11 @@ export function Hero() {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, delay: 0.3, ease }}
-            className="relative col-span-5 col-start-8 row-span-2 row-start-1 flex items-end justify-center self-end lg:col-span-6 lg:col-start-7 lg:row-span-3 lg:justify-end lg:self-stretch"
+            className="relative col-span-12 row-start-4 flex items-end justify-center self-end sm:col-span-5 sm:col-start-8 sm:row-span-2 sm:row-start-1 lg:col-span-6 lg:col-start-7 lg:row-span-3 lg:justify-end lg:self-stretch"
           >
-            {/* on phones the cutout runs a little wider than its column so the technician
-                reads at a confident size instead of a small floating figure */}
-            <div className="relative -mr-[16%] w-[180%] max-w-none sm:mr-0 sm:w-full sm:max-w-[34rem]">
+            {/* Below sm the technician gets his own full-width row, so he reads
+                at a proper size instead of a sliver crammed beside the headline. */}
+            <div className="relative w-[78%] max-w-[20rem] sm:-mr-[6%] sm:w-[130%] sm:max-w-[34rem] lg:mr-0 lg:w-full">
               {/* soft backdrop */}
               <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
                 <div className="absolute left-1/2 top-1/2 size-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/50 blur-[120px]" />

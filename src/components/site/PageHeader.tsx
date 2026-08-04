@@ -268,7 +268,7 @@ export function PageHeader({
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.35, ease }}
-              className="grid grid-cols-3 gap-x-4 gap-y-6 sm:gap-6 lg:justify-items-end"
+              className="grid grid-cols-2 gap-x-4 gap-y-6 min-[420px]:grid-cols-3 sm:gap-6 lg:justify-items-end"
             >
               {stats.map((s) => (
                 <div key={s.label} className="lg:text-right">
