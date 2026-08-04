@@ -135,12 +135,12 @@ export const AMC_PLANS: AmcPlan[] = [
  * the hours are stored rather than parsed back out.
  */
 export const TIME_SLOTS = [
-  { label: "08:00 – 10:00", startsAt: 8, endsAt: 10 },
-  { label: "10:00 – 12:00", startsAt: 10, endsAt: 12 },
-  { label: "12:00 – 02:00", startsAt: 12, endsAt: 14 },
-  { label: "02:00 – 04:00", startsAt: 14, endsAt: 16 },
-  { label: "04:00 – 06:00", startsAt: 16, endsAt: 18 },
-  { label: "06:00 – 08:00", startsAt: 18, endsAt: 20 },
+  { label: "08:00 – 10:00 AM", startsAt: 8, endsAt: 10 },
+  { label: "10:00 AM – 12:00 PM", startsAt: 10, endsAt: 12 },
+  { label: "12:00 – 02:00 PM", startsAt: 12, endsAt: 14 },
+  { label: "02:00 – 04:00 PM", startsAt: 14, endsAt: 16 },
+  { label: "04:00 – 06:00 PM", startsAt: 16, endsAt: 18 },
+  { label: "06:00 – 08:00 PM", startsAt: 18, endsAt: 20 },
 ];
 
 export const PAYMENT_METHODS = [

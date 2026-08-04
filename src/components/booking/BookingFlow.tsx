@@ -479,6 +479,22 @@ function DateStep({ draft, setDraft }: StepProps) {
   );
 }
 
+/** The one-word status shown on the right of every time slot. */
+function SlotTag({ state }: { state: "open" | "now" | "passed" | "full" }) {
+  const tag = {
+    open: { text: "Available", className: "bg-emerald/12 text-emerald" },
+    now: { text: "Starts now", className: "bg-warning/15 text-warning" },
+    passed: { text: "Passed", className: "bg-surface-2 text-muted" },
+    full: { text: "Full", className: "bg-danger/12 text-danger" },
+  }[state];
+
+  return (
+    <span className={cn("shrink-0 rounded-full px-2.5 py-1 text-[0.7rem] font-semibold", tag.className)}>
+      {tag.text}
+    </span>
+  );
+}
+
 function TimeStep({ draft, setDraft }: StepProps) {
   // The clock is read after mount only — rendering a time-dependent list on the
   // server and again in the browser would hydrate mismatched.
@@ -494,15 +510,27 @@ function TimeStep({ draft, setDraft }: StepProps) {
   }, []);
 
   const isToday = draft.date === "Today";
-  /** A window is gone once it has finished — the one running right now is still bookable. */
-  const hasPassed = (endsAt: number) => isToday && now !== null && now >= endsAt;
+
+  /**
+   * Every window is one of four things. Only "today" can produce passed/now —
+   * on any other date each window is simply open.
+   */
+  const stateOf = (slot: (typeof TIME_SLOTS)[number], i: number) => {
+    if (i === 2) return "full" as const;
+    if (!isToday || now === null) return "open" as const;
+    if (now >= slot.endsAt) return "passed" as const;
+    if (now >= slot.startsAt) return "now" as const;
+    return "open" as const;
+  };
 
   // If today gets picked while a now-past window was selected, drop it rather
   // than carrying an unbookable slot into the summary.
   useEffect(() => {
     if (!draft.slot) return;
-    const chosen = TIME_SLOTS.find((s) => s.label === draft.slot);
-    if (chosen && hasPassed(chosen.endsAt)) setDraft((s) => ({ ...s, slot: undefined }));
+    const i = TIME_SLOTS.findIndex((s) => s.label === draft.slot);
+    if (i >= 0 && stateOf(TIME_SLOTS[i], i) === "passed") {
+      setDraft((s) => ({ ...s, slot: undefined }));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [draft.slot, draft.date, now]);
 
@@ -511,10 +539,9 @@ function TimeStep({ draft, setDraft }: StepProps) {
       <StepTitle title="Choose a time slot" hint={`For ${draft.date ?? "your selected date"}.`} />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {TIME_SLOTS.map((slot, i) => {
+          const state = stateOf(slot, i);
           const selected = draft.slot === slot.label;
-          const soldOut = i === 2;
-          const passed = hasPassed(slot.endsAt);
-          const disabled = soldOut || passed;
+          const disabled = state === "full" || state === "passed";
           return (
             <button
               key={slot.label}
@@ -522,21 +549,27 @@ function TimeStep({ draft, setDraft }: StepProps) {
               onClick={() => setDraft((s) => ({ ...s, slot: slot.label }))}
               aria-pressed={selected}
               className={cn(
-                "flex items-center justify-between rounded-2xl border-2 p-4 transition-all",
+                "flex items-center justify-between gap-3 rounded-2xl border-2 p-4 transition-all",
                 disabled && "cursor-not-allowed opacity-40",
                 selected
                   ? "border-primary bg-primary text-white shadow-premium-md ring-2 ring-primary/25"
-                  : "border-border bg-surface",
+                  // the window running right now reads differently from the rest
+                  : state === "now"
+                    ? "border-warning/60 bg-warning/[0.07]"
+                    : "border-border bg-surface",
                 !disabled && !selected && "hover:border-border-strong hover:-translate-y-0.5"
               )}
             >
-              <span className="flex items-center gap-2.5 font-medium">
-                <Clock className={cn("size-5", selected ? "text-white" : "text-muted")} />
-                {slot.label}
+              <span className="flex min-w-0 items-center gap-2.5 font-medium">
+                <Clock className={cn("size-5 shrink-0", selected ? "text-white" : state === "now" ? "text-warning" : "text-muted")} />
+                <span className="truncate">{slot.label}</span>
               </span>
-              {selected && <CheckCircle2 className="size-5" />}
-              {soldOut && <span className="text-xs font-semibold text-danger">Full</span>}
-              {passed && !soldOut && <span className="text-xs font-semibold text-muted">Passed</span>}
+
+              {selected ? (
+                <CheckCircle2 className="size-5 shrink-0" />
+              ) : (
+                <SlotTag state={state} />
+              )}
             </button>
           );
         })}
