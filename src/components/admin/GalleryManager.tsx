@@ -23,20 +23,20 @@ export function GalleryManager() {
 
   return (
     <div>
-      <div className="mb-8 flex items-end justify-between gap-4">
-        <div>
-          <h1 className="font-display text-3xl tracking-[-0.02em]">Gallery</h1>
+      <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="font-display text-2xl tracking-[-0.02em] sm:text-3xl">Gallery</h1>
           <p className="mt-1 text-sm text-muted">Manage the work photos shown on the site.</p>
         </div>
         <button
           onClick={() => setAdding(true)}
-          className="inline-flex items-center gap-1.5 rounded-xl bg-ink px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+          className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-ink px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 sm:py-2"
         >
           <Plus className="size-4" /> Add photo
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
         {items.map((item) => (
           <div key={item.id} className="group relative overflow-hidden rounded-2xl border border-border bg-surface shadow-premium-sm">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -48,7 +48,10 @@ export function GalleryManager() {
             <button
               onClick={() => remove(item.id)}
               aria-label="Remove"
-              className="absolute right-2 top-2 grid size-8 place-items-center rounded-full bg-white/90 text-danger opacity-0 shadow-premium-sm backdrop-blur transition-opacity hover:bg-white group-hover:opacity-100"
+              /* Always visible on touch: reveal-on-hover leaves the only way to
+                 delete a photo unreachable on a phone. Hover-reveal is kept
+                 from lg up, where a pointer exists. */
+              className="absolute right-2 top-2 grid size-8 place-items-center rounded-full bg-white/90 text-danger shadow-premium-sm backdrop-blur transition-opacity hover:bg-white lg:opacity-0 lg:group-hover:opacity-100"
             >
               <Trash2 className="size-4" />
             </button>

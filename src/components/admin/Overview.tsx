@@ -30,25 +30,26 @@ export function Overview({
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="font-display text-3xl tracking-[-0.02em]">Overview</h1>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="font-display text-2xl tracking-[-0.02em] sm:text-3xl">Overview</h1>
         <p className="mt-1 text-sm text-muted">A snapshot of your operations today.</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* 2×2 on phones — four full-width tiles pushed everything below the fold */}
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {stats.map((s) => (
-          <div key={s.label} className="rounded-2xl border border-border bg-surface p-5 shadow-premium-sm">
-            <span className="grid size-10 place-items-center rounded-xl" style={{ background: `${s.tint}18`, color: s.tint }}>
-              <s.icon className="size-5" />
+          <div key={s.label} className="rounded-2xl border border-border bg-surface p-4 shadow-premium-sm sm:p-5">
+            <span className="grid size-9 place-items-center rounded-xl sm:size-10" style={{ background: `${s.tint}18`, color: s.tint }}>
+              <s.icon className="size-4.5 sm:size-5" />
             </span>
-            <p className="mt-4 text-2xl font-semibold tracking-[-0.01em]">{s.value}</p>
-            <p className="mt-1 text-sm text-muted">{s.label}</p>
+            <p className="mt-3 truncate text-xl font-semibold tracking-[-0.01em] sm:mt-4 sm:text-2xl">{s.value}</p>
+            <p className="mt-1 text-[0.78rem] leading-snug text-muted sm:text-sm">{s.label}</p>
           </div>
         ))}
       </div>
 
       <div className="mt-8 rounded-2xl border border-border bg-surface shadow-premium-sm">
-        <div className="flex items-center justify-between border-b border-hairline px-5 py-4">
+        <div className="flex items-center justify-between gap-3 border-b border-hairline px-4 py-4 sm:px-5">
           <h2 className="font-medium">Recent bookings</h2>
           <Link href="/admin/bookings" className="inline-flex items-center gap-1 text-sm text-royal-bright hover:underline">
             View all <ArrowUpRight className="size-4" />
@@ -56,7 +57,7 @@ export function Overview({
         </div>
         <div className="divide-y divide-hairline">
           {bookings.slice(0, 5).map((b) => (
-            <div key={b.id} className="flex items-center justify-between gap-4 px-5 py-3.5 text-sm">
+            <div key={b.id} className="flex items-center justify-between gap-3 px-4 py-3.5 text-sm sm:gap-4 sm:px-5">
               <div className="min-w-0">
                 <p className="truncate font-medium">{b.customer}</p>
                 <p className="truncate text-muted">{b.appliance} · {b.problem || "—"} · {b.city}</p>

@@ -62,8 +62,8 @@ export function ReviewsManager({ initial }: { initial: Review[] }) {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="font-display text-3xl tracking-[-0.02em]">Reviews</h1>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="font-display text-2xl tracking-[-0.02em] sm:text-3xl">Reviews</h1>
         <p className="mt-1 text-sm text-muted">
           Customers rate a service from their dashboard once the job is completed. Approve a review
           to publish it on the website.
@@ -75,7 +75,7 @@ export function ReviewsManager({ initial }: { initial: Review[] }) {
         </p>
       </div>
 
-      <div className="mb-5 flex gap-1.5">
+      <div className="mb-5 flex flex-wrap gap-1.5">
         {FILTERS.map((f) => (
           <button
             key={f}
@@ -95,7 +95,7 @@ export function ReviewsManager({ initial }: { initial: Review[] }) {
 
       <div className="space-y-3">
         {shown.map((r) => (
-          <div key={r.id} className="rounded-2xl border border-border bg-surface p-5 shadow-premium-sm">
+          <div key={r.id} className="rounded-2xl border border-border bg-surface p-4 shadow-premium-sm sm:p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div className="flex flex-wrap items-center gap-2">

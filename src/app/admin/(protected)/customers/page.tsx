@@ -24,14 +24,56 @@ export default async function AdminCustomersPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="font-display text-3xl tracking-[-0.02em]">Customers</h1>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="font-display text-2xl tracking-[-0.02em] sm:text-3xl">Customers</h1>
         <p className="mt-1 text-sm text-muted">
           Everyone who has signed in with Google · {customers.length} total.
         </p>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-border bg-surface shadow-premium-sm">
+      {/* Phones get a card per customer — the five-column table needs 42rem. */}
+      <div className="space-y-3 lg:hidden">
+        {customers.map((c) => (
+          <div key={c.uid} className="rounded-2xl border border-border bg-surface p-4 shadow-premium-sm">
+            <div className="flex items-center gap-3">
+              {c.picture ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={c.picture} alt="" referrerPolicy="no-referrer" className="size-10 shrink-0 rounded-full object-cover" />
+              ) : (
+                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-ink text-xs font-bold text-white">
+                  {initials(c.name)}
+                </span>
+              )}
+              <div className="min-w-0">
+                <p className="truncate font-medium">{c.name}</p>
+                <p className="truncate text-xs text-muted">{c.email}</p>
+              </div>
+            </div>
+
+            <dl className="mt-4 grid grid-cols-3 gap-2 border-t border-hairline pt-3 text-xs">
+              <div>
+                <dt className="text-muted">Bookings</dt>
+                <dd className="mt-0.5 font-semibold tabular-nums">{c.bookings}</dd>
+              </div>
+              <div>
+                <dt className="text-muted">Joined</dt>
+                <dd className="mt-0.5 font-medium">{fmt(c.createdAt)}</dd>
+              </div>
+              <div>
+                <dt className="text-muted">Last login</dt>
+                <dd className="mt-0.5 font-medium">{fmt(c.lastLoginAt)}</dd>
+              </div>
+            </dl>
+          </div>
+        ))}
+        {customers.length === 0 && (
+          <p className="rounded-2xl border border-dashed border-border-strong bg-surface py-10 text-center text-muted">
+            No customers yet — they appear here the moment they sign in.
+          </p>
+        )}
+      </div>
+
+      <div className="hidden overflow-x-auto rounded-2xl border border-border bg-surface shadow-premium-sm lg:block">
         <table className="w-full min-w-[42rem] text-sm">
           <thead>
             <tr className="border-b border-hairline text-left text-xs uppercase tracking-wider text-muted">

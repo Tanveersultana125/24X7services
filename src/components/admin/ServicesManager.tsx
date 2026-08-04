@@ -13,33 +13,34 @@ export function ServicesManager() {
 
   return (
     <div>
-      <div className="mb-8 flex items-end justify-between gap-4">
-        <div>
-          <h1 className="font-display text-3xl tracking-[-0.02em]">Services & prices</h1>
+      {/* stacks on phones so the two actions keep full-size tap targets */}
+      <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="font-display text-2xl tracking-[-0.02em] sm:text-3xl">Services &amp; prices</h1>
           <p className="mt-1 text-sm text-muted">Edit starting prices, timing, and visibility.</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <button
             onClick={() => setRows(SERVICES)}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3.5 py-2 text-sm font-medium hover:bg-surface-2"
+            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-border bg-surface px-3.5 py-2.5 text-sm font-medium hover:bg-surface-2 sm:flex-none sm:py-2"
           >
             <RotateCcw className="size-4" /> Reset
           </button>
           <button
             onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 1800); }}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-ink px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-ink px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 sm:flex-none sm:py-2"
           >
             <Check className="size-4" /> {saved ? "Saved" : "Save changes"}
           </button>
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
         {rows.map((s) => (
-          <div key={s.id} className="rounded-2xl border border-border bg-surface p-5 shadow-premium-sm">
-            <div className="flex items-center justify-between">
-              <h3 className="font-medium">{s.name}</h3>
-              <label className="flex cursor-pointer items-center gap-2 text-xs text-muted">
+          <div key={s.id} className="rounded-2xl border border-border bg-surface p-4 shadow-premium-sm sm:p-5">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="min-w-0 truncate font-medium">{s.name}</h3>
+              <label className="flex shrink-0 cursor-pointer items-center gap-2 text-xs text-muted">
                 <input
                   type="checkbox"
                   checked={s.active}

@@ -94,15 +94,16 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
       {open && <div onClick={() => setOpen(false)} className="fixed inset-0 z-30 bg-ink/40 lg:hidden" />}
 
-      {/* Main */}
-      <div className="flex min-h-dvh flex-col">
-        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border bg-surface/80 px-5 backdrop-blur lg:hidden">
-          <button onClick={() => setOpen(true)} aria-label="Open menu">
+      {/* Main — min-w-0 keeps a wide table from stretching this grid column
+          and pushing the whole admin layout sideways */}
+      <div className="flex min-h-dvh min-w-0 flex-col">
+        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border bg-surface/80 px-4 backdrop-blur sm:px-5 lg:hidden">
+          <button onClick={() => setOpen(true)} aria-label="Open menu" className="grid size-9 place-items-center rounded-lg hover:bg-surface-2">
             <Menu className="size-5" />
           </button>
           <span className="font-display text-lg">24X7 Admin</span>
         </header>
-        <main className="flex-1 p-5 sm:p-8">{children}</main>
+        <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );
