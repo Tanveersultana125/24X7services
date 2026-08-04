@@ -135,10 +135,11 @@ export function MostBooked() {
           {/* Margins, not padding: the scroller is exactly one card wide on a
               phone, so it clips the neighbours instead of letting them peek
               into the arrows' lane. */}
+          <div className="mx-11 overflow-hidden sm:mx-0 sm:overflow-visible">
           <div
             ref={scroller}
             onScroll={update}
-            className="mx-11 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 [scrollbar-width:none] sm:mx-0 [&::-webkit-scrollbar]:hidden"
+            className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
           {CARDS.map((c, i) => (
             <motion.div
@@ -186,6 +187,7 @@ export function MostBooked() {
               </Link>
             </motion.div>
           ))}
+          </div>
           </div>
         </div>
       </div>
