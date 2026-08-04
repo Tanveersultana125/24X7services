@@ -129,58 +129,72 @@ export function Dashboard({
     <div>
       {/* Header */}
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-        <div className="flex items-center gap-4">
+        {/* min-w-0 + truncate: without it a long email can't shrink and pushes
+            the whole page into a horizontal scroll on phones */}
+        <div className="flex min-w-0 items-center gap-3.5 sm:gap-4">
           {user?.picture ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={user.picture} alt="" className="size-14 rounded-2xl object-cover shadow-premium-md" />
+            <img
+              src={user.picture}
+              alt=""
+              referrerPolicy="no-referrer"
+              className="size-12 shrink-0 rounded-2xl object-cover shadow-premium-md sm:size-14"
+            />
           ) : (
-            <div className="grid size-14 place-items-center rounded-2xl bg-gradient-to-br from-primary to-secondary text-lg font-bold text-white shadow-premium-md">
+            <div className="grid size-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary to-secondary text-lg font-bold text-white shadow-premium-md sm:size-14">
               {initials(name)}
             </div>
           )}
-          <div>
+          <div className="min-w-0">
             <p className="text-sm text-muted">Welcome back,</p>
-            <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{name}</h1>
-            {user?.email && <p className="text-sm text-muted">{user.email}</p>}
+            <h1 className="truncate text-xl font-extrabold tracking-tight sm:text-3xl">{name}</h1>
+            {user?.email && <p className="truncate text-sm text-muted">{user.email}</p>}
           </div>
         </div>
-        <div className="flex items-center gap-2.5">
-          <form action="/api/auth/logout" method="post">
+        {/* both actions share the row evenly on phones instead of hugging left */}
+        <div className="flex shrink-0 items-center gap-2.5">
+          <form action="/api/auth/logout" method="post" className="flex-1 sm:flex-none">
             <button
               type="submit"
-              className="inline-flex h-11 items-center gap-2 rounded-full border border-border-strong px-4 text-sm font-medium text-ink transition-colors hover:bg-surface-2"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-border-strong px-4 text-sm font-medium text-ink transition-colors hover:bg-surface-2"
             >
               <LogOut className="size-4" /> Log out
             </button>
           </form>
-          <Button href="/book" size="md"><Plus className="size-4" /> New Booking</Button>
+          <Button href="/book" size="md" className="flex-1 sm:flex-none">
+            <Plus className="size-4" /> New Booking
+          </Button>
         </div>
       </div>
 
-      {/* Stats */}
-      <StaggerGroup className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Stats — 2×2 on phones; one per row made the page needlessly long */}
+      <StaggerGroup className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {stats.map((s) => (
-          <motion.div key={s.label} variants={staggerItem} className="rounded-3xl border border-border bg-surface p-5 shadow-premium-sm">
-            <div className={cn("grid size-11 place-items-center rounded-2xl", s.tint)}>
+          <motion.div
+            key={s.label}
+            variants={staggerItem}
+            className="rounded-2xl border border-border bg-surface p-4 shadow-premium-sm sm:rounded-3xl sm:p-5"
+          >
+            <div className={cn("grid size-10 place-items-center rounded-xl sm:size-11 sm:rounded-2xl", s.tint)}>
               <s.icon className="size-5" />
             </div>
-            <p className="mt-4 text-2xl font-bold tracking-tight">{s.value}</p>
-            <p className="text-sm text-muted">{s.label}</p>
+            <p className="mt-3 text-xl font-bold tracking-tight sm:mt-4 sm:text-2xl">{s.value}</p>
+            <p className="text-[0.8rem] leading-snug text-muted sm:text-sm">{s.label}</p>
           </motion.div>
         ))}
       </StaggerGroup>
 
       {/* Active service banner — only when a job is actually live */}
       {live && (
-        <div className="mt-8 overflow-hidden rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/8 to-accent/8 p-6 shadow-premium-sm">
+        <div className="mt-8 overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/8 to-accent/8 p-5 shadow-premium-sm sm:rounded-3xl sm:p-6">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-            <div className="flex items-start gap-4">
-              <div className="relative grid size-12 place-items-center rounded-2xl bg-primary text-white">
-                <Navigation className="size-6" />
+            <div className="flex min-w-0 items-start gap-3.5 sm:gap-4">
+              <div className="relative grid size-11 shrink-0 place-items-center rounded-2xl bg-primary text-white sm:size-12">
+                <Navigation className="size-5 sm:size-6" />
                 <span className="absolute inset-0 animate-pulse-ring rounded-2xl ring-2 ring-primary/50" />
               </div>
-              <div>
-                <p className="flex items-center gap-2 font-bold">
+              <div className="min-w-0">
+                <p className="flex flex-wrap items-center gap-2 font-bold">
                   {live.status === "in-progress" ? "Technician on the way" : "Technician assigned"}
                   <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-bold text-accent">LIVE</span>
                 </p>
@@ -190,7 +204,9 @@ export function Dashboard({
                 </p>
               </div>
             </div>
-            <Button href="/track" variant="primary" size="md">Track live <ChevronRight className="size-4" /></Button>
+            <Button href="/track" variant="primary" size="md" className="w-full sm:w-auto">
+              Track live <ChevronRight className="size-4" />
+            </Button>
           </div>
         </div>
       )}
@@ -220,12 +236,12 @@ export function Dashboard({
           ) : (
             <div className="space-y-4">
               {history.map((h) => (
-                <div key={h.id} className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-5 shadow-premium-sm sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="grid size-11 place-items-center rounded-xl bg-surface-2 text-primary"><Wrench className="size-5" /></div>
-                    <div>
-                      <p className="font-semibold">{h.appliance}</p>
-                      <p className="text-sm text-muted">{h.problem} · {h.id}</p>
+                <div key={h.id} className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-4 shadow-premium-sm sm:flex-row sm:items-center sm:justify-between sm:p-5">
+                  <div className="flex min-w-0 items-center gap-3.5 sm:gap-4">
+                    <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-surface-2 text-primary"><Wrench className="size-5" /></div>
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold">{h.appliance}</p>
+                      <p className="truncate text-sm text-muted">{h.problem} · {h.id}</p>
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-4 sm:gap-6">
@@ -266,15 +282,15 @@ export function Dashboard({
           ) : (
             <div className="space-y-3">
               {history.map((h) => (
-                <div key={h.id} className="flex items-center justify-between rounded-2xl border border-border bg-surface p-5 shadow-premium-sm">
-                  <div className="flex items-center gap-4">
-                    <div className="grid size-11 place-items-center rounded-xl bg-surface-2 text-secondary"><FileText className="size-5" /></div>
-                    <div>
-                      <p className="font-semibold">Invoice {h.id}</p>
-                      <p className="text-sm text-muted">{h.appliance} · {formatINR(h.amount)}</p>
+                <div key={h.id} className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-surface p-4 shadow-premium-sm sm:p-5">
+                  <div className="flex min-w-0 items-center gap-3.5 sm:gap-4">
+                    <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-surface-2 text-secondary"><FileText className="size-5" /></div>
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold">Invoice {h.id}</p>
+                      <p className="truncate text-sm text-muted">{h.appliance} · {formatINR(h.amount)}</p>
                     </div>
                   </div>
-                  <button className="inline-flex items-center gap-2 rounded-full border border-border-strong px-4 py-2 text-sm font-semibold transition-colors hover:border-primary hover:text-primary">
+                  <button className="inline-flex shrink-0 items-center gap-2 rounded-full border border-border-strong px-3.5 py-2 text-sm font-semibold transition-colors hover:border-primary hover:text-primary sm:px-4">
                     <Download className="size-4" /> PDF
                   </button>
                 </div>
@@ -289,7 +305,7 @@ export function Dashboard({
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {completed.slice(0, 6).map((b) => (
-                <div key={b.id} className="rounded-3xl border border-border bg-surface p-6 shadow-premium-sm">
+                <div key={b.id} className="rounded-2xl border border-border bg-surface p-5 shadow-premium-sm sm:rounded-3xl sm:p-6">
                   <div className="flex items-center justify-between">
                     <div className="grid size-11 place-items-center rounded-2xl bg-accent/10 text-accent"><ShieldCheck className="size-5" /></div>
                     <span className="rounded-full bg-accent/15 px-2.5 py-1 text-xs font-bold text-accent">Active</span>
@@ -314,7 +330,7 @@ export function Dashboard({
               {bookings.map((b) => {
                 const note = STATUS_NOTE[b.status];
                 return (
-                  <div key={b.id} className="flex gap-4 rounded-2xl border border-border bg-surface p-5 shadow-premium-sm">
+                  <div key={b.id} className="flex gap-3.5 rounded-2xl border border-border bg-surface p-4 shadow-premium-sm sm:gap-4 sm:p-5">
                     <div className={cn("grid size-11 shrink-0 place-items-center rounded-xl", note.tint)}>
                       <Bell className="size-5" />
                     </div>
@@ -340,25 +356,25 @@ export function Dashboard({
             <EmptyState label="No payments yet." />
           ) : (
             <div className="space-y-4">
-              <div className="rounded-2xl border border-border bg-surface p-5 shadow-premium-sm">
+              <div className="rounded-2xl border border-border bg-surface p-4 shadow-premium-sm sm:p-5">
                 <p className="text-sm text-muted">Total paid across {bookings.length} booking{bookings.length === 1 ? "" : "s"}</p>
                 <p className="mt-1 text-2xl font-bold tracking-tight">{formatINR(totalPaid)}</p>
               </div>
 
               {payments.map((p) => (
-                <div key={p.method} className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-surface p-5 shadow-premium-sm">
-                  <div className="flex items-center gap-4">
-                    <div className="grid size-11 place-items-center rounded-xl bg-surface-2 text-primary">
+                <div key={p.method} className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-surface p-4 shadow-premium-sm sm:gap-4 sm:p-5">
+                  <div className="flex min-w-0 items-center gap-3.5 sm:gap-4">
+                    <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-surface-2 text-primary">
                       <CreditCard className="size-5" />
                     </div>
-                    <div>
-                      <p className="font-semibold">{p.method}</p>
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold">{p.method}</p>
                       <p className="text-sm text-muted">
                         Used on {p.count} booking{p.count === 1 ? "" : "s"}
                       </p>
                     </div>
                   </div>
-                  <p className="font-semibold">{formatINR(p.total)}</p>
+                  <p className="shrink-0 font-semibold">{formatINR(p.total)}</p>
                 </div>
               ))}
 
@@ -376,9 +392,9 @@ export function Dashboard({
         {tab === "Addresses" && (
           <div className="grid gap-4 sm:grid-cols-2">
             {history.filter((h) => h.address).slice(0, 4).map((h) => (
-              <div key={h.id} className="flex items-start gap-4 rounded-2xl border border-border bg-surface p-5 shadow-premium-sm">
-                <div className="grid size-11 place-items-center rounded-xl bg-surface-2 text-primary"><MapPin className="size-5" /></div>
-                <div>
+              <div key={h.id} className="flex items-start gap-3.5 rounded-2xl border border-border bg-surface p-4 shadow-premium-sm sm:gap-4 sm:p-5">
+                <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-surface-2 text-primary"><MapPin className="size-5" /></div>
+                <div className="min-w-0">
                   <p className="font-semibold">Service address</p>
                   <p className="mt-0.5 text-sm text-muted">{h.address}</p>
                 </div>

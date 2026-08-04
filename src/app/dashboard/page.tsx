@@ -25,7 +25,9 @@ export default async function DashboardPage() {
   return (
     <>
       <SiteNav />
-      <main className="mx-auto max-w-6xl px-5 pt-28 pb-16 sm:pt-32">
+      {/* overflow-x-clip: a single mis-sized child shouldn't let the whole
+          dashboard scroll sideways on a phone */}
+      <main className="mx-auto max-w-6xl overflow-x-clip px-4 pt-24 pb-16 sm:px-5 sm:pt-32">
         <Dashboard
           user={user}
           bookings={bookings}
