@@ -44,13 +44,39 @@ export async function GET() {
       }
     : null;
 
-  let adminSdk: { loaded: boolean; error?: string } = { loaded: false };
+  // Load every module the auth routes pull in, one at a time. A route whose
+  // static imports throw dies before its handler runs and returns an empty 500,
+  // so the only way to find the culprit is to import them individually here.
+  const imports: Record<string, string> = {};
+  const probe = async (name: string, load: () => Promise<unknown>) => {
+    try {
+      await load();
+      imports[name] = "ok";
+    } catch (err) {
+      imports[name] = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+    }
+  };
+
+  await probe("firebase-admin/app", () => import("firebase-admin/app"));
+  await probe("firebase-admin/auth", () => import("firebase-admin/auth"));
+  await probe("firebase-admin/firestore", () => import("firebase-admin/firestore"));
+  await probe("lib/firebase/admin", () => import("@/lib/firebase/admin"));
+  await probe("lib/customer/auth", () => import("@/lib/customer/auth"));
+  await probe("lib/bookings", () => import("@/lib/bookings"));
+  await probe("lib/reviews", () => import("@/lib/reviews"));
+
+  // Initialising the credential is the step that actually touches the private
+  // key — a malformed key fails precisely here.
+  let credential = "not attempted";
   try {
-    await import("firebase-admin/app");
-    adminSdk = { loaded: true };
+    const { getAdminAuth } = await import("@/lib/firebase/admin");
+    getAdminAuth();
+    credential = "ok";
   } catch (err) {
-    adminSdk = { loaded: false, error: err instanceof Error ? err.message : String(err) };
+    credential = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
   }
+
+  const adminSdk = { loaded: imports["firebase-admin/app"] === "ok" };
 
   const projectsMatch =
     !process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || !process.env.FIREBASE_PROJECT_ID
@@ -64,7 +90,10 @@ export async function GET() {
         "set the host's Node.js version to 22.x and redeploy.",
     );
   }
-  if (!adminSdk.loaded) problems.push("firebase-admin failed to load on this runtime.");
+  for (const [name, result] of Object.entries(imports)) {
+    if (result !== "ok") problems.push(`import "${name}" failed — ${result}`);
+  }
+  if (credential !== "ok") problems.push(`Firebase Admin credential failed — ${credential}`);
   for (const [name, present] of Object.entries(env)) {
     if (!present) problems.push(`${name} is not set.`);
   }
@@ -84,6 +113,8 @@ export async function GET() {
     ok: problems.length === 0,
     node: { version: nodeVersion, required: `>=${REQUIRED_NODE_MAJOR}`, ok: nodeOk },
     adminSdk,
+    imports,
+    credential,
     env,
     privateKeyShape,
     projectsMatch,
