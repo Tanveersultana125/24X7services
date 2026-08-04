@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -13,7 +13,44 @@ import { ReviewDialog, type ReviewTarget } from "./ReviewDialog";
 import { formatINR, cn } from "@/lib/utils";
 import type { Booking } from "@/lib/bookings";
 
-const TABS = ["Overview", "Bookings", "Invoices", "Warranty", "Addresses"] as const;
+const TABS = [
+  "Overview",
+  "Bookings",
+  "Invoices",
+  "Warranty",
+  "Notifications",
+  "Payments",
+  "Addresses",
+] as const;
+
+/** What each booking status means to the customer, for the notifications feed. */
+const STATUS_NOTE: Record<Booking["status"], { title: string; body: string; tint: string }> = {
+  new: {
+    title: "Booking confirmed",
+    body: "We're assigning a certified technician to your job.",
+    tint: "text-primary bg-primary/10",
+  },
+  assigned: {
+    title: "Technician assigned",
+    body: "Your technician is scheduled — you can track them on the day.",
+    tint: "text-warning bg-warning/12",
+  },
+  "in-progress": {
+    title: "Technician on the way",
+    body: "Follow the live location from the tracking page.",
+    tint: "text-secondary bg-secondary/10",
+  },
+  completed: {
+    title: "Service completed",
+    body: "Your 90-day repair warranty is now active.",
+    tint: "text-accent bg-accent/12",
+  },
+  cancelled: {
+    title: "Booking cancelled",
+    body: "This job was cancelled. Nothing was charged.",
+    tint: "text-danger bg-danger/12",
+  },
+};
 
 const STATUS_LABEL: Record<Booking["status"], string> = {
   new: "New",
@@ -43,6 +80,7 @@ export function Dashboard({
   const [tab, setTab] = useState<(typeof TABS)[number]>("Overview");
   const [rated, setRated] = useState<string[]>(reviewedBookingIds);
   const [reviewing, setReviewing] = useState<ReviewTarget | null>(null);
+  const tabsRef = useRef<HTMLDivElement>(null);
   const name = user?.name ?? "there";
 
   const history = bookings.map((b) => ({
@@ -62,6 +100,23 @@ export function Dashboard({
 
   const completed = bookings.filter((b) => b.status === "completed");
   const live = bookings.find((b) => b.status === "assigned" || b.status === "in-progress");
+
+  // Payment methods the customer has actually used, with what each has cost them.
+  const totalPaid = bookings
+    .filter((b) => b.status !== "cancelled")
+    .reduce((sum, b) => sum + b.price, 0);
+
+  const payments = Object.values(
+    bookings
+      .filter((b) => b.payment && b.status !== "cancelled")
+      .reduce<Record<string, { method: string; count: number; total: number }>>((acc, b) => {
+        const entry = acc[b.payment] ?? { method: b.payment, count: 0, total: 0 };
+        entry.count += 1;
+        entry.total += b.price;
+        acc[b.payment] = entry;
+        return acc;
+      }, {}),
+  ).sort((a, b) => b.count - a.count);
 
   const stats = [
     { icon: Wrench, label: "Total services", value: String(bookings.length), tint: "text-primary bg-primary/10" },
@@ -141,7 +196,7 @@ export function Dashboard({
       )}
 
       {/* Tabs */}
-      <div className="mt-10 flex gap-1 overflow-x-auto border-b border-border no-scrollbar">
+      <div ref={tabsRef} className="mt-10 flex scroll-mt-24 gap-1 overflow-x-auto border-b border-border no-scrollbar">
         {TABS.map((t) => (
           <button
             key={t}
@@ -251,6 +306,73 @@ export function Dashboard({
           )
         )}
 
+        {tab === "Notifications" && (
+          bookings.length === 0 ? (
+            <EmptyState label="Nothing to report yet." />
+          ) : (
+            <div className="space-y-3">
+              {bookings.map((b) => {
+                const note = STATUS_NOTE[b.status];
+                return (
+                  <div key={b.id} className="flex gap-4 rounded-2xl border border-border bg-surface p-5 shadow-premium-sm">
+                    <div className={cn("grid size-11 shrink-0 place-items-center rounded-xl", note.tint)}>
+                      <Bell className="size-5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                        <p className="font-semibold">{note.title}</p>
+                        <span className="text-xs text-muted">{b.date}</span>
+                      </div>
+                      <p className="mt-1 text-sm text-muted">{note.body}</p>
+                      <p className="mt-2 text-xs text-muted">
+                        {b.brand ? `${b.brand} ` : ""}{b.appliance} · {b.code}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )
+        )}
+
+        {tab === "Payments" && (
+          payments.length === 0 ? (
+            <EmptyState label="No payments yet." />
+          ) : (
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-border bg-surface p-5 shadow-premium-sm">
+                <p className="text-sm text-muted">Total paid across {bookings.length} booking{bookings.length === 1 ? "" : "s"}</p>
+                <p className="mt-1 text-2xl font-bold tracking-tight">{formatINR(totalPaid)}</p>
+              </div>
+
+              {payments.map((p) => (
+                <div key={p.method} className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-surface p-5 shadow-premium-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="grid size-11 place-items-center rounded-xl bg-surface-2 text-primary">
+                      <CreditCard className="size-5" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">{p.method}</p>
+                      <p className="text-sm text-muted">
+                        Used on {p.count} booking{p.count === 1 ? "" : "s"}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="font-semibold">{formatINR(p.total)}</p>
+                </div>
+              ))}
+
+              {/* Saved cards need a payment provider on file — say so rather than
+                  showing an "add card" form that can't store anything. */}
+              <p className="rounded-2xl border border-dashed border-border-strong px-5 py-4 text-sm text-muted">
+                These are the methods you&apos;ve paid with so far. Saving a card for one-tap
+                checkout arrives with online payments — for now you choose your method during
+                each booking.
+              </p>
+            </div>
+          )
+        )}
+
         {tab === "Addresses" && (
           <div className="grid gap-4 sm:grid-cols-2">
             {history.filter((h) => h.address).slice(0, 4).map((h) => (
@@ -269,18 +391,34 @@ export function Dashboard({
         )}
       </div>
 
-      {/* Quick links */}
+      {/* Quick links — the two that have a panel switch to it rather than
+          pointing at a dead anchor. */}
       <div className="mt-12 grid gap-4 sm:grid-cols-3">
-        {[
-          { icon: Heart, label: "Favourite services", href: "/#services" },
-          { icon: Bell, label: "Notifications", href: "#" },
-          { icon: CreditCard, label: "Payment methods", href: "#" },
-        ].map((q) => (
-          <Link key={q.label} href={q.href} className="group flex items-center gap-3 rounded-2xl border border-border bg-surface p-4 shadow-premium-sm transition-all hover:-translate-y-0.5 hover:shadow-premium-md">
+        <Link
+          href="/#services"
+          className="group flex items-center gap-3 rounded-2xl border border-border bg-surface p-4 shadow-premium-sm transition-all hover:-translate-y-0.5 hover:shadow-premium-md"
+        >
+          <div className="grid size-10 place-items-center rounded-xl bg-surface-2 text-primary"><Heart className="size-5" /></div>
+          <span className="font-medium">Favourite services</span>
+          <ChevronRight className="ml-auto size-4 text-muted transition-transform group-hover:translate-x-0.5" />
+        </Link>
+
+        {([
+          { icon: Bell, label: "Notifications", target: "Notifications" },
+          { icon: CreditCard, label: "Payment methods", target: "Payments" },
+        ] as const).map((q) => (
+          <button
+            key={q.label}
+            onClick={() => {
+              setTab(q.target);
+              tabsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            className="group flex items-center gap-3 rounded-2xl border border-border bg-surface p-4 text-left shadow-premium-sm transition-all hover:-translate-y-0.5 hover:shadow-premium-md"
+          >
             <div className="grid size-10 place-items-center rounded-xl bg-surface-2 text-primary"><q.icon className="size-5" /></div>
             <span className="font-medium">{q.label}</span>
             <ChevronRight className="ml-auto size-4 text-muted transition-transform group-hover:translate-x-0.5" />
-          </Link>
+          </button>
         ))}
       </div>
 
