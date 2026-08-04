@@ -74,26 +74,30 @@ export function Hero() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.62, ease }}
-              className="flex flex-wrap items-center gap-2.5 sm:gap-3 lg:mt-10"
+              /* Both actions share one row on phones — at 400px the pair is a
+                 little wider than the column, so they split it instead of the
+                 second wrapping onto its own line. */
+              className="flex items-center gap-2 sm:flex-wrap sm:gap-3 lg:mt-10"
             >
               <Link
                 href="/book"
-                className="group inline-flex items-center gap-2 rounded-full px-5 py-3 text-[0.875rem] font-semibold text-white shadow-lg transition-transform hover:scale-[1.03] sm:px-6 sm:py-3.5 sm:text-[0.95rem]"
+                className="group inline-flex min-w-0 flex-1 items-center justify-center gap-1 rounded-full px-2.5 py-3 text-[0.8rem] font-semibold text-white shadow-lg transition-transform hover:scale-[1.03] sm:flex-none sm:justify-start sm:gap-2 sm:px-6 sm:py-3.5 sm:text-[0.95rem]"
                 style={{ background: RED, boxShadow: `0 16px 40px -12px ${RED}99` }}
               >
-                Book a service
-                <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                <span className="truncate">Book a service</span>
+                <ArrowUpRight className="size-4 shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </Link>
               <Link
                 href="/book?emergency=1"
-                className="group inline-flex items-center gap-2 rounded-full border border-black/15 px-5 py-3 text-[0.875rem] font-medium text-ink transition-colors hover:bg-black/5 sm:px-6 sm:py-3.5 sm:text-[0.95rem]"
+                className="group inline-flex min-w-0 flex-1 items-center justify-center gap-1 rounded-full border border-black/15 px-2.5 py-3 text-[0.8rem] font-medium text-ink transition-colors hover:bg-black/5 sm:flex-none sm:justify-start sm:gap-2 sm:px-6 sm:py-3.5 sm:text-[0.95rem]"
               >
-                <span className="relative grid size-2 place-items-center">
+                <span className="relative grid size-2 shrink-0 place-items-center">
                   <span className="absolute size-2 animate-ping rounded-full" style={{ background: RED }} />
                   <span className="size-2 rounded-full" style={{ background: RED }} />
                 </span>
-                Emergency repair
-                <span className="transition-transform group-hover:translate-x-0.5">→</span>
+                <span className="truncate">Emergency repair</span>
+                {/* decorative — dropped on phones so the label keeps its room */}
+                <span className="hidden transition-transform group-hover:translate-x-0.5 sm:inline">→</span>
               </Link>
             </motion.div>
 
