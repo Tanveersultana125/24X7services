@@ -71,8 +71,12 @@ export function SiteNav() {
             })}
           </div>
 
-          <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
-            <SearchTrigger variant="pill" />
+          {/* On phones the search bar takes the empty middle so the nav reads as
+              one balanced row instead of a logo and a cluster of icons pushed
+              to opposite edges. From xl it goes back to hugging the actions. */}
+          <SearchTrigger variant="pill" className="min-w-0 flex-1 xl:ml-auto xl:w-auto xl:flex-none" />
+
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 xl:ml-0">
             <SearchTrigger variant="icon" />
             <ThemeToggle />
             <AccountMenu />

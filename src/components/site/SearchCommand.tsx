@@ -57,7 +57,13 @@ const BRAND_ITEMS: Item[] = BRANDS.map((b) => ({
 const ALL = [...ACTIONS, ...SERVICE_ITEMS, ...BRAND_ITEMS, ...PAGES];
 const GROUP_ORDER = ["Actions", "Services", "Brands", "Pages"];
 
-export function SearchTrigger({ variant = "pill" }: { variant?: "pill" | "icon" }) {
+export function SearchTrigger({
+  variant = "pill",
+  className,
+}: {
+  variant?: "pill" | "icon";
+  className?: string;
+}) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -74,19 +80,25 @@ export function SearchTrigger({ variant = "pill" }: { variant?: "pill" | "icon" 
   return (
     <>
       {variant === "pill" ? (
+        /* Shown on phones (where it fills the gap between logo and actions) and
+           again at xl. Hidden only in the lg–xl band, where the nav links take
+           that space and the icon-only trigger stands in. */
         <button
           onClick={() => setOpen(true)}
-          className="group hidden items-center gap-2 rounded-full border border-border-strong/60 bg-surface/50 px-4 py-2 text-sm text-muted transition-colors hover:border-ink/30 hover:text-ink xl:inline-flex"
+          className={cn(
+            "group flex min-w-0 items-center gap-2 rounded-full border border-border-strong/60 bg-surface/50 px-3 py-2 text-sm text-muted transition-colors hover:border-ink/30 hover:text-ink lg:hidden xl:flex xl:px-4",
+            className,
+          )}
           aria-label="Search"
         >
-          <Search className="size-4" />
-          <span className="pr-2">Search services…</span>
+          <Search className="size-4 shrink-0" />
+          <span className="truncate text-left">Search services…</span>
         </button>
       ) : (
         <button
           onClick={() => setOpen(true)}
           aria-label="Search"
-          className="grid size-9 shrink-0 place-items-center rounded-full glass text-ink sm:size-10 xl:hidden"
+          className="hidden size-10 shrink-0 place-items-center rounded-full glass text-ink lg:grid xl:hidden"
         >
           <Search className="size-4" />
         </button>
