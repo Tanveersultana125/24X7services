@@ -83,6 +83,40 @@ export function MostBooked() {
     el.scrollBy({ left: dir * step, behavior: "smooth" });
   };
 
+  /**
+   * Drag-to-swipe for pointers. Touch already swipes natively, so this only
+   * takes over for a mouse — grabbing the strip and pulling it sideways.
+   */
+  const drag = useRef({ active: false, startX: 0, startLeft: 0, moved: 0 });
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (e.pointerType === "touch") return;
+    const el = scroller.current;
+    if (!el) return;
+    drag.current = { active: true, startX: e.clientX, startLeft: el.scrollLeft, moved: 0 };
+  };
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    const el = scroller.current;
+    if (!el || !drag.current.active) return;
+    const dx = e.clientX - drag.current.startX;
+    drag.current.moved = Math.max(drag.current.moved, Math.abs(dx));
+    el.scrollLeft = drag.current.startLeft - dx;
+  };
+
+  const endDrag = () => {
+    drag.current.active = false;
+  };
+
+  // A drag that ends on a card would otherwise open it — swallow that click.
+  const onClickCapture = (e: React.MouseEvent) => {
+    if (drag.current.moved > 6) {
+      e.preventDefault();
+      e.stopPropagation();
+      drag.current.moved = 0;
+    }
+  };
+
   return (
     <section id="most-booked" className="relative scroll-mt-28 pb-10 pt-2 sm:pb-14 sm:pt-4">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
@@ -139,7 +173,16 @@ export function MostBooked() {
           <div
             ref={scroller}
             onScroll={update}
-            className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            /* Lenis owns touch scrolling globally; without this it swallows a
+               horizontal swipe and the strip never moves on a phone. */
+            data-lenis-prevent
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={endDrag}
+            onPointerCancel={endDrag}
+            onPointerLeave={endDrag}
+            onClickCapture={onClickCapture}
+            className="flex cursor-grab snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] active:cursor-grabbing [&::-webkit-scrollbar]:hidden"
           >
           {CARDS.map((c, i) => (
             <motion.div

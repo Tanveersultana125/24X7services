@@ -129,7 +129,8 @@ export function Testimonials({ reviews }: { reviews?: ReviewCard[] }) {
         <div
           ref={trackRef}
           onScroll={onScroll}
-          className="mt-12 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          data-lenis-prevent
+          className="mt-12 flex snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {items.map((r, idx) => (
             <article

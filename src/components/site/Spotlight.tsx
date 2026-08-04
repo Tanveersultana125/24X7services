@@ -78,7 +78,8 @@ export function Spotlight() {
           <div
             ref={scroller}
             onScroll={update}
-            className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            data-lenis-prevent
+            className="flex snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {SPOTS.map((s) => (
               <Link

@@ -221,7 +221,7 @@ export function Dashboard({
           right-edge fade is the only thing telling you there's more than
           "Warranty" over there; without it those tabs are invisible. */}
       <div ref={tabsRef} className="relative mt-10 scroll-mt-24 border-b border-border">
-        <div className="flex gap-1 overflow-x-auto no-scrollbar">
+        <div data-lenis-prevent className="flex gap-1 overflow-x-auto overscroll-x-contain no-scrollbar">
           {TABS.map((t) => (
             <button
               key={t}

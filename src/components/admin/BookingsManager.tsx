@@ -130,7 +130,7 @@ export function BookingsManager({ initial }: { initial: Booking[] }) {
       </div>
 
       {/* table — lg and up, where the columns actually fit */}
-      <div className="hidden overflow-x-auto rounded-2xl border border-border bg-surface shadow-premium-sm lg:block">
+      <div data-lenis-prevent className="hidden overflow-x-auto overscroll-x-contain rounded-2xl border border-border bg-surface shadow-premium-sm lg:block">
         <table className="w-full min-w-[46rem] text-sm">
           <thead>
             <tr className="border-b border-hairline text-left text-xs uppercase tracking-wider text-muted">
