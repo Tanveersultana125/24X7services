@@ -132,12 +132,13 @@ export function MostBooked() {
             <ChevronRight className="size-4" />
           </button>
 
-          {/* The side padding on phones is the arrows' lane: one card fills the
-              space between them, so nothing sits on top of the photo. */}
+          {/* Margins, not padding: the scroller is exactly one card wide on a
+              phone, so it clips the neighbours instead of letting them peek
+              into the arrows' lane. */}
           <div
             ref={scroller}
             onScroll={update}
-            className="flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-px-11 px-11 pb-4 [scrollbar-width:none] sm:scroll-px-0 sm:px-0 [&::-webkit-scrollbar]:hidden"
+            className="mx-11 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 [scrollbar-width:none] sm:mx-0 [&::-webkit-scrollbar]:hidden"
           >
           {CARDS.map((c, i) => (
             <motion.div
