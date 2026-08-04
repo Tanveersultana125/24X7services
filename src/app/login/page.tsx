@@ -30,7 +30,9 @@ export default async function LoginPage({
           style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)", backgroundSize: "56px 56px" }}
         />
         <div className="relative [&_*]:text-white">
-          <Logo />
+          <Link href="/" aria-label="24X7 Services — home" className="inline-block">
+            <Logo />
+          </Link>
         </div>
 
         <div className="relative">
@@ -56,7 +58,9 @@ export default async function LoginPage({
             <ArrowLeft className="size-4" /> Home
           </Link>
           <div className="flex items-center gap-3 lg:hidden">
-            <Logo showWord={false} />
+            <Link href="/" aria-label="24X7 Services — home">
+              <Logo showWord={false} />
+            </Link>
           </div>
           <ThemeToggle />
         </div>

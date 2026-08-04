@@ -109,7 +109,11 @@ export function SiteNav() {
             className="fixed inset-0 z-[60] bg-background lg:hidden"
           >
             <div className="flex items-center justify-between px-6 py-5">
-              <Logo />
+              {/* the drawer's logo has to go home and close the drawer — as a
+                  bare <Logo /> it looked tappable but did nothing */}
+              <Link href="/" aria-label="24X7 Services — home" onClick={() => setOpen(false)}>
+                <Logo />
+              </Link>
               <button onClick={() => setOpen(false)} aria-label="Close" className="grid size-10 place-items-center rounded-full glass">
                 <X className="size-5" />
               </button>

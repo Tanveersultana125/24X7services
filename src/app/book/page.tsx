@@ -41,7 +41,9 @@ export default async function BookPage({
           <Link href="/" className="flex items-center gap-2 text-sm font-medium text-muted transition-colors hover:text-foreground">
             <ArrowLeft className="size-4" /> <span className="hidden sm:inline">Home</span>
           </Link>
-          <Logo />
+          <Link href="/" aria-label="24X7 Services — home">
+            <Logo />
+          </Link>
           <ThemeToggle />
         </div>
       </header>

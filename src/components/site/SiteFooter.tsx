@@ -41,7 +41,9 @@ export function SiteFooter() {
       <div className="mx-auto max-w-[92rem] px-6 py-16 sm:px-10">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_2.6fr]">
           <div>
-            <Logo />
+            <Link href="/" aria-label="24X7 Services — home" className="inline-block">
+              <Logo />
+            </Link>
             <p className="mt-5 max-w-xs text-pretty text-sm leading-relaxed text-muted">
               Telangana&apos;s premium doorstep appliance service. Certified experts, genuine
               parts, and a warranty on every repair — 24×7.
