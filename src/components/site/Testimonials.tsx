@@ -68,7 +68,10 @@ export function Testimonials({ reviews }: { reviews?: ReviewCard[] }) {
   const nudge = (dir: -1 | 1) => {
     const el = trackRef.current;
     if (!el) return;
-    el.scrollBy({ left: dir * el.clientWidth, behavior: "smooth" });
+    // step by a card plus the gap, so each press lands on a snap point
+    const card = el.querySelector<HTMLElement>("[data-card]");
+    const step = card ? card.offsetWidth + 20 : el.clientWidth;
+    el.scrollBy({ left: dir * step, behavior: "smooth" });
   };
 
   return (
@@ -125,17 +128,35 @@ export function Testimonials({ reviews }: { reviews?: ReviewCard[] }) {
           </div>
         </div>
 
-        {/* cards */}
+        {/* cards — one between the arrows on phones, like the other carousels */}
+        <div className="relative mt-12">
+          <button
+            onClick={() => nudge(-1)}
+            aria-label="Previous reviews"
+            className="absolute -left-1 top-1/2 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:left-0 sm:size-10 sm:-translate-x-1/2"
+          >
+            <ArrowLeft className="size-4" />
+          </button>
+          <button
+            onClick={() => nudge(1)}
+            aria-label="More reviews"
+            className="absolute -right-1 top-1/2 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:right-0 sm:size-10 sm:translate-x-1/2"
+          >
+            <ArrowRight className="size-4" />
+          </button>
+
+          <div className="mx-9 overflow-hidden sm:mx-0 sm:overflow-visible">
         <div
           ref={trackRef}
           onScroll={onScroll}
           data-lenis-prevent
-          className="mt-12 flex snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {items.map((r, idx) => (
             <article
               key={`${r.name}-${idx}`}
-              className="flex min-h-full shrink-0 basis-[86%] snap-start flex-col rounded-[1.5rem] border border-border bg-surface p-6 shadow-premium-sm sm:basis-[47%] lg:basis-[calc(33.333%-0.834rem)]"
+              data-card
+              className="flex min-h-full shrink-0 basis-full snap-start flex-col rounded-[1.5rem] border border-border bg-surface p-6 shadow-premium-sm sm:basis-[47%] lg:basis-[calc(33.333%-0.834rem)]"
             >
               <header className="flex items-center gap-3">
                 <span
@@ -185,36 +206,20 @@ export function Testimonials({ reviews }: { reviews?: ReviewCard[] }) {
             </article>
           ))}
         </div>
-
-        {/* controls */}
-        <div className="mt-8 flex items-center justify-center gap-5">
-          <button
-            onClick={() => nudge(-1)}
-            aria-label="Previous reviews"
-            className="grid size-9 place-items-center rounded-full border border-border text-muted transition-colors hover:border-border-strong hover:text-ink"
-          >
-            <ArrowLeft className="size-4" />
-          </button>
-
-          <div className="flex items-center gap-1.5">
-            {Array.from({ length: pages }).map((_, i) => (
-              <span
-                key={i}
-                className={cn(
-                  "h-1.5 rounded-full transition-all duration-300",
-                  i === page ? "w-5 bg-royal-bright" : "w-1.5 bg-border-strong"
-                )}
-              />
-            ))}
           </div>
+        </div>
 
-          <button
-            onClick={() => nudge(1)}
-            aria-label="More reviews"
-            className="grid size-9 place-items-center rounded-full border border-border text-muted transition-colors hover:border-border-strong hover:text-ink"
-          >
-            <ArrowRight className="size-4" />
-          </button>
+        {/* position dots — the arrows now live beside the cards */}
+        <div className="mt-8 flex items-center justify-center gap-1.5">
+          {Array.from({ length: pages }).map((_, i) => (
+            <span
+              key={i}
+              className={cn(
+                "h-1.5 rounded-full transition-all duration-300",
+                i === page ? "w-5 bg-royal-bright" : "w-1.5 bg-border-strong"
+              )}
+            />
+          ))}
         </div>
       </div>
     </section>
