@@ -9,9 +9,9 @@
     "start": "next start",
     "lint": "eslint"
   },
-  "//engines": "firebase-admin@14 requires Node >= 22. On an older runtime it fails to load, so every route that touches it (auth, /book, /dashboard, admin) returns a 500 while prerendered pages keep working. Hosts read this field to pick the runtime.",
+  "//engines": "firebase-admin@14 requires Node >= 22. On an older runtime it fails to load and every route that touches it (auth, /book, /dashboard, admin) returns an empty 500, while prerendered pages keep working. Written as '22.x' because Vercel matches its documented major-version form and ignored the '>=22.0.0' range.",
   "engines": {
-    "node": ">=22.0.0"
+    "node": "22.x"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
