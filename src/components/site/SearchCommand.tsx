@@ -86,7 +86,7 @@ export function SearchTrigger({ variant = "pill" }: { variant?: "pill" | "icon" 
         <button
           onClick={() => setOpen(true)}
           aria-label="Search"
-          className="grid size-10 place-items-center rounded-full glass text-ink xl:hidden"
+          className="grid size-9 shrink-0 place-items-center rounded-full glass text-ink sm:size-10 xl:hidden"
         >
           <Search className="size-4" />
         </button>

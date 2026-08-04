@@ -17,7 +17,7 @@ export function ThemeToggle() {
       type="button"
       aria-label="Toggle dark mode"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="relative grid size-10 place-items-center rounded-full glass text-foreground transition-colors hover:bg-surface"
+      className="relative grid size-9 shrink-0 place-items-center rounded-full glass text-foreground transition-colors hover:bg-surface sm:size-10"
     >
       <AnimatePresence mode="wait" initial={false}>
         {mounted && (

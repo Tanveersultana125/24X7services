@@ -11,9 +11,11 @@ export function Logo({ className, showWord = true }: { className?: string; showW
       {showWord && (
         <span className="whitespace-nowrap text-[1.05rem] font-bold tracking-tight">
           24<span className="text-primary">X</span>7
-          {/* the trailing word is the first thing to go on a narrow phone —
-              the mark plus "24X7" still reads, and the nav stops overflowing */}
-          <span className="ml-1 hidden font-medium text-muted min-[400px]:inline">Services</span>
+          {/* Phones get the mark plus "24X7" only. The full wordmark plus three
+              action buttons doesn't reliably fit a narrow screen — and it fits
+              even less once the reader has bumped up their default text size,
+              which a px-based breakpoint can't account for. */}
+          <span className="ml-1 hidden font-medium text-muted sm:inline">Services</span>
         </span>
       )}
     </span>

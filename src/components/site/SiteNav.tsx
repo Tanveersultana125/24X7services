@@ -40,8 +40,10 @@ export function SiteNav() {
             the viewport even when the logo and every action are on screen */}
         <nav className="flex w-full min-w-0 max-w-6xl items-center gap-2 rounded-full border border-border/70 bg-surface/70 py-2.5 pl-3.5 pr-2.5 shadow-premium-sm backdrop-blur-xl sm:gap-3 sm:pl-5">
 
-          <Link href="/" aria-label="24X7 Services" className="shrink-0">
-            <Logo />
+          {/* min-w-0 + truncate is the last line of defence: if the wordmark
+              still can't fit, it clips instead of pushing the buttons off-screen */}
+          <Link href="/" aria-label="24X7 Services" className="min-w-0 shrink overflow-hidden">
+            <Logo className="min-w-0 [&>span:last-child]:truncate" />
           </Link>
 
           <div className="hidden min-w-0 flex-1 items-center justify-center gap-1 lg:flex">
@@ -84,7 +86,7 @@ export function SiteNav() {
             <button
               onClick={() => setOpen(true)}
               aria-label="Open menu"
-              className="grid size-10 place-items-center rounded-full glass lg:hidden"
+              className="grid size-9 shrink-0 place-items-center rounded-full glass sm:size-10 lg:hidden"
             >
               <Menu className="size-5" />
             </button>
