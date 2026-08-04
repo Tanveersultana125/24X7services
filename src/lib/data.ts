@@ -128,13 +128,19 @@ export const AMC_PLANS: AmcPlan[] = [
   },
 ];
 
+/**
+ * Two-hour visit windows. `endsAt` is the 24-hour end of each window — the
+ * booking flow uses it to grey out windows that have already finished when the
+ * customer picks today. The labels are 12-hour and ambiguous on their own, so
+ * the hours are stored rather than parsed back out.
+ */
 export const TIME_SLOTS = [
-  "08:00 – 10:00",
-  "10:00 – 12:00",
-  "12:00 – 02:00",
-  "02:00 – 04:00",
-  "04:00 – 06:00",
-  "06:00 – 08:00",
+  { label: "08:00 – 10:00", startsAt: 8, endsAt: 10 },
+  { label: "10:00 – 12:00", startsAt: 10, endsAt: 12 },
+  { label: "12:00 – 02:00", startsAt: 12, endsAt: 14 },
+  { label: "02:00 – 04:00", startsAt: 14, endsAt: 16 },
+  { label: "04:00 – 06:00", startsAt: 16, endsAt: 18 },
+  { label: "06:00 – 08:00", startsAt: 18, endsAt: 20 },
 ];
 
 export const PAYMENT_METHODS = [

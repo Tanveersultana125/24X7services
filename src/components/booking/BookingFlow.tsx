@@ -480,33 +480,63 @@ function DateStep({ draft, setDraft }: StepProps) {
 }
 
 function TimeStep({ draft, setDraft }: StepProps) {
+  // The clock is read after mount only — rendering a time-dependent list on the
+  // server and again in the browser would hydrate mismatched.
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => {
+    const tick = () => {
+      const d = new Date();
+      setNow(d.getHours() + d.getMinutes() / 60);
+    };
+    tick();
+    const t = setInterval(tick, 60_000);
+    return () => clearInterval(t);
+  }, []);
+
+  const isToday = draft.date === "Today";
+  /** A window is gone once it has finished — the one running right now is still bookable. */
+  const hasPassed = (endsAt: number) => isToday && now !== null && now >= endsAt;
+
+  // If today gets picked while a now-past window was selected, drop it rather
+  // than carrying an unbookable slot into the summary.
+  useEffect(() => {
+    if (!draft.slot) return;
+    const chosen = TIME_SLOTS.find((s) => s.label === draft.slot);
+    if (chosen && hasPassed(chosen.endsAt)) setDraft((s) => ({ ...s, slot: undefined }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draft.slot, draft.date, now]);
+
   return (
     <div>
       <StepTitle title="Choose a time slot" hint={`For ${draft.date ?? "your selected date"}.`} />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {TIME_SLOTS.map((slot, i) => {
-          const selected = draft.slot === slot;
+          const selected = draft.slot === slot.label;
           const soldOut = i === 2;
+          const passed = hasPassed(slot.endsAt);
+          const disabled = soldOut || passed;
           return (
             <button
-              key={slot}
-              disabled={soldOut}
-              onClick={() => setDraft((s) => ({ ...s, slot }))}
+              key={slot.label}
+              disabled={disabled}
+              onClick={() => setDraft((s) => ({ ...s, slot: slot.label }))}
               aria-pressed={selected}
               className={cn(
                 "flex items-center justify-between rounded-2xl border-2 p-4 transition-all",
-                soldOut && "cursor-not-allowed opacity-40",
+                disabled && "cursor-not-allowed opacity-40",
                 selected
                   ? "border-primary bg-primary text-white shadow-premium-md ring-2 ring-primary/25"
-                  : "border-border bg-surface hover:border-border-strong hover:-translate-y-0.5"
+                  : "border-border bg-surface",
+                !disabled && !selected && "hover:border-border-strong hover:-translate-y-0.5"
               )}
             >
               <span className="flex items-center gap-2.5 font-medium">
                 <Clock className={cn("size-5", selected ? "text-white" : "text-muted")} />
-                {slot}
+                {slot.label}
               </span>
               {selected && <CheckCircle2 className="size-5" />}
               {soldOut && <span className="text-xs font-semibold text-danger">Full</span>}
+              {passed && !soldOut && <span className="text-xs font-semibold text-muted">Passed</span>}
             </button>
           );
         })}
