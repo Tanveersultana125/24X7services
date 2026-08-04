@@ -13,6 +13,10 @@
   "engines": {
     "node": "22.x"
   },
+  "//overrides": "firebase-admin -> jwks-rsa does `require('jose')`, but jose@6 is ESM-only. That require only works on runtimes with require(esm) enabled: it loads on Node 24 locally and throws ERR_REQUIRE_ESM on Vercel, taking down firebase-admin/auth and every route behind it. jose@5 ships a CJS build and still exports the two functions jwks-rsa uses (importJWK, exportSPKI). Remove once jwks-rsa imports jose asynchronously.",
+  "overrides": {
+    "jose": "^5.10.0"
+  },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "clsx": "^2.1.1",
