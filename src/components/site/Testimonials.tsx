@@ -133,19 +133,19 @@ export function Testimonials({ reviews }: { reviews?: ReviewCard[] }) {
           <button
             onClick={() => nudge(-1)}
             aria-label="Previous reviews"
-            className="absolute -left-1 top-1/2 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:left-0 sm:size-10 sm:-translate-x-1/2"
+            className="absolute -left-1 top-1/2 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:left-0 sm:size-10"
           >
             <ArrowLeft className="size-4" />
           </button>
           <button
             onClick={() => nudge(1)}
             aria-label="More reviews"
-            className="absolute -right-1 top-1/2 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:right-0 sm:size-10 sm:translate-x-1/2"
+            className="absolute -right-1 top-1/2 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:right-0 sm:size-10"
           >
             <ArrowRight className="size-4" />
           </button>
 
-          <div className="mx-9 overflow-hidden sm:mx-0 sm:overflow-visible">
+          <div className="mx-9 overflow-hidden sm:mx-12">
         <div
           ref={trackRef}
           onScroll={onScroll}
@@ -156,7 +156,9 @@ export function Testimonials({ reviews }: { reviews?: ReviewCard[] }) {
             <article
               key={`${r.name}-${idx}`}
               data-card
-              className="flex min-h-full shrink-0 basis-full snap-start flex-col rounded-[1.5rem] border border-border bg-surface p-6 shadow-premium-sm sm:basis-[47%] lg:basis-[calc(33.333%-0.834rem)]"
+              /* exact fractions of the visible strip (gap-5 = 1.25rem), so a
+                 row holds 1 / 2 / 3 cards with none half-shown */
+              className="flex min-h-full shrink-0 basis-full snap-start flex-col rounded-[1.5rem] border border-border bg-surface p-6 shadow-premium-sm sm:basis-[calc((100%-1.25rem)/2)] lg:basis-[calc((100%-2.5rem)/3)]"
             >
               <header className="flex items-center gap-3">
                 <span
