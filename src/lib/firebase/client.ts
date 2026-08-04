@@ -61,6 +61,45 @@ export function getFirebaseAuth(): Auth {
   return getAuth(app);
 }
 
+/**
+ * What actually went wrong in `signInWithPopup`, per Firebase error code.
+ *
+ * These fail before the app's own server is involved, so the server logs stay
+ * empty — without naming the code here there is nothing to go on.
+ * `hint` is for the console (what to go fix); `message` is for the visitor.
+ */
+const POPUP_ERRORS: Record<string, { message: string; hint: string }> = {
+  "auth/unauthorized-domain": {
+    message: "Sign-in isn't allowed from this domain yet. Please contact support.",
+    hint:
+      "Add this site's domain in Firebase Console → Authentication → Settings → " +
+      "Authorized domains. localhost is allowed by default, which is why this only " +
+      "shows up once deployed.",
+  },
+  "auth/operation-not-allowed": {
+    message: "Google sign-in isn't enabled. Please contact support.",
+    hint: "Enable it in Firebase Console → Authentication → Sign-in method → Google.",
+  },
+  "auth/invalid-api-key": {
+    message: "Sign-in is misconfigured. Please contact support.",
+    hint: "NEXT_PUBLIC_FIREBASE_API_KEY is wrong for this Firebase project.",
+  },
+  "auth/network-request-failed": {
+    message: "We couldn't reach Google. Check your connection and try again.",
+    hint: "Network error, or an extension/ad-blocker blocked the Firebase request.",
+  },
+};
+
+/** Visitor-facing text plus a console hint for a popup sign-in failure. */
+export function describePopupError(code: string): { message: string; hint: string } {
+  return (
+    POPUP_ERRORS[code] ?? {
+      message: "Google sign-in failed. Please try again.",
+      hint: `Unhandled Firebase auth code: ${code || "(none)"}.`,
+    }
+  );
+}
+
 export function createGoogleProvider() {
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ prompt: "select_account" });

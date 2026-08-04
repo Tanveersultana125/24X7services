@@ -10,6 +10,7 @@ import {
   createGoogleProvider,
   firebaseConfigured,
   logFirebaseConfigProblem,
+  describePopupError,
 } from "@/lib/firebase/client";
 
 function GoogleG({ className }: { className?: string }) {
@@ -85,7 +86,9 @@ export function AdminLoginForm() {
       } else if (code === "auth/popup-blocked") {
         setError("Your browser blocked the sign-in popup. Please allow popups and try again.");
       } else {
-        setError("Google sign-in failed. Please try again.");
+        const { message, hint } = describePopupError(code);
+        console.warn(`[24X7] admin login: Google popup failed — ${code || "no code"}. ${hint}`);
+        setError(message);
       }
       setLoading(false);
     }
