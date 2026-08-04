@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { SiteNav } from "@/components/site/SiteNav";
+import { SiteFooter } from "@/components/site/SiteFooter";
 import { Dashboard } from "@/components/dashboard/Dashboard";
 import { getCustomerSession } from "@/lib/customer/auth";
 import { listCustomerBookings } from "@/lib/bookings";
@@ -29,13 +30,16 @@ export default async function DashboardPage() {
           dashboard scroll sideways on a phone */}
       {/* pb clears the fixed chat button (bottom-5 + size-14) so it never
           sits on top of the last card */}
-      <main className="mx-auto max-w-6xl overflow-x-clip px-5 pt-28 pb-28 sm:pt-32 sm:pb-20">
+      {/* flex-1 + footer, same as every other page: without them a short
+          dashboard trails off into a screenful of empty background */}
+      <main className="mx-auto w-full max-w-6xl flex-1 overflow-x-clip px-5 pt-28 pb-16 sm:pt-32">
         <Dashboard
           user={user}
           bookings={bookings}
           reviewedBookingIds={reviews.map((r) => r.bookingId)}
         />
       </main>
+      <SiteFooter />
     </>
   );
 }
