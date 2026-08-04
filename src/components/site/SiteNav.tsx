@@ -38,7 +38,7 @@ export function SiteNav() {
       >
         {/* min-w-0 + a tighter left inset on phones: the pill has to stay inside
             the viewport even when the logo and every action are on screen */}
-        <nav className="flex w-full min-w-0 max-w-6xl items-center gap-2 rounded-full border border-border/70 bg-surface/70 py-2.5 pl-3.5 pr-2.5 shadow-premium-sm backdrop-blur-xl sm:gap-3 sm:pl-5">
+        <nav className="flex w-full min-w-0 max-w-6xl items-center gap-2 rounded-full border border-border/70 bg-surface/70 py-2 pl-3 pr-2 shadow-premium-sm backdrop-blur-xl sm:gap-3 sm:py-2.5 sm:pl-5 sm:pr-2.5">
 
           {/* min-w-0 + truncate is the last line of defence: if the wordmark
               still can't fit, it clips instead of pushing the buttons off-screen.
