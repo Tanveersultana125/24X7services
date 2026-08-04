@@ -29,7 +29,7 @@ export default async function DashboardPage() {
           dashboard scroll sideways on a phone */}
       {/* pb clears the fixed chat button (bottom-5 + size-14) so it never
           sits on top of the last card */}
-      <main className="mx-auto max-w-6xl overflow-x-clip px-4 pt-24 pb-28 sm:px-5 sm:pt-32 sm:pb-20">
+      <main className="mx-auto max-w-6xl overflow-x-clip px-5 pt-28 pb-28 sm:pt-32 sm:pb-20">
         <Dashboard
           user={user}
           bookings={bookings}

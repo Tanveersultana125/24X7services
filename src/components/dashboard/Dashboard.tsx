@@ -131,24 +131,24 @@ export function Dashboard({
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
         {/* min-w-0 + truncate: without it a long email can't shrink and pushes
             the whole page into a horizontal scroll on phones */}
-        <div className="flex min-w-0 items-center gap-3.5 sm:gap-4">
+        <div className="flex min-w-0 items-center gap-4">
           {user?.picture ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={user.picture}
               alt=""
               referrerPolicy="no-referrer"
-              className="size-12 shrink-0 rounded-2xl object-cover shadow-premium-md sm:size-14"
+              className="size-14 shrink-0 rounded-2xl object-cover shadow-premium-md"
             />
           ) : (
-            <div className="grid size-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary to-secondary text-lg font-bold text-white shadow-premium-md sm:size-14">
+            <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary to-secondary text-lg font-bold text-white shadow-premium-md">
               {initials(name)}
             </div>
           )}
           <div className="min-w-0">
-            <p className="text-sm text-muted">Welcome back,</p>
-            <h1 className="truncate text-xl font-extrabold tracking-tight sm:text-3xl">{name}</h1>
-            {user?.email && <p className="truncate text-sm text-muted">{user.email}</p>}
+            <p className="text-[0.8rem] text-muted">Welcome back,</p>
+            <h1 className="mt-0.5 truncate text-[1.4rem] font-extrabold leading-tight tracking-tight sm:text-3xl">{name}</h1>
+            {user?.email && <p className="mt-0.5 truncate text-[0.8rem] text-muted">{user.email}</p>}
           </div>
         </div>
         {/* Both actions share the row evenly on phones. `min-w-0` matters:
@@ -177,14 +177,14 @@ export function Dashboard({
           <motion.div
             key={s.label}
             variants={staggerItem}
-            className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-3.5 shadow-premium-sm sm:block sm:rounded-3xl sm:p-5"
+            className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-4 shadow-premium-sm sm:block sm:rounded-3xl sm:p-5"
           >
-            <div className={cn("grid size-10 shrink-0 place-items-center rounded-xl sm:size-11 sm:rounded-2xl", s.tint)}>
+            <div className={cn("grid size-11 shrink-0 place-items-center rounded-xl sm:rounded-2xl", s.tint)}>
               <s.icon className="size-5" />
             </div>
             <div className="min-w-0 sm:mt-4">
-              <p className="text-lg font-bold leading-tight tracking-tight sm:text-2xl">{s.value}</p>
-              <p className="truncate text-[0.78rem] text-muted sm:text-sm">{s.label}</p>
+              <p className="text-xl font-bold leading-tight tracking-tight sm:text-2xl">{s.value}</p>
+              <p className="mt-0.5 truncate text-[0.8rem] text-muted sm:text-sm">{s.label}</p>
             </div>
           </motion.div>
         ))}
@@ -230,7 +230,7 @@ export function Dashboard({
               }}
               onClick={() => setTab(t)}
               className={cn(
-                "relative whitespace-nowrap px-3.5 py-3 text-sm font-semibold transition-colors sm:px-4",
+                "relative whitespace-nowrap px-4 py-3.5 text-sm font-semibold transition-colors",
                 tab === t ? "text-primary" : "text-muted hover:text-foreground"
               )}
             >
@@ -433,8 +433,8 @@ export function Dashboard({
           href="/#services"
           className="group flex items-center gap-3 rounded-2xl border border-border bg-surface p-4 shadow-premium-sm transition-all hover:-translate-y-0.5 hover:shadow-premium-md"
         >
-          <div className="grid size-10 place-items-center rounded-xl bg-surface-2 text-primary"><Heart className="size-5" /></div>
-          <span className="font-medium">Favourite services</span>
+          <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-surface-2 text-primary"><Heart className="size-5" /></div>
+          <span className="min-w-0 truncate font-medium">Favourite services</span>
           <ChevronRight className="ml-auto size-4 text-muted transition-transform group-hover:translate-x-0.5" />
         </Link>
 
@@ -450,8 +450,8 @@ export function Dashboard({
             }}
             className="group flex items-center gap-3 rounded-2xl border border-border bg-surface p-4 text-left shadow-premium-sm transition-all hover:-translate-y-0.5 hover:shadow-premium-md"
           >
-            <div className="grid size-10 place-items-center rounded-xl bg-surface-2 text-primary"><q.icon className="size-5" /></div>
-            <span className="font-medium">{q.label}</span>
+            <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-surface-2 text-primary"><q.icon className="size-5" /></div>
+            <span className="min-w-0 truncate font-medium">{q.label}</span>
             <ChevronRight className="ml-auto size-4 text-muted transition-transform group-hover:translate-x-0.5" />
           </button>
         ))}
