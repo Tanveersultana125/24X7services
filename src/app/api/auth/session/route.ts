@@ -5,8 +5,27 @@ import {
   projectMismatch,
   describeAuthError,
 } from "@/lib/firebase/admin";
-import { CUSTOMER_COOKIE, SESSION_MAX_AGE, sessionCookieOptions } from "@/lib/customer/auth";
+import {
+  CUSTOMER_COOKIE,
+  SESSION_MAX_AGE,
+  sessionCookieOptions,
+  getCustomerSession,
+} from "@/lib/customer/auth";
 import { upsertCustomer } from "@/lib/bookings";
+
+/**
+ * Who is signed in, for Client Components that can't read the httpOnly cookie.
+ *
+ * The nav lives on statically prerendered pages, so it asks here after
+ * hydration rather than forcing every one of those pages to render per-request.
+ */
+export async function GET() {
+  const user = await getCustomerSession().catch(() => null);
+  return NextResponse.json(
+    { user: user ? { name: user.name, email: user.email, picture: user.picture } : null },
+    { headers: { "Cache-Control": "no-store" } },
+  );
+}
 
 /**
  * Exchange a freshly-minted Firebase ID token for an httpOnly session cookie.

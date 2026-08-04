@@ -4,10 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, Menu, X, UserRound, ChevronRight } from "lucide-react";
+import { ArrowUpRight, Menu, X, UserRound, ChevronRight, LogOut } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { Logo } from "@/components/ui/Logo";
 import { SearchTrigger } from "./SearchCommand";
+import { AccountMenu, Avatar, LogOutForm, useSession } from "./AccountMenu";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
@@ -21,6 +22,7 @@ const LINKS = [
 export function SiteNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const user = useSession();
 
   useEffect(() => {
     document.documentElement.style.overflow = open ? "hidden" : "";
@@ -69,13 +71,7 @@ export function SiteNav() {
             <SearchTrigger variant="pill" />
             <SearchTrigger variant="icon" />
             <ThemeToggle />
-            <Link
-              href="/login"
-              className="hidden items-center gap-1.5 rounded-full px-3.5 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-surface-2 lg:inline-flex"
-            >
-              <UserRound className="size-4" />
-              Log in
-            </Link>
+            <AccountMenu />
             <Link
               href="/book"
               className="group hidden items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-background transition-transform hover:scale-[1.02] sm:inline-flex"
@@ -134,13 +130,33 @@ export function SiteNav() {
                 >
                   Book a service <ArrowUpRight className="size-5" />
                 </Link>
-                <Link
-                  href="/login"
-                  onClick={() => setOpen(false)}
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-border-strong text-[0.95rem] font-medium text-ink"
-                >
-                  <UserRound className="size-5" /> Log in
-                </Link>
+                {user ? (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setOpen(false)}
+                      className="inline-flex h-12 items-center justify-center gap-2.5 rounded-full border border-border-strong text-[0.95rem] font-medium text-ink"
+                    >
+                      <Avatar user={user} className="size-6" /> My dashboard
+                    </Link>
+                    <LogOutForm>
+                      <button
+                        type="submit"
+                        className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full text-[0.95rem] font-medium text-danger transition-colors hover:bg-danger/10"
+                      >
+                        <LogOut className="size-5" /> Log out
+                      </button>
+                    </LogOutForm>
+                  </>
+                ) : (
+                  <Link
+                    href="/login"
+                    onClick={() => setOpen(false)}
+                    className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-border-strong text-[0.95rem] font-medium text-ink"
+                  >
+                    <UserRound className="size-5" /> Log in
+                  </Link>
+                )}
               </div>
             </div>
           </motion.div>
