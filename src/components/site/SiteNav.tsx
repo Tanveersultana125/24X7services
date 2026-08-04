@@ -41,8 +41,10 @@ export function SiteNav() {
         <nav className="flex w-full min-w-0 max-w-6xl items-center gap-2 rounded-full border border-border/70 bg-surface/70 py-2.5 pl-3.5 pr-2.5 shadow-premium-sm backdrop-blur-xl sm:gap-3 sm:pl-5">
 
           {/* min-w-0 + truncate is the last line of defence: if the wordmark
-              still can't fit, it clips instead of pushing the buttons off-screen */}
-          <Link href="/" aria-label="24X7 Services" className="min-w-0 shrink overflow-hidden">
+              still can't fit, it clips instead of pushing the buttons off-screen.
+              No overflow-hidden here — the mark's status dot sits outside its
+              box and would get shaved off. */}
+          <Link href="/" aria-label="24X7 Services" className="min-w-0 shrink">
             <Logo className="min-w-0 [&>span:last-child]:truncate" />
           </Link>
 
