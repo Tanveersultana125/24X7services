@@ -177,13 +177,15 @@ export function Dashboard({
           <motion.div
             key={s.label}
             variants={staggerItem}
-            className="rounded-2xl border border-border bg-surface p-4 shadow-premium-sm sm:rounded-3xl sm:p-5"
+            className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-3.5 shadow-premium-sm sm:block sm:rounded-3xl sm:p-5"
           >
-            <div className={cn("grid size-10 place-items-center rounded-xl sm:size-11 sm:rounded-2xl", s.tint)}>
+            <div className={cn("grid size-10 shrink-0 place-items-center rounded-xl sm:size-11 sm:rounded-2xl", s.tint)}>
               <s.icon className="size-5" />
             </div>
-            <p className="mt-3 text-xl font-bold tracking-tight sm:mt-4 sm:text-2xl">{s.value}</p>
-            <p className="text-[0.8rem] leading-snug text-muted sm:text-sm">{s.label}</p>
+            <div className="min-w-0 sm:mt-4">
+              <p className="text-lg font-bold leading-tight tracking-tight sm:text-2xl">{s.value}</p>
+              <p className="truncate text-[0.78rem] text-muted sm:text-sm">{s.label}</p>
+            </div>
           </motion.div>
         ))}
       </StaggerGroup>
@@ -215,21 +217,34 @@ export function Dashboard({
         </div>
       )}
 
-      {/* Tabs */}
-      <div ref={tabsRef} className="mt-10 flex scroll-mt-24 gap-1 overflow-x-auto border-b border-border no-scrollbar">
-        {TABS.map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={cn(
-              "relative whitespace-nowrap px-4 py-3 text-sm font-semibold transition-colors",
-              tab === t ? "text-primary" : "text-muted hover:text-foreground"
-            )}
-          >
-            {t}
-            {tab === t && <motion.span layoutId="dashtab" className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-primary" />}
-          </button>
-        ))}
+      {/* Tabs — seven of these can't fit a phone, so the strip scrolls. The
+          right-edge fade is the only thing telling you there's more than
+          "Warranty" over there; without it those tabs are invisible. */}
+      <div ref={tabsRef} className="relative mt-10 scroll-mt-24 border-b border-border">
+        <div className="flex gap-1 overflow-x-auto no-scrollbar">
+          {TABS.map((t) => (
+            <button
+              key={t}
+              ref={(el) => {
+                if (el && tab === t) el.scrollIntoView({ block: "nearest", inline: "nearest" });
+              }}
+              onClick={() => setTab(t)}
+              className={cn(
+                "relative whitespace-nowrap px-3.5 py-3 text-sm font-semibold transition-colors sm:px-4",
+                tab === t ? "text-primary" : "text-muted hover:text-foreground"
+              )}
+            >
+              {t}
+              {tab === t && <motion.span layoutId="dashtab" className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-primary" />}
+            </button>
+          ))}
+          {/* keeps the last tab clear of the fade */}
+          <span aria-hidden className="w-6 shrink-0 sm:hidden" />
+        </div>
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background to-transparent sm:hidden"
+        />
       </div>
 
       {/* Content */}
@@ -457,8 +472,8 @@ export function Dashboard({
 
 function EmptyState({ label = "No bookings yet." }: { label?: string }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border-strong bg-surface p-12 text-center">
-      <div className="grid size-14 place-items-center rounded-2xl bg-surface-2 text-primary">
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-strong bg-surface px-5 py-10 text-center sm:rounded-3xl sm:p-12">
+      <div className="grid size-13 place-items-center rounded-2xl bg-surface-2 text-primary sm:size-14">
         <Wrench className="size-6" />
       </div>
       <p className="mt-4 font-semibold">{label}</p>
