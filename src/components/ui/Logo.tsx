@@ -9,9 +9,11 @@ export function Logo({ className, showWord = true }: { className?: string; showW
         <span className="absolute -right-0.5 -bottom-0.5 size-3 rounded-full bg-accent ring-2 ring-[var(--surface)]" />
       </span>
       {showWord && (
-        <span className="text-[1.05rem] font-bold tracking-tight">
+        <span className="whitespace-nowrap text-[1.05rem] font-bold tracking-tight">
           24<span className="text-primary">X</span>7
-          <span className="ml-1 font-medium text-muted">Services</span>
+          {/* the trailing word is the first thing to go on a narrow phone —
+              the mark plus "24X7" still reads, and the nav stops overflowing */}
+          <span className="ml-1 hidden font-medium text-muted min-[400px]:inline">Services</span>
         </span>
       )}
     </span>

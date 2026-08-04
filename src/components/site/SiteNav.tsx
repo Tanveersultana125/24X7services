@@ -36,13 +36,15 @@ export function SiteNav() {
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4"
       >
-        <nav className="flex w-full max-w-6xl items-center gap-3 rounded-full border border-border/70 bg-surface/70 py-2.5 pl-5 pr-2.5 shadow-premium-sm backdrop-blur-xl">
+        {/* min-w-0 + a tighter left inset on phones: the pill has to stay inside
+            the viewport even when the logo and every action are on screen */}
+        <nav className="flex w-full min-w-0 max-w-6xl items-center gap-2 rounded-full border border-border/70 bg-surface/70 py-2.5 pl-3.5 pr-2.5 shadow-premium-sm backdrop-blur-xl sm:gap-3 sm:pl-5">
 
           <Link href="/" aria-label="24X7 Services" className="shrink-0">
             <Logo />
           </Link>
 
-          <div className="hidden flex-1 items-center justify-center gap-1 lg:flex">
+          <div className="hidden min-w-0 flex-1 items-center justify-center gap-1 lg:flex">
             {LINKS.map((l) => {
               const active = pathname === l.href;
               return (
@@ -67,7 +69,7 @@ export function SiteNav() {
             })}
           </div>
 
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
             <SearchTrigger variant="pill" />
             <SearchTrigger variant="icon" />
             <ThemeToggle />

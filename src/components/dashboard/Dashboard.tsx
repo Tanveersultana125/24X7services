@@ -151,18 +151,22 @@ export function Dashboard({
             {user?.email && <p className="truncate text-sm text-muted">{user.email}</p>}
           </div>
         </div>
-        {/* both actions share the row evenly on phones instead of hugging left */}
-        <div className="flex shrink-0 items-center gap-2.5">
-          <form action="/api/auth/logout" method="post" className="flex-1 sm:flex-none">
+        {/* Both actions share the row evenly on phones. `min-w-0` matters:
+            without it each button's own text sets a floor it can't shrink past,
+            and the pair pushes off the right edge on a narrow screen. */}
+        <div className="flex w-full items-center gap-2.5 sm:w-auto sm:shrink-0">
+          <form action="/api/auth/logout" method="post" className="min-w-0 flex-1 sm:flex-none">
             <button
               type="submit"
-              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-border-strong px-4 text-sm font-medium text-ink transition-colors hover:bg-surface-2"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-border-strong px-3 text-sm font-medium text-ink transition-colors hover:bg-surface-2 sm:px-4"
             >
-              <LogOut className="size-4" /> Log out
+              <LogOut className="size-4 shrink-0" />
+              <span className="truncate">Log out</span>
             </button>
           </form>
-          <Button href="/book" size="md" className="flex-1 sm:flex-none">
-            <Plus className="size-4" /> New Booking
+          <Button href="/book" size="md" className="min-w-0 flex-1 px-4 sm:flex-none sm:px-6">
+            <Plus className="size-4 shrink-0" />
+            <span className="truncate">New Booking</span>
           </Button>
         </div>
       </div>
