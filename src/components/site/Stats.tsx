@@ -53,20 +53,42 @@ export function Stats() {
   );
 }
 
+/** How long a tap on a dot holds the carousel before it resumes on its own. */
+const RESUME_AFTER = 6000;
+
 function RotatingStat() {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { margin: "-20%" });
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  // Bumped on every tap so a second tap restarts the resume timer, which a
+  // boolean alone can't do — the effect wouldn't re-run while already paused.
+  const [pauseNonce, setPauseNonce] = useState(0);
 
+  // Only advance while the section is actually on screen.
   useEffect(() => {
-    if (paused) return;
+    if (paused || !inView) return;
     const t = setInterval(() => setIndex((i) => (i + 1) % STATS.length), 2800);
     return () => clearInterval(t);
-  }, [paused]);
+  }, [paused, inView]);
+
+  // A tap pauses the rotation; it always starts itself again afterwards.
+  useEffect(() => {
+    if (!paused) return;
+    const t = setTimeout(() => setPaused(false), RESUME_AFTER);
+    return () => clearTimeout(t);
+  }, [paused, pauseNonce]);
+
+  const show = (i: number) => {
+    setIndex(i);
+    setPaused(true);
+    setPauseNonce((n) => n + 1);
+  };
 
   const s = STATS[index];
 
   return (
-    <div className="mt-8 sm:hidden">
+    <div ref={ref} className="mt-8 sm:hidden">
       <div
         className="relative flex min-h-[11rem] items-center overflow-hidden rounded-3xl border border-border bg-surface pl-8 pr-7 shadow-premium-md transition-colors duration-700"
         style={{ borderColor: rgba(s.color, 0.28) }}
@@ -110,13 +132,12 @@ function RotatingStat() {
         {STATS.map((st, i) => (
           <button
             key={st.label}
-            onClick={() => {
-              setIndex(i);
-              setPaused(true);
-            }}
+            type="button"
+            onClick={() => show(i)}
             aria-label={`Show ${st.label}`}
             aria-current={i === index}
-            className="h-1.5 rounded-full transition-all duration-300"
+            /* generous hit area around a 6px dot, without changing how it looks */
+            className="relative h-1.5 rounded-full transition-all duration-300 before:absolute before:-inset-x-1 before:-inset-y-3 before:content-['']"
             style={{
               width: i === index ? "1.5rem" : "0.375rem",
               background: i === index ? st.color : "var(--border)",
