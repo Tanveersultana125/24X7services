@@ -85,12 +85,39 @@ function RotatingStat() {
     setPauseNonce((n) => n + 1);
   };
 
+  const step = (dir: 1 | -1) => show((index + dir + STATS.length) % STATS.length);
+
+  /**
+   * Swipe support. This card isn't a scroll container, so a finger drag did
+   * nothing — the gesture has to be read by hand.
+   */
+  const swipe = useRef({ x: 0, y: 0, active: false });
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    swipe.current = { x: e.clientX, y: e.clientY, active: true };
+  };
+
+  const onPointerUp = (e: React.PointerEvent) => {
+    if (!swipe.current.active) return;
+    swipe.current.active = false;
+    const dx = e.clientX - swipe.current.x;
+    const dy = e.clientY - swipe.current.y;
+    // a mostly-vertical drag is the page scrolling, not a swipe
+    if (Math.abs(dx) < 40 || Math.abs(dx) <= Math.abs(dy)) return;
+    step(dx < 0 ? 1 : -1);
+  };
+
   const s = STATS[index];
 
   return (
     <div ref={ref} className="mt-8 sm:hidden">
       <div
-        className="relative flex min-h-[11rem] items-center overflow-hidden rounded-3xl border border-border bg-surface pl-8 pr-7 shadow-premium-md transition-colors duration-700"
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+        onPointerCancel={() => (swipe.current.active = false)}
+        /* touch-pan-y keeps vertical page scrolling working while we read
+           horizontal drags ourselves */
+        className="relative flex min-h-[11rem] touch-pan-y select-none items-center overflow-hidden rounded-3xl border border-border bg-surface pl-8 pr-7 shadow-premium-md transition-colors duration-700"
         style={{ borderColor: rgba(s.color, 0.28) }}
       >
         {/* left accent bar — always the current stat's colour */}
