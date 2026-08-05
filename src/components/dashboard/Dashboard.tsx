@@ -83,7 +83,19 @@ export function Dashboard({
 }) {
   const [tab, setTab] = useState<(typeof TABS)[number]>(intent === "rate" ? "Bookings" : "Overview");
   const [rated, setRated] = useState<string[]>(reviewedBookingIds);
-  const [reviewing, setReviewing] = useState<ReviewTarget | null>(null);
+  // Arriving from "Rate your service" opens the form on the job waiting to be
+  // rated, so the customer doesn't have to hunt for it among their bookings.
+  const [reviewing, setReviewing] = useState<ReviewTarget | null>(() => {
+    if (intent !== "rate") return null;
+    const next = bookings.find((b) => b.status === "completed" && !reviewedBookingIds.includes(b.id));
+    return next
+      ? {
+          bookingId: next.id,
+          code: next.code,
+          appliance: `${next.brand ? `${next.brand} ` : ""}${next.appliance}`,
+        }
+      : null;
+  });
   const tabsRef = useRef<HTMLDivElement>(null);
   const name = user?.name ?? "there";
 
