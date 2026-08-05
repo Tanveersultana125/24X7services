@@ -34,6 +34,7 @@ export function ReviewsManager({ initial }: { initial: Review[] }) {
   // Deleting is permanent, so the button asks once before it does it.
   const [confirming, setConfirming] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [expired, setExpired] = useState(false);
 
   const shown = rows.filter(
     (r) =>
@@ -41,6 +42,21 @@ export function ReviewsManager({ initial }: { initial: Review[] }) {
       (source === "any" || (source === "verified" ? r.verified : !r.verified)),
   );
   const pendingCount = rows.filter((r) => r.status === "pending").length;
+
+  /**
+   * The generic "try again" hid the one failure that actually happens: an admin
+   * session is good for 8 hours, and a tab left open past that gets a 401 on
+   * every action with no hint that signing in again is all it needs.
+   */
+  const describe = async (res: Response, fallback: string) => {
+    if (res.status === 401) {
+      setExpired(true);
+      return "Your admin session expired.";
+    }
+    const data = await res.json().catch(() => null);
+    const reason = typeof data?.error === "string" ? data.error : null;
+    return reason ? `${fallback} (${reason})` : fallback;
+  };
 
   // Optimistically apply, persist to Firestore, revert on failure.
   const setStatus = async (id: string, status: ReviewStatus) => {
@@ -53,10 +69,13 @@ export function ReviewsManager({ initial }: { initial: Review[] }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status }),
       });
-      if (!res.ok) throw new Error("failed");
+      if (!res.ok) {
+        setRows(prev);
+        setError(await describe(res, "Couldn't save that change."));
+      }
     } catch {
       setRows(prev);
-      setError("Couldn't save that change. Please try again.");
+      setError("Couldn't reach the server. Check your connection and try again.");
     }
   };
 
@@ -71,10 +90,13 @@ export function ReviewsManager({ initial }: { initial: Review[] }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
       });
-      if (!res.ok) throw new Error("failed");
+      if (!res.ok) {
+        setRows(prev);
+        setError(await describe(res, "Couldn't delete that review."));
+      }
     } catch {
       setRows(prev);
-      setError("Couldn't delete that review. Please try again.");
+      setError("Couldn't reach the server. Check your connection and try again.");
     }
   };
 
@@ -122,7 +144,18 @@ export function ReviewsManager({ initial }: { initial: Review[] }) {
       </div>
 
       {error && (
-        <p className="mb-4 rounded-xl bg-danger/10 px-4 py-3 text-sm text-danger">{error}</p>
+        <p className="mb-4 rounded-xl bg-danger/10 px-4 py-3 text-sm text-danger">
+          {error}
+          {expired && (
+            <>
+              {" "}
+              <a href="/admin/login" className="font-semibold underline underline-offset-4">
+                Sign in again
+              </a>{" "}
+              and your change will save.
+            </>
+          )}
+        </p>
       )}
 
       <div className="space-y-3">
