@@ -18,9 +18,11 @@ export function LeaveReviewCta() {
             <h2 className="font-display mt-5 text-[1.9rem] leading-[1.1] tracking-[-0.03em] sm:text-4xl">
               Had a service with us?
             </h2>
+            {/* This used to claim every review is tied to a booking. Anyone can
+                write one now, so the honest line is what actually happens. */}
             <p className="mt-3 text-[0.95rem] leading-relaxed text-muted">
-              Rate any completed job in a minute. Every review here is tied to a real booking —
-              that&apos;s why there are no fakes on this page.
+              It takes a minute — no booking needed. Our team reads every review before it goes up,
+              and reviews written against a completed visit carry a verified mark.
             </p>
           </div>
 

@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Star, CheckCircle2, Loader2 } from "lucide-react";
+import { Star, CheckCircle2, Loader2, BadgeCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /** Kept in step with REVIEW_MIN_LENGTH / REVIEW_MAX_LENGTH in src/lib/reviews.ts. */
 const MIN_LENGTH = 10;
 const MAX_LENGTH = 600;
+const NAME_MIN = 2;
 
 const RATING_LABEL: Record<number, string> = {
   1: "Poor",
@@ -22,6 +23,8 @@ const ERROR_COPY: Record<string, string> = {
   forbidden: "This booking isn't on your account.",
   not_found: "We couldn't find that booking.",
   unauthenticated: "Please log in again to leave a review.",
+  name_required: "Please tell us your name.",
+  rate_limited: "That's a few reviews in a short while — try again a bit later.",
   server_not_configured: "Reviews aren't available right now. Please try later.",
 };
 
@@ -33,17 +36,25 @@ export type ReviewTarget = {
 
 /**
  * The one review form: the dashboard shows it in a dialog, /reviews/new shows
- * it on the page. Both post to /api/reviews, which re-checks ownership and
- * completion server-side.
+ * it on the page.
+ *
+ * With a `target` it reviews that booking and is stored verified. Without one
+ * it's an open review of the service — the visitor says who they are and what
+ * they used us for. Either way /api/reviews re-checks everything and an admin
+ * publishes it.
  */
 export function ReviewForm({
   target,
+  signedInAs,
   onSubmitted,
   onCancel,
   cancelLabel = "Cancel",
   done,
 }: {
-  target: ReviewTarget;
+  /** The booking being reviewed, when there is one. */
+  target?: ReviewTarget;
+  /** Account name of a signed-in customer — reviews are published under it. */
+  signedInAs?: string;
   /** Fired once the review is stored, so a list can flip the row to "Rated". */
   onSubmitted: (bookingId: string) => void;
   onCancel?: () => void;
@@ -54,11 +65,17 @@ export function ReviewForm({
   const [rating, setRating] = useState(5);
   const [hover, setHover] = useState(0);
   const [text, setText] = useState("");
+  const [name, setName] = useState("");
+  const [city, setCity] = useState("");
+  const [service, setService] = useState("");
   const [state, setState] = useState<"idle" | "saving" | "done">("idle");
   const [error, setError] = useState<string | null>(null);
 
   const trimmed = text.trim();
-  const canSubmit = trimmed.length >= MIN_LENGTH && state === "idle";
+  // Only an anonymous visitor is asked for a name; everyone else already has one.
+  const needsName = !target && !signedInAs;
+  const canSubmit =
+    trimmed.length >= MIN_LENGTH && (!needsName || name.trim().length >= NAME_MIN) && state === "idle";
 
   const submit = async () => {
     if (!canSubmit) return;
@@ -69,7 +86,11 @@ export function ReviewForm({
       const res = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ bookingId: target.bookingId, rating, text: trimmed }),
+        body: JSON.stringify(
+          target
+            ? { bookingId: target.bookingId, rating, text: trimmed }
+            : { rating, text: trimmed, name: name.trim(), city: city.trim(), service: service.trim() },
+        ),
       });
       const data = await res.json().catch(() => null);
 
@@ -80,7 +101,7 @@ export function ReviewForm({
       }
 
       setState("done");
-      onSubmitted(target.bookingId);
+      onSubmitted(target?.bookingId ?? "");
     } catch {
       setError("Couldn't reach the server. Check your connection and try again.");
       setState("idle");
@@ -111,12 +132,28 @@ export function ReviewForm({
     );
   }
 
+  const field =
+    "w-full rounded-2xl border border-border bg-surface-2/50 px-4 py-3 text-sm outline-none transition-colors placeholder:text-muted-2 focus:border-primary";
+
   return (
     <>
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">{target.code}</p>
-      <h2 className="mt-2 pr-10 text-xl font-bold tracking-tight">
-        How was your {target.appliance} service?
-      </h2>
+      {target ? (
+        <>
+          <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+            <BadgeCheck className="size-3.5" /> {target.code}
+          </p>
+          <h2 className="mt-2 pr-10 text-xl font-bold tracking-tight">
+            How was your {target.appliance} service?
+          </h2>
+        </>
+      ) : (
+        <>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+            Your experience
+          </p>
+          <h2 className="mt-2 pr-10 text-xl font-bold tracking-tight">How did we do?</h2>
+        </>
+      )}
 
       {/* stars */}
       <div className="mt-6 flex items-center gap-3">
@@ -144,13 +181,45 @@ export function ReviewForm({
         <span className="text-sm font-medium text-muted">{RATING_LABEL[hover || rating]}</span>
       </div>
 
+      {/* who's writing, and about what — only when no booking carries those details */}
+      {!target && (
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          {needsName ? (
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value.slice(0, 60))}
+              placeholder="Your name"
+              autoComplete="name"
+              className={field}
+            />
+          ) : (
+            <p className="flex items-center rounded-2xl bg-surface-2/50 px-4 py-3 text-sm text-muted">
+              Posting as <span className="ml-1 font-medium text-ink">{signedInAs}</span>
+            </p>
+          )}
+          <input
+            value={city}
+            onChange={(e) => setCity(e.target.value.slice(0, 60))}
+            placeholder="City (optional)"
+            autoComplete="address-level2"
+            className={field}
+          />
+          <input
+            value={service}
+            onChange={(e) => setService(e.target.value.slice(0, 60))}
+            placeholder="What did we do for you? (optional)"
+            className={cn(field, "sm:col-span-2")}
+          />
+        </div>
+      )}
+
       {/* text */}
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value.slice(0, MAX_LENGTH))}
         rows={5}
         placeholder="What went well? Anything we could do better?"
-        className="mt-5 w-full resize-none rounded-2xl border border-border bg-surface-2/50 p-4 text-sm leading-relaxed outline-none transition-colors placeholder:text-muted-2 focus:border-primary"
+        className="mt-3 w-full resize-none rounded-2xl border border-border bg-surface-2/50 p-4 text-sm leading-relaxed outline-none transition-colors placeholder:text-muted-2 focus:border-primary"
       />
 
       <div className="mt-2 flex items-center justify-between text-xs text-muted">

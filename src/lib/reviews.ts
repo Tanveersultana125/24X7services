@@ -7,12 +7,18 @@ import type { ReviewCard } from "@/lib/content";
  * Firestore data layer for customer reviews.
  *
  * Collection:
- *  - `reviews` — one doc per review, always tied to a completed booking.
+ *  - `reviews` — one doc per review.
  *
- * A review can only exist for a booking the customer actually owns and that
- * has been marked `completed`, and only one review per booking. That rule
- * lives here (see `createReviewForBooking`) rather than in the UI, so it holds
- * no matter who calls it.
+ * Reviews come in two kinds:
+ *  - tied to a booking (`createReviewForBooking`) — the customer must own that
+ *    booking and it must be `completed`, one review per booking. Those carry
+ *    `verified: true`.
+ *  - written straight from the site (`createSiteReview`) — anyone can leave one
+ *    about the service. Those carry `verified: false`.
+ *
+ * Both start as `pending` and reach the public wall only once an admin
+ * publishes them. The ownership rules live here rather than in the UI, so they
+ * hold no matter who calls.
  *
  * Every function returns plain, JSON-serialisable objects (Timestamps are
  * converted to millis) so results can be handed straight to Client Components.
@@ -32,6 +38,8 @@ export type Review = {
   rating: number;
   text: string;
   status: ReviewStatus;
+  /** True when the review is attached to a completed booking on this account. */
+  verified: boolean;
   createdAt: number;
 };
 
@@ -91,6 +99,8 @@ function mapReview(id: string, data: FirebaseFirestore.DocumentData): Review {
     rating: typeof data.rating === "number" ? data.rating : 5,
     text: data.text ?? "",
     status: (data.status ?? "pending") as ReviewStatus,
+    // Reviews written before the flag existed were all booking-tied.
+    verified: typeof data.verified === "boolean" ? data.verified : Boolean(data.bookingId),
     createdAt: toMillis(data.createdAt),
   };
 }
@@ -140,6 +150,44 @@ export async function createReviewForBooking(input: {
     text: input.text,
     // Every review waits for an admin before it reaches the public wall.
     status: "pending" as ReviewStatus,
+    verified: true,
+    createdAt: FieldValue.serverTimestamp(),
+  });
+
+  return { ok: true, id: ref.id };
+}
+
+/**
+ * Create a review written straight from the site, with no booking behind it.
+ *
+ * Anyone can leave one — signed in or not — so it is stored unverified and
+ * waits for an admin like every other review. A signed-in customer's display
+ * name comes from their account rather than the request, so a review can't be
+ * published under someone else's name.
+ */
+export async function createSiteReview(input: {
+  uid?: string;
+  name: string;
+  city?: string;
+  /** What they used us for, free text — "AC service", "Fridge repair". */
+  service?: string;
+  rating: number;
+  text: string;
+}): Promise<{ ok: true; id: string }> {
+  const db = getAdminDb();
+
+  const ref = await db.collection(REVIEWS).add({
+    uid: input.uid ?? "",
+    bookingId: "",
+    bookingCode: "",
+    name: input.name,
+    city: input.city ?? "",
+    brand: "",
+    appliance: input.service ?? "",
+    rating: input.rating,
+    text: input.text,
+    status: "pending" as ReviewStatus,
+    verified: false,
     createdAt: FieldValue.serverTimestamp(),
   });
 
