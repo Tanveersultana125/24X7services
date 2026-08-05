@@ -70,7 +70,8 @@ export function Testimonials({ reviews }: { reviews?: ReviewCard[] }) {
     if (!el) return;
     // step by a card plus the gap, so each press lands on a snap point
     const card = el.querySelector<HTMLElement>("[data-card]");
-    const step = card ? card.offsetWidth + 20 : el.clientWidth;
+    // the gap is padding inside the sizer, so its own width is one step
+    const step = card ? card.offsetWidth : el.clientWidth;
     el.scrollBy({ left: dir * step, behavior: "smooth" });
   };
 
@@ -128,37 +129,40 @@ export function Testimonials({ reviews }: { reviews?: ReviewCard[] }) {
           </div>
         </div>
 
-        {/* cards — one between the arrows on phones, like the other carousels */}
+        {/* cards — full-width and swipe-only on phones, arrows from sm up */}
         <div className="relative mt-12">
           <button
             onClick={() => nudge(-1)}
             aria-label="Previous reviews"
-            className="absolute -left-1 top-1/2 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:left-0 sm:size-10"
+            className="absolute left-0 top-1/2 z-10 hidden size-10 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:grid"
           >
             <ArrowLeft className="size-4" />
           </button>
           <button
             onClick={() => nudge(1)}
             aria-label="More reviews"
-            className="absolute -right-1 top-1/2 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:right-0 sm:size-10"
+            className="absolute right-0 top-1/2 z-10 hidden size-10 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:grid"
           >
             <ArrowRight className="size-4" />
           </button>
 
-          <div className="mx-9 overflow-hidden sm:mx-12">
+          <div className="overflow-hidden sm:mx-12">
         <div
           ref={trackRef}
           onScroll={onScroll}
           data-lenis-prevent
-          className="flex snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {items.map((r, idx) => (
-            <article
+            /* sizer carries the gap as padding, so plain fractions give
+               exactly 1 / 2 / 3 whole cards per row */
+            <div
               key={`${r.name}-${idx}`}
               data-card
-              /* exact fractions of the visible strip (gap-5 = 1.25rem), so a
-                 row holds 1 / 2 / 3 cards with none half-shown */
-              className="flex min-h-full shrink-0 basis-full snap-start flex-col rounded-[1.5rem] border border-border bg-surface p-6 shadow-premium-sm sm:basis-[calc((100%-1.25rem)/2)] lg:basis-[calc((100%-2.5rem)/3)]"
+              className="w-full shrink-0 snap-start pr-5 sm:w-1/2 lg:w-1/3"
+            >
+            <article
+              className="flex h-full flex-col rounded-[1.5rem] border border-border bg-surface p-6 shadow-premium-sm"
             >
               <header className="flex items-center gap-3">
                 <span
@@ -206,6 +210,7 @@ export function Testimonials({ reviews }: { reviews?: ReviewCard[] }) {
                 <span className="ml-auto shrink-0 pl-2 text-[0.65rem] text-muted-2">{r.city}</span>
               </footer>
             </article>
+            </div>
           ))}
         </div>
           </div>

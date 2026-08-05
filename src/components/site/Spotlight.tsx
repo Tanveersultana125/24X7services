@@ -37,7 +37,8 @@ export function Spotlight() {
     const el = scroller.current;
     if (!el) return;
     const card = el.querySelector<HTMLElement>("[data-spot]");
-    const step = card ? card.offsetWidth + 20 : el.clientWidth * 0.8;
+    // the gap is padding inside the sizer, so its own width is one step
+    const step = card ? card.offsetWidth : el.clientWidth * 0.8;
     el.scrollBy({ left: dir * step, behavior: "smooth" });
   };
 
@@ -56,7 +57,7 @@ export function Spotlight() {
             onClick={() => slide(-1)}
             disabled={atStart}
             className={cn(
-              "absolute -left-1 top-1/2 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:left-0 sm:size-10",
+              "absolute left-0 top-1/2 z-10 hidden size-10 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:grid",
               atStart && "pointer-events-none opacity-30"
             )}
           >
@@ -68,30 +69,29 @@ export function Spotlight() {
             onClick={() => slide(1)}
             disabled={atEnd}
             className={cn(
-              "absolute -right-1 top-1/2 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:right-0 sm:size-10",
+              "absolute right-0 top-1/2 z-10 hidden size-10 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:grid",
               atEnd && "pointer-events-none opacity-30"
             )}
           >
             <ChevronRight className="size-4" />
           </button>
 
-          {/* One card between the arrows on phones — the wrapper is exactly a
-              card wide, so neighbours are clipped rather than half-shown. */}
-          <div className="mx-9 overflow-hidden sm:mx-12">
+          {/* No arrows on a phone, so the strip keeps the full width and the
+              card isn't squeezed into a lane between two empty gutters. */}
+          <div className="overflow-hidden sm:mx-12">
           <div
             ref={scroller}
             onScroll={update}
             data-lenis-prevent
-            className="flex snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {SPOTS.map((s) => (
+              /* sizer carries the gap as padding, so plain fractions give
+                 exactly 1 / 2 whole banners per row */
+              <div key={s.title} data-spot className="w-full shrink-0 snap-start pr-5 sm:w-1/2">
               <Link
-                key={s.title}
                 href={s.href}
-                data-spot
-                /* exact halves of the visible strip (gap-5 = 1.25rem), so two
-                   banners fill the row with none half-shown */
-                className="group relative h-60 w-full shrink-0 snap-start overflow-hidden rounded-[1.5rem] sm:h-72 sm:w-[calc((100%-1.25rem)/2)]"
+                className="group relative block h-60 w-full overflow-hidden rounded-[1.5rem] sm:h-72"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -116,6 +116,7 @@ export function Spotlight() {
                   </span>
                 </div>
               </Link>
+              </div>
             ))}
           </div>
           </div>

@@ -78,8 +78,9 @@ export function MostBooked() {
   const slide = (dir: 1 | -1) => {
     const el = scroller.current;
     if (!el) return;
+    // the gap is padding inside the card, so its own width is the whole step
     const card = el.querySelector<HTMLElement>("[data-card]");
-    const step = card ? card.offsetWidth + 20 : el.clientWidth * 0.8;
+    const step = card ? card.offsetWidth : el.clientWidth * 0.8;
     el.scrollBy({ left: dir * step, behavior: "smooth" });
   };
 
@@ -147,7 +148,7 @@ export function MostBooked() {
             onClick={() => slide(-1)}
             disabled={atStart}
             className={cn(
-              "absolute -left-1 top-[38%] z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:left-0 sm:top-[42%] sm:size-10",
+              "absolute left-0 top-[42%] z-10 hidden size-10 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:grid",
               atStart && "pointer-events-none opacity-30"
             )}
           >
@@ -159,17 +160,16 @@ export function MostBooked() {
             onClick={() => slide(1)}
             disabled={atEnd}
             className={cn(
-              "absolute -right-1 top-[38%] z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:right-0 sm:top-[42%] sm:size-10",
+              "absolute right-0 top-[42%] z-10 hidden size-10 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:grid",
               atEnd && "pointer-events-none opacity-30"
             )}
           >
             <ChevronRight className="size-4" />
           </button>
 
-          {/* Margins, not padding: the scroller is exactly one card wide on a
-              phone, so it clips the neighbours instead of letting them peek
-              into the arrows' lane. */}
-          <div className="mx-9 overflow-hidden sm:mx-12">
+          {/* No arrows on a phone, so the strip keeps the full width; from sm
+              up the margins are the arrows' lane and clip the neighbours. */}
+          <div className="overflow-hidden sm:mx-12">
           <div
             ref={scroller}
             onScroll={update}
@@ -182,7 +182,7 @@ export function MostBooked() {
             onPointerCancel={endDrag}
             onPointerLeave={endDrag}
             onClickCapture={onClickCapture}
-            className="flex cursor-grab snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] active:cursor-grabbing [&::-webkit-scrollbar]:hidden"
+            className="flex cursor-grab snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] active:cursor-grabbing [&::-webkit-scrollbar]:hidden"
           >
           {CARDS.map((c, i) => (
             <motion.div
@@ -192,9 +192,12 @@ export function MostBooked() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.7, delay: i * 0.08, ease }}
-              /* exact fractions of the visible strip (gap-5 = 1.25rem between
-                 cards), so a row holds 1 / 2 / 3 cards with none half-shown */
-              className="w-full shrink-0 grow-0 snap-start sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-2.5rem)/3)]"
+              /* The gap lives inside the card as padding, so the sizer can use
+                 plain fractions and a row holds exactly 1 / 2 / 3 whole cards.
+                 Subtracting a gap with w-[calc(...)] looked equivalent but
+                 Tailwind never emitted those rules, leaving cards at their
+                 content width and a sliver of the next one showing. */
+              className="w-full shrink-0 grow-0 snap-start pr-5 sm:w-1/2 lg:w-1/3"
             >
               <Link
                 href={c.href}
