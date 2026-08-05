@@ -83,7 +83,9 @@ export function Spotlight() {
             ref={scroller}
             onScroll={update}
             data-lenis-prevent
-            className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            /* -mr-0.5 keeps the next banner's rounding sliver outside the clip
+               box, so no hairline shows next to the arrow */
+            className="-mr-0.5 flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {SPOTS.map((s) => (
               /* sizer carries the gap as padding, so plain fractions give

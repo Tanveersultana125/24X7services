@@ -151,7 +151,9 @@ export function Testimonials({ reviews }: { reviews?: ReviewCard[] }) {
           ref={trackRef}
           onScroll={onScroll}
           data-lenis-prevent
-          className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          /* -mr-0.5 keeps the next card's rounding sliver outside the clip box,
+             so no hairline shows next to the arrow */
+          className="-mr-0.5 flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {items.map((r, idx) => (
             /* sizer carries the gap as padding, so plain fractions give
