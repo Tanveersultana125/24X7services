@@ -54,8 +54,11 @@ export function ReviewsManager({ initial }: { initial: Review[] }) {
       return "Your admin session expired.";
     }
     const data = await res.json().catch(() => null);
-    const reason = typeof data?.error === "string" ? data.error : null;
-    return reason ? `${fallback} (${reason})` : fallback;
+    // The server's own message, when it has one — "delete_failed" alone says
+    // nothing about why.
+    const detail = typeof data?.detail === "string" ? data.detail : null;
+    const code = typeof data?.error === "string" ? data.error : null;
+    return detail ? `${fallback} ${detail}` : code ? `${fallback} (${code})` : fallback;
   };
 
   // Optimistically apply, persist to Firestore, revert on failure.

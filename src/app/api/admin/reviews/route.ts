@@ -5,6 +5,15 @@ import { deleteReview, updateReviewStatus, type ReviewStatus } from "@/lib/revie
 
 const STATUSES: ReviewStatus[] = ["pending", "published", "hidden"];
 
+/**
+ * The panel used to show a bare "couldn't do that", leaving the reason only in
+ * the server log — which nobody watching the browser can read. The caller here
+ * is an authenticated admin, so they get the actual message.
+ */
+function reason(err: unknown): string {
+  return err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+}
+
 /** Pages that render the published review wall. */
 function refreshPublicPages() {
   revalidatePath("/");
@@ -31,7 +40,7 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("[admin/reviews] update failed:", err);
-    return NextResponse.json({ ok: false, error: "update_failed" }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "update_failed", detail: reason(err) }, { status: 500 });
   }
 }
 
@@ -53,6 +62,6 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("[admin/reviews] delete failed:", err);
-    return NextResponse.json({ ok: false, error: "delete_failed" }, { status: 500 });
+    return NextResponse.json({ ok: false, error: "delete_failed", detail: reason(err) }, { status: 500 });
   }
 }
