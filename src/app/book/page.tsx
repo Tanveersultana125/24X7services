@@ -2,9 +2,9 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { BackLink } from "@/components/booking/BackLink";
 import { BookingFlow } from "@/components/booking/BookingFlow";
 import { getCustomerSession } from "@/lib/customer/auth";
 
@@ -38,9 +38,7 @@ export default async function BookPage({
     <div className="min-h-dvh">
       <header className="sticky top-0 z-40 border-b border-border bg-background/70 backdrop-blur-xl">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-3.5">
-          <Link href="/" className="flex items-center gap-2 text-sm font-medium text-muted transition-colors hover:text-foreground">
-            <ArrowLeft className="size-4" /> <span className="hidden sm:inline">Home</span>
-          </Link>
+          <BackLink />
           <Link href="/" aria-label="24X7 Services — home">
             <Logo />
           </Link>

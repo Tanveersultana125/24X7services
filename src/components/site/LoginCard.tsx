@@ -83,8 +83,10 @@ export function LoginCard({ next = "/dashboard" }: { next?: string }) {
         return;
       }
 
-      // Full navigation so the server picks up the new session cookie.
-      window.location.assign(next);
+      // Full navigation so the server picks up the new session cookie, and a
+      // replace so going back from the destination skips this page — signing in
+      // again is never what the customer wants.
+      window.location.replace(next);
     } catch (err) {
       const code = err instanceof FirebaseError ? err.code : "";
       if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
