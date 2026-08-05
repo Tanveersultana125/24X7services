@@ -45,7 +45,7 @@ export function Reviews({
         <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-end">
           <div className="max-w-2xl">
             <Kicker>In their words</Kicker>
-            <h2 className="font-display mt-6 text-[2.6rem] leading-[1.05] tracking-[-0.03em] sm:text-6xl">
+            <h2 className="font-display mt-6 text-[2.6rem] leading-[1.15] sm:leading-[1.05] tracking-[-0.03em] sm:text-6xl">
               Three million homes.
               <br />
               <span className="italic text-royal-bright">One quiet standard.</span>

@@ -63,7 +63,7 @@ export function QuickEstimate() {
             <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-muted">
               Telangana&apos;s most-booked appliance specialists
             </p>
-            <h2 className="mt-4 font-display text-[2.4rem] leading-[1.05] tracking-[-0.03em] sm:text-[3.2rem]">
+            <h2 className="mt-4 font-display text-[2.4rem] leading-[1.15] sm:leading-[1.05] tracking-[-0.03em] sm:text-[3.2rem]">
               Trusted repair and care
               <br />
               for every appliance.

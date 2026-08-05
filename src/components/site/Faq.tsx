@@ -70,7 +70,7 @@ export function Faq() {
           {/* ---------- left rail ---------- */}
           <aside>
             <Kicker>Questions</Kicker>
-            <h2 className="font-display mt-5 text-[2.4rem] leading-[1.05] tracking-[-0.03em] sm:text-[3.2rem]">
+            <h2 className="font-display mt-5 text-[2.4rem] leading-[1.15] sm:leading-[1.05] tracking-[-0.03em] sm:text-[3.2rem]">
               Everything,
               <br />
               answered.

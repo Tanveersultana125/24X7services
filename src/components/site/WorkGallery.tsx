@@ -26,7 +26,7 @@ export function WorkGallery() {
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         <div className="max-w-2xl">
           <Kicker>Real repairs, real homes</Kicker>
-          <h2 className="font-display mt-6 text-[2.6rem] leading-[1.05] tracking-[-0.03em] sm:text-6xl">
+          <h2 className="font-display mt-6 text-[2.6rem] leading-[1.15] sm:leading-[1.05] tracking-[-0.03em] sm:text-6xl">
             Our technicians,
             <br />
             on the job.

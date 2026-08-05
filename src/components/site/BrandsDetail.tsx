@@ -27,7 +27,7 @@ export function BrandsDetail() {
       <section className="py-14 sm:py-20">
         <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
           <Kicker>Coverage</Kicker>
-          <h2 className="font-display mt-6 max-w-2xl text-[2.4rem] leading-[1.05] tracking-[-0.03em] sm:text-5xl">
+          <h2 className="font-display mt-6 max-w-2xl text-[2.4rem] leading-[1.15] sm:leading-[1.05] tracking-[-0.03em] sm:text-5xl">
             What we service, brand by brand.
           </h2>
 
@@ -90,7 +90,7 @@ export function BrandsDetail() {
         <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
           <div className="max-w-2xl">
             <Kicker>Why it matters</Kicker>
-            <h2 className="font-display mt-6 text-[2.4rem] leading-[1.05] tracking-[-0.03em] sm:text-5xl">
+            <h2 className="font-display mt-6 text-[2.4rem] leading-[1.15] sm:leading-[1.05] tracking-[-0.03em] sm:text-5xl">
               Authorised isn&apos;t a label. It&apos;s a standard.
             </h2>
           </div>

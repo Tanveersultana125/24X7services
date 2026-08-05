@@ -41,7 +41,7 @@ export function RatingBreakdown({ summary }: { summary?: Summary }) {
     <section className="py-14 sm:py-20">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         <Kicker>The numbers behind the stars</Kicker>
-        <h2 className="font-display mt-6 max-w-2xl text-[2.4rem] leading-[1.05] tracking-[-0.03em] sm:text-5xl">
+        <h2 className="font-display mt-6 max-w-2xl text-[2.4rem] leading-[1.15] sm:leading-[1.05] tracking-[-0.03em] sm:text-5xl">
           Rated {average}, and here&apos;s why.
         </h2>
 

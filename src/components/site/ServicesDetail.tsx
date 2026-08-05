@@ -101,7 +101,7 @@ export function ServicesDetail() {
                 <ShieldCheck className="size-4" strokeWidth={2.2} />
               </span>
 
-              <h2 className="font-display mt-4 text-[2.4rem] leading-[1.05] tracking-[-0.03em] sm:text-5xl">
+              <h2 className="font-display mt-4 text-[2.4rem] leading-[1.15] sm:leading-[1.05] tracking-[-0.03em] sm:text-5xl">
                 What&apos;s included in <span className="italic text-royal-bright">every</span> service.
               </h2>
 
@@ -176,7 +176,7 @@ export function ServicesDetail() {
                   Transparent pricing
                 </span>
 
-                <h2 className="font-display mt-4 text-[2.2rem] leading-[1.05] tracking-[-0.03em] sm:text-[3.2rem]">
+                <h2 className="font-display mt-4 text-[2.2rem] leading-[1.15] sm:leading-[1.05] tracking-[-0.03em] sm:text-[3.2rem]">
                   Faults we fix —
                   <br />
                   and what they <span className="italic text-royal-bright">cost.</span>

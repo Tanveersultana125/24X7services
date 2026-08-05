@@ -48,7 +48,7 @@ export function Noteworthy() {
     <section className="relative scroll-mt-28 pb-10 pt-2 sm:pb-14 sm:pt-4">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         <Kicker>New &amp; noteworthy</Kicker>
-        <h2 className="font-display mt-6 max-w-xl text-[2.6rem] leading-[1.05] tracking-[-0.03em] sm:text-6xl">
+        <h2 className="font-display mt-6 max-w-xl text-[2.6rem] leading-[1.15] sm:leading-[1.05] tracking-[-0.03em] sm:text-6xl">
           Fresh on the menu.
         </h2>
 

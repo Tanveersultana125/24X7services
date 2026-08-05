@@ -33,7 +33,7 @@ export function ClimateExpertise() {
         {/* features */}
         <div>
           <Kicker>Our expertise</Kicker>
-          <h2 className="font-display mt-6 text-[2.4rem] leading-[1.05] tracking-[-0.03em] sm:text-5xl">
+          <h2 className="font-display mt-6 text-[2.4rem] leading-[1.15] sm:leading-[1.05] tracking-[-0.03em] sm:text-5xl">
             Cooling solutions,
             <br />
             done right.

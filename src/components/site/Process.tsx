@@ -21,7 +21,7 @@ export function Process() {
         <div className="lg:col-span-5">
           <div className="lg:sticky lg:top-28">
             <Kicker>The process</Kicker>
-            <h2 className="font-display mt-6 text-[2.6rem] leading-[1.05] tracking-[-0.03em] sm:text-6xl">
+            <h2 className="font-display mt-6 text-[2.6rem] leading-[1.15] sm:leading-[1.05] tracking-[-0.03em] sm:text-6xl">
               From broken
               <br />
               to brilliant,

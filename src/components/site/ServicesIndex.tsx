@@ -26,7 +26,7 @@ export function ServicesIndex() {
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
             <Kicker>The work</Kicker>
-            <h2 className="font-display mt-6 max-w-xl text-[2.6rem] leading-[1.05] tracking-[-0.03em] sm:text-6xl">
+            <h2 className="font-display mt-6 max-w-xl text-[2.6rem] leading-[1.15] sm:leading-[1.05] tracking-[-0.03em] sm:text-6xl">
               Eight services.
               <br />
               <span className="italic text-muted">One standard.</span>
