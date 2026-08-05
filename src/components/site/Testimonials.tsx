@@ -151,9 +151,10 @@ export function Testimonials({ reviews }: { reviews?: ReviewCard[] }) {
           ref={trackRef}
           onScroll={onScroll}
           data-lenis-prevent
-          /* -mr-0.5 keeps the next card's rounding sliver outside the clip box,
-             so no hairline shows next to the arrow */
-          className="-mr-0.5 flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          /* The strip runs wider than the box that clips it, so the next card's
+             border and its 8px shadow both fall outside the edge instead of
+             drawing a hairline in the arrow's gutter. */
+          className="-mr-3 flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {items.map((r, idx) => (
             /* sizer carries the gap as padding, so plain fractions give

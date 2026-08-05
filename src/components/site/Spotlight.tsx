@@ -83,9 +83,10 @@ export function Spotlight() {
             ref={scroller}
             onScroll={update}
             data-lenis-prevent
-            /* -mr-0.5 keeps the next banner's rounding sliver outside the clip
-               box, so no hairline shows next to the arrow */
-            className="-mr-0.5 flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            /* The strip runs wider than the box that clips it, so the next
+               banner's edge falls outside instead of drawing a hairline in the
+               arrow's gutter. */
+            className="-mr-3 flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {SPOTS.map((s) => (
               /* sizer carries the gap as padding, so plain fractions give

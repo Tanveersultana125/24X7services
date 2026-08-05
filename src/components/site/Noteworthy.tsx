@@ -85,9 +85,10 @@ export function Noteworthy() {
             ref={scroller}
             onScroll={update}
             data-lenis-prevent
-            /* -mr-0.5 keeps the next card's rounding sliver outside the clip
-               box, so no hairline shows next to the arrow */
-            className="-mr-0.5 flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            /* The strip runs wider than the box that clips it, so the next
+               card's edge falls outside instead of drawing a hairline in the
+               arrow's gutter. */
+            className="-mr-3 flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {ITEMS.map((it) => (
               <Link

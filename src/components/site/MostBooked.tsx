@@ -182,10 +182,10 @@ export function MostBooked() {
             onPointerCancel={endDrag}
             onPointerLeave={endDrag}
             onClickCapture={onClickCapture}
-            /* -mr-0.5: fractional card widths round so the next card's border
-               lands a hair inside the clip box and paints a stray hairline by
-               the arrow. Two extra pixels push it past the edge. */
-            className="-mr-0.5 flex cursor-grab snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] active:cursor-grabbing [&::-webkit-scrollbar]:hidden"
+            /* The strip runs wider than the box that clips it, so the next
+               card's border and its 8px shadow both fall outside the edge
+               instead of drawing a hairline in the arrow's gutter. */
+            className="-mr-3 flex cursor-grab snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] active:cursor-grabbing [&::-webkit-scrollbar]:hidden"
           >
           {CARDS.map((c, i) => (
             <motion.div
