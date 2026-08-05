@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, BadgeCheck, ArrowUpRight } from "lucide-react";
 import { Kicker } from "./TextReveal";
+import { ImageLightbox } from "@/components/ui/ImageLightbox";
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
@@ -26,6 +27,7 @@ function Tick() {
 
 export function CoolingSolutions() {
   const [open, setOpen] = useState(2);
+  const [zoomed, setZoomed] = useState(false);
 
   return (
     <section className="relative py-14 sm:py-20">
@@ -89,7 +91,16 @@ export function CoolingSolutions() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="overflow-hidden rounded-[2rem] border border-white/70 shadow-premium-xl"
+            role="button"
+            tabIndex={0}
+            onClick={() => setZoomed(true)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setZoomed(true);
+              }
+            }}
+            className="cursor-zoom-in overflow-hidden rounded-[2rem] border border-white/70 shadow-premium-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-bright"
           >
             {/* squarer crop on phones so the floating card covers a similar share of the
                 frame as it does on desktop */}
@@ -128,6 +139,13 @@ export function CoolingSolutions() {
           </ul>
         </div>
       </div>
+
+      <ImageLightbox
+        images={[{ src: "/work/family-ac.png", label: "A family enjoying cool comfort at home" }]}
+        index={zoomed ? 0 : null}
+        onClose={() => setZoomed(false)}
+        onIndexChange={() => {}}
+      />
     </section>
   );
 }

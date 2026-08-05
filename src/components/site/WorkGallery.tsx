@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { Maximize2 } from "lucide-react";
 import { Kicker } from "./TextReveal";
+import { ImageLightbox } from "@/components/ui/ImageLightbox";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -21,6 +24,8 @@ const SHOTS: Shot[] = [
 ];
 
 export function WorkGallery() {
+  const [opened, setOpened] = useState<number | null>(null);
+
   return (
     <section id="work" className="relative scroll-mt-28 py-14 sm:py-20">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
@@ -42,7 +47,16 @@ export function WorkGallery() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.7, delay: (i % 3) * 0.08, ease }}
-              className="group relative mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-white/60 bg-surface shadow-premium-sm"
+              role="button"
+              tabIndex={0}
+              onClick={() => setOpened(i)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setOpened(i);
+                }
+              }}
+              className="group relative mb-4 block w-full cursor-zoom-in break-inside-avoid overflow-hidden rounded-2xl border border-white/60 bg-surface shadow-premium-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-bright"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -51,6 +65,9 @@ export function WorkGallery() {
                 loading="lazy"
                 className="w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
               />
+              <span className="absolute right-3 top-3 grid size-9 place-items-center rounded-full bg-white/90 text-ink opacity-0 backdrop-blur transition-opacity duration-500 group-hover:opacity-100">
+                <Maximize2 className="size-4" />
+              </span>
               <span
                 aria-hidden
                 className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/55 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
@@ -62,6 +79,13 @@ export function WorkGallery() {
           ))}
         </div>
       </div>
+
+      <ImageLightbox
+        images={SHOTS}
+        index={opened}
+        onClose={() => setOpened(null)}
+        onIndexChange={setOpened}
+      />
     </section>
   );
 }

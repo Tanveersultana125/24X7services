@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Wind, ShieldCheck, Gauge } from "lucide-react";
 import { Kicker } from "./TextReveal";
+import { ImageLightbox } from "@/components/ui/ImageLightbox";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -13,6 +15,8 @@ const FEATURES = [
 ];
 
 export function ClimateExpertise() {
+  const [zoomed, setZoomed] = useState(false);
+
   return (
     <section className="relative py-14 sm:py-20">
       {/* items-stretch, not centre: the photo takes the text column's height so
@@ -24,7 +28,16 @@ export function ClimateExpertise() {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.8, ease }}
-          className="overflow-hidden rounded-[2rem] border border-white/70 shadow-premium-xl lg:h-full"
+          role="button"
+          tabIndex={0}
+          onClick={() => setZoomed(true)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setZoomed(true);
+            }
+          }}
+          className="cursor-zoom-in overflow-hidden rounded-[2rem] border border-white/70 shadow-premium-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-bright lg:h-full"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/work/ac-service.png" alt="Certified technician servicing an air conditioner" className="aspect-[4/3] w-full object-cover lg:aspect-auto lg:h-full" />
@@ -68,6 +81,13 @@ export function ClimateExpertise() {
           </div>
         </div>
       </div>
+
+      <ImageLightbox
+        images={[{ src: "/work/ac-service.png", label: "Certified technician servicing an air conditioner" }]}
+        index={zoomed ? 0 : null}
+        onClose={() => setZoomed(false)}
+        onIndexChange={() => {}}
+      />
     </section>
   );
 }
