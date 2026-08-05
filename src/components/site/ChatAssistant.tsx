@@ -31,7 +31,10 @@ const CHIPS = [
   "Track my technician",
 ];
 
-/** Lightweight rule-based reply engine (front-end demo of the AI assistant). */
+/**
+ * Offline reply engine. The assistant answers through Groq via /api/chat; this
+ * keeps the widget useful when that call fails or the key isn't configured.
+ */
 function getReply(raw: string): { text: string; actions?: Action[] } {
   const t = raw.toLowerCase();
   const has = (...w: string[]) => w.some((x) => t.includes(x));
@@ -146,17 +149,37 @@ export function ChatAssistant() {
   // The assistant is a customer-facing widget — never show it in the admin panel.
   const hidden = pathname?.startsWith("/admin") ?? false;
 
-  const send = (text: string) => {
+  const send = async (text: string) => {
     const value = text.trim();
     if (!value || typing) return;
     setInput("");
-    setMessages((m) => [...m, { id: idRef.current++, role: "user", text: value }]);
+    const asked: Message = { id: idRef.current++, role: "user", text: value };
+    const history = [...messages, asked];
+    setMessages(history);
     setTyping(true);
-    setTimeout(() => {
-      const reply = getReply(value);
-      setTyping(false);
-      setMessages((m) => [...m, { id: idRef.current++, role: "bot", ...reply }]);
-    }, 700 + Math.min(value.length * 12, 700));
+
+    let reply: { text: string; actions?: Action[] } | null = null;
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          // The greeting is ours, not part of the conversation the model needs.
+          messages: history
+            .filter((m) => m.id !== GREETING.id)
+            .map((m) => ({ role: m.role === "user" ? "user" : "assistant", content: m.text })),
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data?.ok && typeof data.text === "string") {
+        reply = { text: data.text, actions: Array.isArray(data.actions) ? data.actions : undefined };
+      }
+    } catch {
+      // offline or blocked — the local engine answers below
+    }
+
+    setTyping(false);
+    setMessages((m) => [...m, { id: idRef.current++, role: "bot", ...(reply ?? getReply(value)) }]);
   };
 
   if (hidden) return null;
