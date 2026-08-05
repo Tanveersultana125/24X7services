@@ -324,7 +324,7 @@ export function Faq() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.7, delay: 0.2, ease }}
-        className="absolute bottom-20 right-8 hidden w-[17rem] rounded-2xl border border-border bg-surface p-5 shadow-premium-xl xl:block"
+        className="absolute bottom-20 right-16 hidden w-[17rem] rounded-2xl border border-border bg-surface p-5 shadow-premium-xl xl:block"
       >
         <div className="flex items-start gap-3">
           <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-royal-bright/10 text-royal-bright">
