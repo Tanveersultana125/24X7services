@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -108,7 +109,22 @@ export function SearchTrigger({
   );
 }
 
+/**
+ * The palette is rendered into <body>, not where it sits in the tree.
+ *
+ * Its trigger lives inside the nav, and the nav has a backdrop-filter — which
+ * makes that element the containing block for `position: fixed` descendants.
+ * Inline, the overlay's inset-0 resolved to the nav pill, so opening search
+ * painted a dark bar across the nav instead of dimming the page.
+ */
 function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  // Nothing to portal during the server render, and the palette renders empty
+  // while closed — so there is no hydration mismatch to worry about.
+  if (typeof document === "undefined") return null;
+  return createPortal(<SearchPalette open={open} onClose={onClose} />, document.body);
+}
+
+function SearchPalette({ open, onClose }: { open: boolean; onClose: () => void }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
