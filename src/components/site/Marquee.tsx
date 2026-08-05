@@ -35,7 +35,7 @@ export function Marquee({
   const copy = useRef<HTMLDivElement>(null);
   const offset = useRef(0);
   const hovering = useRef(false);
-  const drag = useRef({ active: false, startX: 0, startOffset: 0 });
+  const drag = useRef({ active: false, startX: 0, startOffset: 0, moved: 0 });
 
   useEffect(() => {
     let raf = 0;
@@ -66,18 +66,29 @@ export function Marquee({
   }, [reverse]);
 
   const onPointerDown = (e: React.PointerEvent) => {
-    drag.current = { active: true, startX: e.clientX, startOffset: offset.current };
+    drag.current = { active: true, startX: e.clientX, startOffset: offset.current, moved: 0 };
     e.currentTarget.setPointerCapture(e.pointerId);
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
     if (!drag.current.active) return;
+    const dx = e.clientX - drag.current.startX;
+    drag.current.moved = Math.max(drag.current.moved, Math.abs(dx));
     // Dragging right pulls the strip right, so the offset moves the other way.
-    offset.current = drag.current.startOffset - (e.clientX - drag.current.startX);
+    offset.current = drag.current.startOffset - dx;
   };
 
   const endDrag = () => {
     drag.current.active = false;
+  };
+
+  /** A drag that ends on a card would otherwise open it — swallow that click. */
+  const onClickCapture = (e: React.MouseEvent) => {
+    if (drag.current.moved > 6) {
+      e.preventDefault();
+      e.stopPropagation();
+      drag.current.moved = 0;
+    }
   };
 
   return (
@@ -103,6 +114,7 @@ export function Marquee({
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
+        onClickCapture={onClickCapture}
         /* pan-y: a vertical swipe still scrolls the page, a horizontal one is
            ours. Without it the browser claims the gesture and the strip
            wouldn't follow a finger at all. */
