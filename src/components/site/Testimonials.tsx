@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Star, ArrowLeft, ArrowRight, BadgeCheck } from "lucide-react";
 import { TESTIMONIALS, type Testimonial, type ReviewCard } from "@/lib/content";
+import { ReviewLightbox } from "@/components/reviews/ReviewLightbox";
 import { cn } from "@/lib/utils";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -45,6 +46,7 @@ function timeAgo(ms: number): string {
 
 export function Testimonials({ reviews }: { reviews?: ReviewCard[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
+  const [opened, setOpened] = useState<Card | null>(null);
   const [filter, setFilter] = useState<"all" | Source>("all");
   const [page, setPage] = useState(0);
   const [pages, setPages] = useState(1);
@@ -165,7 +167,17 @@ export function Testimonials({ reviews }: { reviews?: ReviewCard[] }) {
               className="w-full shrink-0 snap-start pr-5 sm:w-1/2 lg:w-1/3"
             >
             <article
-              className="flex h-full flex-col rounded-[1.5rem] border border-border bg-surface p-6 shadow-premium-sm"
+              role="button"
+              tabIndex={0}
+              onClick={() => setOpened(r)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setOpened(r);
+                }
+              }}
+              /* Opens the full review — a long one runs past the card. */
+              className="flex h-full cursor-pointer flex-col rounded-[1.5rem] border border-border bg-surface p-6 shadow-premium-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-premium-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-bright"
             >
               <header className="flex items-center gap-3">
                 <span
@@ -232,6 +244,8 @@ export function Testimonials({ reviews }: { reviews?: ReviewCard[] }) {
           ))}
         </div>
       </div>
+
+      <ReviewLightbox review={opened} onClose={() => setOpened(null)} />
     </section>
   );
 }
