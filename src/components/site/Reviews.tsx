@@ -37,11 +37,14 @@ export function Reviews({
   const rowA = all.slice(0, half);
   const rowB = all.slice(half);
 
-  const ratingLabel = average && average > 0 ? average.toFixed(1) : "4.9";
-  const countLabel =
-    count && count > 0
-      ? `${count.toLocaleString("en-IN")} verified review${count === 1 ? "" : "s"}`
-      : "128,400 verified reviews";
+  // The badge switches to live numbers only once enough reviews exist to mean
+  // anything. One 3-star review shouldn't make the wall read "3.0 · 1 review"
+  // while every other figure on the page still says 4.9 out of 128,400.
+  const liveSummary = (count ?? 0) >= MIN_CARDS;
+  const ratingLabel = liveSummary && average && average > 0 ? average.toFixed(1) : "4.9";
+  const countLabel = liveSummary
+    ? `${(count as number).toLocaleString("en-IN")} verified review${count === 1 ? "" : "s"}`
+    : "128,400 verified reviews";
 
   return (
     <section id="reviews" className="relative scroll-mt-28 overflow-hidden py-14 sm:py-20">
