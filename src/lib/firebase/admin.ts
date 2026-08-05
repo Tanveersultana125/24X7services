@@ -55,15 +55,29 @@ export function getAdminAuth(): Auth {
   return getAuth(getAdminApp());
 }
 
-let firestore: Firestore | null = null;
+/**
+ * Held on globalThis, not in a module variable: a dev hot reload re-evaluates
+ * this module and would reset the variable, while `getFirestore()` keeps
+ * handing back the one instance the app already has — and calling `settings()`
+ * on it a second time throws "Firestore has already been initialized", which
+ * surfaced as an admin action that simply refused to work.
+ */
+const store = globalThis as typeof globalThis & { __24x7Firestore?: Firestore };
 
 /** Firestore (Admin) — reused across requests. Requires a Firestore database
  * to exist in the Firebase project (Console → Firestore Database → Create). */
 export function getAdminDb(): Firestore {
-  if (!firestore) {
-    firestore = getFirestore(getAdminApp());
+  if (store.__24x7Firestore) return store.__24x7Firestore;
+
+  const db = getFirestore(getAdminApp());
+  try {
     // Let Firestore silently drop `undefined` fields instead of throwing.
-    firestore.settings({ ignoreUndefinedProperties: true });
+    db.settings({ ignoreUndefinedProperties: true });
+  } catch {
+    // Already configured on this instance — nothing left to do, and throwing
+    // here would take down every route that touches the database.
   }
-  return firestore;
+
+  store.__24x7Firestore = db;
+  return db;
 }
