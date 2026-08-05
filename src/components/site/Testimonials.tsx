@@ -129,19 +129,19 @@ export function Testimonials({ reviews }: { reviews?: ReviewCard[] }) {
           </div>
         </div>
 
-        {/* cards — full-width and swipe-only on phones, arrows from sm up */}
+        {/* cards — full-width on phones, with the arrows riding over the edges */}
         <div className="relative mt-12">
           <button
             onClick={() => nudge(-1)}
             aria-label="Previous reviews"
-            className="absolute left-0 top-1/2 z-10 hidden size-10 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:grid"
+            className="absolute left-1.5 top-1/2 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface/90 shadow-premium-lg backdrop-blur transition-all hover:scale-110 hover:bg-surface-2 sm:left-0 sm:size-10 sm:bg-surface"
           >
             <ArrowLeft className="size-4" />
           </button>
           <button
             onClick={() => nudge(1)}
             aria-label="More reviews"
-            className="absolute right-0 top-1/2 z-10 hidden size-10 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:grid"
+            className="absolute right-1.5 top-1/2 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface/90 shadow-premium-lg backdrop-blur transition-all hover:scale-110 hover:bg-surface-2 sm:right-0 sm:size-10 sm:bg-surface"
           >
             <ArrowRight className="size-4" />
           </button>

@@ -59,7 +59,7 @@ export function Noteworthy() {
             onClick={() => slide(-1)}
             disabled={atStart}
             className={cn(
-              "absolute left-0 top-[38%] z-10 hidden size-10 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:grid",
+              "absolute left-1.5 top-[38%] z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface/90 shadow-premium-lg backdrop-blur transition-all hover:scale-110 hover:bg-surface-2 sm:left-0 sm:size-10 sm:bg-surface",
               atStart && "pointer-events-none opacity-30"
             )}
           >
@@ -71,15 +71,15 @@ export function Noteworthy() {
             onClick={() => slide(1)}
             disabled={atEnd}
             className={cn(
-              "absolute right-0 top-[38%] z-10 hidden size-10 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:grid",
+              "absolute right-1.5 top-[38%] z-10 grid size-9 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface/90 shadow-premium-lg backdrop-blur transition-all hover:scale-110 hover:bg-surface-2 sm:right-0 sm:size-10 sm:bg-surface",
               atEnd && "pointer-events-none opacity-30"
             )}
           >
             <ChevronRight className="size-4" />
           </button>
 
-          {/* No arrows on a phone, so the strip keeps the full width and the
-              card isn't squeezed into a lane between two empty gutters. */}
+          {/* On a phone the arrows ride over the card's edges, so the strip
+              keeps the full width; from sm up the margins are their lane. */}
           <div className="overflow-hidden sm:mx-12">
           <div
             ref={scroller}
