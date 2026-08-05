@@ -28,7 +28,11 @@ export function Reviews({
   count?: number;
   average?: number;
 }) {
-  const all = reviews && reviews.length >= MIN_CARDS ? reviews : SEEDED;
+  // Real reviews always lead. The seeded copy only tops the wall up so it never
+  // looks sparse — the old rule dropped every real review until six existed, so
+  // a customer's freshly published review didn't appear at all.
+  const real = reviews ?? [];
+  const all = real.length >= MIN_CARDS ? real : [...real, ...SEEDED];
   const half = Math.ceil(all.length / 2);
   const rowA = all.slice(0, half);
   const rowB = all.slice(half);
