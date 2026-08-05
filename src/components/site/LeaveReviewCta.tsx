@@ -19,15 +19,13 @@ export function LeaveReviewCta() {
               Had a service with us?
             </h2>
             <p className="mt-3 text-[0.95rem] leading-relaxed text-muted">
-              Open your dashboard and rate any completed job. Every review here is tied to a real
-              booking — that&apos;s why there are no fakes on this page.
+              Rate any completed job in a minute. Every review here is tied to a real booking —
+              that&apos;s why there are no fakes on this page.
             </p>
           </div>
 
           <a
-            /* rate=1 opens the dashboard on the jobs that can be rated, rather
-               than the overview's "book your first service" prompt */
-            href="/dashboard?rate=1"
+            href="/reviews/new"
             className="inline-flex h-12 shrink-0 items-center gap-2 rounded-full bg-ink px-7 text-sm font-semibold text-white transition-opacity hover:opacity-90"
           >
             Rate your service <ArrowRight className="size-4" />

@@ -72,30 +72,15 @@ export function Dashboard({
   user,
   bookings = [],
   reviewedBookingIds = [],
-  intent,
 }: {
   user?: DashboardUser;
   bookings?: Booking[];
   /** Booking ids this customer has already reviewed — those rows show "Rated". */
   reviewedBookingIds?: string[];
-  /** "rate" — arrived from a review CTA, so open on the jobs that can be rated. */
-  intent?: "rate";
 }) {
-  const [tab, setTab] = useState<(typeof TABS)[number]>(intent === "rate" ? "Bookings" : "Overview");
+  const [tab, setTab] = useState<(typeof TABS)[number]>("Overview");
   const [rated, setRated] = useState<string[]>(reviewedBookingIds);
-  // Arriving from "Rate your service" opens the form on the job waiting to be
-  // rated, so the customer doesn't have to hunt for it among their bookings.
-  const [reviewing, setReviewing] = useState<ReviewTarget | null>(() => {
-    if (intent !== "rate") return null;
-    const next = bookings.find((b) => b.status === "completed" && !reviewedBookingIds.includes(b.id));
-    return next
-      ? {
-          bookingId: next.id,
-          code: next.code,
-          appliance: `${next.brand ? `${next.brand} ` : ""}${next.appliance}`,
-        }
-      : null;
-  });
+  const [reviewing, setReviewing] = useState<ReviewTarget | null>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
   const name = user?.name ?? "there";
 
@@ -273,22 +258,9 @@ export function Dashboard({
       <div className="mt-8">
         {(tab === "Overview" || tab === "Bookings") && (
           history.length === 0 ? (
-            intent === "rate" ? (
-              <EmptyState
-                label="Nothing to rate yet."
-                hint="Reviews are tied to a real visit — rate a job here once a technician has completed it."
-              />
-            ) : (
-              <EmptyState />
-            )
+            <EmptyState />
           ) : (
             <div className="space-y-4">
-              {/* Arrived to leave a review with no completed job to review. */}
-              {intent === "rate" && !history.some((h) => h.canReview || h.isRated) && (
-                <p className="rounded-2xl border border-dashed border-border-strong bg-surface px-4 py-3 text-sm text-muted">
-                  You can rate a service once the visit is completed — your open bookings are below.
-                </p>
-              )}
               {history.map((h) => (
                 <div key={h.id} className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-4 shadow-premium-sm sm:flex-row sm:items-center sm:justify-between sm:p-5">
                   <div className="flex min-w-0 items-center gap-3.5 sm:gap-4">
