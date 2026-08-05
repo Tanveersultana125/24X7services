@@ -121,7 +121,9 @@ export function MostBooked() {
   return (
     <section id="most-booked" className="relative scroll-mt-28 pb-10 pt-2 sm:pb-14 sm:pt-4">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
-        <div className="flex items-end justify-between gap-6">
+        {/* The heading fills a phone's width on its own, so "See all" drops to
+            its own row there and only shares the line from sm up. */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
           <div>
             <Kicker>Most booked</Kicker>
             <h2 className="font-display mt-6 max-w-xl text-[2.6rem] leading-[1.15] sm:leading-[1.05] tracking-[-0.03em] sm:text-6xl">
@@ -133,7 +135,7 @@ export function MostBooked() {
 
           <Link
             href="/services"
-            className="hidden shrink-0 items-center gap-1.5 rounded-full border border-border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-surface-2 sm:inline-flex"
+            className="inline-flex shrink-0 items-center gap-1.5 self-end rounded-full border border-border px-4 py-2 text-[0.82rem] font-medium transition-colors hover:bg-surface-2 sm:self-auto sm:px-5 sm:py-2.5 sm:text-sm"
           >
             See all
             <ArrowUpRight className="size-4" />
