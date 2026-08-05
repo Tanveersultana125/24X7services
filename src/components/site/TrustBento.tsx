@@ -267,24 +267,26 @@ export function TrustBento() {
               <GoArrow tint={AMBER} />
             </Link>
           </Card>
-
-          {/* ---------- G — assurance strip ---------- */}
-          <Card i={6} className={cn(SHELL, "col-span-2 !row-auto px-6 py-6 sm:px-8 lg:col-span-4")}>
-            <div className="grid grid-cols-2 gap-x-6 gap-y-6 lg:grid-cols-4 lg:divide-x lg:divide-hairline">
-              {ASSURANCES.map((a) => (
-                <div key={a.title} className="flex items-center gap-3 lg:justify-center lg:px-4">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-full bg-ink text-background sm:size-11">
-                    <a.icon className="size-[1.1rem]" strokeWidth={1.9} />
-                  </span>
-                  <span className="min-w-0 leading-none">
-                    <span className="block text-[0.82rem] font-semibold tracking-tight">{a.title}</span>
-                    <span className="mt-1.5 block text-[0.72rem] text-muted">{a.desc}</span>
-                  </span>
-                </div>
-              ))}
-            </div>
-          </Card>
         </div>
+
+        {/* ---------- G — assurance strip ----------
+            Outside the bento: it always occupies a full row of its own, and in
+            the grid the 10rem row minimum stretched it into a half-empty card. */}
+        <Card i={6} className={cn(SHELL, "mt-4 px-6 py-6 sm:px-8")}>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-6 lg:grid-cols-4 lg:divide-x lg:divide-hairline">
+            {ASSURANCES.map((a) => (
+              <div key={a.title} className="flex items-center gap-3 lg:justify-center lg:px-4">
+                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-ink text-background sm:size-11">
+                  <a.icon className="size-[1.1rem]" strokeWidth={1.9} />
+                </span>
+                <span className="min-w-0 leading-none">
+                  <span className="block text-[0.82rem] font-semibold tracking-tight">{a.title}</span>
+                  <span className="mt-1.5 block text-[0.72rem] text-muted">{a.desc}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </Card>
       </div>
     </section>
   );
