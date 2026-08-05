@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, X, Send, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { OPEN_CHAT_EVENT } from "@/lib/chat-widget";
 
 interface Action {
   label: string;
@@ -145,6 +146,13 @@ export function ChatAssistant() {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, typing, open]);
+
+  // "Chat with AI" links elsewhere on the page open this panel.
+  useEffect(() => {
+    const openPanel = () => setOpen(true);
+    window.addEventListener(OPEN_CHAT_EVENT, openPanel);
+    return () => window.removeEventListener(OPEN_CHAT_EVENT, openPanel);
+  }, []);
 
   // The assistant is a customer-facing widget — never show it in the admin panel.
   const hidden = pathname?.startsWith("/admin") ?? false;

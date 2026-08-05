@@ -21,6 +21,7 @@ import { BRANDS } from "@/lib/data";
 import { TESTIMONIALS } from "@/lib/content";
 import { Kicker } from "./TextReveal";
 import { cn } from "@/lib/utils";
+import { openChatAssistant } from "@/lib/chat-widget";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -160,16 +161,18 @@ export function Faq() {
 
             {/* the other two channels, so this block is the one place to reach us */}
             <div className="mt-3 grid grid-cols-2 gap-3">
-              <Link
-                href="/book"
-                className="group rounded-2xl border border-emerald/25 bg-gradient-to-b from-emerald/12 to-emerald/[0.04] p-4 shadow-premium-sm transition-transform duration-500 hover:-translate-y-0.5"
+              {/* opens the assistant panel — it used to send people to /book */}
+              <button
+                type="button"
+                onClick={openChatAssistant}
+                className="group rounded-2xl border border-emerald/25 bg-gradient-to-b from-emerald/12 to-emerald/[0.04] p-4 text-left shadow-premium-sm transition-transform duration-500 hover:-translate-y-0.5"
               >
                 <span className="grid size-8 place-items-center rounded-lg bg-emerald text-white shadow-[0_6px_14px_-4px_rgba(11,154,99,0.55)] transition-transform duration-500 group-hover:scale-105">
                   <MessageSquareText className="size-4" strokeWidth={1.7} />
                 </span>
                 <span className="mt-3 block text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-emerald">Chat with AI</span>
                 <span className="mt-1.5 block text-[0.8rem] font-semibold tracking-tight">Replies in seconds</span>
-              </Link>
+              </button>
 
               <a
                 href="mailto:care@24x7services.in"

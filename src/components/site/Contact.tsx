@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { openChatAssistant } from "@/lib/chat-widget";
 import {
   ArrowUpRight,
   PhoneCall,
@@ -15,6 +17,10 @@ import {
 } from "lucide-react";
 
 const ease = [0.16, 1, 0.3, 1] as const;
+
+/** One shell for all three channel cards, whether they navigate or open the chat. */
+const CHANNEL_CARD =
+  "group flex items-center gap-3 rounded-2xl border border-white/70 bg-white p-3.5 shadow-premium-sm transition-transform duration-500 hover:-translate-y-0.5 sm:gap-5 sm:p-5";
 
 const ROYAL = "#2547d0";
 const EMERALD = "#0b9a63";
@@ -35,7 +41,8 @@ const CHANNELS = [
     label: "Chat with AI",
     value: "Replies in seconds",
     sub: "Get instant answers",
-    href: "/book",
+    /** Opens the assistant widget in place — there is no page to go to. */
+    href: null,
   },
   {
     icon: Mail,
@@ -128,12 +135,9 @@ export function Contact() {
               transition={{ duration: 0.7, delay: 0.12, ease }}
               className="space-y-2.5 rounded-[1.5rem] border border-white/60 bg-white/55 p-2.5 shadow-premium-md backdrop-blur sm:space-y-3 sm:rounded-[1.75rem] sm:p-4"
             >
-              {CHANNELS.map((c) => (
-                <Link
-                  key={c.label}
-                  href={c.href}
-                  className="group flex items-center gap-3 rounded-2xl border border-white/70 bg-white p-3.5 shadow-premium-sm transition-transform duration-500 hover:-translate-y-0.5 sm:gap-5 sm:p-5"
-                >
+              {CHANNELS.map((c) => {
+                const body = (
+                  <>
                   <span
                     className="grid size-10 shrink-0 place-items-center rounded-xl transition-transform duration-500 group-hover:scale-105 sm:size-14 sm:rounded-2xl"
                     style={{ background: `${c.tint}16`, color: c.tint }}
@@ -161,8 +165,24 @@ export function Contact() {
                   >
                     <ArrowUpRight className="size-4 sm:size-5" />
                   </span>
-                </Link>
-              ))}
+                  </>
+                );
+
+                return c.href ? (
+                  <Link key={c.label} href={c.href} className={CHANNEL_CARD}>
+                    {body}
+                  </Link>
+                ) : (
+                  <button
+                    key={c.label}
+                    type="button"
+                    onClick={openChatAssistant}
+                    className={cn(CHANNEL_CARD, "w-full text-left")}
+                  >
+                    {body}
+                  </button>
+                );
+              })}
             </motion.div>
           </div>
 

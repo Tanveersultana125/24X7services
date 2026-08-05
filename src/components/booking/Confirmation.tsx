@@ -1,13 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
 import {
   CheckCircle2, UserCheck, Navigation, Wrench, FileText, ShieldCheck, Star, PartyPopper,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { brandLabel, applianceLabel } from "@/lib/data";
 import { formatINR } from "@/lib/utils";
+import { openChatAssistant } from "@/lib/chat-widget";
 import type { BookingDraft } from "@/lib/types";
 
 const TIMELINE = [
@@ -113,7 +113,12 @@ export function Confirmation({ draft, total, code }: { draft: BookingDraft; tota
         </Button>
       </div>
       <p className="mt-6 text-center text-sm text-muted">
-        Need help? <Link href="/#ai" className="font-semibold text-primary">Chat with our AI assistant</Link> or call 1800-200-247.
+        {/* the old /#ai anchor pointed at a section that doesn't exist */}
+        Need help?{" "}
+        <button type="button" onClick={openChatAssistant} className="font-semibold text-primary underline-offset-4 hover:underline">
+          Chat with our AI assistant
+        </button>{" "}
+        or call 1800-200-247.
       </p>
     </div>
   );
