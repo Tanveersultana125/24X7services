@@ -15,17 +15,19 @@ const FEATURES = [
 export function ClimateExpertise() {
   return (
     <section className="relative py-14 sm:py-20">
-      <div className="mx-auto grid max-w-[92rem] gap-12 px-6 sm:px-10 lg:grid-cols-2 lg:items-center lg:gap-16">
+      {/* items-stretch, not centre: the photo takes the text column's height so
+          the two line up top and bottom instead of the text overhanging. */}
+      <div className="mx-auto grid max-w-[92rem] gap-12 px-6 sm:px-10 lg:grid-cols-2 lg:items-stretch lg:gap-16">
         {/* image */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.8, ease }}
-          className="overflow-hidden rounded-[2rem] border border-white/70 shadow-premium-xl"
+          className="overflow-hidden rounded-[2rem] border border-white/70 shadow-premium-xl lg:h-full"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/work/ac-service.png" alt="Certified technician servicing an air conditioner" className="aspect-[4/3] w-full object-cover" />
+          <img src="/work/ac-service.png" alt="Certified technician servicing an air conditioner" className="aspect-[4/3] w-full object-cover lg:aspect-auto lg:h-full" />
         </motion.div>
 
         {/* features */}
