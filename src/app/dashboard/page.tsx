@@ -16,7 +16,10 @@ export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const user = await getCustomerSession();
-  if (!user) redirect("/login");
+  // Name the destination: without it, signing in falls back to whatever that
+  // login page was last asked for — a customer who came here to rate a service
+  // could land on the booking form instead.
+  if (!user) redirect("/login?next=%2Fdashboard");
 
   const [bookings, reviews] = await Promise.all([
     listCustomerBookings(user.uid).catch(() => []),
