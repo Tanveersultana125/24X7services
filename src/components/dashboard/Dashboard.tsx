@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
+import { BackLink } from "@/components/ui/BackLink";
 import { motion } from "framer-motion";
 import {
   CalendarClock, FileText, ShieldCheck, Sparkles, Navigation, Plus, Star,
@@ -127,6 +128,12 @@ export function Dashboard({
 
   return (
     <div>
+      {/* The dashboard is often a detour — from a review CTA, a warranty link —
+          so it offers the way back rather than only the site nav. */}
+      <div className="mb-6">
+        <BackLink />
+      </div>
+
       {/* Header */}
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
         {/* min-w-0 + truncate: without it a long email can't shrink and pushes

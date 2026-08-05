@@ -4,7 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Logo } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { BackLink } from "@/components/booking/BackLink";
+import { BackLink } from "@/components/ui/BackLink";
 import { BookingFlow } from "@/components/booking/BookingFlow";
 import { getCustomerSession } from "@/lib/customer/auth";
 
@@ -38,7 +38,7 @@ export default async function BookPage({
     <div className="min-h-dvh">
       <header className="sticky top-0 z-40 border-b border-border bg-background/70 backdrop-blur-xl">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-3.5">
-          <BackLink />
+          <BackLink compact />
           <Link href="/" aria-label="24X7 Services — home">
             <Logo />
           </Link>
