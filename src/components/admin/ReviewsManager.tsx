@@ -1,10 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { Star, Check, EyeOff, Trash2, Undo2 } from "lucide-react";
+import { Star, Check, EyeOff, Trash2, Undo2, BadgeCheck, Globe } from "lucide-react";
 import type { Review, ReviewStatus } from "@/lib/reviews";
 
 const FILTERS: ("all" | ReviewStatus)[] = ["all", "pending", "published", "hidden"];
+
+/** Anyone can write a review now, so moderation needs to see where each came from. */
+const SOURCES = ["any", "verified", "website"] as const;
+type Source = (typeof SOURCES)[number];
+
+const SOURCE_LABEL: Record<Source, string> = {
+  any: "Any source",
+  verified: "Verified visit",
+  website: "From website",
+};
 
 const STATUS_STYLE: Record<ReviewStatus, string> = {
   published: "bg-emerald/12 text-emerald",
@@ -20,9 +30,16 @@ function formatDate(ms: number) {
 export function ReviewsManager({ initial }: { initial: Review[] }) {
   const [rows, setRows] = useState<Review[]>(initial);
   const [filter, setFilter] = useState<"all" | ReviewStatus>("all");
+  const [source, setSource] = useState<Source>("any");
+  // Deleting is permanent, so the button asks once before it does it.
+  const [confirming, setConfirming] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const shown = rows.filter((r) => filter === "all" || r.status === filter);
+  const shown = rows.filter(
+    (r) =>
+      (filter === "all" || r.status === filter) &&
+      (source === "any" || (source === "verified" ? r.verified : !r.verified)),
+  );
   const pendingCount = rows.filter((r) => r.status === "pending").length;
 
   // Optimistically apply, persist to Firestore, revert on failure.
@@ -46,6 +63,7 @@ export function ReviewsManager({ initial }: { initial: Review[] }) {
   const remove = async (id: string) => {
     const prev = rows;
     setRows((r) => r.filter((x) => x.id !== id));
+    setConfirming(null);
     setError(null);
     try {
       const res = await fetch("/api/admin/reviews", {
@@ -65,8 +83,8 @@ export function ReviewsManager({ initial }: { initial: Review[] }) {
       <div className="mb-6 sm:mb-8">
         <h1 className="font-display text-2xl tracking-[-0.02em] sm:text-3xl">Reviews</h1>
         <p className="mt-1 text-sm text-muted">
-          Customers rate a service from their dashboard once the job is completed. Approve a review
-          to publish it on the website.
+          Anyone can write a review from the site; a customer can also rate a completed booking,
+          which arrives marked as a verified visit. Nothing is public until you publish it.
           {pendingCount > 0 && (
             <span className="ml-1.5 font-medium text-amber">
               {pendingCount} waiting for approval.
@@ -75,7 +93,7 @@ export function ReviewsManager({ initial }: { initial: Review[] }) {
         </p>
       </div>
 
-      <div className="mb-5 flex flex-wrap gap-1.5">
+      <div className="mb-3 flex flex-wrap gap-1.5">
         {FILTERS.map((f) => (
           <button
             key={f}
@@ -85,6 +103,20 @@ export function ReviewsManager({ initial }: { initial: Review[] }) {
             }`}
           >
             {f}
+          </button>
+        ))}
+      </div>
+
+      <div className="mb-5 flex flex-wrap gap-1.5">
+        {SOURCES.map((s) => (
+          <button
+            key={s}
+            onClick={() => setSource(s)}
+            className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+              source === s ? "bg-royal-bright text-white" : "border border-border bg-surface text-muted hover:text-ink"
+            }`}
+          >
+            {SOURCE_LABEL[s]}
           </button>
         ))}
       </div>
@@ -103,9 +135,21 @@ export function ReviewsManager({ initial }: { initial: Review[] }) {
                   <span className="text-xs text-muted">
                     · {[r.city, [r.brand, r.appliance].filter(Boolean).join(" ")].filter(Boolean).join(" · ")}
                   </span>
-                  <span className="rounded-md bg-surface-2 px-1.5 py-0.5 font-mono text-[0.65rem] text-muted">
-                    {r.bookingCode}
-                  </span>
+                  {/* an open review has no booking, so the chip would be empty */}
+                  {r.bookingCode && (
+                    <span className="rounded-md bg-surface-2 px-1.5 py-0.5 font-mono text-[0.65rem] text-muted">
+                      {r.bookingCode}
+                    </span>
+                  )}
+                  {r.verified ? (
+                    <span className="inline-flex items-center gap-1 rounded-md bg-emerald/12 px-1.5 py-0.5 text-[0.65rem] font-semibold text-emerald">
+                      <BadgeCheck className="size-3" /> Verified visit
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-md bg-surface-2 px-1.5 py-0.5 text-[0.65rem] font-semibold text-muted">
+                      <Globe className="size-3" /> From website
+                    </span>
+                  )}
                 </div>
                 <div className="mt-1 flex items-center gap-0.5">
                   {Array.from({ length: 5 }).map((_, i) => (
@@ -137,9 +181,20 @@ export function ReviewsManager({ initial }: { initial: Review[] }) {
                   <Undo2 className="size-3.5" /> Back to pending
                 </button>
               )}
-              <button onClick={() => remove(r.id)} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-danger hover:bg-danger/10">
-                <Trash2 className="size-3.5" /> Delete
-              </button>
+              {confirming === r.id ? (
+                <>
+                  <button onClick={() => remove(r.id)} className="inline-flex items-center gap-1.5 rounded-lg bg-danger px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90">
+                    <Trash2 className="size-3.5" /> Delete permanently
+                  </button>
+                  <button onClick={() => setConfirming(null)} className="inline-flex items-center rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted hover:text-ink">
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <button onClick={() => setConfirming(r.id)} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-danger hover:bg-danger/10">
+                  <Trash2 className="size-3.5" /> Delete
+                </button>
+              )}
             </div>
           </div>
         ))}
@@ -147,11 +202,11 @@ export function ReviewsManager({ initial }: { initial: Review[] }) {
         {shown.length === 0 && (
           <div className="rounded-2xl border border-dashed border-border-strong bg-surface py-14 text-center">
             <p className="font-medium">
-              {rows.length === 0 ? "No reviews yet." : `No ${filter} reviews.`}
+              {rows.length === 0 ? "No reviews yet." : "Nothing matches these filters."}
             </p>
             <p className="mt-1 text-sm text-muted">
               {rows.length === 0
-                ? "Reviews arrive here as soon as a customer rates a completed booking."
+                ? "Reviews arrive here the moment someone writes one — from the site or against a completed booking."
                 : "Try a different filter."}
             </p>
           </div>
