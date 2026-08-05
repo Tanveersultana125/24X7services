@@ -11,8 +11,8 @@ const SPEED = 26;
  *
  * It scrolls a real overflow container rather than animating a transform, which
  * is what lets a visitor grab it: the drift, the hover pause and the drag all
- * move the same scrollLeft. The children are rendered twice, so wrapping at the
- * halfway point is invisible.
+ * move the same scrollLeft. The children are rendered twice as two identical
+ * copies, so wrapping at the first copy's width is invisible.
  */
 export function Marquee({
   children,
@@ -24,21 +24,21 @@ export function Marquee({
   children: React.ReactNode;
   reverse?: boolean;
   className?: string;
-  /** Overrides on the moving track — e.g. `items-stretch` for equal-height cards. */
+  /** Overrides on each copy — e.g. `items-stretch` for equal-height cards. */
   trackClassName?: string;
   fade?: boolean;
 }) {
   const viewport = useRef<HTMLDivElement>(null);
+  const copy = useRef<HTMLDivElement>(null);
   const hovering = useRef(false);
-  const drag = useRef({ active: false, startX: 0, startLeft: 0, moved: 0 });
+  const drag = useRef({ active: false, startX: 0, startLeft: 0 });
 
   useEffect(() => {
     const el = viewport.current;
     if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     // A reverse strip starts on the second copy so it has somewhere to go.
-    if (reverse) el.scrollLeft = el.scrollWidth / 2 - 1;
+    if (reverse && copy.current) el.scrollLeft = copy.current.offsetWidth - 1;
 
     let raf = 0;
     let last = performance.now();
@@ -48,14 +48,14 @@ export function Marquee({
       const elapsed = Math.min(now - last, 50);
       last = now;
 
-      if (!hovering.current && !drag.current.active) {
-        el.scrollLeft += ((reverse ? -1 : 1) * SPEED * elapsed) / 1000;
-      }
-
-      const half = el.scrollWidth / 2;
-      if (half > 0) {
-        if (el.scrollLeft >= half) el.scrollLeft -= half;
-        else if (el.scrollLeft < 0) el.scrollLeft += half;
+      const span = copy.current?.offsetWidth ?? 0;
+      // Nothing to loop through until the copies have laid out.
+      if (span > 0) {
+        if (!hovering.current && !drag.current.active) {
+          el.scrollLeft += ((reverse ? -1 : 1) * SPEED * elapsed) / 1000;
+        }
+        if (el.scrollLeft >= span) el.scrollLeft -= span;
+        else if (el.scrollLeft < 0) el.scrollLeft += span;
       }
 
       raf = requestAnimationFrame(frame);
@@ -70,16 +70,14 @@ export function Marquee({
     // Touch already pans the strip natively; driving scrollLeft as well would
     // fight it. This drag is for the cursor.
     if (!el || e.pointerType !== "mouse") return;
-    drag.current = { active: true, startX: e.clientX, startLeft: el.scrollLeft, moved: 0 };
+    drag.current = { active: true, startX: e.clientX, startLeft: el.scrollLeft };
     el.setPointerCapture(e.pointerId);
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
     const el = viewport.current;
     if (!el || !drag.current.active) return;
-    const dx = e.clientX - drag.current.startX;
-    drag.current.moved = Math.max(drag.current.moved, Math.abs(dx));
-    el.scrollLeft = drag.current.startLeft - dx;
+    el.scrollLeft = drag.current.startLeft - (e.clientX - drag.current.startX);
   };
 
   const endDrag = () => {
@@ -115,9 +113,13 @@ export function Marquee({
         onPointerCancel={endDrag}
         className="flex cursor-grab overflow-x-auto overflow-y-hidden overscroll-x-contain active:cursor-grabbing [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        <div className={cn("flex w-max shrink-0 items-center gap-16 pr-16", trackClassName)}>
-          {children}
-          {children}
+        <div className="flex w-max">
+          <div ref={copy} className={cn("flex shrink-0 items-center gap-16 pr-16", trackClassName)}>
+            {children}
+          </div>
+          <div aria-hidden className={cn("flex shrink-0 items-center gap-16 pr-16", trackClassName)}>
+            {children}
+          </div>
         </div>
       </div>
     </div>
