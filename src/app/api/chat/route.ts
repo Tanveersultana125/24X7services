@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { SYSTEM_PROMPT, isAllowedHref } from "@/lib/ai/assistant";
+import { SYSTEM_PROMPT, sanitizeHref } from "@/lib/ai/assistant";
 
 /**
  * The assistant's brain. Talks to Groq's OpenAI-compatible chat endpoint with
@@ -70,9 +70,13 @@ function readReply(content: string): { text: string; actions?: Action[] } {
         const actions = Array.isArray(parsed.actions)
           ? parsed.actions
               .filter((a): a is Record<string, unknown> => Boolean(a) && typeof a === "object")
-              .map((a) => ({ label: String(a.label ?? "").trim(), href: String(a.href ?? "").trim() }))
-              // A link the site doesn't have would 404 — drop it, keep the reply.
-              .filter((a) => a.label && isAllowedHref(a.href))
+              .map((a) => ({
+                label: String(a.label ?? "").trim(),
+                // A link the site doesn't serve would 404, and an unknown
+                // prefill would quietly do nothing — both are stripped here.
+                href: sanitizeHref(String(a.href ?? "")),
+              }))
+              .filter((a): a is Action => Boolean(a.label && a.href))
               .slice(0, 2)
           : [];
         return actions.length ? { text, actions } : { text };
