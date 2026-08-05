@@ -14,12 +14,21 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ rate?: string }>;
+}) {
+  const { rate } = await searchParams;
+  const rating = rate === "1";
+
   const user = await getCustomerSession();
-  // Name the destination: without it, signing in falls back to whatever that
-  // login page was last asked for — a customer who came here to rate a service
-  // could land on the booking form instead.
-  if (!user) redirect("/login?next=%2Fdashboard");
+  // Name the destination, intent and all: without it, signing in falls back to
+  // whatever that login page was last asked for — a customer who came here to
+  // rate a service could land on the booking form instead.
+  if (!user) {
+    redirect(`/login?next=${encodeURIComponent(rating ? "/dashboard?rate=1" : "/dashboard")}`);
+  }
 
   const [bookings, reviews] = await Promise.all([
     listCustomerBookings(user.uid).catch(() => []),
@@ -40,6 +49,7 @@ export default async function DashboardPage() {
           user={user}
           bookings={bookings}
           reviewedBookingIds={reviews.map((r) => r.bookingId)}
+          intent={rating ? "rate" : undefined}
         />
       </main>
       <SiteFooter />

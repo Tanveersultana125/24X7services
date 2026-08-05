@@ -25,7 +25,9 @@ export function LeaveReviewCta() {
           </div>
 
           <a
-            href="/dashboard"
+            /* rate=1 opens the dashboard on the jobs that can be rated, rather
+               than the overview's "book your first service" prompt */
+            href="/dashboard?rate=1"
             className="inline-flex h-12 shrink-0 items-center gap-2 rounded-full bg-ink px-7 text-sm font-semibold text-white transition-opacity hover:opacity-90"
           >
             Rate your service <ArrowRight className="size-4" />

@@ -72,13 +72,16 @@ export function Dashboard({
   user,
   bookings = [],
   reviewedBookingIds = [],
+  intent,
 }: {
   user?: DashboardUser;
   bookings?: Booking[];
   /** Booking ids this customer has already reviewed — those rows show "Rated". */
   reviewedBookingIds?: string[];
+  /** "rate" — arrived from a review CTA, so open on the jobs that can be rated. */
+  intent?: "rate";
 }) {
-  const [tab, setTab] = useState<(typeof TABS)[number]>("Overview");
+  const [tab, setTab] = useState<(typeof TABS)[number]>(intent === "rate" ? "Bookings" : "Overview");
   const [rated, setRated] = useState<string[]>(reviewedBookingIds);
   const [reviewing, setReviewing] = useState<ReviewTarget | null>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
@@ -258,9 +261,22 @@ export function Dashboard({
       <div className="mt-8">
         {(tab === "Overview" || tab === "Bookings") && (
           history.length === 0 ? (
-            <EmptyState />
+            intent === "rate" ? (
+              <EmptyState
+                label="Nothing to rate yet."
+                hint="Reviews are tied to a real visit — rate a job here once a technician has completed it."
+              />
+            ) : (
+              <EmptyState />
+            )
           ) : (
             <div className="space-y-4">
+              {/* Arrived to leave a review with no completed job to review. */}
+              {intent === "rate" && !history.some((h) => h.canReview || h.isRated) && (
+                <p className="rounded-2xl border border-dashed border-border-strong bg-surface px-4 py-3 text-sm text-muted">
+                  You can rate a service once the visit is completed — your open bookings are below.
+                </p>
+              )}
               {history.map((h) => (
                 <div key={h.id} className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-4 shadow-premium-sm sm:flex-row sm:items-center sm:justify-between sm:p-5">
                   <div className="flex min-w-0 items-center gap-3.5 sm:gap-4">
@@ -477,14 +493,20 @@ export function Dashboard({
   );
 }
 
-function EmptyState({ label = "No bookings yet." }: { label?: string }) {
+function EmptyState({
+  label = "No bookings yet.",
+  hint = "Book your first service and it'll show up here.",
+}: {
+  label?: string;
+  hint?: string;
+}) {
   return (
     <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-strong bg-surface px-5 py-10 text-center sm:rounded-3xl sm:p-12">
       <div className="grid size-13 place-items-center rounded-2xl bg-surface-2 text-primary sm:size-14">
         <Wrench className="size-6" />
       </div>
       <p className="mt-4 font-semibold">{label}</p>
-      <p className="mt-1 text-sm text-muted">Book your first service and it&apos;ll show up here.</p>
+      <p className="mt-1 max-w-sm text-sm text-muted">{hint}</p>
       <Button href="/book" size="md" className="mt-5"><Plus className="size-4" /> Book a service</Button>
     </div>
   );
