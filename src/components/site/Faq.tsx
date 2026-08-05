@@ -278,7 +278,9 @@ export function Faq() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease }}
-          className="relative z-10 mt-8 flex flex-col gap-6 overflow-hidden rounded-[1.5rem] px-6 py-7 text-white shadow-[0_28px_60px_-24px_rgba(37,71,208,0.55)] sm:rounded-[1.75rem] sm:px-9 lg:flex-row lg:items-center lg:justify-between xl:mr-[24%]"
+          /* The band stops short of the reassurance card's lane, not just the
+             photo rail's — the card overhangs the rail by a good margin. */
+          className="relative z-10 mt-8 flex flex-col gap-6 overflow-hidden rounded-[1.5rem] px-6 py-7 text-white shadow-[0_28px_60px_-24px_rgba(37,71,208,0.55)] sm:rounded-[1.75rem] sm:px-9 lg:flex-row lg:items-center lg:justify-between xl:mr-[32%]"
           style={{ background: "linear-gradient(105deg, #2f56e0 0%, #2547d0 45%, #1a2f8f 100%)" }}
         >
           <span
