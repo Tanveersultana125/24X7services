@@ -236,7 +236,9 @@ export function TrustBento() {
               className="pointer-events-none absolute -left-10 top-1/2 size-52 -translate-y-1/2 rounded-full opacity-40 blur-3xl"
               style={{ background: "#2547d0" }}
             />
-            <Link href="/book" className="relative flex h-full items-center gap-4 sm:gap-6">
+            {/* The tile promises a human on the line, so it dials one — the
+                booking form it used to open is a different promise. */}
+            <a href="tel:18002000247" className="relative flex h-full items-center gap-4 sm:gap-6">
               <span className="relative grid size-14 shrink-0 place-items-center rounded-full bg-white/10 text-white ring-1 ring-white/20 transition-transform duration-500 group-hover:scale-105 sm:size-16">
                 <Headset className="size-6 sm:size-7" strokeWidth={1.7} />
                 <span className="absolute -right-0.5 -top-0.5 flex size-3.5">
@@ -251,7 +253,7 @@ export function TrustBento() {
                 </span>
               </span>
               <GoArrow tint={ROYAL} onDark />
-            </Link>
+            </a>
           </Card>
 
           {/* ---------- F — same-day service ---------- */}
