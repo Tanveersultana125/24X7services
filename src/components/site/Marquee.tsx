@@ -9,10 +9,13 @@ const SPEED = 26;
 /**
  * A strip that drifts on its own and can also be dragged.
  *
- * It scrolls a real overflow container rather than animating a transform, which
- * is what lets a visitor grab it: the drift, the hover pause and the drag all
- * move the same scrollLeft. The children are rendered twice as two identical
- * copies, so wrapping at the first copy's width is invisible.
+ * One number drives everything: `offset`, applied to the track as a transform.
+ * The drift advances it each frame, a drag sets it directly, and the cursor
+ * resting on the strip freezes it. The children are rendered twice as two
+ * identical copies, so wrapping at the first copy's width is invisible.
+ *
+ * Transform rather than scrollLeft because a scroll container only moves if the
+ * browser agrees it's scrollable — this moves whatever the container thinks.
  */
 export function Marquee({
   children,
@@ -28,18 +31,13 @@ export function Marquee({
   trackClassName?: string;
   fade?: boolean;
 }) {
-  const viewport = useRef<HTMLDivElement>(null);
+  const track = useRef<HTMLDivElement>(null);
   const copy = useRef<HTMLDivElement>(null);
+  const offset = useRef(0);
   const hovering = useRef(false);
-  const drag = useRef({ active: false, startX: 0, startLeft: 0 });
+  const drag = useRef({ active: false, startX: 0, startOffset: 0 });
 
   useEffect(() => {
-    const el = viewport.current;
-    if (!el) return;
-
-    // A reverse strip starts on the second copy so it has somewhere to go.
-    if (reverse && copy.current) el.scrollLeft = copy.current.offsetWidth - 1;
-
     let raf = 0;
     let last = performance.now();
 
@@ -49,13 +47,15 @@ export function Marquee({
       last = now;
 
       const span = copy.current?.offsetWidth ?? 0;
-      // Nothing to loop through until the copies have laid out.
       if (span > 0) {
         if (!hovering.current && !drag.current.active) {
-          el.scrollLeft += ((reverse ? -1 : 1) * SPEED * elapsed) / 1000;
+          offset.current += ((reverse ? -1 : 1) * SPEED * elapsed) / 1000;
         }
-        if (el.scrollLeft >= span) el.scrollLeft -= span;
-        else if (el.scrollLeft < 0) el.scrollLeft += span;
+        // Keep the offset inside one copy — the second copy covers the gap.
+        offset.current = ((offset.current % span) + span) % span;
+        if (track.current) {
+          track.current.style.transform = `translate3d(${-offset.current}px, 0, 0)`;
+        }
       }
 
       raf = requestAnimationFrame(frame);
@@ -66,18 +66,14 @@ export function Marquee({
   }, [reverse]);
 
   const onPointerDown = (e: React.PointerEvent) => {
-    const el = viewport.current;
-    // Touch already pans the strip natively; driving scrollLeft as well would
-    // fight it. This drag is for the cursor.
-    if (!el || e.pointerType !== "mouse") return;
-    drag.current = { active: true, startX: e.clientX, startLeft: el.scrollLeft };
-    el.setPointerCapture(e.pointerId);
+    drag.current = { active: true, startX: e.clientX, startOffset: offset.current };
+    e.currentTarget.setPointerCapture(e.pointerId);
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
-    const el = viewport.current;
-    if (!el || !drag.current.active) return;
-    el.scrollLeft = drag.current.startLeft - (e.clientX - drag.current.startX);
+    if (!drag.current.active) return;
+    // Dragging right pulls the strip right, so the offset moves the other way.
+    offset.current = drag.current.startOffset - (e.clientX - drag.current.startX);
   };
 
   const endDrag = () => {
@@ -98,10 +94,6 @@ export function Marquee({
       }
     >
       <div
-        ref={viewport}
-        /* Lenis owns touch scrolling globally; without this it swallows a
-           horizontal swipe and the strip never moves on a phone. */
-        data-lenis-prevent
         onMouseEnter={() => (hovering.current = true)}
         onMouseLeave={() => {
           hovering.current = false;
@@ -111,9 +103,12 @@ export function Marquee({
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
-        className="flex cursor-grab overflow-x-auto overflow-y-hidden overscroll-x-contain active:cursor-grabbing [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        /* pan-y: a vertical swipe still scrolls the page, a horizontal one is
+           ours. Without it the browser claims the gesture and the strip
+           wouldn't follow a finger at all. */
+        className="cursor-grab touch-pan-y select-none active:cursor-grabbing"
       >
-        <div className="flex w-max">
+        <div ref={track} className="flex w-max will-change-transform">
           <div ref={copy} className={cn("flex shrink-0 items-center gap-16 pr-16", trackClassName)}>
             {children}
           </div>
