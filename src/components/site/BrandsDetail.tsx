@@ -14,10 +14,11 @@ const COVERAGE: Record<string, { appliances: string[]; specialties: string[] }> 
   bosch: { appliances: ["Refrigerator", "Washing Machine", "Microwave & Oven", "Air Conditioner"], specialties: ["EcoSilence motors", "VarioInverter", "German precision"] },
 };
 
+/** One accent each: three identical blue cards read as one long card. */
 const WHY = [
-  { icon: Package, title: "Genuine spare parts", desc: "Every component is brand-approved and traceable — never a local substitute that voids your warranty." },
-  { icon: Wrench, title: "Model-specific training", desc: "Technicians are certified on each brand's exact platforms, not just generic repair." },
-  { icon: ShieldCheck, title: "Warranty-safe service", desc: "Authorised repairs keep your manufacturer warranty intact and add our own 90-day cover." },
+  { icon: Package, tint: "#2547d0", title: "Genuine spare parts", desc: "Every component is brand-approved and traceable — never a local substitute that voids your warranty." },
+  { icon: Wrench, tint: "#0b9a63", title: "Model-specific training", desc: "Technicians are certified on each brand's exact platforms, not just generic repair." },
+  { icon: ShieldCheck, tint: "#d9821b", title: "Warranty-safe service", desc: "Authorised repairs keep your manufacturer warranty intact and add our own 90-day cover." },
 ];
 
 export function BrandsDetail() {
@@ -112,14 +113,26 @@ export function BrandsDetail() {
                 transition={{ duration: 0.6, delay: i * 0.06 }}
                 /* bg-background made these the page with a hairline drawn on
                    it; they take the same lit card the rest of the site uses */
-                className="group rounded-[1.75rem] border border-card-edge bg-gradient-to-b from-card to-surface p-8 shadow-[0_18px_40px_-20px_rgba(23,21,15,0.18),inset_0_1.5px_0_var(--card-edge)] transition-all duration-500 hover:-translate-y-1 dark:border-white/[0.12] dark:shadow-[0_26px_60px_-30px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] dark:hover:border-white/[0.2]"
+                style={{ "--tint": w.tint } as React.CSSProperties}
+                className="group relative overflow-hidden rounded-[1.75rem] border border-card-edge bg-gradient-to-b from-card to-surface p-8 shadow-[0_18px_40px_-20px_rgba(23,21,15,0.18),inset_0_1.5px_0_var(--card-edge)] transition-all duration-500 hover:-translate-y-1 dark:border-white/[0.12] dark:shadow-[0_26px_60px_-30px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] dark:hover:border-white/[0.2]"
               >
-                {/* royal at 10% is a colour on paper and a smudge on black */}
-                <div className="grid size-12 place-items-center rounded-2xl bg-royal/10 text-royal-bright ring-1 ring-inset ring-royal/15 transition-transform duration-500 group-hover:scale-105 dark:bg-royal-bright/20 dark:ring-white/10">
+                {/* the card's own colour, sunk into the corner it comes from */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -right-14 -top-14 size-40 rounded-full opacity-[0.14] blur-2xl transition-opacity duration-500 group-hover:opacity-25 dark:opacity-25 dark:group-hover:opacity-40"
+                  style={{ background: "var(--tint)" }}
+                />
+
+                {/* a tint at 10% is a colour on paper and a smudge on black */}
+                <div className="relative grid size-12 place-items-center rounded-2xl bg-[color-mix(in_srgb,var(--tint)_12%,transparent)] text-[var(--tint)] ring-1 ring-inset ring-[color-mix(in_srgb,var(--tint)_22%,transparent)] transition-transform duration-500 group-hover:scale-105 dark:bg-[color-mix(in_srgb,var(--tint)_24%,transparent)] dark:text-[color-mix(in_srgb,var(--tint)_55%,white)] dark:ring-white/10">
                   <w.icon className="size-6" strokeWidth={1.6} />
                 </div>
-                <h3 className="mt-5 text-lg font-semibold tracking-tight">{w.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-ink-soft">{w.desc}</p>
+                <h3 className="relative mt-5 text-lg font-semibold tracking-tight">{w.title}</h3>
+                <span
+                  aria-hidden
+                  className="relative mt-3 block h-0.5 w-8 rounded-full bg-[var(--tint)] transition-all duration-500 group-hover:w-14 dark:bg-[color-mix(in_srgb,var(--tint)_60%,white)]"
+                />
+                <p className="relative mt-3 text-sm leading-relaxed text-ink-soft">{w.desc}</p>
               </motion.div>
             ))}
           </div>
