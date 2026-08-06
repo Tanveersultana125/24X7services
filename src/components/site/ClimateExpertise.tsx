@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSiteImage } from "@/components/providers/SiteImagesProvider";
 import { motion } from "framer-motion";
 import { Wind, ShieldCheck, Gauge } from "lucide-react";
 import { Kicker } from "./TextReveal";
@@ -15,6 +16,7 @@ const FEATURES = [
 ];
 
 export function ClimateExpertise() {
+  const expertiseServiceSrc = useSiteImage("expertise-service");
   const [zoomed, setZoomed] = useState(false);
 
   return (
@@ -40,7 +42,7 @@ export function ClimateExpertise() {
           className="cursor-zoom-in overflow-hidden rounded-[2rem] border border-card-edge shadow-premium-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-bright lg:h-full"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/work/ac-service.png" alt="Certified technician servicing an air conditioner" className="aspect-[4/3] w-full object-cover lg:aspect-auto lg:h-full" />
+          <img src={expertiseServiceSrc} alt="Certified technician servicing an air conditioner" className="aspect-[4/3] w-full object-cover lg:aspect-auto lg:h-full" />
         </motion.div>
 
         {/* features */}

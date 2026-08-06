@@ -7,6 +7,7 @@ import { ChevronDown, BadgeCheck, ArrowUpRight } from "lucide-react";
 import { Kicker } from "./TextReveal";
 import { ImageLightbox } from "@/components/ui/ImageLightbox";
 import { cn } from "@/lib/utils";
+import { useSiteImage } from "@/components/providers/SiteImagesProvider";
 
 const ITEMS = [
   { title: "Fast & easy AC booking", body: "Pick your appliance, describe the fault, choose a slot — confirmed in under two minutes, no call centres." },
@@ -26,6 +27,7 @@ function Tick() {
 }
 
 export function CoolingSolutions() {
+  const coolingFamilySrc = useSiteImage("cooling-family");
   const [open, setOpen] = useState(2);
   const [zoomed, setZoomed] = useState(false);
 
@@ -105,7 +107,7 @@ export function CoolingSolutions() {
             {/* squarer crop on phones so the floating card covers a similar share of the
                 frame as it does on desktop */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/work/family-ac.png" alt="A family enjoying cool comfort at home" className="aspect-square w-full object-cover sm:aspect-[4/3]" />
+            <img src={coolingFamilySrc} alt="A family enjoying cool comfort at home" className="aspect-square w-full object-cover sm:aspect-[4/3]" />
           </motion.div>
 
           <motion.div

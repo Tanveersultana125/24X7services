@@ -14,6 +14,7 @@ import { APPLIANCES } from "@/lib/data";
 import { formatRange } from "@/lib/utils";
 import type { ApplianceId } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useSiteImage } from "@/components/providers/SiteImagesProvider";
 
 const ROYAL = "#2547d0";
 const EMERALD = "#0b9a63";
@@ -79,6 +80,8 @@ const PRICING_ASSURANCES = [
 ];
 
 export function ServicesDetail() {
+  const promiseShieldSrc = useSiteImage("promise-shield");
+  const applianceLineupSrc = useSiteImage("appliance-lineup");
   const [active, setActive] = useState<ApplianceId>("refrigerator");
   const appliance = APPLIANCES.find((a) => a.id === active)!;
 
@@ -119,7 +122,7 @@ export function ServicesDetail() {
                 style={{ background: "radial-gradient(circle, rgba(37,71,208,0.10), transparent 68%)" }}
               />
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/work/promise-shield-cut.png" alt="" className="w-full" />
+              <img src={promiseShieldSrc} alt="" className="w-full" />
             </div>
           </div>
 
@@ -215,7 +218,7 @@ export function ServicesDetail() {
               {/* the range we service, on its plinth */}
               <div aria-hidden className="relative mx-auto w-full max-w-sm lg:max-w-none">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/work/appliance-lineup-v2.png" alt="" className="w-full" />
+                <img src={applianceLineupSrc} alt="" className="w-full" />
               </div>
 
               {/* promise note */}

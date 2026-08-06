@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSiteImage } from "@/components/providers/SiteImagesProvider";
 import { motion } from "framer-motion";
 import {
   ChevronsRight,
@@ -32,6 +33,7 @@ const RATINGS = [
 ];
 
 export function QuickEstimate() {
+  const estimateTabletSrc = useSiteImage("estimate-tablet");
   const [sent, setSent] = useState(false);
 
   return (
@@ -40,7 +42,7 @@ export function QuickEstimate() {
       <div aria-hidden className="absolute inset-y-0 right-0 z-0 hidden w-[42%] overflow-hidden lg:block">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/work/ac-tech-tablet.png"
+          src={estimateTabletSrc}
           alt=""
           className="h-full w-full object-cover object-[85%_center]"
         />
@@ -115,7 +117,7 @@ export function QuickEstimate() {
             {/* the side photo is desktop-only — show it above the form on small screens */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/work/ac-tech-tablet.png"
+              src={estimateTabletSrc}
               alt=""
               aria-hidden
               className="aspect-[16/9] w-full object-cover object-[center_28%] lg:hidden"

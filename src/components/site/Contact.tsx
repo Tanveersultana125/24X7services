@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { openChatAssistant } from "@/lib/chat-widget";
+import { useSiteImage } from "@/components/providers/SiteImagesProvider";
 import {
   ArrowUpRight,
   PhoneCall,
@@ -62,6 +63,8 @@ const ASSURANCES = [
 ];
 
 export function Contact() {
+  const promiseShieldSrc = useSiteImage("promise-shield");
+
   return (
     <section id="contact" className="relative scroll-mt-28 pb-14 pt-12 sm:pb-20 sm:pt-20">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
@@ -120,7 +123,7 @@ export function Contact() {
               {/* shield mark, sitting beside the headline where the column is empty */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/work/promise-shield-cut.png"
+                src={promiseShieldSrc}
                 alt=""
                 aria-hidden
                 className="pointer-events-none absolute right-0 top-12 w-24 opacity-95 sm:top-14 sm:w-32 lg:top-10 lg:w-44 xl:top-8 xl:w-56"

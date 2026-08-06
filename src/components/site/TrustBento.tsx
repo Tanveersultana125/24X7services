@@ -18,6 +18,7 @@ import {
 import { TESTIMONIALS } from "@/lib/content";
 import { Kicker } from "./TextReveal";
 import { cn } from "@/lib/utils";
+import { useSiteImage } from "@/components/providers/SiteImagesProvider";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -102,6 +103,7 @@ function GoArrow({ tint, onDark }: { tint: string; onDark?: boolean }) {
 }
 
 export function TrustBento() {
+  const warrantyTileSrc = useSiteImage("warranty-tile");
   return (
     <section className="relative py-14 sm:py-20">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
@@ -119,7 +121,7 @@ export function TrustBento() {
           <Card i={0} className="col-span-2 row-span-2 bg-[#0a1533] text-white shadow-[0_32px_60px_-24px_rgba(11,21,51,0.6)]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/work/ac-hero.png"
+              src={warrantyTileSrc}
               alt="Certified technician servicing an air conditioner"
               className="absolute inset-0 size-full object-cover object-[62%_center] transition-transform duration-[1.4s] group-hover:scale-105"
             />

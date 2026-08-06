@@ -4,6 +4,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { ChatAssistant } from "@/components/site/ChatAssistant";
+import { SiteImagesProvider } from "@/components/providers/SiteImagesProvider";
+import { getSiteImages } from "@/lib/site-images";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -102,13 +104,19 @@ const orgJsonLd = {
   aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "128400" },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  // Resolved once per request (cached for a minute) so every section renders
+  // the photo the admin panel currently has assigned.
+  const siteImages = await getSiteImages();
+
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${fraunces.variable} h-full`}>
       <body className="flex min-h-full flex-col antialiased">
         <ThemeProvider>
-          <SmoothScroll>{children}</SmoothScroll>
-          <ChatAssistant />
+          <SiteImagesProvider images={siteImages}>
+            <SmoothScroll>{children}</SmoothScroll>
+            <ChatAssistant />
+          </SiteImagesProvider>
         </ThemeProvider>
         <script
           type="application/ld+json"

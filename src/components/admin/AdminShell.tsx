@@ -9,6 +9,7 @@ import {
   Users,
   Wrench,
   Images,
+  ImagePlay,
   Star,
   LogOut,
   Menu,
@@ -23,6 +24,7 @@ const NAV = [
   { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/services", label: "Services & prices", icon: Wrench },
   { href: "/admin/gallery", label: "Gallery", icon: Images },
+  { href: "/admin/images", label: "Site images", icon: ImagePlay },
   { href: "/admin/reviews", label: "Reviews", icon: Star },
 ];
 

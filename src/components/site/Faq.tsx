@@ -22,6 +22,7 @@ import { TESTIMONIALS } from "@/lib/content";
 import { Kicker } from "./TextReveal";
 import { cn } from "@/lib/utils";
 import { openChatAssistant } from "@/lib/chat-widget";
+import { useSiteImage } from "@/components/providers/SiteImagesProvider";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -46,6 +47,7 @@ const PROMISES = [
 ];
 
 export function Faq() {
+  const faqTechnicianSrc = useSiteImage("faq-technician");
   // Everything starts collapsed — an answer opens only when its row is clicked.
   const [open, setOpen] = useState<number | null>(null);
 
@@ -54,7 +56,7 @@ export function Faq() {
       {/* technician photo rail — only once there is room for three columns */}
       <div aria-hidden className="absolute inset-y-0 right-0 hidden w-[26%] xl:block">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/work/ac-faq-technician.png" alt="" className="h-full w-full object-cover object-center" />
+        <img src={faqTechnicianSrc} alt="" className="h-full w-full object-cover object-center" />
         <div
           className="absolute inset-0"
           style={{ background: "linear-gradient(90deg, var(--background) 0%, rgba(0,0,0,0) 30%)" }}
@@ -86,7 +88,7 @@ export function Faq() {
             <div className="relative mt-7 aspect-[5/4] overflow-hidden rounded-2xl border border-border shadow-premium-sm sm:aspect-[16/9] xl:hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/work/ac-faq-technician.png"
+                src={faqTechnicianSrc}
                 alt="A 24X7 technician servicing a split air conditioner"
                 loading="lazy"
                 className="size-full object-cover object-[center_32%]"

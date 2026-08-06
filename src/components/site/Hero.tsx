@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { useSiteImage } from "@/components/providers/SiteImagesProvider";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight, Star, ShieldCheck, Clock } from "lucide-react";
@@ -9,6 +10,7 @@ const ease = [0.16, 1, 0.3, 1] as const;
 const RED = "#e11d2a";
 
 export function Hero() {
+  const heroTechnicianSrc = useSiteImage("hero-technician");
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const yType = useTransform(scrollYProgress, [0, 1], [0, -50]);
@@ -133,7 +135,7 @@ export function Hero() {
 
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/work/technician.png"
+                src={heroTechnicianSrc}
                 alt="24X7 certified service technician"
                 className="w-full drop-shadow-[0_28px_50px_rgba(60,52,40,0.25)]"
               />
