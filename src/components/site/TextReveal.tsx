@@ -44,12 +44,18 @@ export function Kicker({ children, className }: { children: React.ReactNode; cla
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
+      /* A glass chip rather than loose type: the same material the cards are
+         made of, so a section opens with the site's own surface instead of a
+         line of grey text floating on the page. */
       className={cn(
-        "inline-flex items-center gap-2.5 text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-muted",
+        "inline-flex items-center gap-2.5 rounded-full border border-white/60 bg-white/40 px-3.5 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-ink-soft backdrop-blur-xl backdrop-saturate-150",
+        "shadow-[0_10px_24px_-18px_rgba(23,21,15,0.4),inset_0_1px_0_rgba(255,255,255,0.85)]",
+        "dark:border-white/[0.10] dark:bg-white/[0.06] dark:shadow-[0_10px_24px_-18px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.10)]",
         className
       )}
     >
-      <span className="h-px w-8 bg-border-strong" />
+      {/* the rule fades into the chip instead of butting against its edge */}
+      <span className="h-px w-6 bg-gradient-to-r from-transparent to-border-strong" />
       {children}
     </motion.span>
   );
