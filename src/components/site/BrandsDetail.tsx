@@ -110,13 +110,16 @@ export function BrandsDetail() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.06 }}
-                className="rounded-[1.75rem] border border-border bg-background p-8"
+                /* bg-background made these the page with a hairline drawn on
+                   it; they take the same lit card the rest of the site uses */
+                className="group rounded-[1.75rem] border border-card-edge bg-gradient-to-b from-card to-surface p-8 shadow-[0_18px_40px_-20px_rgba(23,21,15,0.18),inset_0_1.5px_0_var(--card-edge)] transition-all duration-500 hover:-translate-y-1 dark:border-white/[0.12] dark:shadow-[0_26px_60px_-30px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] dark:hover:border-white/[0.2]"
               >
-                <div className="grid size-12 place-items-center rounded-2xl bg-royal/10 text-royal-bright">
+                {/* royal at 10% is a colour on paper and a smudge on black */}
+                <div className="grid size-12 place-items-center rounded-2xl bg-royal/10 text-royal-bright ring-1 ring-inset ring-royal/15 transition-transform duration-500 group-hover:scale-105 dark:bg-royal-bright/20 dark:ring-white/10">
                   <w.icon className="size-6" strokeWidth={1.6} />
                 </div>
                 <h3 className="mt-5 text-lg font-semibold tracking-tight">{w.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted">{w.desc}</p>
+                <p className="mt-2 text-sm leading-relaxed text-ink-soft">{w.desc}</p>
               </motion.div>
             ))}
           </div>
