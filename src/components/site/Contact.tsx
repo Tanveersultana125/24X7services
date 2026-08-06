@@ -20,7 +20,7 @@ const ease = [0.16, 1, 0.3, 1] as const;
 
 /** One shell for all three channel cards, whether they navigate or open the chat. */
 const CHANNEL_CARD =
-  "group flex items-center gap-3 rounded-2xl border border-white/70 bg-white p-3.5 shadow-premium-sm transition-transform duration-500 hover:-translate-y-0.5 sm:gap-5 sm:p-5";
+  "group flex items-center gap-3 rounded-2xl border border-card-edge bg-card p-3.5 shadow-premium-sm transition-transform duration-500 hover:-translate-y-0.5 sm:gap-5 sm:p-5";
 
 const ROYAL = "#2547d0";
 const EMERALD = "#0b9a63";
@@ -65,7 +65,7 @@ export function Contact() {
   return (
     <section id="contact" className="relative scroll-mt-28 pb-14 pt-12 sm:pb-20 sm:pt-20">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
-        <div className="relative overflow-hidden rounded-[1.75rem] border border-white/70 bg-gradient-to-br from-white via-surface to-[#eaeefb] px-4 py-9 shadow-premium-lg sm:rounded-[2.5rem] sm:px-12 sm:py-14">
+        <div className="relative overflow-hidden rounded-[1.75rem] border border-card-edge bg-gradient-to-br from-card via-surface to-royal-bright/10 px-4 py-9 shadow-premium-lg sm:rounded-[2.5rem] sm:px-12 sm:py-14">
           <span
             aria-hidden
             className="pointer-events-none absolute -left-24 -top-28 size-72 rounded-full"
@@ -86,7 +86,7 @@ export function Contact() {
               transition={{ duration: 0.7, ease }}
               className="relative"
             >
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white px-3.5 py-2 shadow-premium-sm">
+              <span className="inline-flex items-center gap-2 rounded-full border border-card-edge bg-card px-3.5 py-2 shadow-premium-sm">
                 <span className="grid size-5 place-items-center rounded-full bg-royal-bright text-white">
                   <ShieldCheck className="size-3" strokeWidth={2.4} />
                 </span>
@@ -133,7 +133,7 @@ export function Contact() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.12, ease }}
-              className="space-y-2.5 rounded-[1.5rem] border border-white/60 bg-white/55 p-2.5 shadow-premium-md backdrop-blur sm:space-y-3 sm:rounded-[1.75rem] sm:p-4"
+              className="space-y-2.5 rounded-[1.5rem] border border-card-edge bg-card/55 p-2.5 shadow-premium-md backdrop-blur sm:space-y-3 sm:rounded-[1.75rem] sm:p-4"
             >
               {CHANNELS.map((c) => {
                 const body = (
@@ -192,7 +192,7 @@ export function Contact() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.2, ease }}
-            className="relative mt-8 grid grid-cols-1 gap-6 rounded-[1.5rem] border border-white/60 bg-white/70 px-5 py-6 shadow-premium-sm backdrop-blur sm:grid-cols-2 sm:px-7 lg:grid-cols-4 lg:divide-x lg:divide-hairline"
+            className="relative mt-8 grid grid-cols-1 gap-6 rounded-[1.5rem] border border-card-edge bg-card/70 px-5 py-6 shadow-premium-sm backdrop-blur sm:grid-cols-2 sm:px-7 lg:grid-cols-4 lg:divide-x lg:divide-hairline"
           >
             {ASSURANCES.map((a) => (
               <div key={a.title} className="flex items-center gap-3.5 lg:justify-center lg:px-4">

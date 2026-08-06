@@ -206,7 +206,7 @@ export function MostBooked() {
             >
               <Link
                 href={c.href}
-                className="group block overflow-hidden rounded-2xl border border-white/60 bg-surface shadow-premium-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-premium-md"
+                className="group block overflow-hidden rounded-2xl border border-card-edge bg-surface shadow-premium-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-premium-md"
               >
                 <div className="relative aspect-[5/4] overflow-hidden">
                   {/* eslint-disable-next-line @next/next/no-img-element */}

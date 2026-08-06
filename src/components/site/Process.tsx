@@ -64,7 +64,7 @@ export function Process() {
               </div>
 
               {/* 3D card */}
-              <div className="relative flex-1 overflow-hidden rounded-2xl border border-white/70 bg-gradient-to-b from-white to-surface p-6 shadow-[0_16px_36px_-18px_rgba(23,21,15,0.2),inset_0_1.5px_0_rgba(255,255,255,0.92),inset_0_-14px_26px_-20px_rgba(23,21,15,0.1)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_30px_54px_-22px_rgba(23,21,15,0.3),inset_0_1.5px_0_rgba(255,255,255,0.95)] sm:p-7">
+              <div className="relative flex-1 overflow-hidden rounded-2xl border border-card-edge bg-gradient-to-b from-card to-surface p-6 shadow-[0_16px_36px_-18px_rgba(23,21,15,0.2),inset_0_1.5px_0_rgba(255,255,255,0.92),inset_0_-14px_26px_-20px_rgba(23,21,15,0.1)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_30px_54px_-22px_rgba(23,21,15,0.3),inset_0_1.5px_0_var(--card-edge)] sm:p-7">
                 <span
                   aria-hidden
                   className="pointer-events-none absolute right-5 top-4 font-display text-5xl font-bold leading-none sm:text-6xl"
@@ -72,7 +72,7 @@ export function Process() {
                 >
                   {s.n}
                 </span>
-                <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/60 to-transparent" />
+                <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/60 to-transparent dark:from-white/[0.06]" />
                 <h3 className="relative text-xl font-semibold tracking-tight sm:text-2xl">{s.title}</h3>
                 <p className="relative mt-3 max-w-lg text-pretty leading-relaxed text-muted">{s.body}</p>
                 {/* accent rule */}

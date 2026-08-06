@@ -142,7 +142,7 @@ export function Hero() {
               <motion.div
                 animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -left-4 top-20 hidden items-center gap-2 rounded-full bg-white/95 px-3.5 py-2 shadow-premium-lg backdrop-blur sm:-left-10 sm:flex"
+                className="absolute -left-4 top-20 hidden items-center gap-2 rounded-full bg-card/95 px-3.5 py-2 shadow-premium-lg backdrop-blur sm:-left-10 sm:flex"
               >
                 <ShieldCheck className="size-4 text-emerald" />
                 <span className="text-xs font-semibold text-ink">Brand-authorised pro</span>
@@ -152,7 +152,7 @@ export function Hero() {
               <motion.div
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute -left-6 bottom-24 hidden rounded-2xl border border-white/70 bg-white px-4 py-3 shadow-premium-xl sm:-left-12 sm:block"
+                className="absolute -left-6 bottom-24 hidden rounded-2xl border border-card-edge bg-card px-4 py-3 shadow-premium-xl sm:-left-12 sm:block"
               >
                 <div className="flex items-center gap-2">
                   <span className="relative flex size-2.5">

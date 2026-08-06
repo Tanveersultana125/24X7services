@@ -29,6 +29,12 @@
   --border-strong: #cfc8b8;
   --hairline: rgba(23, 21, 15, 0.08);
 
+  /* Raised cards. Literal white in light mode; in dark they have to lift off
+     the page instead, which a hardcoded bg-white can't do — that was leaving
+     near-white text on a white card. */
+  --card: #ffffff;
+  --card-edge: rgba(255, 255, 255, 0.7);
+
   --glass-bg: rgba(251, 250, 246, 0.6);
   --glass-border: rgba(255, 255, 255, 0.7);
 
@@ -56,6 +62,9 @@
   --royal-bright: #4f74ff;
   --emerald: #10b981;
 
+  --card: #17171b;
+  --card-edge: rgba(255, 255, 255, 0.08);
+
   --glass-bg: rgba(20, 20, 22, 0.55);
   --glass-border: rgba(255, 255, 255, 0.1);
 
@@ -78,6 +87,8 @@
   --color-muted-2: var(--muted-2);
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
+  --color-card: var(--card);
+  --color-card-edge: var(--card-edge);
 
   --color-royal: var(--royal);
   --color-royal-bright: var(--royal-bright);

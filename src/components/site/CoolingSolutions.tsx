@@ -100,7 +100,7 @@ export function CoolingSolutions() {
                 setZoomed(true);
               }
             }}
-            className="cursor-zoom-in overflow-hidden rounded-[2rem] border border-white/70 shadow-premium-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-bright"
+            className="cursor-zoom-in overflow-hidden rounded-[2rem] border border-card-edge shadow-premium-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-bright"
           >
             {/* squarer crop on phones so the floating card covers a similar share of the
                 frame as it does on desktop */}
@@ -113,7 +113,7 @@ export function CoolingSolutions() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.7, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute -bottom-6 left-8 hidden rounded-2xl border border-white/70 bg-white/95 p-6 shadow-premium-xl backdrop-blur lg:block"
+            className="absolute -bottom-6 left-8 hidden rounded-2xl border border-card-edge bg-card/95 p-6 shadow-premium-xl backdrop-blur lg:block"
           >
             <ul className="space-y-2.5">
               {PERKS.map((p) => (

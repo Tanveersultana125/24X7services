@@ -166,7 +166,7 @@ export function PageHeader({
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.35, ease }}
-                className="mt-10 grid grid-cols-3 rounded-[1.5rem] border border-white/70 bg-white/70 px-3 py-5 shadow-premium-sm backdrop-blur sm:px-6 lg:divide-x lg:divide-hairline"
+                className="mt-10 grid grid-cols-3 rounded-[1.5rem] border border-card-edge bg-card/70 px-3 py-5 shadow-premium-sm backdrop-blur sm:px-6 lg:divide-x lg:divide-hairline"
               >
                 {stats.map((st, i) => (
                   <div key={st.label} className="px-1 text-center sm:px-4">
@@ -213,7 +213,7 @@ export function PageHeader({
                   initial={{ opacity: 0, y: 18 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.3 + i * 0.08, ease }}
-                  className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/70 bg-white shadow-[0_14px_30px_-16px_rgba(23,21,15,0.18),inset_0_1.5px_0_rgba(255,255,255,0.9)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_26px_46px_-20px_rgba(23,21,15,0.28)]"
+                  className="group relative flex flex-col overflow-hidden rounded-2xl border border-card-edge bg-card shadow-[0_14px_30px_-16px_rgba(23,21,15,0.18),inset_0_1.5px_0_var(--card-edge)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_26px_46px_-20px_rgba(23,21,15,0.28)]"
                 >
                   {/* wordmark plate */}
                   <div className="relative grid h-24 place-items-center sm:h-32">
@@ -286,7 +286,7 @@ export function PageHeader({
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.5, ease }}
-            className="mt-10 grid grid-cols-2 gap-5 rounded-[1.5rem] border border-white/70 bg-white/70 px-5 py-6 shadow-premium-sm backdrop-blur sm:px-7 lg:grid-cols-4 lg:divide-x lg:divide-hairline"
+            className="mt-10 grid grid-cols-2 gap-5 rounded-[1.5rem] border border-card-edge bg-card/70 px-5 py-6 shadow-premium-sm backdrop-blur sm:px-7 lg:grid-cols-4 lg:divide-x lg:divide-hairline"
           >
             {BRAND_ASSURANCES.map((a) => (
               <div key={a.title} className="flex items-center gap-3 lg:justify-center lg:px-4">
@@ -339,7 +339,7 @@ function CollageShot({ src, ratio, delay }: { src: string; ratio: string; delay:
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, delay, ease }}
-      className={`overflow-hidden rounded-2xl border border-white/70 shadow-premium-md ${ratio}`}
+      className={`overflow-hidden rounded-2xl border border-card-edge shadow-premium-md ${ratio}`}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt="24X7 technician on the job" className="h-full w-full object-cover" />

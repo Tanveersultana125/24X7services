@@ -37,7 +37,7 @@ export function ClimateExpertise() {
               setZoomed(true);
             }
           }}
-          className="cursor-zoom-in overflow-hidden rounded-[2rem] border border-white/70 shadow-premium-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-bright lg:h-full"
+          className="cursor-zoom-in overflow-hidden rounded-[2rem] border border-card-edge shadow-premium-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-bright lg:h-full"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/work/ac-service.png" alt="Certified technician servicing an air conditioner" className="aspect-[4/3] w-full object-cover lg:aspect-auto lg:h-full" />

@@ -131,7 +131,7 @@ export function ServicesDetail() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.6, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
-                className="group rounded-[1.1rem] border border-white/70 bg-gradient-to-b from-white to-surface p-3 text-center shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_rgba(255,255,255,0.9)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)] sm:rounded-[1.5rem] sm:p-7 sm:text-left"
+                className="group rounded-[1.1rem] border border-card-edge bg-gradient-to-b from-card to-surface p-3 text-center shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_var(--card-edge)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)] sm:rounded-[1.5rem] sm:p-7 sm:text-left"
               >
                 <span
                   className="mx-auto grid size-9 place-items-center rounded-lg transition-transform duration-500 group-hover:-translate-y-0.5 sm:mx-0 sm:size-14 sm:rounded-2xl"
@@ -162,7 +162,7 @@ export function ServicesDetail() {
       <section className="bg-surface py-14 sm:py-20">
         <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
           {/* ---------- intro panel ---------- */}
-          <div className="relative overflow-hidden rounded-[1.75rem] border border-white/70 bg-gradient-to-br from-white to-[#f1f3fc] px-6 py-8 shadow-premium-md sm:rounded-[2rem] sm:px-10 sm:py-10">
+          <div className="relative overflow-hidden rounded-[1.75rem] border border-card-edge bg-gradient-to-br from-card to-royal-bright/10 px-6 py-8 shadow-premium-md sm:rounded-[2rem] sm:px-10 sm:py-10">
             <span
               aria-hidden
               className="pointer-events-none absolute -right-24 -top-24 size-80 rounded-full"
@@ -220,7 +220,7 @@ export function ServicesDetail() {
 
               {/* promise note */}
               <div className="relative">
-                <div className="relative z-10 overflow-hidden rounded-[1.5rem] border border-white/70 bg-white p-6 shadow-premium-md">
+                <div className="relative z-10 overflow-hidden rounded-[1.5rem] border border-card-edge bg-card p-6 shadow-premium-md">
                   <span className="grid size-11 place-items-center rounded-xl bg-royal-bright/10 text-royal-bright">
                     <Receipt className="size-5" strokeWidth={1.8} />
                   </span>
@@ -261,7 +261,7 @@ export function ServicesDetail() {
                   "flex min-w-0 items-center gap-2 rounded-full border px-3 py-2 text-[0.78rem] font-medium transition-all sm:gap-2.5 sm:px-4 sm:py-2.5 sm:text-sm",
                   active === a.id
                     ? "border-transparent text-white"
-                    : "border-white/70 bg-white text-ink shadow-premium-sm hover:-translate-y-0.5"
+                    : "border-card-edge bg-card text-ink shadow-premium-sm hover:-translate-y-0.5"
                 )}
               >
                 <ApplianceTile
@@ -283,7 +283,7 @@ export function ServicesDetail() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.35 }}
-              className="mt-4 overflow-hidden rounded-[1.75rem] border border-white/70 bg-white shadow-premium-md"
+              className="mt-4 overflow-hidden rounded-[1.75rem] border border-card-edge bg-card shadow-premium-md"
             >
               <div className="relative flex min-h-[8.5rem] flex-col items-start gap-3 overflow-hidden border-b border-hairline p-5 sm:min-h-[9.5rem] sm:flex-row sm:items-center sm:gap-4 sm:p-6">
                 <ApplianceTile id={appliance.id} size="lg" className="size-11 shrink-0 sm:size-16" />
@@ -372,7 +372,7 @@ export function ServicesDetail() {
           </AnimatePresence>
 
           {/* ---------- pricing assurances ---------- */}
-          <div className="mt-4 grid grid-cols-1 gap-6 rounded-[1.75rem] border border-white/70 bg-white px-5 py-6 shadow-premium-sm sm:grid-cols-2 sm:px-7 lg:grid-cols-4 lg:divide-x lg:divide-hairline">
+          <div className="mt-4 grid grid-cols-1 gap-6 rounded-[1.75rem] border border-card-edge bg-card px-5 py-6 shadow-premium-sm sm:grid-cols-2 sm:px-7 lg:grid-cols-4 lg:divide-x lg:divide-hairline">
             {PRICING_ASSURANCES.map((a) => (
               <div key={a.title} className="flex items-center gap-3.5 lg:justify-center lg:px-4">
                 <span

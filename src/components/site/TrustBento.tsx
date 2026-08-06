@@ -27,7 +27,7 @@ const AMBER = "#d9821b";
 
 /** Light tiles all share one shell so the bento reads as a single system. */
 const SHELL =
-  "border border-white/70 bg-gradient-to-b from-white to-surface shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_rgba(255,255,255,0.9)] hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)]";
+  "border border-card-edge bg-gradient-to-b from-card to-surface shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_var(--card-edge)] hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)]";
 
 const ASSURANCES = [
   { icon: ShieldCheck, title: "Trusted & Secure", desc: "Your safety is our priority" },

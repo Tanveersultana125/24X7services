@@ -56,7 +56,7 @@ export function WorkGallery() {
                   setOpened(i);
                 }
               }}
-              className="group relative mb-4 block w-full cursor-zoom-in break-inside-avoid overflow-hidden rounded-2xl border border-white/60 bg-surface shadow-premium-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-bright"
+              className="group relative mb-4 block w-full cursor-zoom-in break-inside-avoid overflow-hidden rounded-2xl border border-card-edge bg-surface shadow-premium-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-bright"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
