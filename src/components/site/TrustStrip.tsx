@@ -73,7 +73,12 @@ export function TrustStrip() {
                 <p.icon className="size-[1.1rem] sm:size-6" strokeWidth={1.8} />
               </span>
 
-              <h3 className="font-display mt-3 hyphens-auto text-[0.7rem] leading-tight tracking-[-0.01em] sm:mt-6 sm:text-2xl sm:tracking-[-0.02em]">{p.title}</h3>
+              {/* A display serif at 11px has strokes too fine to survive a
+                  phone screen — it reads as a smudge. The sans carries the
+                  title until there's room for the serif to be itself. */}
+              <h3 className="mt-3 text-[0.78rem] font-semibold leading-tight tracking-[-0.01em] sm:font-display sm:mt-6 sm:text-2xl sm:tracking-[-0.02em]">
+                {p.title}
+              </h3>
               {/* the blurb is unreadable in a ~6rem column — keep it for sm and up */}
               {/* On glass the blurb sits over a colour wash, where `muted` goes
                   soft — it takes the stronger ink instead. */}
