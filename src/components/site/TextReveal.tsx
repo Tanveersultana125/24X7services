@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { LogoMark } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
 
 /**
@@ -54,8 +55,9 @@ export function Kicker({ children, className }: { children: React.ReactNode; cla
         className
       )}
     >
-      {/* the rule fades into the chip instead of butting against its edge */}
-      <span className="h-px w-6 bg-gradient-to-r from-transparent to-border-strong" />
+      {/* the mark, so every section is stamped with the brand rather than a
+          length of grey rule */}
+      <LogoMark size="sm" />
       {children}
     </motion.span>
   );
