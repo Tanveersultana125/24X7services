@@ -35,7 +35,7 @@ export function describeAuthError(err: unknown): string {
   return code ? `${code} — ${message}` : message;
 }
 
-function getAdminApp(): App {
+export function getAdminApp(): App {
   const existing = getApps();
   if (existing.length) return existing[0];
 

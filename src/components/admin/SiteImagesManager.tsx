@@ -9,9 +9,10 @@ import {
 } from "@/lib/site-images-shared";
 import { cn } from "@/lib/utils";
 
-const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-const PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 const MAX_BYTES = 10 * 1024 * 1024;
+
+const DISK_NOTICE =
+  "Firebase Storage isn’t enabled for this project, so the image was saved on this server. It works now, but enable Storage in the Firebase console before deploying — a deployed server starts with an empty disk.";
 
 /**
  * Replace any photograph on the marketing site.
@@ -34,8 +35,8 @@ export function SiteImagesManager({
   const [images, setImages] = useState<SiteImages>(current);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const configured = Boolean(CLOUD && PRESET);
+  // Not a failure — where the bytes landed, when it wasn't the bucket.
+  const [notice, setNotice] = useState<string | null>(null);
 
   const fail = async (res: Response, fallback: string) => {
     if (res.status === 401) {
@@ -64,11 +65,8 @@ export function SiteImagesManager({
     }
   };
 
+  /** Browser → our server → the project's own storage bucket. */
   const upload = async (key: string, file: File) => {
-    if (!configured) {
-      setError("Cloudinary isn't configured — set NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME and _UPLOAD_PRESET.");
-      return;
-    }
     if (!file.type.startsWith("image/")) return setError("That file isn't an image.");
     if (file.size > MAX_BYTES) {
       return setError(`That image is ${(file.size / 1024 / 1024).toFixed(1)} MB — the limit is 10 MB.`);
@@ -79,27 +77,24 @@ export function SiteImagesManager({
     try {
       const form = new FormData();
       form.append("file", file);
-      form.append("upload_preset", PRESET!);
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`, {
-        method: "POST",
-        body: form,
-      });
+      form.append("folder", "site-images");
+      const res = await fetch("/api/admin/upload", { method: "POST", body: form });
       const data = await res.json().catch(() => null);
-      if (!res.ok || !data?.secure_url) {
-        // Cloudinary's own wording for a bad cloud name or preset is "Unknown
-        // API key", which sends people hunting for a key they never set.
-        const message = String(data?.error?.message ?? "");
+      if (!res.ok || !data?.url) {
         setError(
-          res.status === 401 || /unknown api key/i.test(message)
-            ? `Cloudinary rejected the account details (“${message.trim() || "unauthorised"}”). Check NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME, and that NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET is the name of an unsigned upload preset — not an API key or secret. You can paste an image URL below in the meantime.`
-            : message || "Cloudinary refused the upload.",
+          data?.detail
+            ? `Upload failed. ${data.detail}`
+            : data?.error === "storage_not_configured"
+              ? "Storage isn't configured — set NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET."
+              : "Upload failed. Please try again.",
         );
         setBusy(null);
         return;
       }
-      await assign(key, data.secure_url);
+      if (data.stored === "disk") setNotice(DISK_NOTICE);
+      await assign(key, data.url);
     } catch {
-      setError("Couldn't reach Cloudinary. Check your connection and try again.");
+      setError("Couldn't reach the server. Check your connection and try again.");
       setBusy(null);
     }
   };
@@ -133,6 +128,7 @@ export function SiteImagesManager({
       </div>
 
       {error && <p className="mb-4 rounded-xl bg-danger/10 px-4 py-3 text-sm text-danger">{error}</p>}
+      {notice && <p className="mb-4 rounded-xl bg-amber/10 px-4 py-3 text-sm text-amber">{notice}</p>}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {SITE_IMAGE_SLOTS.filter((slot) => slot.group === group).map((slot) => {
@@ -182,8 +178,8 @@ function SlotCard({
   onReset: () => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
-  // The way in when Cloudinary isn't set up — or when the photo already lives
-  // somewhere, including this project's own /public folder.
+  // For a photo that already lives somewhere — another site, or this
+  // project's own /public folder.
   const [urlOpen, setUrlOpen] = useState(false);
   const [url, setUrl] = useState("");
 

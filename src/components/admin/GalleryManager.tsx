@@ -5,11 +5,11 @@ import { Plus, Trash2, X, Loader2, ImageUp } from "lucide-react";
 import { GALLERY_CATEGORIES, type GalleryPhoto } from "@/lib/gallery-shared";
 import { cn } from "@/lib/utils";
 
-const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-const PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-
-/** Cloudinary's free tier stops at 10 MB an image; fail here with a reason instead. */
+/** Matches the limit the upload route enforces; fail here with a reason instead. */
 const MAX_BYTES = 10 * 1024 * 1024;
+
+const DISK_NOTICE =
+  "Firebase Storage isn’t enabled for this project, so the image was saved on this server. It works now, but enable Storage in the Firebase console before deploying — a deployed server starts with an empty disk.";
 
 export function GalleryManager({ initial }: { initial: GalleryPhoto[] }) {
   const [items, setItems] = useState<GalleryPhoto[]>(initial);
@@ -18,9 +18,8 @@ export function GalleryManager({ initial }: { initial: GalleryPhoto[] }) {
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-
-  const configured = Boolean(CLOUD && PRESET);
 
   const describe = async (res: Response, fallback: string) => {
     if (res.status === 401) return "Your admin session expired — sign in again at /admin/login.";
@@ -28,12 +27,8 @@ export function GalleryManager({ initial }: { initial: GalleryPhoto[] }) {
     return typeof data?.detail === "string" ? `${fallback} ${data.detail}` : fallback;
   };
 
-  /** Straight to Cloudinary from the browser — the file never touches our server. */
+  /** Browser → our server → the project's own storage bucket. */
   const upload = async (file: File) => {
-    if (!configured) {
-      setError("Cloudinary isn't configured — set NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME and _UPLOAD_PRESET.");
-      return;
-    }
     if (!file.type.startsWith("image/")) {
       setError("That file isn't an image.");
       return;
@@ -46,21 +41,25 @@ export function GalleryManager({ initial }: { initial: GalleryPhoto[] }) {
     setUploading(true);
     setError(null);
     try {
-      const form = new FormData();
-      form.append("file", file);
-      form.append("upload_preset", PRESET!);
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`, {
-        method: "POST",
-        body: form,
-      });
+      const body = new FormData();
+      body.append("file", file);
+      body.append("folder", "gallery");
+      const res = await fetch("/api/admin/upload", { method: "POST", body });
       const data = await res.json().catch(() => null);
-      if (!res.ok || !data?.secure_url) {
-        setError(data?.error?.message ?? "Cloudinary refused the upload.");
+      if (!res.ok || !data?.url) {
+        setError(
+          data?.detail
+            ? `Upload failed. ${data.detail}`
+            : data?.error === "storage_not_configured"
+              ? "Storage isn't configured — set NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET."
+              : "Upload failed. Please try again.",
+        );
         return;
       }
-      setDraft((d) => ({ ...d, src: data.secure_url, label: d.label || file.name.replace(/\.[^.]+$/, "") }));
+      if (data.stored === "disk") setNotice(DISK_NOTICE);
+      setDraft((d) => ({ ...d, src: data.url, label: d.label || file.name.replace(/\.[^.]+$/, "") }));
     } catch {
-      setError("Couldn't reach Cloudinary. Check your connection and try again.");
+      setError("Couldn't reach the server. Check your connection and try again.");
     } finally {
       setUploading(false);
     }
@@ -120,7 +119,7 @@ export function GalleryManager({ initial }: { initial: GalleryPhoto[] }) {
         <div className="min-w-0">
           <h1 className="font-display text-2xl tracking-[-0.02em] sm:text-3xl">Gallery</h1>
           <p className="mt-1 text-sm text-muted">
-            The work photos on the Process page. Uploads go to Cloudinary; the page refreshes itself
+            The work photos on the Process page. Uploads are stored in the project&apos;s own bucket; the page refreshes itself
             once a photo is added or removed.
           </p>
         </div>
@@ -135,6 +134,7 @@ export function GalleryManager({ initial }: { initial: GalleryPhoto[] }) {
       {error && !adding && (
         <p className="mb-4 rounded-xl bg-danger/10 px-4 py-3 text-sm text-danger">{error}</p>
       )}
+      {notice && <p className="mb-4 rounded-xl bg-amber/10 px-4 py-3 text-sm text-amber">{notice}</p>}
 
       {items.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border-strong bg-surface py-14 text-center">
@@ -213,7 +213,7 @@ export function GalleryManager({ initial }: { initial: GalleryPhoto[] }) {
                 label="…or paste an image URL"
                 value={draft.src}
                 onChange={(v) => setDraft({ ...draft, src: v })}
-                placeholder="https://res.cloudinary.com/… or /work/gallery/ac-1.png"
+                placeholder="https://… or /work/gallery/ac-1.png"
               />
               <Input
                 label="Label"
