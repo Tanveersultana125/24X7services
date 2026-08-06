@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Loader2, ImageUp, RotateCcw } from "lucide-react";
+import { Loader2, ImageUp, RotateCcw, Link as LinkIcon } from "lucide-react";
 import {
   SITE_IMAGE_SLOTS,
   DEFAULT_SITE_IMAGES,
@@ -86,7 +86,14 @@ export function SiteImagesManager({
       });
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.secure_url) {
-        setError(data?.error?.message ?? "Cloudinary refused the upload.");
+        // Cloudinary's own wording for a bad cloud name or preset is "Unknown
+        // API key", which sends people hunting for a key they never set.
+        const message = String(data?.error?.message ?? "");
+        setError(
+          res.status === 401 || /unknown api key/i.test(message)
+            ? `Cloudinary rejected the account details (“${message.trim() || "unauthorised"}”). Check NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME, and that NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET is the name of an unsigned upload preset — not an API key or secret. You can paste an image URL below in the meantime.`
+            : message || "Cloudinary refused the upload.",
+        );
         setBusy(null);
         return;
       }
@@ -141,6 +148,7 @@ export function SiteImagesManager({
               custom={src !== slot.defaultSrc}
               busy={busy === slot.key}
               onUpload={(file) => upload(slot.key, file)}
+              onUseUrl={(url) => assign(slot.key, url)}
               onReset={() => reset(slot.key)}
             />
           );
@@ -159,6 +167,7 @@ function SlotCard({
   custom,
   busy,
   onUpload,
+  onUseUrl,
   onReset,
 }: {
   slotKey: string;
@@ -169,9 +178,14 @@ function SlotCard({
   custom: boolean;
   busy: boolean;
   onUpload: (file: File) => void;
+  onUseUrl: (url: string) => void;
   onReset: () => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
+  // The way in when Cloudinary isn't set up — or when the photo already lives
+  // somewhere, including this project's own /public folder.
+  const [urlOpen, setUrlOpen] = useState(false);
+  const [url, setUrl] = useState("");
 
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-premium-sm">
@@ -235,6 +249,13 @@ function SlotCard({
           >
             <ImageUp className="size-3.5" /> Replace
           </button>
+          <button
+            onClick={() => setUrlOpen((o) => !o)}
+            disabled={busy}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-ink"
+          >
+            <LinkIcon className="size-3.5" /> Use a URL
+          </button>
           {custom && (
             <button
               onClick={onReset}
@@ -245,6 +266,34 @@ function SlotCard({
             </button>
           )}
         </div>
+
+        {urlOpen && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const value = url.trim();
+              if (!value) return;
+              onUseUrl(value);
+              setUrl("");
+              setUrlOpen(false);
+            }}
+            className="mt-3 flex gap-2"
+          >
+            <input
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="https://… or /work/ac.png"
+              className="min-w-0 flex-1 rounded-lg border border-border bg-surface-2 px-3 py-2 text-xs outline-none focus:border-royal-bright"
+            />
+            <button
+              type="submit"
+              disabled={!url.trim() || busy}
+              className="rounded-lg bg-ink px-3 py-2 text-xs font-medium text-background hover:opacity-90 disabled:opacity-50"
+            >
+              Save
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
