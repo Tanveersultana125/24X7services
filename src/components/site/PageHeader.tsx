@@ -94,18 +94,24 @@ export function PageHeader({
       {/* full-bleed technician image (desktop) — sits on a soft blue wash so it blends */}
       {image && (
         <>
+          {/* The wash is what a cut-out photo used to stand on. A photo that
+              brings its own background covers it, and on a dark page it would
+              only read as a pale slab — so light keeps it, dark doesn't. */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 hidden lg:block"
+            className="pointer-events-none absolute inset-0 hidden lg:block dark:lg:hidden"
             style={{ background: "linear-gradient(105deg, transparent 40%, rgba(226,234,251,0.55) 64%, #e3ebfc 100%)" }}
           />
+          {/* Fills the right of the header rather than sitting on its floor:
+              a scene photo is wider than it is tall, so anchoring it to the
+              bottom left a band of empty header above it. */}
           <motion.img
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1.1, delay: 0.2, ease }}
             src={image}
             alt="24X7 certified technician on the job"
-            className="pointer-events-none absolute bottom-0 right-0 hidden w-[46%] max-w-[40rem] object-contain object-bottom [-webkit-mask-image:linear-gradient(to_right,transparent_0%,#000_38%)] [mask-image:linear-gradient(to_right,transparent_0%,#000_38%)] lg:block"
+            className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[52%] max-w-[46rem] object-cover object-left [-webkit-mask-image:linear-gradient(to_right,transparent_0%,#000_24%)] [mask-image:linear-gradient(to_right,transparent_0%,#000_24%)] lg:block"
           />
         </>
       )}
