@@ -7,6 +7,7 @@ import { Guarantees } from "@/components/site/Guarantees";
 import { TrustBento } from "@/components/site/TrustBento";
 import { Contact } from "@/components/site/Contact";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { listGalleryPhotos } from "@/lib/gallery";
 
 export const metadata: Metadata = {
   title: "How It Works",
@@ -14,7 +15,13 @@ export const metadata: Metadata = {
     "From broken to brilliant in four moves — AI diagnosis, same-day booking, live technician tracking, and four guarantees in writing.",
 };
 
-export default function ProcessPage() {
+// Refreshed on demand: adding or removing a photo in the admin panel
+// revalidates this page.
+export const revalidate = 600;
+
+export default async function ProcessPage() {
+  const photos = await listGalleryPhotos().catch(() => []);
+
   return (
     <>
       <SiteNav />
@@ -36,7 +43,7 @@ export default function ProcessPage() {
           ]}
         />
         <Process />
-        <WorkGallery />
+        <WorkGallery photos={photos.map((p) => ({ src: p.src, label: p.label }))} />
         <Guarantees />
         <TrustBento />
         <Contact />

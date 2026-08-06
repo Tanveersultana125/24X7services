@@ -23,8 +23,11 @@ const SHOTS: Shot[] = [
   { src: "/work/gallery/ac-2.png", label: "Split-AC deep clean" },
 ];
 
-export function WorkGallery() {
+export function WorkGallery({ photos }: { photos?: Shot[] }) {
   const [opened, setOpened] = useState<number | null>(null);
+  // The seeded shots keep the section from looking abandoned before the first
+  // upload; once the admin adds photos, those are the gallery.
+  const shots = photos && photos.length > 0 ? photos : SHOTS;
 
   return (
     <section id="work" className="relative scroll-mt-28 py-14 sm:py-20">
@@ -40,7 +43,7 @@ export function WorkGallery() {
 
         {/* masonry */}
         <div className="mt-10 sm:mt-14 gap-4 [column-fill:_balance] sm:columns-2 lg:columns-3">
-          {SHOTS.map((s, i) => (
+          {shots.map((s, i) => (
             <motion.figure
               key={s.src}
               initial={{ opacity: 0, y: 24 }}
@@ -81,7 +84,7 @@ export function WorkGallery() {
       </div>
 
       <ImageLightbox
-        images={SHOTS}
+        images={shots}
         index={opened}
         onClose={() => setOpened(null)}
         onIndexChange={setOpened}
