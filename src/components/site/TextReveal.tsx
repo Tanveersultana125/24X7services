@@ -44,17 +44,18 @@ export function Kicker({ children, className }: { children: React.ReactNode; cla
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      /* Light keeps the editorial rule and quiet capitals. Dark sets the label
-         inside the brand tile — same gradient, lit top edge and glow as the
-         mark — because on a black page quiet grey capitals read as a caption
-         that got lost. */
+      /* Two materials, one label. Light is glass — the surface the cards are
+         made of, which needs a bright page behind it to read. Dark is the
+         brand tile, since glass over black is just grey. */
       className={cn(
-        "inline-flex items-center gap-2.5 text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-muted",
-        "dark:relative dark:overflow-hidden dark:rounded-full dark:bg-gradient-to-br dark:from-primary dark:to-secondary dark:px-4 dark:py-1.5 dark:font-bold dark:tracking-[0.24em] dark:text-white dark:shadow-[0_8px_20px_-8px_rgba(30,136,229,0.65)]",
+        "relative inline-flex items-center gap-2.5 overflow-hidden rounded-full border border-white/60 bg-white/40 px-3.5 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-ink-soft backdrop-blur-xl backdrop-saturate-150",
+        "shadow-[0_10px_24px_-18px_rgba(23,21,15,0.4),inset_0_1px_0_rgba(255,255,255,0.85)]",
+        "dark:border-transparent dark:bg-gradient-to-br dark:from-primary dark:to-secondary dark:px-4 dark:font-bold dark:tracking-[0.24em] dark:text-white dark:backdrop-blur-none dark:shadow-[0_8px_20px_-8px_rgba(30,136,229,0.65)]",
         className
       )}
     >
-      <span aria-hidden className="h-px w-8 bg-border-strong dark:hidden" />
+      {/* the rule fades into the glass; the tile has no need of it */}
+      <span aria-hidden className="h-px w-6 bg-gradient-to-r from-transparent to-border-strong dark:hidden" />
       {/* the mark's sheen, stretched across the pill */}
       <span
         aria-hidden
