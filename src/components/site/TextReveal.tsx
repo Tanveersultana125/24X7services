@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { LogoMark } from "@/components/ui/Logo";
 import { cn } from "@/lib/utils";
 
 /**
@@ -55,9 +54,14 @@ export function Kicker({ children, className }: { children: React.ReactNode; cla
         className
       )}
     >
-      {/* the mark, so every section is stamped with the brand rather than a
-          length of grey rule */}
-      <LogoMark size="sm" />
+      {/* Not the mark itself — the mark's *finish*: the same gradient and the
+          same lit top edge, on a shape small enough to read as punctuation. */}
+      <span
+        aria-hidden
+        className="relative size-2.5 shrink-0 rounded-[3px] bg-gradient-to-br from-primary to-secondary shadow-[0_2px_6px_-1px_rgba(30,136,229,0.55)]"
+      >
+        <span className="absolute inset-x-[2px] top-[1px] h-1/3 rounded-full bg-white/55 blur-[1px]" />
+      </span>
       {children}
     </motion.span>
   );
