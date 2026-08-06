@@ -121,12 +121,19 @@ export function Contact() {
               </Link>
 
               {/* shield mark, sitting beside the headline where the column is empty */}
+              {/* On paper the illustration sits on a white panel that lights it
+                  from every side. On a dark one it had nothing to stand on, so
+                  it gets its own pool of light. */}
+              <span
+                aria-hidden
+                className="pointer-events-none absolute right-0 top-12 hidden size-40 -translate-y-6 translate-x-6 rounded-full bg-royal-bright/25 blur-[70px] dark:block sm:top-14 lg:top-10 lg:size-56 xl:top-8 xl:size-64"
+              />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={promiseShieldSrc}
                 alt=""
                 aria-hidden
-                className="pointer-events-none absolute right-0 top-12 w-24 opacity-95 sm:top-14 sm:w-32 lg:top-10 lg:w-44 xl:top-8 xl:w-56"
+                className="pointer-events-none absolute right-0 top-12 w-24 opacity-95 drop-shadow-[0_10px_24px_rgba(0,0,0,0.45)] sm:top-14 sm:w-32 lg:top-10 lg:w-44 xl:top-8 xl:w-56"
               />
             </motion.div>
 
