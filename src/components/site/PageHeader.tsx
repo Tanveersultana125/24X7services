@@ -6,6 +6,7 @@ import { ChevronRight, BadgeCheck, ShieldCheck, Award, PackageCheck, Headset } f
 import { BrandMark } from "@/components/ui/Icons";
 import { BRANDS } from "@/lib/data";
 import type { BrandId } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -130,7 +131,18 @@ export function PageHeader({
           <span className={onDark ? "text-white" : "text-ink"}>{crumb}</span>
         </motion.nav>
 
-        <div className={image || bgImage ? "mt-10 max-w-2xl" : "mt-8 grid gap-12 lg:grid-cols-[0.7fr_1.3fr] lg:items-center"}>
+        {/* The logo wall carries four tiles and needs the room to show them;
+            0.7fr squeezed them into stamps beside an oversized column. */}
+        <div
+          className={
+            image || bgImage
+              ? "mt-10 max-w-2xl"
+              : cn(
+                  "mt-8 grid gap-12 lg:items-center",
+                  logos ? "lg:grid-cols-[0.95fr_1.05fr]" : "lg:grid-cols-[0.7fr_1.3fr]",
+                )
+          }
+        >
           <div className={logos || collage ? "lg:order-2" : undefined}>
             {logos && (
               <motion.span
@@ -224,22 +236,28 @@ export function PageHeader({
                   {/* Wordmark plate — white in both themes. A brand mark is
                       fixed artwork: Samsung's navy on a near-black card reads
                       as a different, muddier logo, which is not ours to do. */}
-                  <div className="relative grid h-24 place-items-center bg-white sm:h-32">
+                  <div className="relative grid h-28 place-items-center bg-white sm:h-36">
                     <span
                       aria-hidden
                       className="pointer-events-none absolute inset-0 opacity-[0.07]"
                       style={{ background: `radial-gradient(120% 90% at 70% 110%, ${b.accent}, transparent 62%)` }}
                     />
-                    <span className="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-emerald/12 px-2 py-0.5 text-[0.55rem] font-semibold text-emerald sm:left-3 sm:top-3 sm:text-[0.58rem]">
+                    <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-emerald/10 px-2 py-1 text-[0.56rem] font-semibold uppercase tracking-[0.1em] text-emerald ring-1 ring-inset ring-emerald/20 sm:text-[0.6rem]">
                       <BadgeCheck className="size-3" /> Authorised
                     </span>
                     <CardMark id={b.id} />
                   </div>
 
                   {/* brand-colour footer */}
+                  {/* A flat slab of brand colour is loud on a dark page —
+                      lit from above and deepened at the foot, it reads as part
+                      of the card instead of a highlighter stripe. */}
                   <div
-                    className="flex items-center gap-2.5 px-3 py-3 text-white sm:gap-3 sm:px-4"
-                    style={{ background: b.accent }}
+                    className="relative flex items-center gap-2.5 px-3 py-3.5 text-white sm:gap-3 sm:px-4 sm:py-4"
+                    style={{
+                      background: `linear-gradient(160deg, ${b.accent}, color-mix(in srgb, ${b.accent} 72%, #0b1020))`,
+                      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.22)",
+                    }}
                   >
                     <span className="grid size-7 shrink-0 place-items-center rounded-full bg-white/20 ring-1 ring-inset ring-white/30 sm:size-9">
                       <ShieldCheck className="size-3.5 sm:size-4" strokeWidth={2} />
