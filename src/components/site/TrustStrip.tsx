@@ -39,14 +39,10 @@ export function TrustStrip() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.7, delay: i * 0.1, ease }}
-              /* theme-light: these three keep their white, raised look in dark
-                 mode — they're the first thing under the hero and the design
-                 leans on that contrast. Pinning the tokens takes the text and
-                 borders with it, so nothing inside has to be special-cased. */
-              className="theme-light group relative overflow-hidden rounded-[1.1rem] border border-card-edge bg-gradient-to-b from-card to-surface p-3 text-center text-ink sm:rounded-[1.75rem] sm:p-7 sm:text-left shadow-[0_18px_40px_-18px_rgba(23,21,15,0.2),inset_0_1.5px_0_var(--card-edge),inset_0_-16px_28px_-20px_rgba(23,21,15,0.12)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_38px_64px_-24px_rgba(23,21,15,0.32),inset_0_1.5px_0_var(--card-edge)]"
+              className="group relative overflow-hidden rounded-[1.1rem] border border-card-edge bg-gradient-to-b from-card to-surface p-3 text-center sm:rounded-[1.75rem] sm:p-7 sm:text-left shadow-[0_18px_40px_-18px_rgba(23,21,15,0.2),inset_0_1.5px_0_var(--card-edge),inset_0_-16px_28px_-20px_rgba(23,21,15,0.12)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_38px_64px_-24px_rgba(23,21,15,0.32),inset_0_1.5px_0_var(--card-edge)]"
             >
               {/* glossy top sheen */}
-              <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/60 to-transparent" />
+              <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/60 to-transparent dark:from-white/[0.06]" />
 
               <span
                 className="relative mx-auto grid size-9 place-items-center rounded-xl shadow-[0_8px_16px_-4px_rgba(23,21,15,0.22),inset_0_1px_0_rgba(255,255,255,0.7)] transition-transform duration-500 group-hover:-translate-y-1 group-hover:scale-105 sm:mx-0 sm:size-12 sm:rounded-2xl"
