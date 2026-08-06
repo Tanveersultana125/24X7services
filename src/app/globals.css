@@ -58,14 +58,20 @@
   --surface-2: #1c1c20;
   --ink: #f1efe8;
   --ink-soft: #cbc7bd;
-  --muted: #928d82;
-  --muted-2: #676359;
-  --border: rgba(255, 255, 255, 0.09);
-  --border-strong: rgba(255, 255, 255, 0.16);
-  --hairline: rgba(255, 255, 255, 0.08);
+  --muted: #9c968a;
+  /* #676359 was under 3:1 on a dark card — the small print it carries
+     (labels, captions, counts) was technically there and practically not. */
+  --muted-2: #7c7669;
+  /* Shadows do almost nothing on a dark page, so the border is what gives a
+     card its edge; the old 0.09 left them floating. */
+  --border: rgba(255, 255, 255, 0.13);
+  --border-strong: rgba(255, 255, 255, 0.22);
+  --hairline: rgba(255, 255, 255, 0.1);
 
   --royal-bright: #4f74ff;
   --emerald: #10b981;
+  --amber: #e39c42;
+  --danger: #ef5f5f;
 
   --card: #17171b;
   --card-edge: rgba(255, 255, 255, 0.08);

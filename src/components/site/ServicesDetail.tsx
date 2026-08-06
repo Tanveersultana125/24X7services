@@ -313,9 +313,12 @@ export function ServicesDetail() {
                     />
                     <span
                       className="absolute inset-0"
+                      /* Fades the unit photo into the card it sits on — so it
+                         has to fade to the card's colour, not to white, or the
+                         scrim paints a bright wash across a dark card. */
                       style={{
                         background:
-                          "linear-gradient(90deg, #ffffff 0%, rgba(255,255,255,0.88) 22%, rgba(255,255,255,0.25) 52%, rgba(255,255,255,0) 78%)",
+                          "linear-gradient(90deg, var(--card) 0%, color-mix(in srgb, var(--card) 88%, transparent) 22%, color-mix(in srgb, var(--card) 25%, transparent) 52%, transparent 78%)",
                       }}
                     />
                   </span>
