@@ -257,7 +257,7 @@ export function Faq() {
                               {BRANDS.map((b) => (
                                 <span
                                   key={b.id}
-                                  className="grid h-12 min-w-[6.5rem] place-items-center rounded-xl border border-border bg-surface px-4 shadow-premium-sm"
+                                  className="grid h-12 min-w-[6.5rem] place-items-center rounded-xl bg-white px-4 shadow-premium-sm ring-1 ring-black/5"
                                 >
                                   <BrandMark id={b.id} tone="brand" className="text-[0.8rem]" />
                                 </span>

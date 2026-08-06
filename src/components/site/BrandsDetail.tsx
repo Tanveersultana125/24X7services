@@ -45,7 +45,10 @@ export function BrandsDetail() {
                 >
                   <span className="pointer-events-none absolute -right-16 -top-16 size-40 rounded-full opacity-10 blur-2xl transition-opacity group-hover:opacity-20" style={{ background: b.accent }} />
                   <div className="flex items-start justify-between">
-                    <BrandMark id={b.id} tone="brand" className="text-2xl" />
+                    {/* white plate so the mark keeps its official colours in both themes */}
+                    <span className="grid h-12 min-w-[7rem] place-items-center rounded-xl bg-white px-4 ring-1 ring-black/5">
+                      <BrandMark id={b.id} tone="brand" className="text-xl" />
+                    </span>
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald/10 px-3 py-1 text-xs font-semibold text-emerald">
                       <ShieldCheck className="size-3.5" /> Authorised
                     </span>

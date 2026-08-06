@@ -256,7 +256,7 @@ function BrandStep({ draft, setDraft }: StepProps) {
           >
             {/* wordmarks are much wider than they are tall — give the tile a fixed
                 landscape box so SAMSUNG/BOSCH cannot spill over the label */}
-            <div className="grid h-12 w-[5.25rem] shrink-0 place-items-center overflow-hidden rounded-xl bg-surface-2 px-2">
+            <div className="grid h-12 w-[5.25rem] shrink-0 place-items-center overflow-hidden rounded-xl bg-white px-2 ring-1 ring-black/5">
               <BrandMark
                 id={b.id}
                 tone="brand"

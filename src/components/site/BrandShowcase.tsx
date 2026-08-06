@@ -62,7 +62,7 @@ export function BrandShowcase() {
                         background: `
                           radial-gradient(135% 90% at 50% -12%, ${rgba(b.accent, 0.16)}, transparent 58%),
                           radial-gradient(90% 70% at 50% 118%, ${rgba(b.accent, 0.1)}, transparent 72%),
-                          linear-gradient(180deg, #ffffff, var(--surface))
+                          linear-gradient(180deg, #ffffff, #f4f2ec)
                         `,
                         boxShadow:
                           "var(--shadow-lg), inset 0 1.5px 0 rgba(255,255,255,0.95), inset 0 -20px 34px -22px rgba(23,21,15,0.16)",
@@ -77,7 +77,7 @@ export function BrandShowcase() {
                       aria-hidden
                       className="pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/70 to-transparent"
                     />
-                    <span className="relative text-xs font-medium uppercase tracking-[0.2em] text-muted">{`0${i + 1}`}</span>
+                    <span className="relative text-xs font-medium uppercase tracking-[0.2em] text-on-white/55">{`0${i + 1}`}</span>
                     {b.id === "lg" ? (
                       <BrandMark
                         id={b.id}
@@ -163,7 +163,7 @@ export function BrandShowcase() {
                     : {
                         background: `
                           radial-gradient(135% 90% at 50% -12%, ${rgba(b.accent, 0.16)}, transparent 58%),
-                          linear-gradient(180deg, #ffffff, var(--surface))
+                          linear-gradient(180deg, #ffffff, #f4f2ec)
                         `,
                         boxShadow:
                           "var(--shadow-lg), inset 0 1.5px 0 rgba(255,255,255,0.95), inset 0 -20px 34px -22px rgba(23,21,15,0.16)",
@@ -178,7 +178,7 @@ export function BrandShowcase() {
                   <span
                     className={cn(
                       "text-[0.68rem] font-medium uppercase tracking-[0.2em] transition-colors",
-                      open ? "text-white/70" : "text-muted"
+                      open ? "text-white/70" : "text-on-white/55"
                     )}
                   >
                     {`0${i + 1}`}
@@ -190,7 +190,7 @@ export function BrandShowcase() {
                   <ChevronDown
                     className={cn(
                       "size-5 shrink-0 transition-all duration-500",
-                      open ? "rotate-180 text-white/80" : "text-muted"
+                      open ? "rotate-180 text-white/80" : "text-on-white/45"
                     )}
                   />
                 </button>

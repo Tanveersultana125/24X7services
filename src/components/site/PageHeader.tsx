@@ -215,8 +215,10 @@ export function PageHeader({
                   transition={{ duration: 0.6, delay: 0.3 + i * 0.08, ease }}
                   className="group relative flex flex-col overflow-hidden rounded-2xl border border-card-edge bg-card shadow-[0_14px_30px_-16px_rgba(23,21,15,0.18),inset_0_1.5px_0_var(--card-edge)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_26px_46px_-20px_rgba(23,21,15,0.28)]"
                 >
-                  {/* wordmark plate */}
-                  <div className="relative grid h-24 place-items-center sm:h-32">
+                  {/* Wordmark plate — white in both themes. A brand mark is
+                      fixed artwork: Samsung's navy on a near-black card reads
+                      as a different, muddier logo, which is not ours to do. */}
+                  <div className="relative grid h-24 place-items-center bg-white sm:h-32">
                     <span
                       aria-hidden
                       className="pointer-events-none absolute inset-0 opacity-[0.07]"
