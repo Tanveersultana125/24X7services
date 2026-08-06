@@ -8,7 +8,11 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-:root {
+/* `.theme-light` / `.theme-dark` carry the same values as the page defaults so
+   a subtree can pin its own theme — the admin panel does, since a customer
+   turning the site dark shouldn't repaint the back office. */
+:root,
+.theme-light {
   /* Brand */
   --royal: #1e3a8a;         /* deep royal blue */
   --royal-bright: #2547d0;  /* electric royal */
@@ -52,7 +56,8 @@
   --shadow-emerald: 0 20px 50px -16px rgba(11, 154, 99, 0.4);
 }
 
-.dark {
+.dark,
+.theme-dark {
   --background: #0b0b0d;
   --surface: #141416;
   --surface-2: #1c1c20;

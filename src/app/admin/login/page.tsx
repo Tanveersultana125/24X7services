@@ -9,7 +9,9 @@ export default async function AdminLoginPage() {
   if (await isAuthenticated()) redirect("/admin");
 
   return (
-    <div className="grid min-h-dvh place-items-center bg-surface-2 px-6">
+    /* theme-light: the sign-in screen belongs to the panel, not the site, so a
+       visitor's dark mode doesn't follow an admin in here either. */
+    <div className="theme-light grid min-h-dvh place-items-center bg-surface-2 px-6 text-ink">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <p className="font-display text-2xl tracking-[-0.02em]">24X7 · Admin</p>

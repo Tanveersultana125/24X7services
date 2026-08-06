@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SITE_IMAGE_GROUP_PAGES } from "@/lib/site-images-shared";
+import { AdminThemeProvider, AdminThemeToggle } from "@/components/admin/AdminTheme";
 
 const NAV = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
@@ -41,7 +42,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-dvh bg-surface-2 lg:grid lg:grid-cols-[16rem_1fr]">
+    <AdminThemeProvider>
+    <div className="min-h-dvh bg-surface-2 text-ink lg:grid lg:grid-cols-[16rem_1fr]">
       {/* Sidebar */}
       <aside
         className={cn(
@@ -105,6 +107,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="absolute inset-x-0 bottom-0 space-y-1 border-t border-border p-3">
+          {/* The panel's own theme — the site's dark mode doesn't reach here. */}
+          <AdminThemeToggle className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted hover:bg-surface-2 hover:text-ink" />
           <Link
             href="/"
             target="_blank"
@@ -135,5 +139,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
+    </AdminThemeProvider>
   );
 }
