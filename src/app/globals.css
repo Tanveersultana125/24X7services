@@ -35,6 +35,11 @@
   --card: #ffffff;
   --card-edge: rgba(255, 255, 255, 0.7);
 
+  /* Ink for the pills and badges that stay white in both themes — over a photo
+     or a dark tile. `--ink` can't serve them: it turns near-white in dark and
+     leaves white text on a white pill. */
+  --on-white: #17150f;
+
   --glass-bg: rgba(251, 250, 246, 0.6);
   --glass-border: rgba(255, 255, 255, 0.7);
 
@@ -89,6 +94,7 @@
   --color-border-strong: var(--border-strong);
   --color-card: var(--card);
   --color-card-edge: var(--card-edge);
+  --color-on-white: var(--on-white);
 
   --color-royal: var(--royal);
   --color-royal-bright: var(--royal-bright);

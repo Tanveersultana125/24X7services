@@ -65,7 +65,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 onClick={() => setOpen(false)}
                 className={cn(
                   "mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
-                  active ? "bg-ink text-white" : "text-muted hover:bg-surface-2 hover:text-ink"
+                  active ? "bg-ink text-background" : "text-muted hover:bg-surface-2 hover:text-ink"
                 )}
               >
                 <item.icon className="size-4.5" />

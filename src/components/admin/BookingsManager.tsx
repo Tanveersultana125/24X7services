@@ -64,7 +64,7 @@ export function BookingsManager({ initial }: { initial: Booking[] }) {
               key={s}
               onClick={() => setFilter(s)}
               className={`rounded-full px-3 py-1.5 text-xs font-medium capitalize transition-colors ${
-                filter === s ? "bg-ink text-white" : "border border-border bg-surface text-muted hover:text-ink"
+                filter === s ? "bg-ink text-background" : "border border-border bg-surface text-muted hover:text-ink"
               }`}
             >
               {s === "all" ? "All" : STATUS_META[s].label}

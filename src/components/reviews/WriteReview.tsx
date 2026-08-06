@@ -45,7 +45,7 @@ export function WriteReview({
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link
             href="/reviews"
-            className="inline-flex h-11 items-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="inline-flex h-11 items-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-background transition-opacity hover:opacity-90"
           >
             Read reviews <ArrowRight className="size-4" />
           </Link>

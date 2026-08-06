@@ -124,7 +124,7 @@ export function ReviewsManager({ initial }: { initial: Review[] }) {
             key={f}
             onClick={() => setFilter(f)}
             className={`rounded-full px-3 py-1.5 text-xs font-medium capitalize transition-colors ${
-              filter === f ? "bg-ink text-white" : "border border-border bg-surface text-muted hover:text-ink"
+              filter === f ? "bg-ink text-background" : "border border-border bg-surface text-muted hover:text-ink"
             }`}
           >
             {f}

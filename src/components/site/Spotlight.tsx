@@ -113,7 +113,7 @@ export function Spotlight() {
                     <h3 className="font-display text-2xl leading-tight tracking-[-0.01em] sm:text-3xl">{s.title}</h3>
                     <p className="mt-2 max-w-[16rem] text-sm text-white/85">{s.sub}</p>
                   </div>
-                  <span className="inline-flex w-max items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-ink transition-transform group-hover:scale-[1.03]">
+                  <span className="inline-flex w-max items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-on-white transition-transform group-hover:scale-[1.03]">
                     {s.cta}
                     <ArrowUpRight className="size-4" />
                   </span>

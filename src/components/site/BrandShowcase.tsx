@@ -124,7 +124,7 @@ export function BrandShowcase() {
 
                         <Link
                           href={`/book?brand=${b.id}`}
-                          className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-ink transition-transform hover:scale-[1.02]"
+                          className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-on-white transition-transform hover:scale-[1.02]"
                         >
                           Book {b.name} service
                           <ArrowUpRight className="size-4" />
@@ -220,7 +220,7 @@ export function BrandShowcase() {
 
                         <Link
                           href={`/book?brand=${b.id}`}
-                          className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-[0.82rem] font-medium text-ink"
+                          className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-[0.82rem] font-medium text-on-white"
                         >
                           Book {b.name} service
                           <ArrowUpRight className="size-4" />

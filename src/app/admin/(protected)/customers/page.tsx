@@ -40,7 +40,7 @@ export default async function AdminCustomersPage() {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={c.picture} alt="" referrerPolicy="no-referrer" className="size-10 shrink-0 rounded-full object-cover" />
               ) : (
-                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-ink text-xs font-bold text-white">
+                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-ink text-xs font-bold text-background">
                   {initials(c.name)}
                 </span>
               )}
@@ -93,7 +93,7 @@ export default async function AdminCustomersPage() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={c.picture} alt="" className="size-9 rounded-full object-cover" />
                     ) : (
-                      <span className="grid size-9 place-items-center rounded-full bg-ink text-xs font-bold text-white">
+                      <span className="grid size-9 place-items-center rounded-full bg-ink text-xs font-bold text-background">
                         {initials(c.name)}
                       </span>
                     )}

@@ -30,7 +30,7 @@ export function GalleryManager() {
         </div>
         <button
           onClick={() => setAdding(true)}
-          className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-ink px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 sm:py-2"
+          className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-ink px-4 py-2.5 text-sm font-medium text-background hover:opacity-90 sm:py-2"
         >
           <Plus className="size-4" /> Add photo
         </button>
@@ -90,7 +90,7 @@ export function GalleryManager() {
             </div>
             <div className="mt-5 flex justify-end gap-2">
               <button onClick={() => setAdding(false)} className="rounded-xl border border-border px-4 py-2 text-sm font-medium hover:bg-surface-2">Cancel</button>
-              <button onClick={add} disabled={!draft.src.trim()} className="rounded-xl bg-ink px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50">Add</button>
+              <button onClick={add} disabled={!draft.src.trim()} className="rounded-xl bg-ink px-4 py-2 text-sm font-medium text-background hover:opacity-90 disabled:opacity-50">Add</button>
             </div>
           </div>
         </div>

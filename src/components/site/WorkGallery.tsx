@@ -65,14 +65,14 @@ export function WorkGallery() {
                 loading="lazy"
                 className="w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
               />
-              <span className="absolute right-3 top-3 grid size-9 place-items-center rounded-full bg-white/90 text-ink opacity-0 backdrop-blur transition-opacity duration-500 group-hover:opacity-100">
+              <span className="absolute right-3 top-3 grid size-9 place-items-center rounded-full bg-white/90 text-on-white opacity-0 backdrop-blur transition-opacity duration-500 group-hover:opacity-100">
                 <Maximize2 className="size-4" />
               </span>
               <span
                 aria-hidden
                 className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/55 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
               />
-              <figcaption className="absolute bottom-3 left-3 translate-y-1 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-ink opacity-0 backdrop-blur transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+              <figcaption className="absolute bottom-3 left-3 translate-y-1 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-on-white opacity-0 backdrop-blur transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
                 {s.label}
               </figcaption>
             </motion.figure>

@@ -28,7 +28,7 @@ export function ServicesManager() {
           </button>
           <button
             onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 1800); }}
-            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-ink px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 sm:flex-none sm:py-2"
+            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-ink px-4 py-2.5 text-sm font-medium text-background hover:opacity-90 sm:flex-none sm:py-2"
           >
             <Check className="size-4" /> {saved ? "Saved" : "Save changes"}
           </button>

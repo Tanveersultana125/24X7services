@@ -28,7 +28,7 @@ export function LeaveReviewCta() {
 
           <a
             href="/reviews/new"
-            className="inline-flex h-12 shrink-0 items-center gap-2 rounded-full bg-ink px-7 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="inline-flex h-12 shrink-0 items-center gap-2 rounded-full bg-ink px-7 text-sm font-semibold text-background transition-opacity hover:opacity-90"
           >
             Rate your service <ArrowRight className="size-4" />
           </a>

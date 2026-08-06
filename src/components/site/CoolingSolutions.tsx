@@ -78,7 +78,7 @@ export function CoolingSolutions() {
 
           <Link
             href="/book"
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-medium text-white transition-transform hover:scale-[1.02]"
+            className="mt-8 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-medium text-background transition-transform hover:scale-[1.02]"
           >
             Book your service <ArrowUpRight className="size-4" />
           </Link>

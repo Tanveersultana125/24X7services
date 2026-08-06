@@ -121,7 +121,7 @@ export function PlansCompare() {
 
             <a
               href={`/book?amc=${plan.id}`}
-              className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink text-sm font-semibold text-background transition-opacity hover:opacity-90"
             >
               Choose {plan.name} <ArrowUpRight className="size-4" />
             </a>

@@ -123,7 +123,7 @@ export function ReviewForm({
         {onCancel && (
           <button
             onClick={onCancel}
-            className="mt-6 inline-flex h-11 items-center rounded-full bg-ink px-6 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="mt-6 inline-flex h-11 items-center rounded-full bg-ink px-6 text-sm font-semibold text-background transition-opacity hover:opacity-90"
           >
             Done
           </button>
@@ -249,7 +249,7 @@ export function ReviewForm({
         <button
           onClick={submit}
           disabled={!canSubmit}
-          className="inline-flex h-11 items-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:pointer-events-none disabled:opacity-40"
+          className="inline-flex h-11 items-center gap-2 rounded-full bg-ink px-6 text-sm font-semibold text-background transition-opacity hover:opacity-90 disabled:pointer-events-none disabled:opacity-40"
         >
           {state === "saving" && <Loader2 className="size-4 animate-spin" />}
           {state === "saving" ? "Sending…" : "Submit review"}

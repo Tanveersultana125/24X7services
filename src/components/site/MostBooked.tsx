@@ -218,7 +218,7 @@ export function MostBooked() {
                   />
                   <span aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/25 via-transparent to-transparent" />
                   {c.instant && (
-                    <span className="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-white/95 px-2 py-0.5 text-[0.62rem] font-semibold text-ink shadow-premium-sm backdrop-blur">
+                    <span className="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-white/95 px-2 py-0.5 text-[0.62rem] font-semibold text-on-white shadow-premium-sm backdrop-blur">
                       <Zap className="size-2.5 text-emerald" /> Instant
                     </span>
                   )}

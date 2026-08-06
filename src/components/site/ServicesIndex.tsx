@@ -163,7 +163,7 @@ function Preview({ svc }: { svc: Service }) {
             }}
           />
         )}
-        <span className="absolute right-5 top-5 rounded-full bg-white/90 px-3 py-1 text-xs font-medium uppercase tracking-wider text-ink backdrop-blur">
+        <span className="absolute right-5 top-5 rounded-full bg-white/90 px-3 py-1 text-xs font-medium uppercase tracking-wider text-on-white backdrop-blur">
           {svc.kind}
         </span>
       </div>
