@@ -44,25 +44,19 @@ export function Kicker({ children, className }: { children: React.ReactNode; cla
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      /* A glass chip rather than loose type: the same material the cards are
-         made of, so a section opens with the site's own surface instead of a
-         line of grey text floating on the page. */
+      /* The label sits inside the brand tile, the way "24" sits inside the
+         mark: same gradient, same lit top edge, same glow underneath — so a
+         section opens with the identity rather than a line of grey capitals. */
       className={cn(
-        "inline-flex items-center gap-2.5 rounded-full border border-white/60 bg-white/40 px-3.5 py-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-ink-soft backdrop-blur-xl backdrop-saturate-150",
-        "shadow-[0_10px_24px_-18px_rgba(23,21,15,0.4),inset_0_1px_0_rgba(255,255,255,0.85)]",
-        "dark:border-white/[0.10] dark:bg-white/[0.06] dark:shadow-[0_10px_24px_-18px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.10)]",
+        "relative inline-flex items-center overflow-hidden rounded-full bg-gradient-to-br from-primary to-secondary px-4 py-1.5",
+        "text-[0.7rem] font-bold uppercase tracking-[0.24em] text-white",
+        "shadow-[0_8px_20px_-8px_rgba(30,136,229,0.65)]",
         className
       )}
     >
-      {/* Not the mark itself — the mark's *finish*: the same gradient and the
-          same lit top edge, on a shape small enough to read as punctuation. */}
-      <span
-        aria-hidden
-        className="relative size-2.5 shrink-0 rounded-[3px] bg-gradient-to-br from-primary to-secondary shadow-[0_2px_6px_-1px_rgba(30,136,229,0.55)]"
-      >
-        <span className="absolute inset-x-[2px] top-[1px] h-1/3 rounded-full bg-white/55 blur-[1px]" />
-      </span>
-      {children}
+      {/* the mark's sheen, stretched across the pill */}
+      <span aria-hidden className="pointer-events-none absolute inset-x-2 top-0.5 h-1/3 rounded-full bg-white/35 blur-[3px]" />
+      <span className="relative">{children}</span>
     </motion.span>
   );
 }
