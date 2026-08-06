@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Star, Zap, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Kicker } from "./TextReveal";
+import { useSiteImages } from "@/components/providers/SiteImagesProvider";
 import { APPLIANCES } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +19,8 @@ const PHOTO: Record<string, string> = {
 };
 
 type Card = {
+  /** Which site-image slot this card's photo comes from. */
+  slot: string;
   title: string;
   img: string;
   price: number;
@@ -32,6 +35,7 @@ const CARDS: Card[] = [
   {
     title: "AC repair & service",
     img: "/work/ac-service.png",
+    slot: "mostbooked-ac-service",
     price: 299,
     rating: 4.7,
     meta: "1.4M+ booked",
@@ -41,6 +45,7 @@ const CARDS: Card[] = [
   {
     title: "AC installation",
     img: "/work/ac.png",
+    slot: "mostbooked-ac-installation",
     price: 1099,
     rating: 4.7,
     meta: "620K+ booked",
@@ -49,6 +54,7 @@ const CARDS: Card[] = [
   ...APPLIANCES.filter((a) => PHOTO[a.id]).map((a) => ({
     title: `${a.name} repair`,
     img: PHOTO[a.id],
+    slot: `mostbooked-${a.id}`,
     price: a.startingPrice,
     rating: a.rating,
     meta: `${a.bookings} booked`,
@@ -58,6 +64,7 @@ const CARDS: Card[] = [
 ];
 
 export function MostBooked() {
+  const images = useSiteImages();
   const scroller = useRef<HTMLDivElement>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
@@ -211,7 +218,7 @@ export function MostBooked() {
                 <div className="relative aspect-[5/4] overflow-hidden">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={c.img}
+                    src={images[c.slot] ?? c.img}
                     alt={c.title}
                     loading="lazy"
                     className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"

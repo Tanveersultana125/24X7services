@@ -4,18 +4,20 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Kicker } from "./TextReveal";
+import { useSiteImages } from "@/components/providers/SiteImagesProvider";
 import { cn } from "@/lib/utils";
 
-type Spot = { title: string; sub: string; img: string; href: string; cta: string; tint: string };
+type Spot = { title: string; sub: string; img: string; slot: string; href: string; cta: string; tint: string };
 
 const SPOTS: Spot[] = [
-  { title: "Foam-jet AC deep clean", sub: "Cooling like new — from ₹599", img: "/work/ac-service.png", href: "/book", cta: "Book now", tint: "#16306e" },
-  { title: "Annual Care Plan", sub: "2 free visits + 10% off every repair", img: "/work/gallery/fridge-1.png", href: "/plans", cta: "Explore plans", tint: "#0b4d33" },
-  { title: "24×7 emergency repair", sub: "A tracked technician in under 90 min", img: "/work/gallery/washing-1.png", href: "/book?emergency=1", cta: "Book now", tint: "#7a1620" },
-  { title: "Microwave & oven care", sub: "Heating restored, same visit — from ₹199", img: "/work/microwave.png", href: "/book?appliance=microwave", cta: "Book now", tint: "#6b3a12" },
+  { title: "Foam-jet AC deep clean", sub: "Cooling like new — from ₹599", img: "/work/ac-service.png", slot: "spotlight-deep-clean", href: "/book", cta: "Book now", tint: "#16306e" },
+  { title: "Annual Care Plan", sub: "2 free visits + 10% off every repair", img: "/work/gallery/fridge-1.png", slot: "spotlight-care-plan", href: "/plans", cta: "Explore plans", tint: "#0b4d33" },
+  { title: "24×7 emergency repair", sub: "A tracked technician in under 90 min", img: "/work/gallery/washing-1.png", slot: "spotlight-emergency", href: "/book?emergency=1", cta: "Book now", tint: "#7a1620" },
+  { title: "Microwave & oven care", sub: "Heating restored, same visit — from ₹199", img: "/work/microwave.png", slot: "spotlight-microwave", href: "/book?appliance=microwave", cta: "Book now", tint: "#6b3a12" },
 ];
 
 export function Spotlight() {
+  const images = useSiteImages();
   const scroller = useRef<HTMLDivElement>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
@@ -98,7 +100,7 @@ export function Spotlight() {
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={s.img}
+                  src={images[s.slot] ?? s.img}
                   alt={s.title}
                   loading="lazy"
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"

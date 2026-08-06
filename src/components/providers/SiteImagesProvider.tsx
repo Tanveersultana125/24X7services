@@ -28,3 +28,11 @@ export function useSiteImage(key: string): string {
   const images = useContext(SiteImagesContext);
   return images[key] ?? DEFAULT_SITE_IMAGES[key] ?? "";
 }
+
+/**
+ * The whole map, for a list that resolves one image per row — a hook can't be
+ * called inside a `.map()`.
+ */
+export function useSiteImages(): SiteImages {
+  return useContext(SiteImagesContext);
+}

@@ -4,20 +4,22 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Zap, ChevronLeft, ChevronRight } from "lucide-react";
 import { Kicker } from "./TextReveal";
+import { useSiteImages } from "@/components/providers/SiteImagesProvider";
 import { cn } from "@/lib/utils";
 
-type Item = { title: string; img: string; href: string; badge?: string; eta?: string };
+type Item = { title: string; img: string; slot: string; href: string; badge?: string; eta?: string };
 
 const ITEMS: Item[] = [
-  { title: "Foam-jet AC service", img: "/work/ac-service.png", href: "/book", badge: "New" },
-  { title: "Front-load washer care", img: "/work/gallery/washing-1.png", href: "/book?appliance=washing-machine", eta: "In 60 mins" },
-  { title: "Smart fridge diagnosis", img: "/work/gallery/fridge-1.png", href: "/book?appliance=refrigerator" },
-  { title: "Microwave express fix", img: "/work/microwave.png", href: "/book?appliance=microwave", eta: "In 44 mins" },
-  { title: "AC installation", img: "/work/ac.png", href: "/book", badge: "New" },
-  { title: "Refrigerator gas top-up", img: "/work/gallery/fridge-2.png", href: "/book?appliance=refrigerator" },
+  { title: "Foam-jet AC service", img: "/work/ac-service.png", slot: "noteworthy-ac-service", href: "/book", badge: "New" },
+  { title: "Front-load washer care", img: "/work/gallery/washing-1.png", slot: "noteworthy-washer", href: "/book?appliance=washing-machine", eta: "In 60 mins" },
+  { title: "Smart fridge diagnosis", img: "/work/gallery/fridge-1.png", slot: "noteworthy-fridge", href: "/book?appliance=refrigerator" },
+  { title: "Microwave express fix", img: "/work/microwave.png", slot: "noteworthy-microwave", href: "/book?appliance=microwave", eta: "In 44 mins" },
+  { title: "AC installation", img: "/work/ac.png", slot: "noteworthy-installation", href: "/book", badge: "New" },
+  { title: "Refrigerator gas top-up", img: "/work/gallery/fridge-2.png", slot: "noteworthy-gas", href: "/book?appliance=refrigerator" },
 ];
 
 export function Noteworthy() {
+  const images = useSiteImages();
   const scroller = useRef<HTMLDivElement>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
@@ -102,7 +104,7 @@ export function Noteworthy() {
                 <div className="relative overflow-hidden rounded-2xl bg-surface-2">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={it.img}
+                    src={images[it.slot] ?? it.img}
                     alt={it.title}
                     loading="lazy"
                     className="aspect-square w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
