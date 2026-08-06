@@ -41,9 +41,12 @@ export function BrandsDetail() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: i * 0.06 }}
-                  className="group relative overflow-hidden rounded-[1.75rem] border border-border bg-surface p-8"
+                  /* On a near-black page, surface-on-background is barely a
+                     card at all. Lit from above with a rim to hold its edge —
+                     the same treatment the rest of the site's cards get. */
+                  className="group relative overflow-hidden rounded-[1.75rem] border border-card-edge bg-gradient-to-b from-card to-surface p-8 shadow-[0_18px_40px_-20px_rgba(23,21,15,0.18),inset_0_1.5px_0_var(--card-edge)] transition-all duration-500 hover:-translate-y-1 dark:border-white/[0.12] dark:shadow-[0_26px_60px_-30px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] dark:hover:border-white/[0.2]"
                 >
-                  <span className="pointer-events-none absolute -right-16 -top-16 size-40 rounded-full opacity-10 blur-2xl transition-opacity group-hover:opacity-20" style={{ background: b.accent }} />
+                  <span className="pointer-events-none absolute -right-16 -top-16 size-40 rounded-full opacity-10 blur-2xl transition-opacity group-hover:opacity-20 dark:opacity-[0.18] dark:group-hover:opacity-30" style={{ background: b.accent }} />
                   <div className="flex items-start justify-between">
                     {/* white plate so the mark keeps its official colours in both themes */}
                     <span className="grid h-12 min-w-[7rem] place-items-center rounded-xl bg-white px-4 ring-1 ring-black/5">
@@ -59,7 +62,9 @@ export function BrandsDetail() {
                     <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-2">Appliances</p>
                     <div className="mt-2.5 flex flex-wrap gap-2">
                       {c.appliances.map((a) => (
-                        <span key={a} className="rounded-full border border-border px-3 py-1 text-xs font-medium">{a}</span>
+                        /* the chips sat on the card with nothing but a hairline
+                           to separate them — a recessed fill gives them a shape */
+                        <span key={a} className="rounded-full border border-border bg-surface-2/60 px-3 py-1 text-xs font-medium">{a}</span>
                       ))}
                     </div>
                   </div>
