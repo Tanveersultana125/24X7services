@@ -4,7 +4,6 @@ import { useRef, useState } from "react";
 import { Loader2, ImageUp, RotateCcw } from "lucide-react";
 import {
   SITE_IMAGE_SLOTS,
-  SITE_IMAGE_GROUPS,
   DEFAULT_SITE_IMAGES,
   type SiteImages,
 } from "@/lib/site-images-shared";
@@ -20,7 +19,18 @@ const MAX_BYTES = 10 * 1024 * 1024;
  * Each card is a slot, not a file: uploading here reassigns what that position
  * renders, and "Reset" puts back the image that ships with the build.
  */
-export function SiteImagesManager({ current }: { current: SiteImages }) {
+export function SiteImagesManager({
+  current,
+  group,
+  title,
+  blurb,
+}: {
+  current: SiteImages;
+  /** Restricts the page to one group of slots. */
+  group: string;
+  title: string;
+  blurb: string;
+}) {
   const [images, setImages] = useState<SiteImages>(current);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -108,45 +118,31 @@ export function SiteImagesManager({ current }: { current: SiteImages }) {
   return (
     <div>
       <div className="mb-6 sm:mb-8">
-        <h1 className="font-display text-2xl tracking-[-0.02em] sm:text-3xl">Site images</h1>
+        <h1 className="font-display text-2xl tracking-[-0.02em] sm:text-3xl">{title}</h1>
         <p className="mt-1 max-w-2xl text-sm text-muted">
-          Every photograph on the public pages. Replace one and it appears everywhere that position
-          is used; reset puts back the original.
+          {blurb} Replace one and it appears everywhere that position is used; reset puts back the
+          original.
         </p>
       </div>
 
       {error && <p className="mb-4 rounded-xl bg-danger/10 px-4 py-3 text-sm text-danger">{error}</p>}
 
-      {/* Grouped the way the page is, so a slot is findable by where it sits. */}
-      <div className="space-y-10">
-        {SITE_IMAGE_GROUPS.map((group) => {
-          const slots = SITE_IMAGE_SLOTS.filter((s) => s.group === group);
-          if (slots.length === 0) return null;
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {SITE_IMAGE_SLOTS.filter((slot) => slot.group === group).map((slot) => {
+          const src = images[slot.key] ?? slot.defaultSrc;
           return (
-            <section key={group}>
-              <h2 className="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted">
-                {group}
-              </h2>
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {slots.map((slot) => {
-                  const src = images[slot.key] ?? slot.defaultSrc;
-                  return (
-                    <SlotCard
-                      key={slot.key}
-                      slotKey={slot.key}
-                      label={slot.label}
-                      where={slot.where}
-                      ratio={slot.ratio}
-                      src={src}
-                      custom={src !== slot.defaultSrc}
-                      busy={busy === slot.key}
-                      onUpload={(file) => upload(slot.key, file)}
-                      onReset={() => reset(slot.key)}
-                    />
-                  );
-                })}
-              </div>
-            </section>
+            <SlotCard
+              key={slot.key}
+              slotKey={slot.key}
+              label={slot.label}
+              where={slot.where}
+              ratio={slot.ratio}
+              src={src}
+              custom={src !== slot.defaultSrc}
+              busy={busy === slot.key}
+              onUpload={(file) => upload(slot.key, file)}
+              onReset={() => reset(slot.key)}
+            />
           );
         })}
       </div>

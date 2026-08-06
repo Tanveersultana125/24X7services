@@ -17,6 +17,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SITE_IMAGE_GROUP_PAGES } from "@/lib/site-images-shared";
 
 const NAV = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
@@ -61,18 +62,44 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           {NAV.map((item) => {
             const active = item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className={cn(
-                  "mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
-                  active ? "bg-ink text-background" : "text-muted hover:bg-surface-2 hover:text-ink"
+              <div key={item.href}>
+                <Link
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+                    active ? "bg-ink text-background" : "text-muted hover:bg-surface-2 hover:text-ink"
+                  )}
+                >
+                  <item.icon className="size-4.5" />
+                  {item.label}
+                </Link>
+
+                {/* Images opens into one page per section of the site — listed
+                    here so a section is one click away, not two. */}
+                {item.href === "/admin/images" && active && (
+                  <div className="mb-2 ml-6 border-l border-border pl-3">
+                    {SITE_IMAGE_GROUP_PAGES.map((g) => {
+                      const href = `/admin/images/${g.slug}`;
+                      return (
+                        <Link
+                          key={g.slug}
+                          href={href}
+                          onClick={() => setOpen(false)}
+                          className={cn(
+                            "mb-0.5 block rounded-lg px-3 py-2 text-[0.82rem] transition-colors",
+                            pathname === href
+                              ? "bg-surface-2 font-medium text-ink"
+                              : "text-muted hover:text-ink"
+                          )}
+                        >
+                          {g.name}
+                        </Link>
+                      );
+                    })}
+                  </div>
                 )}
-              >
-                <item.icon className="size-4.5" />
-                {item.label}
-              </Link>
+              </div>
             );
           })}
         </nav>

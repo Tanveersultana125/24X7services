@@ -20,13 +20,22 @@ export type SiteImageSlot = {
   group: string;
 };
 
-/** Section order in the admin panel. */
-export const SITE_IMAGE_GROUPS = [
-  "Page sections",
-  "Most booked",
-  "Spotlight",
-  "New & noteworthy",
+/**
+ * Each group is its own page under Admin → Images, in this order. The slug is
+ * the URL; the name is what a slot's `group` field carries.
+ */
+export const SITE_IMAGE_GROUP_PAGES = [
+  { slug: "sections", name: "Page sections", blurb: "The standalone photographs across the homepage and inner pages." },
+  { slug: "most-booked", name: "Most booked", blurb: "The service cards in the “Our most booked services” strip." },
+  { slug: "spotlight", name: "Spotlight", blurb: "The wide banners in “Handpicked for you”." },
+  { slug: "noteworthy", name: "New & noteworthy", blurb: "The square cards in “Fresh on the menu”." },
 ] as const;
+
+export const SITE_IMAGE_GROUPS = SITE_IMAGE_GROUP_PAGES.map((g) => g.name);
+
+export function groupBySlug(slug: string) {
+  return SITE_IMAGE_GROUP_PAGES.find((g) => g.slug === slug) ?? null;
+}
 
 export const SITE_IMAGE_SLOTS: SiteImageSlot[] = [
   {
