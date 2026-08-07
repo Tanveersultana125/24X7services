@@ -132,13 +132,6 @@ export function Contact() {
                   aria-hidden
                   className="absolute bottom-4 left-1/2 hidden size-56 -translate-x-1/2 rounded-full bg-royal-bright/25 blur-[70px] dark:block lg:size-64"
                 />
-                {/* The keyed-out backdrop took the contact shadow with it, which
-                    left the toolbox and pot ending mid-air as if cropped. This
-                    puts the ground back under them. */}
-                <span
-                  aria-hidden
-                  className="absolute bottom-1 left-1/2 h-5 w-[78%] -translate-x-1/2 rounded-[50%] bg-ink/20 blur-lg dark:bg-black/45"
-                />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={contactPromiseSrc}
