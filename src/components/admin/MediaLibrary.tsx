@@ -1,25 +1,45 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Check, Copy, ImageUp, Loader2, Trash2 } from "lucide-react";
+import { Check, ImageUp, Loader2, Trash2 } from "lucide-react";
 import type { MediaImage } from "@/lib/media";
+import { requestCardForImage } from "@/lib/admin/add-card-event";
 import { cn } from "@/lib/utils";
 
 const MAX_BYTES = 10 * 1024 * 1024;
 // Kept in step with the upload route, so a rejection is explained here first.
 const TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"];
 
+const NEW_CARD = "new-card";
+
+export type PlaceTarget = { key: string; label: string };
+
 /**
- * Images an admin has uploaded but not yet placed.
+ * Photographs uploaded from the panel, and the one control that puts them on
+ * the site.
  *
- * Every position on this page is fixed by the design, so "add" can't mean a
- * new position here. It means a new image on the shelf: upload once, copy its
- * link, and point any slot or card at it with "Use a URL".
+ * Uploading alone changes nothing a visitor sees — a photo has to be given a
+ * position. That used to mean copying a link and pasting it into a field
+ * further down the page, which read as "I uploaded it, so where is it?".
+ * Choosing a position here does the same write, in one step.
  */
-export function MediaLibrary({ initial }: { initial: MediaImage[] }) {
+export function MediaLibrary({
+  initial,
+  targets,
+  onPlace,
+  canAddCard,
+}: {
+  initial: MediaImage[];
+  /** The positions on this page a photo can be dropped into. */
+  targets: PlaceTarget[];
+  onPlace: (key: string, url: string) => Promise<boolean>;
+  /** Carousel pages can also take a brand-new card. */
+  canAddCard: boolean;
+}) {
   const [items, setItems] = useState(initial);
   const [busy, setBusy] = useState(false);
-  const [copied, setCopied] = useState<string | null>(null);
+  const [placing, setPlacing] = useState<string | null>(null);
+  const [placed, setPlaced] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -63,6 +83,20 @@ export function MediaLibrary({ initial }: { initial: MediaImage[] }) {
     }
   };
 
+  const place = async (item: MediaImage, choice: string) => {
+    if (choice === NEW_CARD) {
+      requestCardForImage(item.url);
+      return;
+    }
+    setPlacing(item.id);
+    setError(null);
+    const ok = await onPlace(choice, item.url);
+    setPlacing(null);
+    if (!ok) return;
+    const label = targets.find((t) => t.key === choice)?.label ?? "the site";
+    setPlaced((prev) => ({ ...prev, [item.id]: label }));
+  };
+
   const remove = async (id: string) => {
     const prev = items;
     setItems((list) => list.filter((i) => i.id !== id));
@@ -82,25 +116,14 @@ export function MediaLibrary({ initial }: { initial: MediaImage[] }) {
     }
   };
 
-  const copy = async (url: string, id: string) => {
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopied(id);
-      window.setTimeout(() => setCopied(null), 1600);
-    } catch {
-      setError("Your browser wouldn't let the page copy — select the link and copy it by hand.");
-    }
-  };
-
   return (
     <section className="mb-10 border-b border-border pb-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="max-w-xl">
           <h2 className="font-display text-xl tracking-[-0.02em]">Your images</h2>
           <p className="mt-1 text-sm text-muted">
-            Upload a photo here to keep it ready. An image on the shelf isn&apos;t on the site by
-            itself — copy its link, then use <span className="font-medium">Use a URL</span> on
-            whichever position or card should show it.
+            Upload a photo, then pick where it goes — it&apos;s on the site as soon as you choose.
+            {canAddCard && " Pick “a new card” to build a whole card around it instead."}
           </p>
         </div>
         <input
@@ -141,14 +164,39 @@ export function MediaLibrary({ initial }: { initial: MediaImage[] }) {
               <img src={item.url} alt={item.name} className="aspect-[4/3] w-full object-cover" />
               <div className="p-3">
                 <p className="truncate text-sm font-medium">{item.name}</p>
+
+                {placed[item.id] ? (
+                  <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-emerald">
+                    <Check className="size-3.5 shrink-0" />
+                    <span className="truncate">Now showing in {placed[item.id]}</span>
+                  </p>
+                ) : (
+                  <p className="mt-1.5 text-xs text-muted-2">Not on the site yet</p>
+                )}
+
                 <div className="mt-2 flex gap-1.5">
-                  <button
-                    onClick={() => copy(item.url, item.id)}
-                    className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-border px-2 py-1.5 text-xs font-medium text-muted hover:text-ink"
+                  <label className="sr-only" htmlFor={`place-${item.id}`}>
+                    Where should {item.name} appear?
+                  </label>
+                  <select
+                    id={`place-${item.id}`}
+                    value=""
+                    disabled={placing === item.id}
+                    onChange={(e) => {
+                      const choice = e.target.value;
+                      e.target.value = "";
+                      if (choice) place(item, choice);
+                    }}
+                    className="min-w-0 flex-1 rounded-lg border border-border bg-surface-2 px-2 py-1.5 text-xs font-medium text-ink disabled:opacity-50"
                   >
-                    {copied === item.id ? <Check className="size-3.5 text-emerald" /> : <Copy className="size-3.5" />}
-                    {copied === item.id ? "Copied" : "Copy link"}
-                  </button>
+                    <option value="">{placing === item.id ? "Placing…" : "Use it here…"}</option>
+                    {targets.map((t) => (
+                      <option key={t.key} value={t.key}>
+                        {t.label}
+                      </option>
+                    ))}
+                    {canAddCard && <option value={NEW_CARD}>➕ As a new card</option>}
+                  </select>
                   <button
                     onClick={() => remove(item.id)}
                     aria-label={`Remove ${item.name}`}

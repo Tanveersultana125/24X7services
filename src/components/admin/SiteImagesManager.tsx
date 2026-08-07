@@ -1,6 +1,8 @@
 "use client";
 
-import { useRef, useState, type ReactNode } from "react";
+import { useRef, useState } from "react";
+import type { MediaImage } from "@/lib/media";
+import { MediaLibrary } from "./MediaLibrary";
 import { Loader2, ImageUp, RotateCcw, Link as LinkIcon, Pencil, Trash2, Undo2 } from "lucide-react";
 import { SECTION_FIELDS, SPOTLIGHT_TINTS, type SectionId } from "@/lib/section-items-shared";
 import type { SectionOverrides } from "@/lib/section-overrides-shared";
@@ -30,7 +32,7 @@ export function SiteImagesManager({
   blurb,
   section,
   overrides: initialOverrides = {},
-  library,
+  media,
 }: {
   current: SiteImages;
   /** Restricts the page to one group of slots. */
@@ -40,9 +42,10 @@ export function SiteImagesManager({
   /** Set on the carousel pages, where a slot is a card with words of its own. */
   section?: SectionId;
   overrides?: SectionOverrides;
-  /** The upload shelf, shown under the page header and above the positions. */
-  library?: ReactNode;
+  /** Photos already uploaded, for the shelf above the positions. */
+  media: MediaImage[];
 }) {
+  const groupSlots = SITE_IMAGE_SLOTS.filter((slot) => slot.group === group);
   const [images, setImages] = useState<SiteImages>(current);
   const [overrides, setOverrides] = useState<SectionOverrides>(initialOverrides);
   const [editing, setEditing] = useState<string | null>(null);
@@ -61,7 +64,8 @@ export function SiteImagesManager({
     setError(typeof data?.detail === "string" ? `${fallback} ${data.detail}` : fallback);
   };
 
-  const assign = async (key: string, src: string) => {
+  /** Returns whether the position now holds this photo. */
+  const assign = async (key: string, src: string): Promise<boolean> => {
     setBusy(key);
     setError(null);
     try {
@@ -70,10 +74,15 @@ export function SiteImagesManager({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ key, src }),
       });
-      if (!res.ok) return void (await fail(res, "Couldn't save that image."));
+      if (!res.ok) {
+        await fail(res, "Couldn't save that image.");
+        return false;
+      }
       setImages((prev) => ({ ...prev, [key]: src }));
+      return true;
     } catch {
       setError("Couldn't reach the server. Check your connection and try again.");
+      return false;
     } finally {
       setBusy(null);
     }
@@ -203,10 +212,15 @@ export function SiteImagesManager({
       {error && <p className="mb-4 rounded-xl bg-danger/10 px-4 py-3 text-sm text-danger">{error}</p>}
       {notice && <p className="mb-4 rounded-xl bg-amber/10 px-4 py-3 text-sm text-amber">{notice}</p>}
 
-      {library}
+      <MediaLibrary
+        initial={media}
+        targets={groupSlots.map((s) => ({ key: s.key, label: s.label }))}
+        onPlace={assign}
+        canAddCard={Boolean(section)}
+      />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {SITE_IMAGE_SLOTS.filter((slot) => slot.group === group).map((slot) => {
+        {groupSlots.map((slot) => {
           const src = images[slot.key] ?? slot.defaultSrc;
           const emptied = src === NO_IMAGE;
           return (

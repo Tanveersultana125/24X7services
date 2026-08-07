@@ -6,7 +6,6 @@ import { SectionItems } from "@/components/admin/SectionItems";
 import { listSectionItems } from "@/lib/section-items";
 import { SECTION_BY_SLUG } from "@/lib/section-items-shared";
 import { getSectionOverrides } from "@/lib/section-overrides";
-import { MediaLibrary } from "@/components/admin/MediaLibrary";
 import { listMedia } from "@/lib/media";
 
 export const dynamic = "force-dynamic";
@@ -41,7 +40,7 @@ export default async function AdminSiteImageGroupPage({
         blurb={group.blurb}
         section={section}
         overrides={overrides}
-        library={<MediaLibrary initial={media} />}
+        media={media}
       />
       {section && <SectionItems section={section} label={group.name} initial={added} />}
     </>

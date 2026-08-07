@@ -8,6 +8,7 @@ import {
   type SectionId,
   type SectionItem,
 } from "@/lib/section-items-shared";
+import { ADD_CARD_EVENT, type AddCardRequest } from "@/lib/admin/add-card-event";
 import { cn } from "@/lib/utils";
 
 const MAX_BYTES = 10 * 1024 * 1024;
@@ -42,13 +43,26 @@ export function SectionItems({
 
   const fields = SECTION_FIELDS[section];
 
-  const openAdd = () => {
+  const openAdd = useCallback((withSrc = "") => {
     setEditing(null);
     setDraft({ tint: SPOTLIGHT_TINTS[0] });
-    setSrc("");
+    setSrc(withSrc);
     setError(null);
     setAdding(true);
-  };
+  }, []);
+
+  /**
+   * "Use it here → as a new card" from the shelf above. The photo is already
+   * uploaded by then, so the dialog opens with only the words left to write.
+   */
+  useEffect(() => {
+    const onRequest = (e: Event) => {
+      const src = (e as CustomEvent<AddCardRequest>).detail?.src;
+      if (src) openAdd(src);
+    };
+    window.addEventListener(ADD_CARD_EVENT, onRequest);
+    return () => window.removeEventListener(ADD_CARD_EVENT, onRequest);
+  }, [openAdd]);
 
   const openEdit = (item: SectionItem) => {
     setEditing(item);
@@ -204,7 +218,7 @@ export function SectionItems({
           </p>
         </div>
         <button
-          onClick={openAdd}
+          onClick={() => openAdd()}
           className="inline-flex items-center gap-1.5 rounded-xl bg-ink px-4 py-2.5 text-sm font-medium text-background hover:opacity-90"
         >
           <Plus className="size-4" /> Add a card
