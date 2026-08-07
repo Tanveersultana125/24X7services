@@ -13,7 +13,9 @@ export function Hero() {
   const heroTechnicianSrc = useSiteImage("hero-technician");
   // With no photo the copy has the whole width to itself rather than sitting
   // in half a hero with an empty half beside it.
-  const copyCols = heroTechnicianSrc ? "col-span-7 lg:col-span-6" : "col-span-12 lg:col-span-9";
+  const copyCols = heroTechnicianSrc
+    ? "col-span-12 sm:col-span-7 lg:col-span-6"
+    : "col-span-12 lg:col-span-9";
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const yType = useTransform(scrollYProgress, [0, 1], [0, -50]);
@@ -75,8 +77,8 @@ export function Hero() {
 
           {/* CTAs and proof — full width below the technician */}
           <div
-            className={`col-span-12 col-start-1 row-start-3 lg:self-start ${
-              heroTechnicianSrc ? "lg:col-span-6" : "lg:col-span-9"
+            className={`col-span-12 col-start-1 lg:self-start ${
+              heroTechnicianSrc ? "row-start-4 sm:row-start-3 lg:col-span-6" : "row-start-3 lg:col-span-9"
             }`}
           >
             <motion.div
@@ -132,11 +134,12 @@ export function Hero() {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, delay: 0.3, ease }}
-            className="relative col-span-5 col-start-8 row-span-2 row-start-1 flex items-end justify-center self-end lg:col-span-6 lg:col-start-7 lg:row-span-3 lg:justify-end lg:self-stretch"
+            /* A phone column is ~130px wide — four photographs can't live in
+               that, and widening it past the column is what was cutting the
+               collage off at both edges. Below sm it gets a row of its own. */
+            className="relative col-span-12 row-start-3 flex items-end justify-center self-end sm:col-span-5 sm:col-start-8 sm:row-span-2 sm:row-start-1 lg:col-span-6 lg:col-start-7 lg:row-span-3 lg:justify-end lg:self-stretch"
           >
-            {/* on phones it runs a little wider than its column so the four
-                photographs stay large enough to read */}
-            <div className="relative -mr-[16%] w-[180%] max-w-none sm:mr-0 sm:w-full sm:max-w-[34rem]">
+            <div className="relative w-full max-w-[22rem] sm:max-w-[34rem]">
               {/* soft backdrop */}
               <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
                 <div className="absolute left-1/2 top-1/2 size-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/50 blur-[120px]" />
