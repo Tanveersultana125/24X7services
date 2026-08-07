@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Loader2, ImageUp, RotateCcw, Link as LinkIcon, Pencil, Eye, EyeOff } from "lucide-react";
+import { Loader2, ImageUp, RotateCcw, Link as LinkIcon, Pencil, Trash2, Undo2 } from "lucide-react";
 import { SECTION_FIELDS, SPOTLIGHT_TINTS, type SectionId } from "@/lib/section-items-shared";
 import type { SectionOverrides } from "@/lib/section-overrides-shared";
 import {
@@ -338,6 +338,9 @@ function SlotCard({
   onRestore?: () => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
+  // Taking a card off the site is worth a second press, the way deleting a
+  // review is — it is reversible, but not by accident.
+  const [confirming, setConfirming] = useState(false);
   // For a photo that already lives somewhere — another site, or this
   // project's own /public folder.
   const [urlOpen, setUrlOpen] = useState(false);
@@ -375,7 +378,7 @@ function SlotCard({
         )}
         {hidden && (
           <span className="absolute inset-0 grid place-items-center bg-surface/80 text-xs font-semibold uppercase tracking-[0.14em] text-muted">
-            Hidden from the site
+            Deleted from the site
           </span>
         )}
       </div>
@@ -431,17 +434,42 @@ function SlotCard({
               >
                 <Pencil className="size-3.5" /> Edit text
               </button>
-              <button
-                onClick={onToggleHidden}
-                disabled={busy}
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium",
-                  hidden ? "text-emerald hover:text-emerald" : "text-danger hover:bg-danger/10",
-                )}
-              >
-                {hidden ? <Eye className="size-3.5" /> : <EyeOff className="size-3.5" />}
-                {hidden ? "Show" : "Hide"}
-              </button>
+              {hidden ? (
+                <button
+                  onClick={onToggleHidden}
+                  disabled={busy}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-emerald"
+                >
+                  <Undo2 className="size-3.5" /> Restore
+                </button>
+              ) : confirming ? (
+                <>
+                  <button
+                    onClick={() => {
+                      setConfirming(false);
+                      onToggleHidden?.();
+                    }}
+                    disabled={busy}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-danger px-3 py-2 text-xs font-semibold text-white hover:opacity-90"
+                  >
+                    <Trash2 className="size-3.5" /> Delete it
+                  </button>
+                  <button
+                    onClick={() => setConfirming(false)}
+                    className="inline-flex items-center rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-ink"
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setConfirming(true)}
+                  disabled={busy}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-danger hover:bg-danger/10"
+                >
+                  <Trash2 className="size-3.5" /> Delete
+                </button>
+              )}
             </>
           )}
           {(custom || rewritten || hidden) && (
