@@ -3,9 +3,9 @@
 import { useRef, useState } from "react";
 import type { MediaImage } from "@/lib/media";
 import { MediaLibrary } from "./MediaLibrary";
-import { Loader2, ImageUp, RotateCcw, Link as LinkIcon, Pencil, Trash2, Undo2 } from "lucide-react";
+import { Loader2, ImageUp, RotateCcw, Link as LinkIcon, Pencil, Trash2, Undo2, X } from "lucide-react";
 import { SECTION_FIELDS, SPOTLIGHT_TINTS, type SectionId } from "@/lib/section-items-shared";
-import type { SectionOverrides } from "@/lib/section-overrides-shared";
+import type { SectionOverride, SectionOverrides } from "@/lib/section-overrides-shared";
 import {
   SITE_IMAGE_SLOTS,
   DEFAULT_SITE_IMAGES,
@@ -54,6 +54,13 @@ export function SiteImagesManager({
   const [error, setError] = useState<string | null>(null);
   // Not a failure — where the bytes landed, when it wasn't the bucket.
   const [notice, setNotice] = useState<string | null>(null);
+  /**
+   * The last change and how to put it back. Only one deep: this undoes the
+   * step you just took, which is the one you regret.
+   */
+  const [undo, setUndo] = useState<{ label: string; run: () => Promise<boolean> } | null>(null);
+
+  const labelOf = (key: string) => groupSlots.find((s) => s.key === key)?.label ?? "that position";
 
   const fail = async (res: Response, fallback: string) => {
     if (res.status === 401) {
@@ -64,8 +71,12 @@ export function SiteImagesManager({
     setError(typeof data?.detail === "string" ? `${fallback} ${data.detail}` : fallback);
   };
 
-  /** Returns whether the position now holds this photo. */
-  const assign = async (key: string, src: string): Promise<boolean> => {
+  /**
+   * The four writes, with no memory of their own. Everything below records
+   * how to reverse itself in terms of these, so an undo is an ordinary write
+   * and can't leave the panel and the site disagreeing.
+   */
+  const putImage = async (key: string, src: string): Promise<boolean> => {
     setBusy(key);
     setError(null);
     try {
@@ -86,6 +97,51 @@ export function SiteImagesManager({
     } finally {
       setBusy(null);
     }
+  };
+
+  const dropImage = async (key: string): Promise<boolean> => {
+    setBusy(key);
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/site-images", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key }),
+      });
+      if (!res.ok) {
+        await fail(res, "Couldn't reset that image.");
+        return false;
+      }
+      setImages((prev) => ({ ...prev, [key]: DEFAULT_SITE_IMAGES[key] }));
+      return true;
+    } catch {
+      setError("Couldn't reach the server. Check your connection and try again.");
+      return false;
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  /**
+   * Puts a position back the way it was before the last change — to whichever
+   * photo it held, or to the build's own if it held nothing of ours.
+   */
+  const restoreImage = (key: string, previous: string | undefined) =>
+    previous === undefined || previous === DEFAULT_SITE_IMAGES[key]
+      ? dropImage(key)
+      : putImage(key, previous);
+
+  /** Returns whether the position now holds this photo. */
+  const assign = async (key: string, src: string): Promise<boolean> => {
+    const previous = images[key];
+    const ok = await putImage(key, src);
+    if (ok) {
+      setUndo({
+        label: `Changed the photo in ${labelOf(key)}.`,
+        run: () => restoreImage(key, previous),
+      });
+    }
+    return ok;
   };
 
   /** Browser → our server → the project's own storage bucket. */
@@ -122,8 +178,7 @@ export function SiteImagesManager({
     }
   };
 
-  /** Rewrite or hide a built-in card; both are stored against its slot. */
-  const patchOverride = async (key: string, fields: Record<string, unknown>) => {
+  const putOverride = async (key: string, fields: Record<string, unknown>): Promise<boolean> => {
     setBusy(key);
     setError(null);
     try {
@@ -132,18 +187,21 @@ export function SiteImagesManager({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ key, ...fields }),
       });
-      if (!res.ok) return void (await fail(res, "Couldn't save that card."));
+      if (!res.ok) {
+        await fail(res, "Couldn't save that card.");
+        return false;
+      }
       setOverrides((prev) => ({ ...prev, [key]: { ...prev[key], ...fields } }));
-      setEditing(null);
+      return true;
     } catch {
       setError("Couldn't reach the server. Check your connection and try again.");
+      return false;
     } finally {
       setBusy(null);
     }
   };
 
-  /** Back to exactly what the code says — words, link and visibility. */
-  const clearOverride = async (key: string) => {
+  const dropOverride = async (key: string): Promise<boolean> => {
     setBusy(key);
     setError(null);
     try {
@@ -152,16 +210,59 @@ export function SiteImagesManager({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ key }),
       });
-      if (!res.ok) return void (await fail(res, "Couldn't restore that card."));
+      if (!res.ok) {
+        await fail(res, "Couldn't restore that card.");
+        return false;
+      }
       setOverrides((prev) => {
         const next = { ...prev };
         delete next[key];
         return next;
       });
+      return true;
     } catch {
       setError("Couldn't reach the server. Check your connection and try again.");
+      return false;
     } finally {
       setBusy(null);
+    }
+  };
+
+  /**
+   * The route merges, so putting an earlier state back means clearing first —
+   * otherwise a field the last change added would survive the undo.
+   */
+  const restoreOverride = async (key: string, previous: SectionOverride | undefined) => {
+    const cleared = await dropOverride(key);
+    if (!cleared) return false;
+    if (!previous || Object.keys(previous).length === 0) return true;
+    return putOverride(key, previous);
+  };
+
+  /** Rewrite or hide a built-in card; both are stored against its slot. */
+  const patchOverride = async (key: string, fields: Record<string, unknown>) => {
+    const previous = overrides[key];
+    const ok = await putOverride(key, fields);
+    if (!ok) return;
+    setEditing(null);
+    setUndo({
+      label:
+        "hidden" in fields
+          ? `${fields.hidden ? "Deleted" : "Restored"} ${labelOf(key)}.`
+          : `Edited the words on ${labelOf(key)}.`,
+      run: () => restoreOverride(key, previous),
+    });
+  };
+
+  /** Back to exactly what the code says — words, link and visibility. */
+  const clearOverride = async (key: string) => {
+    const previous = overrides[key];
+    const ok = await dropOverride(key);
+    if (ok && previous) {
+      setUndo({
+        label: `Restored ${labelOf(key)} to the original.`,
+        run: () => restoreOverride(key, previous),
+      });
     }
   };
 
@@ -182,21 +283,20 @@ export function SiteImagesManager({
   };
 
   const reset = async (key: string) => {
-    setBusy(key);
-    setError(null);
-    try {
-      const res = await fetch("/api/admin/site-images", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key }),
+    const previous = images[key];
+    const ok = await dropImage(key);
+    if (ok && previous !== DEFAULT_SITE_IMAGES[key]) {
+      setUndo({
+        label: `Put the original photo back in ${labelOf(key)}.`,
+        run: () => restoreImage(key, previous),
       });
-      if (!res.ok) return void (await fail(res, "Couldn't reset that image."));
-      setImages((prev) => ({ ...prev, [key]: DEFAULT_SITE_IMAGES[key] }));
-    } catch {
-      setError("Couldn't reach the server. Check your connection and try again.");
-    } finally {
-      setBusy(null);
     }
+  };
+
+  const runUndo = async () => {
+    if (!undo) return;
+    const ok = await undo.run();
+    if (ok) setUndo(null);
   };
 
   return (
@@ -211,6 +311,28 @@ export function SiteImagesManager({
 
       {error && <p className="mb-4 rounded-xl bg-danger/10 px-4 py-3 text-sm text-danger">{error}</p>}
       {notice && <p className="mb-4 rounded-xl bg-amber/10 px-4 py-3 text-sm text-amber">{notice}</p>}
+
+      {undo && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-surface-2 px-4 py-3 text-sm">
+          <span className="text-ink">{undo.label}</span>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={runUndo}
+              disabled={busy !== null}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-ink px-3 py-1.5 text-xs font-medium text-background hover:opacity-90 disabled:opacity-50"
+            >
+              <Undo2 className="size-3.5" /> Undo
+            </button>
+            <button
+              onClick={() => setUndo(null)}
+              aria-label="Dismiss"
+              className="rounded-lg p-1.5 text-muted hover:text-ink"
+            >
+              <X className="size-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       <MediaLibrary
         initial={media}
