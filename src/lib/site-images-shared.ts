@@ -87,14 +87,6 @@ export const SITE_IMAGE_SLOTS: SiteImageSlot[] = [
     group: "Page sections",
   },
   {
-    key: "contact-promise",
-    label: "Contact panel illustration",
-    where: "Contact panel — the artwork beside “Let’s get it fixed”",
-    defaultSrc: "/work/fridge-promise.png",
-    ratio: "Tall portrait, cut out",
-    group: "Page sections",
-  },
-  {
     key: "promise-shield",
     label: "Promise shield",
     where: "Contact panel and the services promise card",

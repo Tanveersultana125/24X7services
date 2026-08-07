@@ -4,7 +4,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { openChatAssistant } from "@/lib/chat-widget";
-import { useSiteImage } from "@/components/providers/SiteImagesProvider";
 import {
   ArrowUpRight,
   PhoneCall,
@@ -63,8 +62,6 @@ const ASSURANCES = [
 ];
 
 export function Contact() {
-  const contactPromiseSrc = useSiteImage("contact-promise");
-
   return (
     <section id="contact" className="relative scroll-mt-28 pb-14 pt-12 sm:pb-20 sm:pt-20">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
@@ -119,24 +116,6 @@ export function Contact() {
                 Book a service
                 <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </Link>
-
-              {/* The illustration stands beside the headline where the column
-                  runs out. It's a tall cut-out, so it's anchored to the panel's
-                  floor and sized by height — width would let it outgrow the
-                  panel it stands in. */}
-              {/* On paper it sits on a white panel that lights it from every
-                  side. On a dark one it had nothing to stand on. */}
-              <span
-                aria-hidden
-                className="pointer-events-none absolute -right-4 bottom-0 hidden size-48 rounded-full bg-royal-bright/25 blur-[70px] dark:block lg:size-64"
-              />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={contactPromiseSrc}
-                alt=""
-                aria-hidden
-                className="pointer-events-none absolute -right-2 bottom-0 h-40 w-auto drop-shadow-[0_18px_34px_rgba(23,21,15,0.28)] sm:right-0 sm:h-56 lg:h-72 xl:h-80 dark:drop-shadow-[0_18px_34px_rgba(0,0,0,0.5)]"
-              />
             </motion.div>
 
             {/* ---------- channels ---------- */}
