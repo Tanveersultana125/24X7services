@@ -55,10 +55,18 @@ export async function uploadImage(input: {
       await file.makePublic();
       return { url: `https://storage.googleapis.com/${BUCKET}/${encodeURI(path)}`, stored: "bucket" };
     } catch (err) {
-      // A project with Storage still switched off has no bucket at all. That
-      // shouldn't stop someone changing a photograph, so the file lands on this
-      // server instead — good enough to work with, and the panel says as much.
+      // A project with Storage still switched off has no bucket at all.
       if (!/bucket does not exist|notFound|404/i.test(String(err))) throw err;
+
+      // On a deployed server the disk is not the site: it is wiped on every
+      // deploy and, on most hosts, read-only. Falling back there would report
+      // a saved photograph that 404s for every visitor — so say what's wrong
+      // instead of appearing to succeed.
+      if (process.env.NODE_ENV === "production") {
+        throw new Error(
+          `Firebase Storage isn't enabled for ${BUCKET}. Turn Storage on in the Firebase console — a deployed server has nowhere else to keep an upload.`,
+        );
+      }
       console.warn("[uploads] no storage bucket — writing to public/uploads instead");
     }
   }
@@ -66,6 +74,11 @@ export async function uploadImage(input: {
   return writeToDisk(path, input.data);
 }
 
+/**
+ * Development only, and only until Storage is switched on. These files are
+ * committed rather than ignored: the URL stored against a slot points at
+ * /uploads/…, so a deployed build has to carry them or the position 404s.
+ */
 async function writeToDisk(path: string, data: Buffer): Promise<UploadResult> {
   const { writeFile, mkdir } = await import("node:fs/promises");
   const { join, dirname } = await import("node:path");

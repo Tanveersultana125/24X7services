@@ -40,8 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# admin uploads written to disk when Firebase Storage isn't enabled
-/public/uploads
+# Admin uploads land here while Firebase Storage is off. They are committed,
+# not ignored: the URL saved against a position points at /uploads/…, so a
+# deployed build that does not carry them shows a broken image.
 
 # verification builds run beside the dev server
 .next-verify
