@@ -3,19 +3,22 @@
 import { useState } from "react";
 import { useSiteImage } from "@/components/providers/SiteImagesProvider";
 import { motion } from "framer-motion";
-import { Wind, ShieldCheck, Gauge } from "lucide-react";
+import { Snowflake, ShieldCheck, Droplets } from "lucide-react";
 import { Kicker } from "./TextReveal";
 import { ImageLightbox } from "@/components/ui/ImageLightbox";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
+/** The three faults people actually call us about, in the order they call. */
 const FEATURES = [
-  { icon: Wind, tint: "#2547d0", title: "Dependable AC service", body: "Expert installation, deep-clean, gas top-up and repair for every split and window unit — done in one visit." },
-  { icon: ShieldCheck, tint: "#0b9a63", title: "Genuine parts & warranty", body: "Only brand-approved components, fitted by certified pros, and backed by a 90-day written warranty." },
-  { icon: Gauge, tint: "#d9821b", title: "Efficient climate care", body: "Advanced tools and diagnostics keep your appliances running cooler, quieter and more energy-efficient." },
+  { icon: Snowflake, tint: "#2547d0", title: "Cooling & gas top-up", body: "No cooling or weak cooling traced to its cause — leak test, compressor check and a measured gas charge, not a guess." },
+  { icon: ShieldCheck, tint: "#0b9a63", title: "Genuine parts & warranty", body: "Brand-approved compressors, thermostats and door gaskets, fitted by certified pros and backed by a 90-day written warranty." },
+  { icon: Droplets, tint: "#d9821b", title: "Frost, leaks & noise", body: "Freezer icing over, water pooling under the crisper, a hum that keeps the kitchen awake — the faults we're called back for most." },
 ];
 
-export function ClimateExpertise() {
+const PHOTO_LABEL = "Certified technician repairing a refrigerator's compressor and coils";
+
+export function FridgeExpertise() {
   const expertiseServiceSrc = useSiteImage("expertise-service");
   const [zoomed, setZoomed] = useState(false);
 
@@ -48,21 +51,21 @@ export function ClimateExpertise() {
           className="cursor-zoom-in overflow-hidden rounded-[2rem] border border-card-edge shadow-premium-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-royal-bright lg:h-full"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={expertiseServiceSrc} alt="Certified technician servicing an air conditioner" className="aspect-[4/3] w-full object-cover lg:aspect-auto lg:h-full" />
+          <img src={expertiseServiceSrc} alt={PHOTO_LABEL} className="aspect-[4/3] w-full object-cover lg:aspect-auto lg:h-full" />
         </motion.div>
         )}
 
         {/* features */}
         <div>
-          <Kicker>Our expertise</Kicker>
+          <Kicker>Refrigerator care</Kicker>
           <h2 className="font-display mt-6 text-[2.4rem] leading-[1.15] sm:leading-[1.05] tracking-[-0.03em] sm:text-5xl">
-            Cooling solutions,
+            Fridge trouble,
             <br />
-            done right.
+            sorted today.
           </h2>
           <p className="mt-5 max-w-md text-pretty leading-relaxed text-muted">
-            We prioritise your comfort — dependable, skilled technicians deliver efficient service for
-            every appliance in your home.
+            A fridge that stops cooling can&apos;t wait until next week. Our technicians diagnose the
+            fault at your door and carry the parts to finish the repair in the same visit.
           </p>
 
           <div className="mt-10 space-y-7">
@@ -92,7 +95,7 @@ export function ClimateExpertise() {
       </div>
 
       <ImageLightbox
-        images={[{ src: expertiseServiceSrc, label: "Certified technician servicing an air conditioner" }]}
+        images={[{ src: expertiseServiceSrc, label: PHOTO_LABEL }]}
         index={zoomed ? 0 : null}
         onClose={() => setZoomed(false)}
         onIndexChange={() => {}}

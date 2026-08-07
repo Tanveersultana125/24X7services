@@ -56,9 +56,9 @@ export const SITE_IMAGE_SLOTS: SiteImageSlot[] = [
   },
   {
     key: "expertise-service",
-    label: "Cooling solutions photo",
-    where: "Homepage — “Cooling solutions, done right”",
-    defaultSrc: "/work/ac-service.png",
+    label: "Refrigerator care photo",
+    where: "Homepage — “Fridge trouble, sorted today”",
+    defaultSrc: "/work/fridge-expertise.webp",
     ratio: "Landscape 4:3",
     group: "Page sections",
   },

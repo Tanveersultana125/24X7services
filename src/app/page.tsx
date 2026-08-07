@@ -5,7 +5,7 @@ import { MostBooked } from "@/components/site/MostBooked";
 import { Spotlight } from "@/components/site/Spotlight";
 import { Noteworthy } from "@/components/site/Noteworthy";
 import { CoolingSolutions } from "@/components/site/CoolingSolutions";
-import { ClimateExpertise } from "@/components/site/ClimateExpertise";
+import { FridgeExpertise } from "@/components/site/FridgeExpertise";
 import { BrandShowcase } from "@/components/site/BrandShowcase";
 import { TrustBento } from "@/components/site/TrustBento";
 import { Emergency } from "@/components/site/Emergency";
@@ -40,7 +40,7 @@ export default async function Home() {
         <Spotlight added={inSection("spotlight")} overrides={overrides} />
         <Noteworthy added={inSection("noteworthy")} overrides={overrides} />
         <CoolingSolutions />
-        <ClimateExpertise />
+        <FridgeExpertise />
         <BrandShowcase />
         <TrustBento />
         <Emergency />
