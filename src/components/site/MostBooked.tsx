@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Star, Zap, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Kicker } from "./TextReveal";
 import { useSiteImages } from "@/components/providers/SiteImagesProvider";
+import type { SectionItem } from "@/lib/section-items-shared";
 import { APPLIANCES } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
@@ -63,8 +64,20 @@ const CARDS: Card[] = [
   })),
 ];
 
-export function MostBooked() {
+export function MostBooked({ added = [] }: { added?: SectionItem[] }) {
   const images = useSiteImages();
+  const cards: Card[] = [
+    ...CARDS,
+    ...added.map((a) => ({
+      title: a.title,
+      img: a.src,
+      slot: `added-${a.id}`,
+      price: a.price,
+      rating: a.rating || 4.8,
+      meta: a.meta,
+      href: a.href,
+    })),
+  ];
   const scroller = useRef<HTMLDivElement>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
@@ -196,7 +209,7 @@ export function MostBooked() {
                instead of drawing a hairline in the arrow's gutter. */
             className="-mr-3 flex cursor-grab snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] active:cursor-grabbing [&::-webkit-scrollbar]:hidden"
           >
-          {CARDS.map((c, i) => (
+          {cards.map((c, i) => (
             <motion.div
               key={c.title}
               data-card

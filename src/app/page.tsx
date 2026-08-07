@@ -14,6 +14,7 @@ import { Stats } from "@/components/site/Stats";
 import { Faq } from "@/components/site/Faq";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { listPublishedReviews, toTestimonial } from "@/lib/reviews";
+import { listSectionItems } from "@/lib/section-items";
 
 // Prerendered and refreshed every 5 minutes; admin approvals revalidate it
 // immediately via revalidatePath in /api/admin/reviews.
@@ -22,6 +23,9 @@ export const revalidate = 300;
 export default async function Home() {
   const reviews = await listPublishedReviews(12).catch(() => []);
   const cards = reviews.map(toTestimonial);
+  // cards an admin added to the strips, on top of the built-in ones
+  const added = await listSectionItems();
+  const inSection = (id: string) => added.filter((i) => i.section === id);
 
   return (
     <>
@@ -29,9 +33,9 @@ export default async function Home() {
       <main className="flex-1">
         <Hero />
         <TrustStrip />
-        <MostBooked />
-        <Spotlight />
-        <Noteworthy />
+        <MostBooked added={inSection("most-booked")} />
+        <Spotlight added={inSection("spotlight")} />
+        <Noteworthy added={inSection("noteworthy")} />
         <CoolingSolutions />
         <ClimateExpertise />
         <BrandShowcase />

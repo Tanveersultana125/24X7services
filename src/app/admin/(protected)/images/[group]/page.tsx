@@ -2,6 +2,9 @@ import { notFound } from "next/navigation";
 import { SiteImagesManager } from "@/components/admin/SiteImagesManager";
 import { getSiteImages } from "@/lib/site-images";
 import { groupBySlug, SITE_IMAGE_GROUP_PAGES } from "@/lib/site-images-shared";
+import { SectionItems } from "@/components/admin/SectionItems";
+import { listSectionItems } from "@/lib/section-items";
+import { SECTION_BY_SLUG } from "@/lib/section-items-shared";
 
 export const dynamic = "force-dynamic";
 
@@ -20,12 +23,19 @@ export default async function AdminSiteImageGroupPage({
   if (!group) notFound();
 
   const current = await getSiteImages();
+  // The carousels can take extra cards; the fixed page positions cannot.
+  const section = SECTION_BY_SLUG[slug];
+  const added = section ? (await listSectionItems()).filter((i) => i.section === section) : [];
+
   return (
-    <SiteImagesManager
-      current={current}
-      group={group.name}
-      title={group.name}
-      blurb={group.blurb}
-    />
+    <>
+      <SiteImagesManager
+        current={current}
+        group={group.name}
+        title={group.name}
+        blurb={group.blurb}
+      />
+      {section && <SectionItems section={section} label={group.name} initial={added} />}
+    </>
   );
 }

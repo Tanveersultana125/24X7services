@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Kicker } from "./TextReveal";
 import { useSiteImages } from "@/components/providers/SiteImagesProvider";
+import type { SectionItem } from "@/lib/section-items-shared";
 import { cn } from "@/lib/utils";
 
 type Spot = { title: string; sub: string; img: string; slot: string; href: string; cta: string; tint: string };
@@ -16,8 +17,21 @@ const SPOTS: Spot[] = [
   { title: "Microwave & oven care", sub: "Heating restored, same visit — from ₹199", img: "/work/microwave.png", slot: "spotlight-microwave", href: "/book?appliance=microwave", cta: "Book now", tint: "#6b3a12" },
 ];
 
-export function Spotlight() {
+export function Spotlight({ added = [] }: { added?: SectionItem[] }) {
   const images = useSiteImages();
+  // cards added from the admin panel run after the ones that ship with the strip
+  const spots: Spot[] = [
+    ...SPOTS,
+    ...added.map((a) => ({
+      title: a.title,
+      sub: a.sub,
+      img: a.src,
+      slot: `added-${a.id}`,
+      href: a.href,
+      cta: a.cta || "Book now",
+      tint: a.tint,
+    })),
+  ];
   const scroller = useRef<HTMLDivElement>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
@@ -90,7 +104,7 @@ export function Spotlight() {
                arrow's gutter. */
             className="-mr-3 flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
-            {SPOTS.map((s) => (
+            {spots.map((s) => (
               /* sizer carries the gap as padding, so plain fractions give
                  exactly 1 / 2 whole banners per row */
               <div key={s.title} data-spot className="w-full shrink-0 snap-start pr-5 sm:w-1/2">

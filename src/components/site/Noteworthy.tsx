@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Zap, ChevronLeft, ChevronRight } from "lucide-react";
 import { Kicker } from "./TextReveal";
 import { useSiteImages } from "@/components/providers/SiteImagesProvider";
+import type { SectionItem } from "@/lib/section-items-shared";
 import { cn } from "@/lib/utils";
 
 type Item = { title: string; img: string; slot: string; href: string; badge?: string; eta?: string };
@@ -18,8 +19,19 @@ const ITEMS: Item[] = [
   { title: "Refrigerator gas top-up", img: "/work/gallery/fridge-2.png", slot: "noteworthy-gas", href: "/book?appliance=refrigerator" },
 ];
 
-export function Noteworthy() {
+export function Noteworthy({ added = [] }: { added?: SectionItem[] }) {
   const images = useSiteImages();
+  const items: Item[] = [
+    ...ITEMS,
+    ...added.map((a) => ({
+      title: a.title,
+      img: a.src,
+      slot: `added-${a.id}`,
+      href: a.href,
+      badge: a.badge || undefined,
+      eta: a.meta || undefined,
+    })),
+  ];
   const scroller = useRef<HTMLDivElement>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
@@ -92,7 +104,7 @@ export function Noteworthy() {
                arrow's gutter. */
             className="-mr-3 flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
-            {ITEMS.map((it) => (
+            {items.map((it) => (
               <Link
                 key={it.title}
                 href={it.href}
