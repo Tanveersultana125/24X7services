@@ -13,9 +13,7 @@ export function Hero() {
   const heroTechnicianSrc = useSiteImage("hero-technician");
   // With no photo the copy has the whole width to itself rather than sitting
   // in half a hero with an empty half beside it.
-  const copyCols = heroTechnicianSrc
-    ? "col-span-12 sm:col-span-7 lg:col-span-6"
-    : "col-span-12 lg:col-span-9";
+  const copyCols = heroTechnicianSrc ? "col-span-7 lg:col-span-6" : "col-span-12 lg:col-span-9";
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const yType = useTransform(scrollYProgress, [0, 1], [0, -50]);
@@ -46,7 +44,9 @@ export function Hero() {
           </span>
         </motion.div>
 
-        <div className="mt-6 grid grid-cols-12 items-end gap-x-4 gap-y-5 sm:mt-8 sm:gap-y-7 lg:grid-rows-[auto_auto_1fr] lg:items-start lg:gap-y-0">
+        {/* tighter columns on phones: the gutters were taking 176px of a 342px
+            row, which is what left the collage nothing to be drawn in */}
+        <div className="mt-6 grid grid-cols-12 items-end gap-x-2 gap-y-5 sm:mt-8 sm:gap-x-4 sm:gap-y-7 lg:grid-rows-[auto_auto_1fr] lg:items-start lg:gap-y-0">
           {/* Headline — sits beside the technician on every screen */}
           <motion.div
             style={{ y: yType }}
@@ -77,8 +77,8 @@ export function Hero() {
 
           {/* CTAs and proof — full width below the technician */}
           <div
-            className={`col-span-12 col-start-1 lg:self-start ${
-              heroTechnicianSrc ? "row-start-4 sm:row-start-3 lg:col-span-6" : "row-start-3 lg:col-span-9"
+            className={`col-span-12 col-start-1 row-start-3 lg:self-start ${
+              heroTechnicianSrc ? "lg:col-span-6" : "lg:col-span-9"
             }`}
           >
             <motion.div
@@ -134,10 +134,7 @@ export function Hero() {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, delay: 0.3, ease }}
-            /* A phone column is ~130px wide — four photographs can't live in
-               that, and widening it past the column is what was cutting the
-               collage off at both edges. Below sm it gets a row of its own. */
-            className="relative col-span-12 row-start-3 flex items-end justify-end self-end sm:col-span-5 sm:col-start-8 sm:row-span-2 sm:row-start-1 lg:col-span-6 lg:col-start-7 lg:row-span-3 lg:self-stretch"
+            className="relative col-span-5 col-start-8 row-span-2 row-start-1 flex items-end justify-end self-end lg:col-span-6 lg:col-start-7 lg:row-span-3 lg:self-stretch"
           >
             {/* The supplied artwork is cropped: 503px of the washing-machine
                 diamond and 212px of the AC one run straight off its own right
@@ -145,7 +142,7 @@ export function Hero() {
                 pushed past the page's right edge instead — a photograph that
                 continues off the page reads as intentional where the same cut
                 in mid-air reads as broken. */}
-            <div className="relative -mr-6 w-full max-w-[22rem] sm:mr-[calc(-2.5rem_-_max(0px,(100vw_-_92rem)/2))] sm:max-w-[34rem]">
+            <div className="relative -mr-6 w-full sm:mr-[calc(-2.5rem_-_max(0px,(100vw_-_92rem)/2))] sm:max-w-[34rem]">
               {/* soft backdrop */}
               <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
                 <div className="absolute left-1/2 top-1/2 size-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/50 blur-[120px]" />
@@ -158,32 +155,32 @@ export function Hero() {
                 className="w-full drop-shadow-[0_28px_50px_rgba(60,52,40,0.25)]"
               />
 
-              {/* Floating proof chips. On a phone they sit on the collage
-                  rather than beside it — there is no room outside it — so the
-                  hero still reads the way it does on a desktop. */}
+              {/* Floating proof chips, from sm up. Beside the collage there is
+                  the headline, and over it there is 160px of picture — on a
+                  phone they either cover the photo or land on the buttons. */}
               <motion.div
                 animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -left-2 top-12 flex items-center gap-1.5 rounded-full bg-card/95 px-2.5 py-1.5 shadow-premium-lg backdrop-blur sm:-left-10 sm:top-20 sm:gap-2 sm:px-3.5 sm:py-2"
+                className="absolute -left-10 top-20 hidden items-center gap-2 rounded-full bg-card/95 px-3.5 py-2 shadow-premium-lg backdrop-blur sm:flex"
               >
-                <ShieldCheck className="size-3.5 text-emerald sm:size-4" />
-                <span className="text-[0.68rem] font-semibold text-ink sm:text-xs">Brand-authorised pro</span>
+                <ShieldCheck className="size-4 text-emerald" />
+                <span className="text-xs font-semibold text-ink">Brand-authorised pro</span>
               </motion.div>
 
               {/* floating live card — lower left */}
               <motion.div
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute -left-3 bottom-16 rounded-xl border border-card-edge bg-card px-3 py-2 shadow-premium-xl sm:-left-12 sm:bottom-24 sm:rounded-2xl sm:px-4 sm:py-3"
+                className="absolute -left-12 bottom-24 hidden rounded-2xl border border-card-edge bg-card px-4 py-3 shadow-premium-xl sm:block"
               >
                 <div className="flex items-center gap-2">
                   <span className="relative flex size-2.5">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald opacity-60" />
                     <span className="relative inline-flex size-2.5 rounded-full bg-emerald" />
                   </span>
-                  <p className="text-[0.68rem] font-semibold text-ink sm:text-[0.72rem]">Ravi is on the way</p>
+                  <p className="text-[0.72rem] font-semibold text-ink">Ravi is on the way</p>
                 </div>
-                <p className="mt-0.5 text-[0.6rem] text-muted sm:mt-1 sm:text-[0.64rem]">Arriving in 8 min · live tracking</p>
+                <p className="mt-1 text-[0.64rem] text-muted">Arriving in 8 min · live tracking</p>
               </motion.div>
             </div>
           </motion.div>
