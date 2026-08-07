@@ -116,14 +116,16 @@ export function ServicesDetail() {
             </div>
 
             {/* promise mark — background keyed out, so it sits straight on the page */}
-            <div aria-hidden className="relative w-full max-w-sm shrink-0 lg:w-[24rem]">
-              <span
-                className="pointer-events-none absolute inset-0 -z-10 rounded-full blur-3xl"
-                style={{ background: "radial-gradient(circle, rgba(37,71,208,0.10), transparent 68%)" }}
-              />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={promiseShieldSrc} alt="" className="w-full" />
-            </div>
+            {promiseShieldSrc && (
+              <div aria-hidden className="relative w-full max-w-sm shrink-0 lg:w-[24rem]">
+                <span
+                  className="pointer-events-none absolute inset-0 -z-10 rounded-full blur-3xl"
+                  style={{ background: "radial-gradient(circle, rgba(37,71,208,0.10), transparent 68%)" }}
+                />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={promiseShieldSrc} alt="" className="w-full" />
+              </div>
+            )}
           </div>
 
           <div className="mt-10 grid grid-cols-3 gap-2.5 sm:mt-14 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
@@ -216,10 +218,12 @@ export function ServicesDetail() {
               </div>
 
               {/* the range we service, on its plinth */}
-              <div aria-hidden className="relative mx-auto w-full max-w-sm lg:max-w-none">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={applianceLineupSrc} alt="" className="w-full" />
-              </div>
+              {applianceLineupSrc && (
+                <div aria-hidden className="relative mx-auto w-full max-w-sm lg:max-w-none">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={applianceLineupSrc} alt="" className="w-full" />
+                </div>
+              )}
 
               {/* promise note */}
               <div className="relative">

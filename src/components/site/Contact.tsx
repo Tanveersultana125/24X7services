@@ -125,6 +125,7 @@ export function Contact() {
               {/* Back beside the headline from lg up, where the column has room
                   to its right; below that the panel is too narrow to float
                   anything over the copy, so it sits in the flow instead. */}
+              {contactPromiseSrc && (
               <div className="pointer-events-none relative mt-10 flex justify-center lg:absolute lg:right-0 lg:top-0 lg:mt-0 lg:block">
                 {/* on paper the panel lights it from every side; on a dark one
                     it had nothing to stand on */}
@@ -140,6 +141,7 @@ export function Contact() {
                   className="relative h-44 w-auto drop-shadow-[0_14px_20px_rgba(23,21,15,0.2)] sm:h-52 lg:h-60 xl:h-72 dark:drop-shadow-[0_14px_20px_rgba(0,0,0,0.45)]"
                 />
               </div>
+              )}
             </motion.div>
 
             {/* ---------- channels ---------- */}

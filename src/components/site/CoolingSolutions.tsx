@@ -86,7 +86,9 @@ export function CoolingSolutions() {
           </Link>
         </div>
 
-        {/* image + floating perks card */}
+        {/* image + floating perks card — the card floats against the photo, so
+            deleting the photo from the panel takes the pair with it */}
+        {coolingFamilySrc && (
         <div className="relative col-span-12 col-start-1 row-start-2 self-center sm:col-span-5 sm:col-start-8 sm:row-start-1 lg:col-span-6 lg:col-start-7 lg:row-span-2">
           <motion.div
             initial={{ opacity: 0, scale: 0.96 }}
@@ -127,6 +129,7 @@ export function CoolingSolutions() {
             </ul>
           </motion.div>
         </div>
+        )}
 
         {/* below lg the photo column is too narrow to float a card over — run the perks
             as a full-width strip between the heading row and the accordion instead */}
@@ -143,7 +146,7 @@ export function CoolingSolutions() {
       </div>
 
       <ImageLightbox
-        images={[{ src: "/work/family-ac.png", label: "A family enjoying cool comfort at home" }]}
+        images={[{ src: coolingFamilySrc, label: "A family enjoying cool comfort at home" }]}
         index={zoomed ? 0 : null}
         onClose={() => setZoomed(false)}
         onIndexChange={() => {}}

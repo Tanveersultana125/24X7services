@@ -133,12 +133,14 @@ export function Hero() {
                 <div className="absolute left-1/2 top-1/2 size-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/50 blur-[120px]" />
               </div>
 
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={heroTechnicianSrc}
-                alt="24X7 certified service technician"
-                className="w-full drop-shadow-[0_28px_50px_rgba(60,52,40,0.25)]"
-              />
+              {heroTechnicianSrc && (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={heroTechnicianSrc}
+                  alt="24X7 certified service technician"
+                  className="w-full drop-shadow-[0_28px_50px_rgba(60,52,40,0.25)]"
+                />
+              )}
 
               {/* floating brand-authorised chip — near the pointing hand */}
               <motion.div

@@ -39,6 +39,7 @@ export function QuickEstimate() {
   return (
     <section className="relative overflow-hidden border-y border-hairline">
       {/* photo panel — full-bleed on the right, fading into the page on the left */}
+      {estimateTabletSrc && (
       <div aria-hidden className="absolute inset-y-0 right-0 z-0 hidden w-[42%] overflow-hidden lg:block">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -51,6 +52,7 @@ export function QuickEstimate() {
           style={{ background: "linear-gradient(90deg, var(--background) 0%, rgba(0,0,0,0) 38%)" }}
         />
       </div>
+      )}
 
       <div className="relative z-10 mx-auto max-w-[92rem] px-6 py-14 sm:px-10 sm:py-20">
         <div className="grid items-center gap-10 lg:grid-cols-[1fr_27rem] lg:gap-16">
@@ -115,13 +117,15 @@ export function QuickEstimate() {
             className="overflow-hidden rounded-[1.75rem] border border-hairline bg-surface shadow-premium-xl"
           >
             {/* the side photo is desktop-only — show it above the form on small screens */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={estimateTabletSrc}
-              alt=""
-              aria-hidden
-              className="aspect-[16/9] w-full object-cover object-[center_28%] lg:hidden"
-            />
+            {estimateTabletSrc && (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={estimateTabletSrc}
+                alt=""
+                aria-hidden
+                className="aspect-[16/9] w-full object-cover object-[center_28%] lg:hidden"
+              />
+            )}
 
             <div className="p-6 sm:p-7">
               <div className="text-center">

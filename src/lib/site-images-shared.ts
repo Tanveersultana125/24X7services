@@ -133,6 +133,13 @@ export const SITE_IMAGE_SLOTS: SiteImageSlot[] = [
   { key: "noteworthy-gas", label: "Refrigerator gas top-up", where: "Homepage — Fresh on the menu", defaultSrc: "/work/gallery/fridge-2.png", ratio: "Square", group: "New & noteworthy" },
 ];
 
+/**
+ * Stored against a slot an admin has emptied. A slot always holds something,
+ * so "no photo here" has to be a value rather than a missing row — a missing
+ * row already means "use the one from the build".
+ */
+export const NO_IMAGE = "__none__";
+
 export type SiteImages = Record<string, string>;
 
 /** The build's own images, used before anything is uploaded. */

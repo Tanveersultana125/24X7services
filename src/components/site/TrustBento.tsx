@@ -119,12 +119,14 @@ export function TrustBento() {
         <div className="mt-10 grid auto-rows-[minmax(10rem,auto)] grid-cols-2 gap-4 sm:mt-14 lg:grid-cols-4">
           {/* ---------- A — 90-day warranty, photo tile ---------- */}
           <Card i={0} className="col-span-2 row-span-2 bg-[#0a1533] text-white shadow-[0_32px_60px_-24px_rgba(11,21,51,0.6)]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={warrantyTileSrc}
-              alt="Certified technician servicing an air conditioner"
-              className="absolute inset-0 size-full object-cover object-[62%_center] transition-transform duration-[1.4s] group-hover:scale-105"
-            />
+            {warrantyTileSrc && (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={warrantyTileSrc}
+                alt="Certified technician servicing an air conditioner"
+                className="absolute inset-0 size-full object-cover object-[62%_center] transition-transform duration-[1.4s] group-hover:scale-105"
+              />
+            )}
             <div
               aria-hidden
               className="absolute inset-0"

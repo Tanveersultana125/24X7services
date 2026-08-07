@@ -54,6 +54,7 @@ export function Faq() {
   return (
     <section id="faq" className="relative scroll-mt-28 overflow-hidden pb-12 pt-14 sm:pb-14 sm:pt-20">
       {/* technician photo rail — only once there is room for three columns */}
+      {faqTechnicianSrc && (
       <div aria-hidden className="absolute inset-y-0 right-0 hidden w-[26%] xl:block">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={faqTechnicianSrc} alt="" className="h-full w-full object-cover object-center" />
@@ -67,9 +68,14 @@ export function Faq() {
           style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0), var(--background))" }}
         />
       </div>
+      )}
 
       <div className="relative mx-auto max-w-[92rem] px-6 sm:px-10">
-        <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-10 xl:pr-[24%]">
+        <div
+          className={`grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-10 ${
+            faqTechnicianSrc ? "xl:pr-[24%]" : ""
+          }`}
+        >
           {/* ---------- left rail ---------- */}
           <aside>
             <Kicker>Questions</Kicker>
@@ -85,15 +91,17 @@ export function Faq() {
 
             {/* Same technician photo as the desktop rail, framed as a card — the
                 right-hand strip has no room to exist below three columns. */}
-            <div className="relative mt-7 aspect-[5/4] overflow-hidden rounded-2xl border border-border shadow-premium-sm sm:aspect-[16/9] xl:hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={faqTechnicianSrc}
-                alt="A 24X7 technician servicing a split air conditioner"
-                loading="lazy"
-                className="size-full object-cover object-[center_32%]"
-              />
-            </div>
+            {faqTechnicianSrc && (
+              <div className="relative mt-7 aspect-[5/4] overflow-hidden rounded-2xl border border-border shadow-premium-sm sm:aspect-[16/9] xl:hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={faqTechnicianSrc}
+                  alt="A 24X7 technician servicing a split air conditioner"
+                  loading="lazy"
+                  className="size-full object-cover object-[center_32%]"
+                />
+              </div>
+            )}
 
             {/* promise cards */}
             <div className="mt-7 grid grid-cols-2 gap-3">

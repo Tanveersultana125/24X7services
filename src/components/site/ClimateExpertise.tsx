@@ -23,8 +23,14 @@ export function ClimateExpertise() {
     <section className="relative py-14 sm:py-20">
       {/* items-stretch, not centre: the photo takes the text column's height so
           the two line up top and bottom instead of the text overhanging. */}
-      <div className="mx-auto grid max-w-[92rem] gap-12 px-6 sm:px-10 lg:grid-cols-2 lg:items-stretch lg:gap-16">
+      {/* one column, not an empty half, if the photo has been deleted from the panel */}
+      <div
+        className={`mx-auto grid max-w-[92rem] gap-12 px-6 sm:px-10 lg:gap-16 ${
+          expertiseServiceSrc ? "lg:grid-cols-2 lg:items-stretch" : ""
+        }`}
+      >
         {/* image */}
+        {expertiseServiceSrc && (
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -44,6 +50,7 @@ export function ClimateExpertise() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={expertiseServiceSrc} alt="Certified technician servicing an air conditioner" className="aspect-[4/3] w-full object-cover lg:aspect-auto lg:h-full" />
         </motion.div>
+        )}
 
         {/* features */}
         <div>
@@ -85,7 +92,7 @@ export function ClimateExpertise() {
       </div>
 
       <ImageLightbox
-        images={[{ src: "/work/ac-service.png", label: "Certified technician servicing an air conditioner" }]}
+        images={[{ src: expertiseServiceSrc, label: "Certified technician servicing an air conditioner" }]}
         index={zoomed ? 0 : null}
         onClose={() => setZoomed(false)}
         onIndexChange={() => {}}

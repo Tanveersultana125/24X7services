@@ -7,6 +7,7 @@ import type { SectionOverrides } from "@/lib/section-overrides-shared";
 import {
   SITE_IMAGE_SLOTS,
   DEFAULT_SITE_IMAGES,
+  NO_IMAGE,
   type SiteImages,
 } from "@/lib/site-images-shared";
 import { cn } from "@/lib/utils";
@@ -207,6 +208,7 @@ export function SiteImagesManager({
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {SITE_IMAGE_SLOTS.filter((slot) => slot.group === group).map((slot) => {
           const src = images[slot.key] ?? slot.defaultSrc;
+          const emptied = src === NO_IMAGE;
           return (
             <SlotCard
               key={slot.key}
@@ -214,12 +216,16 @@ export function SiteImagesManager({
               label={slot.label}
               where={slot.where}
               ratio={slot.ratio}
-              src={src}
+              src={emptied ? "" : src}
               custom={src !== slot.defaultSrc}
               busy={busy === slot.key}
               onUpload={(file) => upload(slot.key, file)}
               onUseUrl={(url) => assign(slot.key, url)}
               onReset={() => reset(slot.key)}
+              // A carousel card is deleted whole, through its section override;
+              // a standalone page photo is deleted by emptying its position.
+              emptied={emptied}
+              onEmpty={section ? undefined : () => assign(slot.key, NO_IMAGE)}
               editable={Boolean(section)}
               hidden={Boolean(overrides[slot.key]?.hidden)}
               rewritten={Object.keys(overrides[slot.key] ?? {}).some((k) => k !== "hidden")}
@@ -317,6 +323,8 @@ function SlotCard({
   onUpload,
   onUseUrl,
   onReset,
+  emptied = false,
+  onEmpty,
   editable = false,
   hidden = false,
   rewritten = false,
@@ -334,6 +342,10 @@ function SlotCard({
   onUpload: (file: File) => void;
   onUseUrl: (url: string) => void;
   onReset: () => void;
+  /** The position is on the site but showing nothing. */
+  emptied?: boolean;
+  /** Absent where a picture can't be taken away on its own. */
+  onEmpty?: () => void;
   /** Carousel cards carry words as well as a picture. */
   editable?: boolean;
   hidden?: boolean;
@@ -364,16 +376,25 @@ function SlotCard({
           backgroundPosition: "0 0, 0 8px, 8px -8px, -8px 0",
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} alt={label} className="max-h-full max-w-full object-contain" />
+        {src ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={src} alt={label} className="max-h-full max-w-full object-contain" />
+        ) : (
+          <span className="text-xs font-medium text-muted-2">No image</span>
+        )}
         {busy && (
           <span className="absolute inset-0 grid place-items-center bg-surface/70">
             <Loader2 className="size-6 animate-spin text-muted" />
           </span>
         )}
-        {custom && (
+        {custom && !emptied && (
           <span className="absolute left-3 top-3 rounded-full bg-emerald/15 px-2 py-0.5 text-[0.65rem] font-semibold text-emerald">
             Replaced
+          </span>
+        )}
+        {emptied && (
+          <span className="absolute left-3 top-3 rounded-full bg-danger/15 px-2 py-0.5 text-[0.65rem] font-semibold text-danger">
+            Deleted from the site
           </span>
         )}
         {rewritten && !hidden && (
@@ -419,9 +440,9 @@ function SlotCard({
               "inline-flex items-center gap-1.5 rounded-lg bg-ink px-3 py-2 text-xs font-medium text-background hover:opacity-90",
               busy && "pointer-events-none opacity-60",
             )}
-            aria-label={`Replace ${slotKey}`}
+            aria-label={`${emptied ? "Add an image to" : "Replace"} ${slotKey}`}
           >
-            <ImageUp className="size-3.5" /> Replace
+            <ImageUp className="size-3.5" /> {emptied ? "Add image" : "Replace"}
           </button>
           <button
             onClick={() => setUrlOpen((o) => !o)}
@@ -430,6 +451,38 @@ function SlotCard({
           >
             <LinkIcon className="size-3.5" /> Use a URL
           </button>
+          {/* Takes the photo off the site and leaves the position empty —
+              recoverable with Reset, but worth a second press first. */}
+          {onEmpty && !emptied && (
+            confirming ? (
+              <>
+                <button
+                  onClick={() => {
+                    setConfirming(false);
+                    onEmpty();
+                  }}
+                  disabled={busy}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-danger px-3 py-2 text-xs font-semibold text-white hover:opacity-90"
+                >
+                  <Trash2 className="size-3.5" /> Delete it
+                </button>
+                <button
+                  onClick={() => setConfirming(false)}
+                  className="inline-flex items-center rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-ink"
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setConfirming(true)}
+                disabled={busy}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-danger hover:bg-danger/10"
+              >
+                <Trash2 className="size-3.5" /> Delete
+              </button>
+            )
+          )}
           {editable && (
             <>
               <button
@@ -486,7 +539,7 @@ function SlotCard({
               disabled={busy}
               className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-ink"
             >
-              <RotateCcw className="size-3.5" /> Reset
+              <RotateCcw className="size-3.5" /> {emptied ? "Bring it back" : "Reset"}
             </button>
           )}
         </div>

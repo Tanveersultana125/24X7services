@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { DEFAULT_SITE_IMAGES, type SiteImages } from "@/lib/site-images-shared";
+import { DEFAULT_SITE_IMAGES, NO_IMAGE, type SiteImages } from "@/lib/site-images-shared";
 
 /**
  * The current image for every slot, resolved once in the root layout and read
@@ -23,10 +23,15 @@ export function SiteImagesProvider({
   return <SiteImagesContext.Provider value={images}>{children}</SiteImagesContext.Provider>;
 }
 
-/** The image assigned to a slot, or the one that ships with the build. */
+/**
+ * The image assigned to a slot, or the one that ships with the build. Empty
+ * when an admin has deleted it — every caller renders nothing in that case,
+ * rather than an image element pointing at nowhere.
+ */
 export function useSiteImage(key: string): string {
   const images = useContext(SiteImagesContext);
-  return images[key] ?? DEFAULT_SITE_IMAGES[key] ?? "";
+  const src = images[key] ?? DEFAULT_SITE_IMAGES[key] ?? "";
+  return src === NO_IMAGE ? "" : src;
 }
 
 /**
