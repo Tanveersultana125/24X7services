@@ -39,17 +39,27 @@ export function SectionItems({
   const [src, setSrc] = useState("");
   const [busy, setBusy] = useState<"upload" | "save" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  /** The required field that stopped the save, so the form can point at it. */
+  const [missing, setMissing] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const fields = SECTION_FIELDS[section];
 
-  const openAdd = useCallback((withSrc = "") => {
-    setEditing(null);
-    setDraft({ tint: SPOTLIGHT_TINTS[0] });
-    setSrc(withSrc);
-    setError(null);
-    setAdding(true);
-  }, []);
+  const openAdd = useCallback(
+    (withSrc = "") => {
+      const seeded: Draft = { tint: SPOTLIGHT_TINTS[0] };
+      for (const f of SECTION_FIELDS[section]) {
+        if (f.initial) seeded[f.name as string] = f.initial;
+      }
+      setEditing(null);
+      setDraft(seeded);
+      setSrc(withSrc);
+      setError(null);
+      setMissing(null);
+      setAdding(true);
+    },
+    [section],
+  );
 
   /**
    * "Use it here → as a new card" from the shelf above. The photo is already
@@ -132,12 +142,23 @@ export function SectionItems({
   }, [adding, upload]);
 
   const save = async () => {
-    const missing = fields.find((f) => f.required && !draft[f.name as string]?.trim());
-    if (!src) return setError("Add a photo first.");
-    if (missing) return setError(`${missing.label} is required.`);
+    const blank = fields.find((f) => f.required && !draft[f.name as string]?.trim());
+    if (!src) {
+      setMissing(null);
+      return setError("Add a photo first.");
+    }
+    if (blank) {
+      setMissing(blank.name as string);
+      return setError(
+        blank.name === "href"
+          ? "Link is empty — that's where the card takes people. /book sends them to the booking form."
+          : `${blank.label} is empty. Fill it in and try again.`,
+      );
+    }
 
     setBusy("save");
     setError(null);
+    setMissing(null);
     try {
       const res = await fetch("/api/admin/section-items", {
         method: editing ? "PATCH" : "POST",
@@ -350,9 +371,13 @@ export function SectionItems({
                     <input
                       type={f.type === "number" ? "number" : "text"}
                       value={draft[f.name as string] ?? ""}
-                      onChange={(e) => setDraft((d) => ({ ...d, [f.name as string]: e.target.value }))}
+                      onChange={(e) => {
+                        if (missing === f.name) setMissing(null);
+                        setDraft((d) => ({ ...d, [f.name as string]: e.target.value }));
+                      }}
                       placeholder={f.placeholder}
-                      className={field}
+                      autoFocus={missing === f.name}
+                      className={cn(field, missing === f.name && "border-danger ring-1 ring-danger")}
                     />
                   </label>
                 ),

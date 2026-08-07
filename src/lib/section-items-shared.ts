@@ -39,6 +39,11 @@ export type SectionField = {
   type: "text" | "number" | "colour";
   placeholder?: string;
   required?: boolean;
+  /**
+   * What a new card starts with. A required field whose answer is the same
+   * nine times out of ten shouldn't be an empty box you have to guess at.
+   */
+  initial?: string;
 };
 
 /** What the admin form asks for, per section. */
@@ -47,7 +52,7 @@ export const SECTION_FIELDS: Record<SectionId, SectionField[]> = {
     { name: "title", label: "Title", type: "text", placeholder: "Foam-jet AC deep clean", required: true },
     { name: "sub", label: "Subtitle", type: "text", placeholder: "Cooling like new — from ₹599" },
     { name: "cta", label: "Button label", type: "text", placeholder: "Book now" },
-    { name: "href", label: "Link", type: "text", placeholder: "/book?appliance=ac", required: true },
+    { name: "href", label: "Link", type: "text", placeholder: "/book?appliance=ac", required: true, initial: "/book" },
     { name: "tint", label: "Banner tint", type: "colour" },
   ],
   "most-booked": [
@@ -55,13 +60,13 @@ export const SECTION_FIELDS: Record<SectionId, SectionField[]> = {
     { name: "price", label: "From price (₹)", type: "number", placeholder: "299" },
     { name: "rating", label: "Rating", type: "number", placeholder: "4.7" },
     { name: "meta", label: "Meta", type: "text", placeholder: "1.4M+ booked" },
-    { name: "href", label: "Link", type: "text", placeholder: "/book?appliance=ac", required: true },
+    { name: "href", label: "Link", type: "text", placeholder: "/book?appliance=ac", required: true, initial: "/book" },
   ],
   noteworthy: [
     { name: "title", label: "Title", type: "text", placeholder: "Foam-jet AC service", required: true },
     { name: "badge", label: "Badge", type: "text", placeholder: "New" },
     { name: "meta", label: "Time", type: "text", placeholder: "In 60 mins" },
-    { name: "href", label: "Link", type: "text", placeholder: "/book", required: true },
+    { name: "href", label: "Link", type: "text", placeholder: "/book", required: true, initial: "/book" },
   ],
 };
 
