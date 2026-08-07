@@ -41,9 +41,9 @@ export default async function AdminSiteImageGroupPage({
         blurb={group.blurb}
         section={section}
         overrides={overrides}
+        library={<MediaLibrary initial={media} />}
       />
       {section && <SectionItems section={section} label={group.name} initial={added} />}
-      <MediaLibrary initial={media} />
     </>
   );
 }

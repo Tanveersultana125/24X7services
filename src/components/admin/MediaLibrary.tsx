@@ -93,7 +93,7 @@ export function MediaLibrary({ initial }: { initial: MediaImage[] }) {
   };
 
   return (
-    <section className="mt-12 border-t border-border pt-8">
+    <section className="mb-10 border-b border-border pb-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="max-w-xl">
           <h2 className="font-display text-xl tracking-[-0.02em]">Your images</h2>

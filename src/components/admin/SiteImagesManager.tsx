@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { Loader2, ImageUp, RotateCcw, Link as LinkIcon, Pencil, Trash2, Undo2 } from "lucide-react";
 import { SECTION_FIELDS, SPOTLIGHT_TINTS, type SectionId } from "@/lib/section-items-shared";
 import type { SectionOverrides } from "@/lib/section-overrides-shared";
@@ -29,6 +29,7 @@ export function SiteImagesManager({
   blurb,
   section,
   overrides: initialOverrides = {},
+  library,
 }: {
   current: SiteImages;
   /** Restricts the page to one group of slots. */
@@ -38,6 +39,8 @@ export function SiteImagesManager({
   /** Set on the carousel pages, where a slot is a card with words of its own. */
   section?: SectionId;
   overrides?: SectionOverrides;
+  /** The upload shelf, shown under the page header and above the positions. */
+  library?: ReactNode;
 }) {
   const [images, setImages] = useState<SiteImages>(current);
   const [overrides, setOverrides] = useState<SectionOverrides>(initialOverrides);
@@ -198,6 +201,8 @@ export function SiteImagesManager({
 
       {error && <p className="mb-4 rounded-xl bg-danger/10 px-4 py-3 text-sm text-danger">{error}</p>}
       {notice && <p className="mb-4 rounded-xl bg-amber/10 px-4 py-3 text-sm text-amber">{notice}</p>}
+
+      {library}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {SITE_IMAGE_SLOTS.filter((slot) => slot.group === group).map((slot) => {
