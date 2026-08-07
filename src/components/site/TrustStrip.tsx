@@ -80,7 +80,11 @@ export function TrustStrip() {
               {/* A display serif at 11px has strokes too fine to survive a
                   phone screen — it reads as a smudge. The sans carries the
                   title until there's room for the serif to be itself. */}
-              <h3 className="mt-3 text-[0.78rem] font-semibold leading-tight tracking-[-0.01em] sm:font-display sm:mt-6 sm:text-2xl sm:tracking-[-0.02em]">
+              {/* "Trustworthiness" is one 15-letter word in a ~76px column —
+                  it can't wrap on a space, so it ran under the card's edge and
+                  was clipped. Hyphenation gives it somewhere to break; the
+                  anywhere-break is the fallback for browsers that won't. */}
+              <h3 className="mt-3 hyphens-auto text-[0.78rem] font-semibold leading-tight tracking-[-0.01em] [overflow-wrap:anywhere] sm:mt-6 sm:font-display sm:text-2xl sm:tracking-[-0.02em] sm:[overflow-wrap:normal]">
                 {p.title}
               </h3>
               {/* the blurb is unreadable in a ~6rem column — keep it for sm and up */}
