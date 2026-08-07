@@ -137,9 +137,15 @@ export function Hero() {
             /* A phone column is ~130px wide — four photographs can't live in
                that, and widening it past the column is what was cutting the
                collage off at both edges. Below sm it gets a row of its own. */
-            className="relative col-span-12 row-start-3 flex items-end justify-center self-end sm:col-span-5 sm:col-start-8 sm:row-span-2 sm:row-start-1 lg:col-span-6 lg:col-start-7 lg:row-span-3 lg:justify-end lg:self-stretch"
+            className="relative col-span-12 row-start-3 flex items-end justify-end self-end sm:col-span-5 sm:col-start-8 sm:row-span-2 sm:row-start-1 lg:col-span-6 lg:col-start-7 lg:row-span-3 lg:self-stretch"
           >
-            <div className="relative w-full max-w-[22rem] sm:max-w-[34rem]">
+            {/* The supplied artwork is cropped: 503px of the washing-machine
+                diamond and 212px of the AC one run straight off its own right
+                and top edges. No pixels exist beyond those, so the collage is
+                pushed past the page's right edge instead — a photograph that
+                continues off the page reads as intentional where the same cut
+                in mid-air reads as broken. */}
+            <div className="relative -mr-6 w-full max-w-[22rem] sm:mr-[calc(-2.5rem_-_max(0px,(100vw_-_92rem)/2))] sm:max-w-[34rem]">
               {/* soft backdrop */}
               <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
                 <div className="absolute left-1/2 top-1/2 size-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/50 blur-[120px]" />
