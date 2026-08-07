@@ -53,7 +53,11 @@ export function TrustStrip() {
                  depth is a lit top edge and a rim, since a drop shadow does
                  nothing on a dark page. */
               style={{ "--tint": p.tint } as React.CSSProperties}
-              className="group relative overflow-hidden rounded-[1.1rem] border border-white/60 bg-white/40 p-3 text-center backdrop-blur-2xl backdrop-saturate-[1.8] sm:rounded-[1.75rem] sm:p-7 sm:text-left shadow-[0_18px_40px_-18px_rgba(23,21,15,0.18),inset_0_1.5px_0_rgba(255,255,255,0.85)] transition-all duration-500 hover:-translate-y-2 hover:bg-white/50 hover:shadow-[0_38px_64px_-24px_rgba(23,21,15,0.3),inset_0_1.5px_0_rgba(255,255,255,0.9)] dark:border-white/[0.10] dark:bg-white/[0.055] dark:shadow-[0_26px_60px_-30px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.10)] dark:hover:border-white/[0.18] dark:hover:bg-white/[0.08] dark:hover:shadow-[0_40px_80px_-34px_rgba(0,0,0,1),inset_0_1px_0_rgba(255,255,255,0.14)]"
+              /* The row stretches every card to the tallest, and "Customer
+                 Satisfaction" takes two lines on a phone — so the other two
+                 sat with their text at the top and a gap underneath. Centring
+                 the contents puts all three in the middle of their card. */
+              className="group relative flex flex-col justify-center overflow-hidden rounded-[1.1rem] border border-white/60 bg-white/40 p-3 text-center backdrop-blur-2xl sm:block backdrop-saturate-[1.8] sm:rounded-[1.75rem] sm:p-7 sm:text-left shadow-[0_18px_40px_-18px_rgba(23,21,15,0.18),inset_0_1.5px_0_rgba(255,255,255,0.85)] transition-all duration-500 hover:-translate-y-2 hover:bg-white/50 hover:shadow-[0_38px_64px_-24px_rgba(23,21,15,0.3),inset_0_1.5px_0_rgba(255,255,255,0.9)] dark:border-white/[0.10] dark:bg-white/[0.055] dark:shadow-[0_26px_60px_-30px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.10)] dark:hover:border-white/[0.18] dark:hover:bg-white/[0.08] dark:hover:shadow-[0_40px_80px_-34px_rgba(0,0,0,1),inset_0_1px_0_rgba(255,255,255,0.14)]"
             >
               {/* glossy top sheen */}
               <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/60 to-transparent dark:from-white/[0.05]" />
