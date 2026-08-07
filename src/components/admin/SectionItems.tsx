@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ImageUp, Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
 import {
   SECTION_FIELDS,
@@ -68,7 +68,7 @@ export function SectionItems({
     setAdding(true);
   };
 
-  const upload = async (file: File) => {
+  const upload = useCallback(async (file: File) => {
     if (!file.type.startsWith("image/")) return setError("That file isn't an image.");
     if (file.size > MAX_BYTES) {
       return setError(`That image is ${(file.size / 1024 / 1024).toFixed(1)} MB — the limit is 10 MB.`);
@@ -86,13 +86,36 @@ export function SectionItems({
         return;
       }
       setSrc(data.url);
-      if (!draft.title) setDraft((d) => ({ ...d, title: file.name.replace(/\.[^.]+$/, "") }));
+      // A screenshot pasted from the clipboard arrives as "image.png", which
+      // makes a poor card title — only fill an empty one.
+      const name = file.name.replace(/\.[^.]+$/, "");
+      setDraft((d) => (d.title?.trim() ? d : { ...d, title: name }));
     } catch {
       setError("Couldn't reach the server. Check your connection and try again.");
     } finally {
       setBusy(null);
     }
-  };
+  }, []);
+
+  /**
+   * Ctrl+V while the dialog is open. A screenshot or an image copied from
+   * another page never reaches the disk, so "choose a file" can't get at it.
+   * Text pasted into one of the fields is left alone.
+   */
+  useEffect(() => {
+    if (!adding) return;
+    const onPaste = (e: ClipboardEvent) => {
+      const clip = e.clipboardData;
+      if (!clip) return;
+      const image = Array.from(clip.files).find((f) => f.type.startsWith("image/"));
+      if (!image) return;
+      if (clip.types.includes("text/plain")) return;
+      e.preventDefault();
+      upload(image);
+    };
+    window.addEventListener("paste", onPaste);
+    return () => window.removeEventListener("paste", onPaste);
+  }, [adding, upload]);
 
   const save = async () => {
     const missing = fields.find((f) => f.required && !draft[f.name as string]?.trim());
@@ -270,6 +293,9 @@ export function SectionItems({
               >
                 {busy === "upload" ? <Loader2 className="size-5 animate-spin text-muted" /> : <ImageUp className="size-5 text-muted" />}
                 <span className="font-medium">{busy === "upload" ? "Uploading…" : "Choose a photo or drop it here"}</span>
+                {busy !== "upload" && (
+                  <span className="text-xs text-muted">or paste a copied image with Ctrl/⌘+V</span>
+                )}
               </button>
 
               <label className="block">
