@@ -42,7 +42,7 @@ export const SITE_IMAGE_SLOTS: SiteImageSlot[] = [
     key: "hero-technician",
     label: "Hero technician",
     where: "Homepage — the large photo beside the headline",
-    defaultSrc: "/work/technician.png",
+    defaultSrc: "/work/hero-service-collage.webp",
     ratio: "Portrait, cut out on a transparent background",
     group: "Page sections",
   },

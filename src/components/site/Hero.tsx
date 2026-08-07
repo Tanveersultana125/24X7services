@@ -118,15 +118,15 @@ export function Hero() {
             </motion.div>
           </div>
 
-          {/* Technician cutout — points toward the headline */}
+          {/* Our technicians at work, four trades in one diamond collage */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1, delay: 0.3, ease }}
             className="relative col-span-5 col-start-8 row-span-2 row-start-1 flex items-end justify-center self-end lg:col-span-6 lg:col-start-7 lg:row-span-3 lg:justify-end lg:self-stretch"
           >
-            {/* on phones the cutout runs a little wider than its column so the technician
-                reads at a confident size instead of a small floating figure */}
+            {/* on phones it runs a little wider than its column so the four
+                photographs stay large enough to read */}
             <div className="relative -mr-[16%] w-[180%] max-w-none sm:mr-0 sm:w-full sm:max-w-[34rem]">
               {/* soft backdrop */}
               <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
@@ -137,7 +137,7 @@ export function Hero() {
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   src={heroTechnicianSrc}
-                  alt="24X7 certified service technician"
+                  alt="24X7 technicians servicing an air conditioner, refrigerator, washing machine and microwave"
                   className="w-full drop-shadow-[0_28px_50px_rgba(60,52,40,0.25)]"
                 />
               )}
