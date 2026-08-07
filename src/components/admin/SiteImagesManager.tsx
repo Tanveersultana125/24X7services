@@ -1,7 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Loader2, ImageUp, RotateCcw, Link as LinkIcon } from "lucide-react";
+import { Loader2, ImageUp, RotateCcw, Link as LinkIcon, Pencil, Eye, EyeOff } from "lucide-react";
+import { SECTION_FIELDS, SPOTLIGHT_TINTS, type SectionId } from "@/lib/section-items-shared";
+import type { SectionOverrides } from "@/lib/section-overrides-shared";
 import {
   SITE_IMAGE_SLOTS,
   DEFAULT_SITE_IMAGES,
@@ -25,14 +27,22 @@ export function SiteImagesManager({
   group,
   title,
   blurb,
+  section,
+  overrides: initialOverrides = {},
 }: {
   current: SiteImages;
   /** Restricts the page to one group of slots. */
   group: string;
   title: string;
   blurb: string;
+  /** Set on the carousel pages, where a slot is a card with words of its own. */
+  section?: SectionId;
+  overrides?: SectionOverrides;
 }) {
   const [images, setImages] = useState<SiteImages>(current);
+  const [overrides, setOverrides] = useState<SectionOverrides>(initialOverrides);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [draft, setDraft] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   // Not a failure — where the bytes landed, when it wasn't the bucket.
@@ -99,6 +109,65 @@ export function SiteImagesManager({
     }
   };
 
+  /** Rewrite or hide a built-in card; both are stored against its slot. */
+  const patchOverride = async (key: string, fields: Record<string, unknown>) => {
+    setBusy(key);
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/section-overrides", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key, ...fields }),
+      });
+      if (!res.ok) return void (await fail(res, "Couldn't save that card."));
+      setOverrides((prev) => ({ ...prev, [key]: { ...prev[key], ...fields } }));
+      setEditing(null);
+    } catch {
+      setError("Couldn't reach the server. Check your connection and try again.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  /** Back to exactly what the code says — words, link and visibility. */
+  const clearOverride = async (key: string) => {
+    setBusy(key);
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/section-overrides", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key }),
+      });
+      if (!res.ok) return void (await fail(res, "Couldn't restore that card."));
+      setOverrides((prev) => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+    } catch {
+      setError("Couldn't reach the server. Check your connection and try again.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const openEdit = (key: string) => {
+    const o = overrides[key] ?? {};
+    setDraft({
+      title: o.title ?? "",
+      sub: o.sub ?? "",
+      cta: o.cta ?? "",
+      href: o.href ?? "",
+      meta: o.meta ?? "",
+      badge: o.badge ?? "",
+      price: o.price ? String(o.price) : "",
+      rating: o.rating ? String(o.rating) : "",
+      tint: o.tint ?? SPOTLIGHT_TINTS[0],
+    });
+    setEditing(key);
+  };
+
   const reset = async (key: string) => {
     setBusy(key);
     setError(null);
@@ -146,10 +215,88 @@ export function SiteImagesManager({
               onUpload={(file) => upload(slot.key, file)}
               onUseUrl={(url) => assign(slot.key, url)}
               onReset={() => reset(slot.key)}
+              editable={Boolean(section)}
+              hidden={Boolean(overrides[slot.key]?.hidden)}
+              rewritten={Object.keys(overrides[slot.key] ?? {}).some((k) => k !== "hidden")}
+              onEdit={() => openEdit(slot.key)}
+              onToggleHidden={() => patchOverride(slot.key, { hidden: !overrides[slot.key]?.hidden })}
+              onRestore={() => clearOverride(slot.key)}
             />
           );
         })}
       </div>
+
+      {/* Rewriting a built-in card: the same fields its section shows, empty
+          meaning "leave what the code says". */}
+      {editing && section && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-ink/50 p-4" onClick={() => setEditing(null)}>
+          <div
+            className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-border bg-surface p-6 shadow-premium-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-medium">
+              Edit {SITE_IMAGE_SLOTS.find((s) => s.key === editing)?.label ?? "card"}
+            </h3>
+            <p className="mt-1 text-xs text-muted">Leave a field empty to keep what the site ships with.</p>
+
+            <div className="mt-4 space-y-3">
+              {SECTION_FIELDS[section].map((f) =>
+                f.type === "colour" ? (
+                  <div key={f.name as string}>
+                    <span className="text-xs font-medium text-muted">{f.label}</span>
+                    <div className="mt-1.5 flex gap-2">
+                      {SPOTLIGHT_TINTS.map((t) => (
+                        <button
+                          key={t}
+                          onClick={() => setDraft((d) => ({ ...d, tint: t }))}
+                          aria-label={t}
+                          className={cn(
+                            "size-8 rounded-lg ring-2 ring-offset-2 ring-offset-surface",
+                            draft.tint === t ? "ring-royal-bright" : "ring-transparent",
+                          )}
+                          style={{ background: t }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <label key={f.name as string} className="block">
+                    <span className="text-xs font-medium text-muted">{f.label}</span>
+                    <input
+                      type={f.type === "number" ? "number" : "text"}
+                      value={draft[f.name as string] ?? ""}
+                      onChange={(e) => setDraft((d) => ({ ...d, [f.name as string]: e.target.value }))}
+                      placeholder={f.placeholder}
+                      className="mt-1 w-full rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm outline-none focus:border-royal-bright"
+                    />
+                  </label>
+                ),
+              )}
+            </div>
+
+            <div className="mt-5 flex justify-end gap-2">
+              <button onClick={() => setEditing(null)} className="rounded-xl border border-border px-4 py-2 text-sm font-medium hover:bg-surface-2">
+                Cancel
+              </button>
+              <button
+                onClick={() =>
+                  patchOverride(editing, {
+                    ...Object.fromEntries(
+                      Object.entries(draft).filter(([, v]) => v !== ""),
+                    ),
+                    ...(draft.price ? { price: Number(draft.price) } : {}),
+                    ...(draft.rating ? { rating: Number(draft.rating) } : {}),
+                  })
+                }
+                disabled={busy !== null}
+                className="rounded-xl bg-ink px-4 py-2 text-sm font-medium text-background hover:opacity-90 disabled:opacity-50"
+              >
+                Save changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -165,6 +312,12 @@ function SlotCard({
   onUpload,
   onUseUrl,
   onReset,
+  editable = false,
+  hidden = false,
+  rewritten = false,
+  onEdit,
+  onToggleHidden,
+  onRestore,
 }: {
   slotKey: string;
   label: string;
@@ -176,6 +329,13 @@ function SlotCard({
   onUpload: (file: File) => void;
   onUseUrl: (url: string) => void;
   onReset: () => void;
+  /** Carousel cards carry words as well as a picture. */
+  editable?: boolean;
+  hidden?: boolean;
+  rewritten?: boolean;
+  onEdit?: () => void;
+  onToggleHidden?: () => void;
+  onRestore?: () => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   // For a photo that already lives somewhere — another site, or this
@@ -206,6 +366,16 @@ function SlotCard({
         {custom && (
           <span className="absolute left-3 top-3 rounded-full bg-emerald/15 px-2 py-0.5 text-[0.65rem] font-semibold text-emerald">
             Replaced
+          </span>
+        )}
+        {rewritten && !hidden && (
+          <span className="absolute right-3 top-3 rounded-full bg-royal-bright/15 px-2 py-0.5 text-[0.65rem] font-semibold text-royal-bright">
+            Edited
+          </span>
+        )}
+        {hidden && (
+          <span className="absolute inset-0 grid place-items-center bg-surface/80 text-xs font-semibold uppercase tracking-[0.14em] text-muted">
+            Hidden from the site
           </span>
         )}
       </div>
@@ -252,9 +422,34 @@ function SlotCard({
           >
             <LinkIcon className="size-3.5" /> Use a URL
           </button>
-          {custom && (
+          {editable && (
+            <>
+              <button
+                onClick={onEdit}
+                disabled={busy}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-ink"
+              >
+                <Pencil className="size-3.5" /> Edit text
+              </button>
+              <button
+                onClick={onToggleHidden}
+                disabled={busy}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium",
+                  hidden ? "text-emerald hover:text-emerald" : "text-danger hover:bg-danger/10",
+                )}
+              >
+                {hidden ? <Eye className="size-3.5" /> : <EyeOff className="size-3.5" />}
+                {hidden ? "Show" : "Hide"}
+              </button>
+            </>
+          )}
+          {(custom || rewritten || hidden) && (
             <button
-              onClick={onReset}
+              onClick={() => {
+                if (custom) onReset();
+                if (rewritten || hidden) onRestore?.();
+              }}
               disabled={busy}
               className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-ink"
             >

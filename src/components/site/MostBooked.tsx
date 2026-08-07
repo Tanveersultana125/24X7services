@@ -7,6 +7,8 @@ import { Star, Zap, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react
 import { Kicker } from "./TextReveal";
 import { useSiteImages } from "@/components/providers/SiteImagesProvider";
 import type { SectionItem } from "@/lib/section-items-shared";
+import type { SectionOverrides } from "@/lib/section-overrides-shared";
+import { clean } from "@/lib/section-overrides-apply";
 import { APPLIANCES } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
@@ -64,10 +66,16 @@ const CARDS: Card[] = [
   })),
 ];
 
-export function MostBooked({ added = [] }: { added?: SectionItem[] }) {
+export function MostBooked({
+  added = [],
+  overrides = {},
+}: {
+  added?: SectionItem[];
+  overrides?: SectionOverrides;
+}) {
   const images = useSiteImages();
   const cards: Card[] = [
-    ...CARDS,
+    ...CARDS.filter((c) => !overrides[c.slot]?.hidden).map((c) => ({ ...c, ...clean(overrides[c.slot]) })),
     ...added.map((a) => ({
       title: a.title,
       img: a.src,

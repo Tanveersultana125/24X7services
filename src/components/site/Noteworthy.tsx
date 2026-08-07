@@ -6,6 +6,8 @@ import { Zap, ChevronLeft, ChevronRight } from "lucide-react";
 import { Kicker } from "./TextReveal";
 import { useSiteImages } from "@/components/providers/SiteImagesProvider";
 import type { SectionItem } from "@/lib/section-items-shared";
+import type { SectionOverrides } from "@/lib/section-overrides-shared";
+import { clean } from "@/lib/section-overrides-apply";
 import { cn } from "@/lib/utils";
 
 type Item = { title: string; img: string; slot: string; href: string; badge?: string; eta?: string };
@@ -19,10 +21,22 @@ const ITEMS: Item[] = [
   { title: "Refrigerator gas top-up", img: "/work/gallery/fridge-2.png", slot: "noteworthy-gas", href: "/book?appliance=refrigerator" },
 ];
 
-export function Noteworthy({ added = [] }: { added?: SectionItem[] }) {
+export function Noteworthy({
+  added = [],
+  overrides = {},
+}: {
+  added?: SectionItem[];
+  overrides?: SectionOverrides;
+}) {
   const images = useSiteImages();
   const items: Item[] = [
-    ...ITEMS,
+    ...ITEMS.filter((i) => !overrides[i.slot]?.hidden).map((i) => {
+      const o = clean(overrides[i.slot]);
+      // the card calls it eta; the panel calls it meta, since most-booked uses
+      // the same field for "1.2M+ booked"
+      const meta = typeof o.meta === "string" ? o.meta : undefined;
+      return { ...i, ...o, eta: meta ?? i.eta } as Item;
+    }),
     ...added.map((a) => ({
       title: a.title,
       img: a.src,

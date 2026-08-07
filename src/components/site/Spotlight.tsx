@@ -6,6 +6,8 @@ import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Kicker } from "./TextReveal";
 import { useSiteImages } from "@/components/providers/SiteImagesProvider";
 import type { SectionItem } from "@/lib/section-items-shared";
+import type { SectionOverrides } from "@/lib/section-overrides-shared";
+import { clean } from "@/lib/section-overrides-apply";
 import { cn } from "@/lib/utils";
 
 type Spot = { title: string; sub: string; img: string; slot: string; href: string; cta: string; tint: string };
@@ -17,11 +19,18 @@ const SPOTS: Spot[] = [
   { title: "Microwave & oven care", sub: "Heating restored, same visit — from ₹199", img: "/work/microwave.png", slot: "spotlight-microwave", href: "/book?appliance=microwave", cta: "Book now", tint: "#6b3a12" },
 ];
 
-export function Spotlight({ added = [] }: { added?: SectionItem[] }) {
+export function Spotlight({
+  added = [],
+  overrides = {},
+}: {
+  added?: SectionItem[];
+  overrides?: SectionOverrides;
+}) {
   const images = useSiteImages();
-  // cards added from the admin panel run after the ones that ship with the strip
+  // Built-in banners take whatever the panel has rewritten, and drop out
+  // entirely if it has hidden them; added ones run after them.
   const spots: Spot[] = [
-    ...SPOTS,
+    ...SPOTS.filter((s) => !overrides[s.slot]?.hidden).map((s) => ({ ...s, ...clean(overrides[s.slot]) })),
     ...added.map((a) => ({
       title: a.title,
       sub: a.sub,
