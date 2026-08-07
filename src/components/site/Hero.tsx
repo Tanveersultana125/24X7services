@@ -158,30 +158,32 @@ export function Hero() {
                 className="w-full drop-shadow-[0_28px_50px_rgba(60,52,40,0.25)]"
               />
 
-              {/* floating brand-authorised chip — near the pointing hand */}
+              {/* Floating proof chips. On a phone they sit on the collage
+                  rather than beside it — there is no room outside it — so the
+                  hero still reads the way it does on a desktop. */}
               <motion.div
                 animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -left-4 top-20 hidden items-center gap-2 rounded-full bg-card/95 px-3.5 py-2 shadow-premium-lg backdrop-blur sm:-left-10 sm:flex"
+                className="absolute -left-2 top-12 flex items-center gap-1.5 rounded-full bg-card/95 px-2.5 py-1.5 shadow-premium-lg backdrop-blur sm:-left-10 sm:top-20 sm:gap-2 sm:px-3.5 sm:py-2"
               >
-                <ShieldCheck className="size-4 text-emerald" />
-                <span className="text-xs font-semibold text-ink">Brand-authorised pro</span>
+                <ShieldCheck className="size-3.5 text-emerald sm:size-4" />
+                <span className="text-[0.68rem] font-semibold text-ink sm:text-xs">Brand-authorised pro</span>
               </motion.div>
 
               {/* floating live card — lower left */}
               <motion.div
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute -left-6 bottom-24 hidden rounded-2xl border border-card-edge bg-card px-4 py-3 shadow-premium-xl sm:-left-12 sm:block"
+                className="absolute -left-3 bottom-16 rounded-xl border border-card-edge bg-card px-3 py-2 shadow-premium-xl sm:-left-12 sm:bottom-24 sm:rounded-2xl sm:px-4 sm:py-3"
               >
                 <div className="flex items-center gap-2">
                   <span className="relative flex size-2.5">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald opacity-60" />
                     <span className="relative inline-flex size-2.5 rounded-full bg-emerald" />
                   </span>
-                  <p className="text-[0.72rem] font-semibold text-ink">Ravi is on the way</p>
+                  <p className="text-[0.68rem] font-semibold text-ink sm:text-[0.72rem]">Ravi is on the way</p>
                 </div>
-                <p className="mt-1 text-[0.64rem] text-muted">Arriving in 8 min · live tracking</p>
+                <p className="mt-0.5 text-[0.6rem] text-muted sm:mt-1 sm:text-[0.64rem]">Arriving in 8 min · live tracking</p>
               </motion.div>
             </div>
           </motion.div>
