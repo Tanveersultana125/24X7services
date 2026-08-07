@@ -61,6 +61,14 @@ export async function addSectionItem(input: Omit<SectionItem, "id" | "createdAt"
   return { id: ref.id };
 }
 
+/** Only the fields the form offers; the section and creation time are fixed. */
+export async function updateSectionItem(
+  id: string,
+  fields: Partial<Omit<SectionItem, "id" | "section" | "createdAt">>,
+): Promise<void> {
+  await getAdminDb().collection(ITEMS).doc(id).update(fields);
+}
+
 export async function deleteSectionItem(id: string): Promise<void> {
   await getAdminDb().collection(ITEMS).doc(id).delete();
 }

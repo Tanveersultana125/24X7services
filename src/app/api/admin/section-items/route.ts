@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { isAuthenticated } from "@/lib/admin/auth";
-import { addSectionItem, deleteSectionItem } from "@/lib/section-items";
+import { addSectionItem, deleteSectionItem, updateSectionItem } from "@/lib/section-items";
 import { SECTION_FIELDS, type SectionId } from "@/lib/section-items-shared";
 
 /** Add or remove a card in one of the homepage strips. Admin session required. */
@@ -55,6 +55,43 @@ export async function POST(request: Request) {
   } catch (err) {
     console.error("[admin/section-items] add failed:", err);
     return NextResponse.json({ ok: false, error: "add_failed", detail: reason(err) }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: Request) {
+  if (!(await isAuthenticated())) {
+    return NextResponse.json({ ok: false, error: "unauthenticated" }, { status: 401 });
+  }
+
+  const body = await request.json().catch(() => null);
+  const id = typeof body?.id === "string" ? body.id : "";
+  const src = text(body?.src);
+  const title = text(body?.title);
+  const href = text(body?.href) || "/book";
+
+  const validSrc = src.startsWith("/") || src.startsWith("https://");
+  if (!id || !validSrc || !title || !href.startsWith("/")) {
+    return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
+  }
+
+  try {
+    await updateSectionItem(id, {
+      src,
+      title,
+      sub: text(body?.sub),
+      cta: text(body?.cta) || "Book now",
+      price: num(body?.price),
+      rating: num(body?.rating),
+      meta: text(body?.meta),
+      badge: text(body?.badge),
+      href,
+      tint: /^#[0-9a-fA-F]{6}$/.test(String(body?.tint)) ? String(body.tint) : "#16306e",
+    });
+    revalidatePath("/", "layout");
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    console.error("[admin/section-items] update failed:", err);
+    return NextResponse.json({ ok: false, error: "update_failed", detail: reason(err) }, { status: 500 });
   }
 }
 

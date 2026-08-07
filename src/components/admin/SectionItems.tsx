@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { ImageUp, Loader2, Plus, Trash2, X } from "lucide-react";
+import { ImageUp, Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
 import {
   SECTION_FIELDS,
   SPOTLIGHT_TINTS,
@@ -32,6 +32,8 @@ export function SectionItems({
 }) {
   const [items, setItems] = useState(initial);
   const [adding, setAdding] = useState(false);
+  /** The card being edited; null while adding a new one. */
+  const [editing, setEditing] = useState<SectionItem | null>(null);
   const [draft, setDraft] = useState<Draft>({ tint: SPOTLIGHT_TINTS[0] });
   const [src, setSrc] = useState("");
   const [busy, setBusy] = useState<"upload" | "save" | null>(null);
@@ -39,6 +41,32 @@ export function SectionItems({
   const fileRef = useRef<HTMLInputElement>(null);
 
   const fields = SECTION_FIELDS[section];
+
+  const openAdd = () => {
+    setEditing(null);
+    setDraft({ tint: SPOTLIGHT_TINTS[0] });
+    setSrc("");
+    setError(null);
+    setAdding(true);
+  };
+
+  const openEdit = (item: SectionItem) => {
+    setEditing(item);
+    setDraft({
+      title: item.title,
+      sub: item.sub,
+      cta: item.cta,
+      price: item.price ? String(item.price) : "",
+      rating: item.rating ? String(item.rating) : "",
+      meta: item.meta,
+      badge: item.badge,
+      href: item.href,
+      tint: item.tint,
+    });
+    setSrc(item.src);
+    setError(null);
+    setAdding(true);
+  };
 
   const upload = async (file: File) => {
     if (!file.type.startsWith("image/")) return setError("That file isn't an image.");
@@ -75,10 +103,10 @@ export function SectionItems({
     setError(null);
     try {
       const res = await fetch("/api/admin/section-items", {
-        method: "POST",
+        method: editing ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          section,
+          ...(editing ? { id: editing.id } : { section }),
           src,
           ...draft,
           price: draft.price ? Number(draft.price) : 0,
@@ -86,7 +114,7 @@ export function SectionItems({
         }),
       });
       const data = await res.json().catch(() => null);
-      if (!res.ok || !data?.id) {
+      if (!res.ok || !data?.ok) {
         setError(
           res.status === 401
             ? "Your admin session expired — sign in again at /admin/login."
@@ -94,10 +122,8 @@ export function SectionItems({
         );
         return;
       }
-      setItems((prev) => [
-        ...prev,
-        {
-          id: data.id,
+      const saved = {
+          id: editing ? editing.id : data.id,
           section,
           src,
           title: draft.title ?? "",
@@ -109,11 +135,12 @@ export function SectionItems({
           badge: draft.badge ?? "",
           href: draft.href ?? "/book",
           tint: draft.tint ?? SPOTLIGHT_TINTS[0],
-          createdAt: Date.now(),
-        },
-      ]);
+          createdAt: editing ? editing.createdAt : Date.now(),
+      };
+      setItems((prev) => (editing ? prev.map((i) => (i.id === saved.id ? saved : i)) : [...prev, saved]));
       setDraft({ tint: SPOTLIGHT_TINTS[0] });
       setSrc("");
+      setEditing(null);
       setAdding(false);
     } catch {
       setError("Couldn't reach the server. Check your connection and try again.");
@@ -154,7 +181,7 @@ export function SectionItems({
           </p>
         </div>
         <button
-          onClick={() => setAdding(true)}
+          onClick={openAdd}
           className="inline-flex items-center gap-1.5 rounded-xl bg-ink px-4 py-2.5 text-sm font-medium text-background hover:opacity-90"
         >
           <Plus className="size-4" /> Add a card
@@ -180,13 +207,22 @@ export function SectionItems({
                   <p className="truncate font-medium">{item.title}</p>
                   <p className="mt-0.5 truncate text-xs text-muted">{item.href}</p>
                 </div>
-                <button
-                  onClick={() => remove(item.id)}
-                  aria-label={`Delete ${item.title}`}
-                  className="shrink-0 rounded-lg p-2 text-danger hover:bg-danger/10"
-                >
-                  <Trash2 className="size-4" />
-                </button>
+                <div className="flex shrink-0 gap-1">
+                  <button
+                    onClick={() => openEdit(item)}
+                    aria-label={`Edit ${item.title}`}
+                    className="rounded-lg p-2 text-muted hover:bg-surface-2 hover:text-ink"
+                  >
+                    <Pencil className="size-4" />
+                  </button>
+                  <button
+                    onClick={() => remove(item.id)}
+                    aria-label={`Delete ${item.title}`}
+                    className="rounded-lg p-2 text-danger hover:bg-danger/10"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -200,7 +236,7 @@ export function SectionItems({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
-              <h3 className="font-medium">Add a card to {label}</h3>
+              <h3 className="font-medium">{editing ? `Edit ${editing.title}` : `Add a card to ${label}`}</h3>
               <button onClick={() => setAdding(false)} aria-label="Close">
                 <X className="size-5 text-muted" />
               </button>
@@ -295,7 +331,7 @@ export function SectionItems({
                 className="inline-flex items-center gap-2 rounded-xl bg-ink px-4 py-2 text-sm font-medium text-background hover:opacity-90 disabled:opacity-50"
               >
                 {busy === "save" && <Loader2 className="size-4 animate-spin" />}
-                {busy === "save" ? "Saving…" : "Add card"}
+                {busy === "save" ? "Saving…" : editing ? "Save changes" : "Add card"}
               </button>
             </div>
           </div>
