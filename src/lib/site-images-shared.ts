@@ -37,12 +37,23 @@ export function groupBySlug(slug: string) {
   return SITE_IMAGE_GROUP_PAGES.find((g) => g.slug === slug) ?? null;
 }
 
+/**
+ * Stored against a slot an admin has emptied, and the default for a position
+ * that ships without a photo. A slot always holds something, so "no photo
+ * here" has to be a value rather than a missing row — a missing row already
+ * means "use the one from the build".
+ */
+export const NO_IMAGE = "__none__";
+
 export const SITE_IMAGE_SLOTS: SiteImageSlot[] = [
   {
     key: "hero-technician",
     label: "Hero technician",
     where: "Homepage — the large photo beside the headline",
-    defaultSrc: "/work/hero-service-collage.webp",
+    // Empty on purpose: the headline runs the full width without it. Add one
+    // from the panel, or point the slot at /work/hero-service-collage.webp to
+    // bring the diamond collage back.
+    defaultSrc: NO_IMAGE,
     ratio: "Portrait, cut out on a transparent background",
     group: "Page sections",
   },
@@ -132,13 +143,6 @@ export const SITE_IMAGE_SLOTS: SiteImageSlot[] = [
   { key: "noteworthy-installation", label: "AC installation", where: "Homepage — Fresh on the menu", defaultSrc: "/work/ac.png", ratio: "Square", group: "New & noteworthy" },
   { key: "noteworthy-gas", label: "Refrigerator gas top-up", where: "Homepage — Fresh on the menu", defaultSrc: "/work/gallery/fridge-2.png", ratio: "Square", group: "New & noteworthy" },
 ];
-
-/**
- * Stored against a slot an admin has emptied. A slot always holds something,
- * so "no photo here" has to be a value rather than a missing row — a missing
- * row already means "use the one from the build".
- */
-export const NO_IMAGE = "__none__";
 
 export type SiteImages = Record<string, string>;
 

@@ -11,6 +11,9 @@ const RED = "#e11d2a";
 
 export function Hero() {
   const heroTechnicianSrc = useSiteImage("hero-technician");
+  // With no photo the copy has the whole width to itself rather than sitting
+  // in half a hero with an empty half beside it.
+  const copyCols = heroTechnicianSrc ? "col-span-7 lg:col-span-6" : "col-span-12 lg:col-span-9";
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const yType = useTransform(scrollYProgress, [0, 1], [0, -50]);
@@ -45,7 +48,7 @@ export function Hero() {
           {/* Headline — sits beside the technician on every screen */}
           <motion.div
             style={{ y: yType }}
-            className="relative z-10 col-span-7 self-start lg:col-span-6 lg:row-start-1"
+            className={`relative z-10 self-start lg:row-start-1 ${copyCols}`}
           >
             <h1 className="font-display text-[1.75rem] leading-[1.06] tracking-[-0.03em] sm:text-[3.2rem] md:text-[4rem] lg:text-[6.2rem]">
               <Line delay={0.05}>Broken today.</Line>
@@ -63,7 +66,7 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.5, ease }}
             /* justified on phones so the narrow column has a clean right edge;
                hyphenation keeps the word gaps from opening up */
-            className="col-span-7 col-start-1 row-start-2 max-w-md hyphens-auto self-start text-justify text-[0.875rem] leading-relaxed text-muted sm:text-pretty sm:text-left sm:text-base lg:col-span-6 lg:mt-8 lg:text-lg"
+            className={`col-start-1 row-start-2 max-w-md hyphens-auto self-start text-justify text-[0.875rem] leading-relaxed text-muted sm:text-pretty sm:text-left sm:text-base lg:mt-8 lg:text-lg ${copyCols}`}
           >
             Certified doorstep repair, installation and maintenance for Samsung, LG,
             IFB &amp; Bosch — genuine parts, a 90-day warranty, and a technician you can
@@ -71,7 +74,11 @@ export function Hero() {
           </motion.p>
 
           {/* CTAs and proof — full width below the technician */}
-          <div className="col-span-12 col-start-1 row-start-3 lg:col-span-6 lg:self-start">
+          <div
+            className={`col-span-12 col-start-1 row-start-3 lg:self-start ${
+              heroTechnicianSrc ? "lg:col-span-6" : "lg:col-span-9"
+            }`}
+          >
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -118,7 +125,9 @@ export function Hero() {
             </motion.div>
           </div>
 
-          {/* Our technicians at work, four trades in one diamond collage */}
+          {/* The photo, with the chips that float against its edges — they have
+              nothing to float against once it's deleted, so they go with it. */}
+          {heroTechnicianSrc && (
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
@@ -133,14 +142,12 @@ export function Hero() {
                 <div className="absolute left-1/2 top-1/2 size-[32rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/50 blur-[120px]" />
               </div>
 
-              {heroTechnicianSrc && (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img
-                  src={heroTechnicianSrc}
-                  alt="24X7 technicians servicing an air conditioner, refrigerator, washing machine and microwave"
-                  className="w-full drop-shadow-[0_28px_50px_rgba(60,52,40,0.25)]"
-                />
-              )}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={heroTechnicianSrc}
+                alt="24X7 technicians servicing an air conditioner, refrigerator, washing machine and microwave"
+                className="w-full drop-shadow-[0_28px_50px_rgba(60,52,40,0.25)]"
+              />
 
               {/* floating brand-authorised chip — near the pointing hand */}
               <motion.div
@@ -169,6 +176,7 @@ export function Hero() {
               </motion.div>
             </div>
           </motion.div>
+          )}
         </div>
       </div>
     </section>
