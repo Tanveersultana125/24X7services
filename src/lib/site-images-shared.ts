@@ -50,10 +50,7 @@ export const SITE_IMAGE_SLOTS: SiteImageSlot[] = [
     key: "hero-technician",
     label: "Hero technician",
     where: "Homepage — the large photo beside the headline",
-    // Empty on purpose: the headline runs the full width without it. Add one
-    // from the panel, or point the slot at /work/hero-service-collage.webp to
-    // bring the diamond collage back.
-    defaultSrc: NO_IMAGE,
+    defaultSrc: "/work/hero-service-collage.webp",
     ratio: "Portrait, cut out on a transparent background",
     group: "Page sections",
   },
