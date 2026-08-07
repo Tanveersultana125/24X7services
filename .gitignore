@@ -42,3 +42,6 @@ next-env.d.ts
 
 # admin uploads written to disk when Firebase Storage isn't enabled
 /public/uploads
+
+# verification builds run beside the dev server
+.next-verify
