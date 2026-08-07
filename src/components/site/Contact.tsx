@@ -106,7 +106,9 @@ export function Contact() {
 
               <span aria-hidden className="mt-5 block h-1 w-14 rounded-full bg-royal-bright" />
 
-              <p className="mt-5 max-w-md text-pretty leading-relaxed text-muted">
+              {/* narrower from lg up, where the illustration takes the right of
+                  this column — the copy stops before it rather than under it */}
+              <p className="mt-5 max-w-md text-pretty leading-relaxed text-muted lg:max-w-[19rem] xl:max-w-sm">
                 A certified expert, genuine parts and a 90-day warranty are 60 seconds away.
                 Book now — or reach us however you like.
               </p>
@@ -120,23 +122,29 @@ export function Contact() {
                 <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </Link>
 
-              {/* In the flow of the column, not floating over it. Absolute
-                  positioning put it on top of the paragraph and let the panel's
-                  overflow clip its feet; as a block it takes its own room and
-                  the panel grows to hold it. */}
-              <div className="pointer-events-none relative mt-10 flex justify-center lg:justify-end">
+              {/* Back beside the headline from lg up, where the column has room
+                  to its right; below that the panel is too narrow to float
+                  anything over the copy, so it sits in the flow instead. */}
+              <div className="pointer-events-none relative mt-10 flex justify-center lg:absolute lg:right-0 lg:top-0 lg:mt-0 lg:block">
                 {/* on paper the panel lights it from every side; on a dark one
                     it had nothing to stand on */}
                 <span
                   aria-hidden
-                  className="absolute bottom-0 hidden size-56 rounded-full bg-royal-bright/25 blur-[70px] dark:block lg:size-64"
+                  className="absolute bottom-4 left-1/2 hidden size-56 -translate-x-1/2 rounded-full bg-royal-bright/25 blur-[70px] dark:block lg:size-64"
+                />
+                {/* The keyed-out backdrop took the contact shadow with it, which
+                    left the toolbox and pot ending mid-air as if cropped. This
+                    puts the ground back under them. */}
+                <span
+                  aria-hidden
+                  className="absolute bottom-1 left-1/2 h-5 w-[78%] -translate-x-1/2 rounded-[50%] bg-ink/20 blur-lg dark:bg-black/45"
                 />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={contactPromiseSrc}
                   alt=""
                   aria-hidden
-                  className="relative h-44 w-auto drop-shadow-[0_18px_34px_rgba(23,21,15,0.28)] sm:h-52 lg:h-64 xl:h-72 dark:drop-shadow-[0_18px_34px_rgba(0,0,0,0.5)]"
+                  className="relative h-44 w-auto drop-shadow-[0_14px_20px_rgba(23,21,15,0.2)] sm:h-52 lg:h-60 xl:h-72 dark:drop-shadow-[0_14px_20px_rgba(0,0,0,0.45)]"
                 />
               </div>
             </motion.div>
