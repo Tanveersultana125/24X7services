@@ -135,7 +135,7 @@ export function Contact() {
                 src={contactPromiseSrc}
                 alt=""
                 aria-hidden
-                className="pointer-events-none absolute -right-2 bottom-0 h-32 w-auto opacity-95 drop-shadow-[0_16px_30px_rgba(0,0,0,0.45)] sm:right-0 sm:h-44 lg:h-56 xl:h-64"
+                className="pointer-events-none absolute -right-2 bottom-0 h-40 w-auto drop-shadow-[0_18px_34px_rgba(23,21,15,0.28)] sm:right-0 sm:h-56 lg:h-72 xl:h-80 dark:drop-shadow-[0_18px_34px_rgba(0,0,0,0.5)]"
               />
             </motion.div>
 
