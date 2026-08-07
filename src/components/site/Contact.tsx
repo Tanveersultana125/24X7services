@@ -63,7 +63,7 @@ const ASSURANCES = [
 ];
 
 export function Contact() {
-  const promiseShieldSrc = useSiteImage("promise-shield");
+  const contactPromiseSrc = useSiteImage("contact-promise");
 
   return (
     <section id="contact" className="relative scroll-mt-28 pb-14 pt-12 sm:pb-20 sm:pt-20">
@@ -120,20 +120,22 @@ export function Contact() {
                 <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </Link>
 
-              {/* shield mark, sitting beside the headline where the column is empty */}
-              {/* On paper the illustration sits on a white panel that lights it
-                  from every side. On a dark one it had nothing to stand on, so
-                  it gets its own pool of light. */}
+              {/* The illustration stands beside the headline where the column
+                  runs out. It's a tall cut-out, so it's anchored to the panel's
+                  floor and sized by height — width would let it outgrow the
+                  panel it stands in. */}
+              {/* On paper it sits on a white panel that lights it from every
+                  side. On a dark one it had nothing to stand on. */}
               <span
                 aria-hidden
-                className="pointer-events-none absolute right-0 top-12 hidden size-40 -translate-y-6 translate-x-6 rounded-full bg-royal-bright/25 blur-[70px] dark:block sm:top-14 lg:top-10 lg:size-56 xl:top-8 xl:size-64"
+                className="pointer-events-none absolute -right-4 bottom-0 hidden size-48 rounded-full bg-royal-bright/25 blur-[70px] dark:block lg:size-64"
               />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={promiseShieldSrc}
+                src={contactPromiseSrc}
                 alt=""
                 aria-hidden
-                className="pointer-events-none absolute right-0 top-12 w-24 opacity-95 drop-shadow-[0_10px_24px_rgba(0,0,0,0.45)] sm:top-14 sm:w-32 lg:top-10 lg:w-44 xl:top-8 xl:w-56"
+                className="pointer-events-none absolute -right-2 bottom-0 h-32 w-auto opacity-95 drop-shadow-[0_16px_30px_rgba(0,0,0,0.45)] sm:right-0 sm:h-44 lg:h-56 xl:h-64"
               />
             </motion.div>
 
