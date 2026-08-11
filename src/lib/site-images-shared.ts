@@ -105,9 +105,9 @@ export const SITE_IMAGE_SLOTS: SiteImageSlot[] = [
   {
     key: "promise-shield",
     label: "Promise shield",
-    where: "Contact panel and the services promise card",
-    defaultSrc: "/work/promise-shield-cut.png",
-    ratio: "Square, cut out",
+    where: "Services page — beside “What’s included in every service”",
+    defaultSrc: "/work/promise-shield-panel.webp",
+    ratio: "Landscape, shown in a rounded frame",
     group: "Page sections",
   },
   {

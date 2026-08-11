@@ -115,15 +115,20 @@ export function ServicesDetail() {
               </p>
             </div>
 
-            {/* promise mark — background keyed out, so it sits straight on the page */}
+            {/* The illustration is drawn on its own pale ground, and cutting
+                that away took bites out of the shield's white rim — on a dark
+                page they read as notches in the artwork. It keeps its ground
+                and is framed instead, which is what it was drawn for. */}
             {promiseShieldSrc && (
               <div aria-hidden className="relative w-full max-w-sm shrink-0 lg:w-[24rem]">
                 <span
-                  className="pointer-events-none absolute inset-0 -z-10 rounded-full blur-3xl"
-                  style={{ background: "radial-gradient(circle, rgba(37,71,208,0.10), transparent 68%)" }}
+                  className="pointer-events-none absolute -inset-6 -z-10 rounded-full blur-3xl"
+                  style={{ background: "radial-gradient(circle, rgba(37,71,208,0.16), transparent 68%)" }}
                 />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={promiseShieldSrc} alt="" className="w-full" />
+                <div className="overflow-hidden rounded-[1.75rem] border border-card-edge shadow-premium-xl dark:border-white/10 dark:shadow-[0_30px_70px_-30px_rgba(0,0,0,0.9)]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={promiseShieldSrc} alt="" className="w-full" />
+                </div>
               </div>
             )}
           </div>
