@@ -62,9 +62,13 @@ export default async function LoginPage({
 
         {/* The brand panel is the left half of this page, and below lg there is
             no left half — so a phone met a bare form on an empty screen. It
-            gets the same panel as a band: the mark, the line, and the three
-            things worth knowing before signing in. */}
-        <div className="relative overflow-hidden bg-royal px-6 pb-7 pt-6 text-white lg:hidden">
+            appears here as a card: the mark, the member's line, and the three
+            things worth knowing before signing in.
+
+            Inset and rounded, not full-bleed. Everything else on this page sits
+            inside the same 24px margin, so a blue block running off both edges
+            read as a panel with its sides chopped off. */}
+        <div className="relative mx-6 overflow-hidden rounded-[1.5rem] bg-royal px-5 pb-6 pt-5 text-white lg:hidden">
           <div aria-hidden className="pointer-events-none absolute -right-20 -top-24 size-72 rounded-full bg-royal-bright/40 blur-3xl" />
           <div
             aria-hidden
