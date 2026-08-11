@@ -27,7 +27,14 @@ function formatDate(ms: number) {
   return new Date(ms).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 }
 
-export function ReviewsManager({ initial }: { initial: Review[] }) {
+export function ReviewsManager({
+  initial,
+  failure = null,
+}: {
+  initial: Review[];
+  /** Set when the list couldn't be read at all, rather than being empty. */
+  failure?: string | null;
+}) {
   const [rows, setRows] = useState<Review[]>(initial);
   const [filter, setFilter] = useState<"all" | ReviewStatus>("all");
   const [source, setSource] = useState<Source>("any");
@@ -238,13 +245,20 @@ export function ReviewsManager({ initial }: { initial: Review[] }) {
         {shown.length === 0 && (
           <div className="rounded-2xl border border-dashed border-border-strong bg-surface py-14 text-center">
             <p className="font-medium">
-              {rows.length === 0 ? "No reviews yet." : "Nothing matches these filters."}
+              {failure
+                ? "Couldn't load the reviews."
+                : rows.length === 0
+                  ? "No reviews yet."
+                  : "Nothing matches these filters."}
             </p>
             <p className="mt-1 text-sm text-muted">
-              {rows.length === 0
-                ? "Reviews arrive here the moment someone writes one — from the site or against a completed booking."
-                : "Try a different filter."}
+              {failure
+                ? "Nothing is lost — this page just couldn't read them. Try again in a moment."
+                : rows.length === 0
+                  ? "Reviews arrive here the moment someone writes one — from the site or against a completed booking."
+                  : "Try a different filter."}
             </p>
+            {failure && <p className="mt-2 text-xs text-danger">{failure}</p>}
           </div>
         )}
       </div>

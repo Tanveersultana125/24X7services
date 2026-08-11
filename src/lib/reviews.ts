@@ -197,8 +197,13 @@ export async function createSiteReview(input: {
 /** All reviews, newest first (admin). */
 export async function listReviews(): Promise<Review[]> {
   const db = getAdminDb();
-  const snap = await db.collection(REVIEWS).orderBy("createdAt", "desc").get();
-  return snap.docs.map((d) => mapReview(d.id, d.data()));
+  // Sorted here, not by Firestore: an orderBy silently drops any document
+  // missing that field, so a review whose timestamp never landed would be
+  // invisible to the panel — the one place it has to be visible.
+  const snap = await db.collection(REVIEWS).get();
+  return snap.docs
+    .map((d) => mapReview(d.id, d.data()))
+    .sort((a, b) => b.createdAt - a.createdAt);
 }
 
 /** Approved reviews for the public site, newest first. */
