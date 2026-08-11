@@ -4,9 +4,11 @@ import { useState } from "react";
 import { Check, Loader2, Plus, RotateCcw, Trash2, X } from "lucide-react";
 import {
   blankProblem,
+  brandsFor,
   type CatalogueService,
   type ServiceProblem,
 } from "@/lib/catalogue-shared";
+import { BRANDS } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
 /**
@@ -56,6 +58,7 @@ export function ServicesManager({ initial }: { initial: CatalogueService[] }) {
       rating: s.rating,
       bookings: s.bookings,
       active: s.active,
+      brands: brandsFor(s),
       problems: s.problems,
     });
     setBusy(null);
@@ -94,6 +97,7 @@ export function ServicesManager({ initial }: { initial: CatalogueService[] }) {
         rating: 4.8,
         bookings: "New",
         problems: [blankProblem()],
+        brands: BRANDS.map((b) => b.id),
         active: true,
         custom: true,
         createdAt: Date.now(),
@@ -253,6 +257,42 @@ function ServiceCard({
         <Field label="Bookings label">
           <input value={s.bookings} onChange={(e) => onChange({ bookings: e.target.value })} className={input} />
         </Field>
+      </div>
+
+      {/* Which of the four we are authorised for cover this appliance. */}
+      <div className="mt-4">
+        <span className="text-xs font-medium text-muted">Brands we service this for</span>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {BRANDS.map((b) => {
+            const on = brandsFor(s).includes(b.id);
+            return (
+              <button
+                key={b.id}
+                onClick={() =>
+                  onChange({
+                    brands: on
+                      ? brandsFor(s).filter((id) => id !== b.id)
+                      : [...brandsFor(s), b.id],
+                  })
+                }
+                aria-pressed={on}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                  on
+                    ? "border-transparent text-white"
+                    : "border-border text-muted hover:text-ink",
+                )}
+                style={on ? { background: b.accent } : undefined}
+              >
+                {on && <Check className="size-3" />}
+                {b.name}
+              </button>
+            );
+          })}
+        </div>
+        {brandsFor(s).length === 0 && (
+          <p className="mt-2 text-xs text-danger">Pick at least one — a service with no brands can&apos;t be booked.</p>
+        )}
       </div>
 
       {/* The faults a customer picks from, with what each is quoted at. */}

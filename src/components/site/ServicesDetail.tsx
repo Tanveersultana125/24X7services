@@ -9,8 +9,10 @@ import {
   Cog, Volume2, Flame, Zap, Thermometer, Fan, RotateCw, MonitorSmartphone, Power,
   Lock, Disc3, Cpu, PackageOpen,
 } from "lucide-react";
-import { ApplianceTile, APPLIANCE_ACCENT } from "@/components/ui/Icons";
+import { ApplianceTile, APPLIANCE_ACCENT, BrandMark } from "@/components/ui/Icons";
 import { useServices } from "@/components/providers/ServicesProvider";
+import { brandsFor } from "@/lib/catalogue-shared";
+import { BRANDS } from "@/lib/data";
 import { formatRange } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { useSiteImage } from "@/components/providers/SiteImagesProvider";
@@ -336,6 +338,22 @@ export function ServicesDetail() {
                     />
                   </span>
                 )}
+              </div>
+
+              {/* Who we are authorised for on this appliance — the question a
+                  customer asks before the price, not after. */}
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-hairline px-5 py-3 sm:px-6">
+                <span className="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-muted">
+                  Authorised for
+                </span>
+                {BRANDS.filter((b) => brandsFor(appliance).includes(b.id)).map((b) => (
+                  <span
+                    key={b.id}
+                    className="grid h-6 w-14 place-items-center rounded-md bg-white px-1.5 ring-1 ring-black/5"
+                  >
+                    <BrandMark id={b.id} tone="brand" className={b.id === "lg" ? "text-base" : "text-[0.55rem]"} />
+                  </span>
+                ))}
               </div>
 
               <ul className="divide-y divide-hairline">

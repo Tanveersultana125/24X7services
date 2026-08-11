@@ -1,5 +1,6 @@
 import { APPLIANCES } from "./data";
-import type { Appliance, Problem } from "./types";
+import { BRANDS } from "./data";
+import type { Appliance, BrandId, Problem } from "./types";
 
 /**
  * The service catalogue the site actually shows.
@@ -15,8 +16,17 @@ import type { Appliance, Problem } from "./types";
 export type ServiceProblem = Problem;
 
 /** A built-in appliance or an added one, with everything either needs. */
+/** The four we are authorised for. A service may cover any subset. */
+export const BRAND_IDS: BrandId[] = BRANDS.map((b) => b.id);
+
 export type CatalogueService = Omit<Appliance, "id"> & {
   id: string;
+  /**
+   * Which manufacturers we service this appliance for. Empty is read as "all
+   * four" so a service saved before this field existed doesn't lose its
+   * brands.
+   */
+  brands?: BrandId[];
   /** Hidden services stay in the panel and off the site. */
   active: boolean;
   /** Added here rather than shipped in the build — deletable. */
@@ -29,7 +39,11 @@ export type CatalogueService = Omit<Appliance, "id"> & {
 export type ServiceEdit = Partial<Omit<CatalogueService, "id" | "custom" | "createdAt">>;
 export type ServiceEdits = Record<string, ServiceEdit>;
 
-export const DEFAULT_SERVICES: CatalogueService[] = APPLIANCES.map((a) => ({ ...a, active: true }));
+export const DEFAULT_SERVICES: CatalogueService[] = APPLIANCES.map((a) => ({
+  ...a,
+  active: true,
+  brands: BRAND_IDS,
+}));
 
 export const EDITABLE_TEXT = ["name", "blurb", "serviceTime", "bookings"] as const;
 export const EDITABLE_NUMBER = ["startingPrice", "rating"] as const;
@@ -53,6 +67,11 @@ export function slugify(name: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
     .slice(0, 40);
+}
+
+/** The brands a service covers, treating "unset" as all of them. */
+export function brandsFor(service: CatalogueService): BrandId[] {
+  return service.brands?.length ? service.brands : BRAND_IDS;
 }
 
 /** A new service starts with one problem, because none at all can't be booked. */

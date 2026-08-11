@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/Button";
 import { ApplianceTile, BrandMark } from "@/components/ui/Icons";
 import { BRANDS, TIME_SLOTS, PAYMENT_METHODS, getAppliance, brandLabel, applianceLabel } from "@/lib/data";
 import { useServices } from "@/components/providers/ServicesProvider";
+import { brandsFor } from "@/lib/catalogue-shared";
 import { formatINR, formatRange, cn } from "@/lib/utils";
 import { OTHER_PROBLEM_ID, type BookingDraft, type BrandId, type ApplianceId } from "@/lib/types";
 
@@ -244,12 +245,18 @@ function StepTitle({ title, hint }: { title: string; hint?: string }) {
 }
 
 function BrandStep({ draft, setDraft }: StepProps) {
+  const services = useServices();
   const isOther = draft.brand === "other";
+  // Only the makers we are authorised for on the appliance they picked —
+  // offering a brand we don't service is a booking we have to call back and
+  // cancel. Before an appliance is chosen, all of them stand.
+  const chosen = services.find((a) => a.id === draft.appliance);
+  const offered = chosen ? BRANDS.filter((b) => brandsFor(chosen).includes(b.id)) : BRANDS;
   return (
     <div>
       <StepTitle title="Choose your brand" hint="Select the manufacturer — or add your own if it's not listed." />
       <div className="grid gap-4 sm:grid-cols-2">
-        {BRANDS.map((b) => (
+        {offered.map((b) => (
           <OptionCard
             key={b.id}
             selected={draft.brand === b.id}

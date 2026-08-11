@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { isAuthenticated } from "@/lib/admin/auth";
+import type { BrandId } from "@/lib/types";
 import {
   addService,
   deleteAddedService,
@@ -10,6 +11,7 @@ import {
   updateAddedService,
 } from "@/lib/catalogue";
 import {
+  BRAND_IDS,
   DEFAULT_SERVICES,
   slugify,
   type CatalogueService,
@@ -64,6 +66,13 @@ function problems(value: unknown): ServiceProblem[] | undefined {
   return out;
 }
 
+/** Only the brands we actually list — anything else is dropped. */
+function brands(value: unknown): BrandId[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const known = new Set<string>(BRAND_IDS);
+  return value.filter((b): b is BrandId => typeof b === "string" && known.has(b));
+}
+
 /** The fields shared by adding and editing, taken only if present. */
 function fields(body: Record<string, unknown>): ServiceEdit {
   const out: ServiceEdit = {};
@@ -82,6 +91,8 @@ function fields(body: Record<string, unknown>): ServiceEdit {
   if (typeof body.active === "boolean") out.active = body.active;
   const list = problems(body.problems);
   if (list) out.problems = list;
+  const picked = brands(body.brands);
+  if (picked) out.brands = picked;
   return out;
 }
 
@@ -119,6 +130,7 @@ export async function POST(request: Request) {
       rating: patch.rating ?? 4.8,
       bookings: patch.bookings ?? "New",
       problems: patch.problems ?? [],
+      brands: patch.brands ?? BRAND_IDS,
       active: patch.active ?? true,
       custom: true,
       createdAt: Date.now(),
