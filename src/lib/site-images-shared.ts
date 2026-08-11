@@ -114,8 +114,8 @@ export const SITE_IMAGE_SLOTS: SiteImageSlot[] = [
     key: "appliance-lineup",
     label: "Appliance line-up",
     where: "Services page — the appliances card",
-    defaultSrc: "/work/appliance-lineup-v2.png",
-    ratio: "Wide landscape, cut out",
+    defaultSrc: "/work/appliance-lineup-v3.webp",
+    ratio: "Wide landscape, cut out, fading out at the base",
     group: "Page sections",
   },
   // ---- Most booked carousel ----
