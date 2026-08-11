@@ -8,6 +8,7 @@ import {
   type CatalogueService,
   type ServiceProblem,
 } from "@/lib/catalogue-shared";
+import Link from "next/link";
 import { BRANDS } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
@@ -59,7 +60,6 @@ export function ServicesManager({ initial }: { initial: CatalogueService[] }) {
       bookings: s.bookings,
       active: s.active,
       brands: brandsFor(s),
-      brandPrices: s.brandPrices ?? {},
       problems: s.problems,
     });
     setBusy(null);
@@ -114,8 +114,9 @@ export function ServicesManager({ initial }: { initial: CatalogueService[] }) {
         <div className="min-w-0">
           <h1 className="font-display text-2xl tracking-[-0.02em] sm:text-3xl">Services &amp; prices</h1>
           <p className="mt-1 max-w-2xl text-sm text-muted">
-            What the site offers, what each costs and how long it takes — and the faults a customer
-            picks from when booking. Saving a service publishes it straight away.
+            What the site offers, how long each takes, and the faults a customer picks from when
+            booking. What each brand is charged lives on that brand&apos;s page. Saving publishes
+            straight away.
           </p>
         </div>
         <button
@@ -260,60 +261,51 @@ function ServiceCard({
         </Field>
       </div>
 
-      {/* Which of the four we are authorised for cover this appliance, and
-          what each starts at — a Bosch part is not a Samsung part. */}
+      {/* Which of the four we are authorised for cover this appliance. What
+          each of them is charged is set on that brand's own page — one job
+          per page, rather than the same four boxes in two places. */}
       <div className="mt-4">
         <span className="text-xs font-medium text-muted">Brands we service this for</span>
-        <div className="mt-2 space-y-1.5">
+        <div className="mt-2 flex flex-wrap gap-2">
           {BRANDS.map((b) => {
             const on = brandsFor(s).includes(b.id);
-            const own = s.brandPrices?.[b.id];
             return (
-              <div key={b.id} className="flex items-center gap-2">
-                <button
-                  onClick={() =>
-                    onChange({
-                      brands: on ? brandsFor(s).filter((id) => id !== b.id) : [...brandsFor(s), b.id],
-                    })
-                  }
-                  aria-pressed={on}
-                  className={cn(
-                    "inline-flex w-28 shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
-                    on ? "border-transparent text-white" : "border-border text-muted hover:text-ink",
-                  )}
-                  style={on ? { background: b.accent } : undefined}
-                >
-                  {on && <Check className="size-3 shrink-0" />}
-                  {b.name}
-                </button>
-                {on && (
-                  <label className="flex min-w-0 flex-1 items-center gap-2">
-                    <span className="shrink-0 text-[0.68rem] text-muted-2">starts at ₹</span>
-                    <input
-                      type="number"
-                      value={own ?? ""}
-                      placeholder={String(s.startingPrice)}
-                      onChange={(e) => {
-                        const next = { ...(s.brandPrices ?? {}) };
-                        const n = Number(e.target.value);
-                        if (e.target.value === "" || !Number.isFinite(n) || n <= 0) delete next[b.id];
-                        else next[b.id] = Math.round(n);
-                        onChange({ brandPrices: next });
-                      }}
-                      aria-label={`${b.name} starting price`}
-                      className="w-24 rounded-lg border border-border bg-surface px-2 py-1 text-xs outline-none focus:border-royal-bright"
-                    />
-                  </label>
+              <button
+                key={b.id}
+                onClick={() =>
+                  onChange({
+                    brands: on ? brandsFor(s).filter((id) => id !== b.id) : [...brandsFor(s), b.id],
+                  })
+                }
+                aria-pressed={on}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                  on ? "border-transparent text-white" : "border-border text-muted hover:text-ink",
                 )}
-              </div>
+                style={on ? { background: b.accent } : undefined}
+              >
+                {on && <Check className="size-3" />}
+                {b.name}
+              </button>
             );
           })}
         </div>
-        <p className="mt-2 text-[0.68rem] text-muted-2">
-          Leave a price empty to charge this service&apos;s own ₹{s.startingPrice}.
-        </p>
-        {brandsFor(s).length === 0 && (
-          <p className="mt-2 text-xs text-danger">Pick at least one — a service with no brands can&apos;t be booked.</p>
+        {brandsFor(s).length === 0 ? (
+          <p className="mt-2 text-xs text-danger">
+            Pick at least one — a service with no brands can&apos;t be booked.
+          </p>
+        ) : (
+          <p className="mt-2 text-[0.68rem] text-muted-2">
+            What each brand pays is set on its own page —{" "}
+            {BRANDS.filter((b) => brandsFor(s).includes(b.id)).map((b, i, list) => (
+              <span key={b.id}>
+                <Link href={`/admin/services/${b.id}`} className="font-medium text-royal-bright hover:underline">
+                  {b.name}
+                </Link>
+                {i < list.length - 1 ? ", " : "."}
+              </span>
+            ))}
+          </p>
         )}
       </div>
 
