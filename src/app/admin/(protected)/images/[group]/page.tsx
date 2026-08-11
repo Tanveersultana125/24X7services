@@ -7,6 +7,8 @@ import { listSectionItems } from "@/lib/section-items";
 import { SECTION_BY_SLUG } from "@/lib/section-items-shared";
 import { getSectionOverrides } from "@/lib/section-overrides";
 import { listMedia } from "@/lib/media";
+import { StorageNotice } from "@/components/admin/StorageNotice";
+import { describeStorage } from "@/lib/uploads";
 
 export const dynamic = "force-dynamic";
 
@@ -30,9 +32,11 @@ export default async function AdminSiteImageGroupPage({
   const added = section ? (await listSectionItems()).filter((i) => i.section === section) : [];
   const overrides = section ? await getSectionOverrides() : {};
   const media = await listMedia();
+  const storage = await describeStorage();
 
   return (
     <>
+      <StorageNotice status={storage} />
       <SiteImagesManager
         current={current}
         group={group.name}

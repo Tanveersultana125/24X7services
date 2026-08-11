@@ -159,3 +159,53 @@ async function writeToDisk(path: string, data: Buffer): Promise<UploadResult> {
 
   return { url: `/uploads/${path}`, stored: "disk" };
 }
+
+/**
+ * Whether an upload actually has somewhere to go, checked rather than assumed.
+ *
+ * A Firebase bucket name in the environment doesn't mean Storage was ever
+ * switched on — this project has had one set the whole time while every upload
+ * failed. So the bucket is asked whether it exists, and the answer is cached
+ * for a few minutes because it changes about once in a project's life.
+ */
+export type StorageStatus = { ok: boolean; where: string; problem?: string };
+
+const STATUS_TTL_MS = 5 * 60 * 1000;
+const statusCache = globalThis as typeof globalThis & {
+  __24x7StorageStatus?: { at: number; value: StorageStatus };
+};
+
+export async function describeStorage(): Promise<StorageStatus> {
+  const cached = statusCache.__24x7StorageStatus;
+  if (cached && Date.now() - cached.at < STATUS_TTL_MS) return cached.value;
+
+  const value = await probeStorage();
+  statusCache.__24x7StorageStatus = { at: Date.now(), value };
+  return value;
+}
+
+async function probeStorage(): Promise<StorageStatus> {
+  if (cloudinaryConfigured()) {
+    return { ok: true, where: `Cloudinary (${CLOUDINARY.cloud})` };
+  }
+
+  if (BUCKET) {
+    try {
+      const [exists] = await getStorage(getAdminApp()).bucket(BUCKET).exists();
+      if (exists) return { ok: true, where: `Firebase Storage (${BUCKET})` };
+      return {
+        ok: false,
+        where: "nowhere",
+        problem: `Firebase Storage has never been switched on for ${BUCKET}, so the bucket doesn't exist.`,
+      };
+    } catch (err) {
+      return {
+        ok: false,
+        where: "nowhere",
+        problem: `Couldn't reach Firebase Storage: ${err instanceof Error ? err.message : String(err)}`,
+      };
+    }
+  }
+
+  return { ok: false, where: "nowhere", problem: "No storage is configured." };
+}
