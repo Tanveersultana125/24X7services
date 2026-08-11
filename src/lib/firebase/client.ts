@@ -55,9 +55,25 @@ export function logFirebaseConfigProblem(where: string) {
   );
 }
 
-/** Lazily initialise (or reuse) the Firebase app and return its Auth instance. */
+/**
+ * Lazily initialise (or reuse) the Firebase app and return its Auth instance.
+ *
+ * authDomain is this site's own host, not <project>.firebaseapp.com. The
+ * sign-in window reports its result through a handler page served from
+ * authDomain, and a browser that partitions storage — Safari, and Chrome with
+ * third-party cookies off — gives that page its own sessionStorage when it is
+ * on another domain. The handler then can't find the state sign-in began with
+ * and stops on "Unable to process request due to missing initial state".
+ *
+ * next.config.ts proxies /__/auth and /__/firebase through to Firebase, so the
+ * handler is genuinely on this origin and shares storage with the page.
+ */
 export function getFirebaseAuth(): Auth {
-  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  const config: FirebaseOptions =
+    typeof window === "undefined"
+      ? firebaseConfig
+      : { ...firebaseConfig, authDomain: window.location.host };
+  const app = getApps().length ? getApp() : initializeApp(config);
   return getAuth(app);
 }
 
