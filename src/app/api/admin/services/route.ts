@@ -73,6 +73,17 @@ function brands(value: unknown): BrandId[] | undefined {
   return value.filter((b): b is BrandId => typeof b === "string" && known.has(b));
 }
 
+/** A price per make, keeping only the makes we list and the numbers that parse. */
+function brandPrices(value: unknown): Partial<Record<BrandId, number>> | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const out: Partial<Record<BrandId, number>> = {};
+  for (const id of BRAND_IDS) {
+    const n = num((value as Record<string, unknown>)[id]);
+    if (n !== undefined && n > 0) out[id] = Math.round(n);
+  }
+  return out;
+}
+
 /** The fields shared by adding and editing, taken only if present. */
 function fields(body: Record<string, unknown>): ServiceEdit {
   const out: ServiceEdit = {};
@@ -93,6 +104,8 @@ function fields(body: Record<string, unknown>): ServiceEdit {
   if (list) out.problems = list;
   const picked = brands(body.brands);
   if (picked) out.brands = picked;
+  const perBrand = brandPrices(body.brandPrices);
+  if (perBrand) out.brandPrices = perBrand;
   return out;
 }
 
@@ -131,6 +144,7 @@ export async function POST(request: Request) {
       bookings: patch.bookings ?? "New",
       problems: patch.problems ?? [],
       brands: patch.brands ?? BRAND_IDS,
+      brandPrices: patch.brandPrices ?? {},
       active: patch.active ?? true,
       custom: true,
       createdAt: Date.now(),

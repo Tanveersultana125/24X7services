@@ -11,9 +11,9 @@ import {
 } from "lucide-react";
 import { ApplianceTile, APPLIANCE_ACCENT, BrandMark } from "@/components/ui/Icons";
 import { useServices } from "@/components/providers/ServicesProvider";
-import { brandsFor } from "@/lib/catalogue-shared";
+import { brandsFor, priceFor, pricesDiffer } from "@/lib/catalogue-shared";
 import { BRANDS } from "@/lib/data";
-import { formatRange } from "@/lib/utils";
+import { formatINR, formatRange } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { useSiteImage } from "@/components/providers/SiteImagesProvider";
 
@@ -347,11 +347,18 @@ export function ServicesDetail() {
                   Authorised for
                 </span>
                 {BRANDS.filter((b) => brandsFor(appliance).includes(b.id)).map((b) => (
-                  <span
-                    key={b.id}
-                    className="grid h-6 w-14 place-items-center rounded-md bg-white px-1.5 ring-1 ring-black/5"
-                  >
-                    <BrandMark id={b.id} tone="brand" className={b.id === "lg" ? "text-base" : "text-[0.55rem]"} />
+                  <span key={b.id} className="flex items-center gap-1.5">
+                    <span className="grid h-6 w-14 place-items-center rounded-md bg-white px-1.5 ring-1 ring-black/5">
+                      <BrandMark id={b.id} tone="brand" className={b.id === "lg" ? "text-base" : "text-[0.55rem]"} />
+                    </span>
+                    {/* Only worth printing when the makes don't all start at
+                        the same number — otherwise it's the same figure four
+                        times over. */}
+                    {pricesDiffer(appliance) && (
+                      <span className="text-[0.7rem] font-medium text-muted">
+                        from {formatINR(priceFor(appliance, b.id))}
+                      </span>
+                    )}
                   </span>
                 ))}
               </div>

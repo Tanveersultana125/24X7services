@@ -59,6 +59,7 @@ export function ServicesManager({ initial }: { initial: CatalogueService[] }) {
       bookings: s.bookings,
       active: s.active,
       brands: brandsFor(s),
+      brandPrices: s.brandPrices ?? {},
       problems: s.problems,
     });
     setBusy(null);
@@ -259,37 +260,58 @@ function ServiceCard({
         </Field>
       </div>
 
-      {/* Which of the four we are authorised for cover this appliance. */}
+      {/* Which of the four we are authorised for cover this appliance, and
+          what each starts at — a Bosch part is not a Samsung part. */}
       <div className="mt-4">
         <span className="text-xs font-medium text-muted">Brands we service this for</span>
-        <div className="mt-2 flex flex-wrap gap-2">
+        <div className="mt-2 space-y-1.5">
           {BRANDS.map((b) => {
             const on = brandsFor(s).includes(b.id);
+            const own = s.brandPrices?.[b.id];
             return (
-              <button
-                key={b.id}
-                onClick={() =>
-                  onChange({
-                    brands: on
-                      ? brandsFor(s).filter((id) => id !== b.id)
-                      : [...brandsFor(s), b.id],
-                  })
-                }
-                aria-pressed={on}
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
-                  on
-                    ? "border-transparent text-white"
-                    : "border-border text-muted hover:text-ink",
+              <div key={b.id} className="flex items-center gap-2">
+                <button
+                  onClick={() =>
+                    onChange({
+                      brands: on ? brandsFor(s).filter((id) => id !== b.id) : [...brandsFor(s), b.id],
+                    })
+                  }
+                  aria-pressed={on}
+                  className={cn(
+                    "inline-flex w-28 shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                    on ? "border-transparent text-white" : "border-border text-muted hover:text-ink",
+                  )}
+                  style={on ? { background: b.accent } : undefined}
+                >
+                  {on && <Check className="size-3 shrink-0" />}
+                  {b.name}
+                </button>
+                {on && (
+                  <label className="flex min-w-0 flex-1 items-center gap-2">
+                    <span className="shrink-0 text-[0.68rem] text-muted-2">starts at ₹</span>
+                    <input
+                      type="number"
+                      value={own ?? ""}
+                      placeholder={String(s.startingPrice)}
+                      onChange={(e) => {
+                        const next = { ...(s.brandPrices ?? {}) };
+                        const n = Number(e.target.value);
+                        if (e.target.value === "" || !Number.isFinite(n) || n <= 0) delete next[b.id];
+                        else next[b.id] = Math.round(n);
+                        onChange({ brandPrices: next });
+                      }}
+                      aria-label={`${b.name} starting price`}
+                      className="w-24 rounded-lg border border-border bg-surface px-2 py-1 text-xs outline-none focus:border-royal-bright"
+                    />
+                  </label>
                 )}
-                style={on ? { background: b.accent } : undefined}
-              >
-                {on && <Check className="size-3" />}
-                {b.name}
-              </button>
+              </div>
             );
           })}
         </div>
+        <p className="mt-2 text-[0.68rem] text-muted-2">
+          Leave a price empty to charge this service&apos;s own ₹{s.startingPrice}.
+        </p>
         {brandsFor(s).length === 0 && (
           <p className="mt-2 text-xs text-danger">Pick at least one — a service with no brands can&apos;t be booked.</p>
         )}

@@ -27,6 +27,13 @@ export type CatalogueService = Omit<Appliance, "id"> & {
    * brands.
    */
   brands?: BrandId[];
+  /**
+   * What this service starts at for a given make, where that differs — a
+   * Bosch part is not a Samsung part. A brand with nothing set here falls back
+   * to `startingPrice`, so only the brands that actually differ need filling
+   * in.
+   */
+  brandPrices?: Partial<Record<BrandId, number>>;
   /** Hidden services stay in the panel and off the site. */
   active: boolean;
   /** Added here rather than shipped in the build — deletable. */
@@ -72,6 +79,18 @@ export function slugify(name: string): string {
 /** The brands a service covers, treating "unset" as all of them. */
 export function brandsFor(service: CatalogueService): BrandId[] {
   return service.brands?.length ? service.brands : BRAND_IDS;
+}
+
+/** What this service starts at for a make — its own price, or the service's. */
+export function priceFor(service: CatalogueService, brand?: BrandId): number {
+  const own = brand ? service.brandPrices?.[brand] : undefined;
+  return typeof own === "number" && own > 0 ? own : service.startingPrice;
+}
+
+/** True when the makes don't all start at the same number. */
+export function pricesDiffer(service: CatalogueService): boolean {
+  const set = new Set(brandsFor(service).map((b) => priceFor(service, b)));
+  return set.size > 1;
 }
 
 /** A new service starts with one problem, because none at all can't be booked. */

@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/Button";
 import { ApplianceTile, BrandMark } from "@/components/ui/Icons";
 import { BRANDS, TIME_SLOTS, PAYMENT_METHODS, getAppliance, brandLabel, applianceLabel } from "@/lib/data";
 import { useServices } from "@/components/providers/ServicesProvider";
-import { brandsFor } from "@/lib/catalogue-shared";
+import { brandsFor, priceFor } from "@/lib/catalogue-shared";
 import { formatINR, formatRange, cn } from "@/lib/utils";
 import { OTHER_PROBLEM_ID, type BookingDraft, type BrandId, type ApplianceId } from "@/lib/types";
 
@@ -325,7 +325,12 @@ function ApplianceStep({ draft, setDraft }: StepProps) {
             <ApplianceTile id={a.id} />
             <div>
               <p className="font-semibold">{a.name}</p>
-              <p className="text-sm text-muted">From {formatINR(a.startingPrice)} · {a.serviceTime}</p>
+              {/* If they picked a brand first, quote that brand's price —
+                  otherwise the card would promise one figure and the summary
+                  charge another. */}
+              <p className="text-sm text-muted">
+                From {formatINR(priceFor(a, draft.brand))} · {a.serviceTime}
+              </p>
             </div>
           </OptionCard>
         ))}
