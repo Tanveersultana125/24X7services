@@ -70,10 +70,18 @@ export function PageHeader({
             src={bgImage}
             alt=""
             aria-hidden
-            // on light headers the phone veil washes the photo out, so deepen the
-            // image itself there rather than thinning the veil any further
+            /* A phone header is tall and narrow while these photographs are
+               wide, so filling it meant showing a thin vertical slice of the
+               scene. Below sm the picture keeps its own shape at the full
+               width of the page — the whole scene, as on a laptop — and fades
+               out at its foot rather than stopping on a line. */
             className={
-              "absolute inset-0 h-full w-full object-cover object-center" +
+              "absolute inset-x-0 top-0 h-auto w-full object-cover object-center " +
+              "[-webkit-mask-image:linear-gradient(to_bottom,#000_68%,transparent_100%)] " +
+              "[mask-image:linear-gradient(to_bottom,#000_68%,transparent_100%)] " +
+              "sm:inset-0 sm:h-full sm:[-webkit-mask-image:none] sm:[mask-image:none]" +
+              // on light headers the phone veil washes the photo out, so deepen
+              // the image itself there rather than thinning the veil any further
               (onDark ? "" : " brightness-[0.84] lg:brightness-100")
             }
           />
