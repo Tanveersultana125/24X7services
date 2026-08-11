@@ -88,23 +88,54 @@ function RotatingStat() {
   const step = (dir: 1 | -1) => show((index + dir + STATS.length) % STATS.length);
 
   /**
-   * Swipe support. This card isn't a scroll container, so a finger drag did
-   * nothing — the gesture has to be read by hand.
+   * Drag support, for a finger and for a mouse. This card isn't a scroll
+   * container, so neither gesture does anything on its own — both are read
+   * here, and the card follows the pointer so it's clear it can be dragged.
    */
-  const swipe = useRef({ x: 0, y: 0, active: false });
+  const swipe = useRef({ x: 0, y: 0, active: false, axis: "" as "" | "x" | "y" });
+  const [offset, setOffset] = useState(0);
+  const [dragging, setDragging] = useState(false);
 
   const onPointerDown = (e: React.PointerEvent) => {
-    swipe.current = { x: e.clientX, y: e.clientY, active: true };
+    swipe.current = { x: e.clientX, y: e.clientY, active: true, axis: "" };
+    // Without capture a mouse that leaves the card mid-drag never delivers
+    // pointerup, and the gesture is left half-finished.
+    e.currentTarget.setPointerCapture(e.pointerId);
   };
 
-  const onPointerUp = (e: React.PointerEvent) => {
+  const onPointerMove = (e: React.PointerEvent) => {
     if (!swipe.current.active) return;
-    swipe.current.active = false;
     const dx = e.clientX - swipe.current.x;
     const dy = e.clientY - swipe.current.y;
-    // a mostly-vertical drag is the page scrolling, not a swipe
-    if (Math.abs(dx) < 40 || Math.abs(dx) <= Math.abs(dy)) return;
-    step(dx < 0 ? 1 : -1);
+
+    // Decide once what this gesture is: sideways drags the card, downwards is
+    // the page scrolling and stays the page's.
+    if (!swipe.current.axis) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      swipe.current.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+      if (swipe.current.axis === "x") {
+        setPaused(true);
+        setDragging(true);
+      }
+    }
+    if (swipe.current.axis !== "x") return;
+    // Damped, so the card gives a little rather than sliding off its row.
+    setOffset(dx * 0.4);
+  };
+
+  const endDrag = (e: React.PointerEvent) => {
+    if (!swipe.current.active) return;
+    const dx = e.clientX - swipe.current.x;
+    const wasX = swipe.current.axis === "x";
+    swipe.current.active = false;
+    swipe.current.axis = "";
+    setOffset(0);
+    setDragging(false);
+    if (!wasX) return;
+    if (Math.abs(dx) >= 40) step(dx < 0 ? 1 : -1);
+    // A drag too short to count still counts as a touch: hold the rotation a
+    // moment rather than moving the card out from under the pointer.
+    else setPauseNonce((n) => n + 1);
   };
 
   const s = STATS[index];
@@ -113,12 +144,22 @@ function RotatingStat() {
     <div ref={ref} className="mt-8 sm:hidden">
       <div
         onPointerDown={onPointerDown}
-        onPointerUp={onPointerUp}
-        onPointerCancel={() => (swipe.current.active = false)}
+        onPointerMove={onPointerMove}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
         /* touch-pan-y keeps vertical page scrolling working while we read
-           horizontal drags ourselves */
-        className="relative flex min-h-[11rem] touch-pan-y select-none items-center overflow-hidden rounded-3xl border border-border bg-surface pl-8 pr-7 shadow-premium-md transition-colors duration-700"
-        style={{ borderColor: rgba(s.color, 0.28) }}
+           horizontal drags ourselves; the cursor says a mouse can drag it too */
+        className="relative flex min-h-[11rem] cursor-grab touch-pan-y select-none items-center overflow-hidden rounded-3xl border border-border bg-surface pl-8 pr-7 shadow-premium-md active:cursor-grabbing"
+        style={{
+          borderColor: rgba(s.color, 0.28),
+          transform: `translate3d(${offset}px, 0, 0)`,
+          // Follows the pointer exactly while held, snaps back when let go.
+          // Declared here rather than as a class, or the inline transform would
+          // animate on every move and lag behind the finger.
+          transition: dragging
+            ? "border-color 0.7s"
+            : "border-color 0.7s, transform 0.35s cubic-bezier(0.16,1,0.3,1)",
+        }}
       >
         {/* left accent bar — always the current stat's colour */}
         <span
