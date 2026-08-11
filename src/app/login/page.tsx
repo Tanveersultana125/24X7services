@@ -97,7 +97,10 @@ export default async function LoginPage({
           <LoginCard next={safeNext} />
         </div>
 
-        <p className="px-6 pb-8 text-center text-xs text-muted">
+        {/* The chat button is fixed 20px off the bottom-right and is 56px
+            across, so on a phone it sat over the end of this line. Clear it
+            vertically rather than nudging the text off-centre. */}
+        <p className="px-6 pb-24 text-center text-xs text-muted sm:pb-8">
           By continuing you agree to our{" "}
           <Link href="#" className="underline underline-offset-2">Terms</Link> &amp;{" "}
           <Link href="#" className="underline underline-offset-2">Privacy Policy</Link>.
