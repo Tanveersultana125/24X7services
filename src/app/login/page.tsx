@@ -57,15 +57,43 @@ export default async function LoginPage({
           <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-ink">
             <ArrowLeft className="size-4" /> Home
           </Link>
-          <div className="flex items-center gap-3 lg:hidden">
-            <Link href="/" aria-label="24X7 Services — home">
-              <Logo showWord={false} />
-            </Link>
-          </div>
           <ThemeToggle />
         </div>
 
-        <div className="flex flex-1 items-center justify-center px-6 py-12">
+        {/* The brand panel is the left half of this page, and below lg there is
+            no left half — so a phone met a bare form on an empty screen. It
+            gets the same panel as a band: the mark, the line, and the three
+            things worth knowing before signing in. */}
+        <div className="relative overflow-hidden bg-royal px-6 pb-7 pt-6 text-white lg:hidden">
+          <div aria-hidden className="pointer-events-none absolute -right-20 -top-24 size-72 rounded-full bg-royal-bright/40 blur-3xl" />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-[0.07]"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
+              backgroundSize: "40px 40px",
+            }}
+          />
+          <div className="relative [&_*]:text-white">
+            <Link href="/" aria-label="24X7 Services — home" className="inline-block">
+              <Logo />
+            </Link>
+          </div>
+          <blockquote className="font-display relative mt-5 text-[1.6rem] leading-[1.15] tracking-[-0.02em]">
+            &ldquo;The most premium home-service experience I&apos;ve ever used.&rdquo;
+          </blockquote>
+          <p className="relative mt-2.5 text-[0.8rem] text-white/70">
+            Ananya R. · Premium AMC member since 2024
+          </p>
+          <div className="relative mt-5 flex flex-wrap gap-x-5 gap-y-2 border-t border-white/15 pt-4 text-[0.78rem]">
+            <span className="flex items-center gap-1.5"><Star className="size-3.5 fill-amber text-amber" /> 4.9 rating</span>
+            <span className="flex items-center gap-1.5"><ShieldCheck className="size-3.5 text-emerald-bright" /> 90-day warranty</span>
+            <span className="flex items-center gap-1.5"><Clock className="size-3.5 text-white/70" /> Under 90 min</span>
+          </div>
+        </div>
+
+        <div className="flex flex-1 items-center justify-center px-6 py-10 sm:py-12">
           <LoginCard next={safeNext} />
         </div>
 
