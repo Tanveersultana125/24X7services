@@ -56,23 +56,34 @@ export function logFirebaseConfigProblem(where: string) {
 }
 
 /**
- * Lazily initialise (or reuse) the Firebase app and return its Auth instance.
+ * Whether to run Google's sign-in handler on this origin instead of on
+ * <project>.firebaseapp.com.
  *
- * authDomain is this site's own host, not <project>.firebaseapp.com. The
- * sign-in window reports its result through a handler page served from
- * authDomain, and a browser that partitions storage — Safari, and Chrome with
- * third-party cookies off — gives that page its own sessionStorage when it is
- * on another domain. The handler then can't find the state sign-in began with
- * and stops on "Unable to process request due to missing initial state".
+ * Serving it here is what fixes Safari and iOS: the handler page reports the
+ * sign-in result back through sessionStorage, and a browser that partitions
+ * storage gives a page on another domain its own — so the handler can't find
+ * the state sign-in began with, and stops on "missing initial state".
  *
- * next.config.ts proxies /__/auth and /__/firebase through to Firebase, so the
- * handler is genuinely on this origin and shares storage with the page.
+ * It is off unless asked for, because Google checks the redirect URI against
+ * the OAuth client's own list and only <project>.firebaseapp.com/__/auth/handler
+ * is on it out of the box. Turning this on without adding this site's handler
+ * to that list fails everywhere, with redirect_uri_mismatch — worse than the
+ * bug it fixes. So: add
+ *
+ *     https://<this site>/__/auth/handler
+ *
+ * under Google Cloud Console → APIs & Services → Credentials → the Web client
+ * Firebase created → Authorised redirect URIs, then set
+ * NEXT_PUBLIC_FIREBASE_AUTH_PROXY=1 and redeploy.
  */
+const SAME_ORIGIN_HANDLER = process.env.NEXT_PUBLIC_FIREBASE_AUTH_PROXY === "1";
+
+/** Lazily initialise (or reuse) the Firebase app and return its Auth instance. */
 export function getFirebaseAuth(): Auth {
   const config: FirebaseOptions =
-    typeof window === "undefined"
-      ? firebaseConfig
-      : { ...firebaseConfig, authDomain: window.location.host };
+    SAME_ORIGIN_HANDLER && typeof window !== "undefined"
+      ? { ...firebaseConfig, authDomain: window.location.host }
+      : firebaseConfig;
   const app = getApps().length ? getApp() : initializeApp(config);
   return getAuth(app);
 }

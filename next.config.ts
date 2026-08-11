@@ -20,8 +20,11 @@ const nextConfig: NextConfig = {
    *
    * Proxying /__/auth puts the handler — and the scripts it pulls in beside
    * itself — on this origin, where it shares storage with the page that opened
-   * it. The client sets its authDomain to the current host to match; see
-   * lib/firebase/client.ts.
+   * it.
+   *
+   * The proxy is always mounted; whether the SDK uses it is decided by
+   * NEXT_PUBLIC_FIREBASE_AUTH_PROXY, because Google must be told about the new
+   * redirect URI first. See lib/firebase/client.ts for what to add and where.
    */
   async rewrites() {
     const handler = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN;
