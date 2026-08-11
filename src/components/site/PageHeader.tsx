@@ -13,6 +13,11 @@ const ease = [0.16, 1, 0.3, 1] as const;
 const NAVY = "#16295e";
 const GOLD = "#c08a2e";
 
+/** Shared by the headers that ask for a dark scrim and by every header in dark mode. */
+const DARK_SCRIM =
+  "linear-gradient(100deg, rgba(18,20,24,0.88) 0%, rgba(18,20,24,0.74) 34%, rgba(18,20,24,0.34) 60%, rgba(18,20,24,0.12) 100%)";
+const DARK_VEIL = "rgba(18,20,24,0.66)";
+
 const BRAND_ASSURANCES = [
   { icon: ShieldCheck, tint: NAVY, title: "Certified Experts", desc: "Trained & verified professionals" },
   { icon: PackageCheck, tint: GOLD, title: "Genuine Parts", desc: "100% original parts with warranty" },
@@ -72,23 +77,31 @@ export function PageHeader({
               (onDark ? "" : " brightness-[0.84] lg:brightness-100")
             }
           />
-          {/* scrim on the copy side so the text stays readable */}
+          {/* Scrim on the copy side so the text stays readable. The copy takes
+              its colour from the theme, so the scrim has to as well — a cream
+              veil in both themes left near-white type on a near-white wash. */}
           <div
             aria-hidden
-            className="absolute inset-0"
+            className={"absolute inset-0" + (onDark ? "" : " dark:hidden")}
             style={{
               background: onDark
-                ? "linear-gradient(100deg, rgba(18,20,24,0.88) 0%, rgba(18,20,24,0.74) 34%, rgba(18,20,24,0.34) 60%, rgba(18,20,24,0.12) 100%)"
+                ? DARK_SCRIM
                 : "linear-gradient(100deg, rgba(245,243,238,0.95) 0%, rgba(245,243,238,0.82) 34%, rgba(245,243,238,0.35) 58%, rgba(245,243,238,0.05) 100%)",
             }}
           />
+          {!onDark && (
+            <div aria-hidden className="absolute inset-0 hidden dark:block" style={{ background: DARK_SCRIM }} />
+          )}
           {/* the scrim above fades left-to-right, which leaves nothing to read against on a
               narrow screen — lay an even veil under the copy below lg */}
           <div
             aria-hidden
-            className="absolute inset-0 lg:hidden"
-            style={{ background: onDark ? "rgba(18,20,24,0.6)" : "rgba(245,243,238,0.54)" }}
+            className={"absolute inset-0 lg:hidden" + (onDark ? "" : " dark:hidden")}
+            style={{ background: onDark ? DARK_VEIL : "rgba(245,243,238,0.54)" }}
           />
+          {!onDark && (
+            <div aria-hidden className="absolute inset-0 hidden dark:max-lg:block" style={{ background: DARK_VEIL }} />
+          )}
         </>
       )}
 
