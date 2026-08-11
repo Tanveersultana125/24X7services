@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SITE_IMAGE_GROUP_PAGES } from "@/lib/site-images-shared";
+import { BRANDS } from "@/lib/data";
 import { AdminThemeProvider, AdminThemeToggle } from "@/components/admin/AdminTheme";
 
 const NAV = [
@@ -76,6 +77,49 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                   <item.icon className="size-4.5" />
                   {item.label}
                 </Link>
+
+                {/* Services opens into one page per manufacturer, where their
+                    prices sit side by side — that is how a price is decided,
+                    Samsung against Samsung rather than fridge against washer. */}
+                {item.href === "/admin/services" && active && (
+                  <div className="mb-2 ml-6 border-l border-border pl-3">
+                    <Link
+                      href="/admin/services"
+                      onClick={() => setOpen(false)}
+                      className={cn(
+                        "mb-0.5 block rounded-lg px-3 py-2 text-[0.82rem] transition-colors",
+                        pathname === "/admin/services"
+                          ? "bg-surface-2 font-medium text-ink"
+                          : "text-muted hover:text-ink",
+                      )}
+                    >
+                      All services
+                    </Link>
+                    {BRANDS.map((b) => {
+                      const href = `/admin/services/${b.id}`;
+                      return (
+                        <Link
+                          key={b.id}
+                          href={href}
+                          onClick={() => setOpen(false)}
+                          className={cn(
+                            "mb-0.5 flex items-center gap-2 rounded-lg px-3 py-2 text-[0.82rem] transition-colors",
+                            pathname === href
+                              ? "bg-surface-2 font-medium text-ink"
+                              : "text-muted hover:text-ink",
+                          )}
+                        >
+                          <span
+                            aria-hidden
+                            className="size-2 shrink-0 rounded-full"
+                            style={{ background: b.accent }}
+                          />
+                          {b.name}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
 
                 {/* Images opens into one page per section of the site — listed
                     here so a section is one click away, not two. */}
