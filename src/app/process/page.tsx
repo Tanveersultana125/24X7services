@@ -37,7 +37,7 @@ export default async function ProcessPage() {
           ]}
           collage={[
             "/work/gallery/ac-1.png",
-            "/work/gallery/washing-1.png",
+            "/work/gallery/washing-3.webp",
             "/work/gallery/fridge-1.png",
             "/work/gallery/microwave-1.png",
           ]}
