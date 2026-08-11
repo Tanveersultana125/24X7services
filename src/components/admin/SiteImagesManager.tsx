@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 const MAX_BYTES = 10 * 1024 * 1024;
 
 const DISK_NOTICE =
-  "Firebase Storage isn’t enabled for this project, so the image was saved on this server. It works now, but enable Storage in the Firebase console before deploying — a deployed server starts with an empty disk.";
+  "This upload was saved on the dev server, because neither Cloudinary nor Firebase Storage is configured. It works locally, but a deployed server starts with an empty disk — set the Cloudinary keys, or turn Storage on in the Firebase console, before deploying.";
 
 /**
  * Replace any photograph on the marketing site.
@@ -164,7 +164,7 @@ export function SiteImagesManager({
           data?.detail
             ? `Upload failed. ${data.detail}`
             : data?.error === "storage_not_configured"
-              ? "Storage isn't configured — set NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET."
+              ? "Storage isn't configured — set the CLOUDINARY_* keys, or turn on Firebase Storage."
               : "Upload failed. Please try again.",
         );
         setBusy(null);

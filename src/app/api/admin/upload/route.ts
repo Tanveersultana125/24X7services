@@ -23,7 +23,9 @@ export async function POST(request: Request) {
   if (!(await isAuthenticated())) {
     return NextResponse.json({ ok: false, error: "unauthenticated" }, { status: 401 });
   }
-  if (!storageConfigured()) {
+  // In development an upload can still land on the local disk, which is
+  // enough to work with. On a deployed server there is nowhere to put it.
+  if (!storageConfigured() && process.env.NODE_ENV === "production") {
     return NextResponse.json({ ok: false, error: "storage_not_configured" }, { status: 503 });
   }
 
