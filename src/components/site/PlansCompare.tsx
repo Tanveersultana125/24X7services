@@ -83,11 +83,14 @@ export function PlansCompare() {
                       transition={{ duration: 0.35, ease }}
                     />
                   )}
-                  {/* The pill is `ink`, which is near-black on paper and
-                      near-white on a dark page — so its label has to be the
-                      page colour, not white, or the selected tab disappears
-                      into its own pill in dark mode. */}
-                  <span className={cn("relative", on ? "text-background" : "text-muted")}>{p.name}</span>
+                  {/* The pill is `ink` — near-black on paper, near-white on a
+                      dark page — so the selected label takes the page colour
+                      and inverts with it. The unselected ones are controls to
+                      be read and tapped, not background: `muted` is the tone
+                      for prose you may skip, and here it read as switched off. */}
+                  <span className={cn("relative", on ? "text-background" : "text-ink-soft")}>
+                    {p.name}
+                  </span>
                 </button>
               );
             })}
