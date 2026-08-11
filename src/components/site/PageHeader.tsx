@@ -160,11 +160,17 @@ export function PageHeader({
               ? "mt-10 max-w-2xl"
               : cn(
                   "mt-8 grid gap-12 lg:items-center",
-                  logos ? "lg:grid-cols-[0.95fr_1.05fr]" : "lg:grid-cols-[0.7fr_1.3fr]",
+                  logos
+                    ? "lg:grid-cols-[0.95fr_1.05fr]"
+                    // The collage reads as the supporting picture, so the copy
+                    // leads on the left and it follows on the right.
+                    : collage
+                      ? "lg:grid-cols-[1.3fr_0.7fr]"
+                      : "lg:grid-cols-[0.7fr_1.3fr]",
                 )
           }
         >
-          <div className={logos || collage ? "lg:order-2" : undefined}>
+          <div className={logos ? "lg:order-2" : undefined}>
             {logos && (
               <motion.span
                 initial={{ opacity: 0 }}
@@ -298,7 +304,7 @@ export function PageHeader({
 
           {/* photo collage */}
           {!image && !bgImage && collage && collage.length >= 4 && (
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:order-1">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:order-2">
               <div className="flex flex-col gap-3 sm:gap-4">
                 <CollageShot src={collage[0]} ratio="aspect-square" delay={0.25} />
                 <CollageShot src={collage[1]} ratio="aspect-[4/5]" delay={0.4} />
