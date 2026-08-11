@@ -198,20 +198,23 @@ function ServiceCard({
   return (
     <div className="rounded-2xl border border-border bg-surface p-4 shadow-premium-sm sm:p-5">
       <div className="flex items-start justify-between gap-3">
-        <input
-          value={s.name}
-          onChange={(e) => onChange({ name: e.target.value })}
-          aria-label="Service name"
-          className="min-w-0 flex-1 rounded-lg border border-transparent bg-transparent px-1 py-0.5 font-medium outline-none hover:border-border focus:border-royal-bright focus:bg-surface-2"
-        />
-        <label className="flex shrink-0 cursor-pointer items-center gap-2 text-xs text-muted">
+        <div className="min-w-0 flex-1">
+          <span className="text-xs font-medium text-muted">Service name</span>
+          <input
+            value={s.name}
+            onChange={(e) => onChange({ name: e.target.value })}
+            aria-label="Service name"
+            className="mt-1 w-full rounded-lg border border-border bg-surface-2 px-3 py-2 font-medium outline-none focus:border-royal-bright"
+          />
+        </div>
+        <label className="mt-6 flex shrink-0 cursor-pointer items-center gap-2 text-xs font-medium text-muted">
           <input
             type="checkbox"
             checked={s.active}
             onChange={(e) => onChange({ active: e.target.checked })}
             className="size-4 accent-emerald"
           />
-          {s.active ? "Live" : "Hidden"}
+          <span className={s.active ? "text-emerald" : undefined}>{s.active ? "Live" : "Hidden"}</span>
         </label>
       </div>
 
@@ -233,7 +236,7 @@ function ServiceCard({
             className={input}
           />
         </Field>
-        <Field label="CatalogueService time">
+        <Field label="Service time">
           <input value={s.serviceTime} onChange={(e) => onChange({ serviceTime: e.target.value })} className={input} />
         </Field>
         <Field label="Rating">
@@ -288,36 +291,46 @@ function ServiceCard({
                     <X className="size-3.5" />
                   </button>
                 </div>
-                <div className="mt-2 grid grid-cols-[1fr_1fr_1fr_auto] items-center gap-2">
-                  <input
-                    type="number"
-                    value={p.price[0]}
-                    onChange={(e) => setProblem(i, { price: [Number(e.target.value), p.price[1]] })}
-                    aria-label="Lowest price"
-                    className="w-full rounded-lg border border-border bg-surface px-2 py-1.5 text-xs outline-none focus:border-royal-bright"
-                  />
-                  <input
-                    type="number"
-                    value={p.price[1]}
-                    onChange={(e) => setProblem(i, { price: [p.price[0], Number(e.target.value)] })}
-                    aria-label="Highest price"
-                    className="w-full rounded-lg border border-border bg-surface px-2 py-1.5 text-xs outline-none focus:border-royal-bright"
-                  />
-                  <input
-                    value={p.eta}
-                    onChange={(e) => setProblem(i, { eta: e.target.value })}
-                    aria-label="Time"
-                    placeholder="60 min"
-                    className="w-full rounded-lg border border-border bg-surface px-2 py-1.5 text-xs outline-none focus:border-royal-bright"
-                  />
-                  <label className="flex shrink-0 cursor-pointer items-center gap-1.5 text-[0.68rem] text-muted">
+                {/* Three bare boxes in a row said nothing about which was
+                    which — the quote's floor, its ceiling, and how long. */}
+                <div className="mt-2 grid grid-cols-[1fr_1fr_1fr_auto] items-end gap-2">
+                  <Small label="From ₹">
+                    <input
+                      type="number"
+                      value={p.price[0]}
+                      onChange={(e) => setProblem(i, { price: [Number(e.target.value), p.price[1]] })}
+                      className={smallInput}
+                    />
+                  </Small>
+                  <Small label="Up to ₹">
+                    <input
+                      type="number"
+                      value={p.price[1]}
+                      onChange={(e) => setProblem(i, { price: [p.price[0], Number(e.target.value)] })}
+                      className={smallInput}
+                    />
+                  </Small>
+                  <Small label="Takes">
+                    <input
+                      value={p.eta}
+                      onChange={(e) => setProblem(i, { eta: e.target.value })}
+                      placeholder="60 min"
+                      className={smallInput}
+                    />
+                  </Small>
+                  {/* "Common" is what puts a fault at the top of the booking
+                      list, so it is worth saying rather than initialling. */}
+                  <label
+                    title="Show this fault first when booking"
+                    className="mb-1.5 flex shrink-0 cursor-pointer items-center gap-1.5 text-[0.68rem] font-medium text-muted"
+                  >
                     <input
                       type="checkbox"
                       checked={Boolean(p.common)}
                       onChange={(e) => setProblem(i, { common: e.target.checked })}
                       className="size-3.5 accent-royal-bright"
                     />
-                    Common
+                    Show first
                   </label>
                 </div>
               </div>
@@ -384,6 +397,19 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <label className="mt-3 block">
       <span className="text-xs font-medium text-muted">{label}</span>
       <div className="mt-1">{children}</div>
+    </label>
+  );
+}
+
+const smallInput =
+  "w-full rounded-lg border border-border bg-surface px-2 py-1.5 text-xs outline-none focus:border-royal-bright";
+
+/** A labelled field inside a problem row, where the label has to be tiny. */
+function Small({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block min-w-0">
+      <span className="text-[0.62rem] font-medium uppercase tracking-[0.08em] text-muted-2">{label}</span>
+      <div className="mt-0.5">{children}</div>
     </label>
   );
 }
