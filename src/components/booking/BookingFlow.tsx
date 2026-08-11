@@ -12,7 +12,8 @@ import { OptionCard } from "./OptionCard";
 import { Confirmation } from "./Confirmation";
 import { Button } from "@/components/ui/Button";
 import { ApplianceTile, BrandMark } from "@/components/ui/Icons";
-import { APPLIANCES, BRANDS, TIME_SLOTS, PAYMENT_METHODS, getAppliance, brandLabel, applianceLabel } from "@/lib/data";
+import { BRANDS, TIME_SLOTS, PAYMENT_METHODS, getAppliance, brandLabel, applianceLabel } from "@/lib/data";
+import { useServices } from "@/components/providers/ServicesProvider";
 import { formatINR, formatRange, cn } from "@/lib/utils";
 import { OTHER_PROBLEM_ID, type BookingDraft, type BrandId, type ApplianceId } from "@/lib/types";
 
@@ -302,12 +303,13 @@ function BrandStep({ draft, setDraft }: StepProps) {
 }
 
 function ApplianceStep({ draft, setDraft }: StepProps) {
+  const services = useServices();
   const isOther = draft.appliance === "other";
   return (
     <div>
       <StepTitle title="Which appliance needs care?" hint="Pick the appliance — or add your own if it's not listed." />
       <div className="grid gap-4 sm:grid-cols-2">
-        {APPLIANCES.map((a) => (
+        {services.map((a) => (
           <OptionCard
             key={a.id}
             selected={draft.appliance === a.id}

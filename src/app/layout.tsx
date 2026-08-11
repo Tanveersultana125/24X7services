@@ -6,6 +6,8 @@ import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { ChatAssistant } from "@/components/site/ChatAssistant";
 import { SiteImagesProvider } from "@/components/providers/SiteImagesProvider";
 import { getSiteImages } from "@/lib/site-images";
+import { ServicesProvider } from "@/components/providers/ServicesProvider";
+import { getServices } from "@/lib/catalogue";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -107,15 +109,17 @@ const orgJsonLd = {
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   // Resolved once per request (cached for a minute) so every section renders
   // the photo the admin panel currently has assigned.
-  const siteImages = await getSiteImages();
+  const [siteImages, services] = await Promise.all([getSiteImages(), getServices()]);
 
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${fraunces.variable} h-full`}>
       <body className="flex min-h-full flex-col antialiased">
         <ThemeProvider>
           <SiteImagesProvider images={siteImages}>
-            <SmoothScroll>{children}</SmoothScroll>
-            <ChatAssistant />
+            <ServicesProvider services={services}>
+              <SmoothScroll>{children}</SmoothScroll>
+              <ChatAssistant />
+            </ServicesProvider>
           </SiteImagesProvider>
         </ThemeProvider>
         <script

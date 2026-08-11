@@ -1,4 +1,3 @@
-import { APPLIANCES } from "@/lib/data";
 
 export type BookingStatus = "new" | "assigned" | "in-progress" | "completed" | "cancelled";
 
@@ -28,25 +27,9 @@ export const BOOKINGS: Booking[] = [
 
 export const TECHNICIANS = ["Ravi K.", "Imran S.", "Deepak M.", "Sunil P."];
 
-export type AdminService = {
-  id: string;
-  name: string;
-  startingPrice: number;
-  serviceTime: string;
-  rating: number;
-  bookings: string;
-  active: boolean;
-};
-
-export const SERVICES: AdminService[] = APPLIANCES.map((a) => ({
-  id: a.id,
-  name: a.name,
-  startingPrice: a.startingPrice,
-  serviceTime: a.serviceTime,
-  rating: a.rating,
-  bookings: a.bookings,
-  active: true,
-}));
+// Services are real data now — see `src/lib/catalogue.ts` for the Firestore
+// layer and `catalogue-shared.ts` for how a saved change is merged with what
+// ships in `data.ts`.
 
 // Reviews are real data now — see `src/lib/reviews.ts` for the Firestore layer.
 

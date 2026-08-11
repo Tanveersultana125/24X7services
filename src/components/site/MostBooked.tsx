@@ -9,7 +9,7 @@ import { useSiteImages } from "@/components/providers/SiteImagesProvider";
 import type { SectionItem } from "@/lib/section-items-shared";
 import type { SectionOverrides } from "@/lib/section-overrides-shared";
 import { clean } from "@/lib/section-overrides-apply";
-import { APPLIANCES } from "@/lib/data";
+import { useServices } from "@/components/providers/ServicesProvider";
 import { cn } from "@/lib/utils";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -33,8 +33,11 @@ type Card = {
   href: string;
 };
 
-// AC leads the row (real photo, common service); the rest come straight from data.
-const CARDS: Card[] = [
+// AC leads the row (real photo, common service); the rest follow the
+// catalogue. Only the four that ship with the site appear here — each card's
+// photo comes from a named image slot, and a service added from the panel has
+// no slot of its own. Those are added to this strip as cards instead.
+const HEAD: Card[] = [
   {
     title: "AC repair & service",
     img: "/work/ac-service.png",
@@ -54,16 +57,6 @@ const CARDS: Card[] = [
     meta: "620K+ booked",
     href: "/book",
   },
-  ...APPLIANCES.filter((a) => PHOTO[a.id]).map((a) => ({
-    title: `${a.name} repair`,
-    img: PHOTO[a.id],
-    slot: `mostbooked-${a.id}`,
-    price: a.startingPrice,
-    rating: a.rating,
-    meta: `${a.bookings} booked`,
-    instant: a.id === "microwave",
-    href: `/book?appliance=${a.id}`,
-  })),
 ];
 
 export function MostBooked({
@@ -74,8 +67,24 @@ export function MostBooked({
   overrides?: SectionOverrides;
 }) {
   const images = useSiteImages();
+  const services = useServices();
+  const catalogue: Card[] = [
+    ...HEAD,
+    ...services
+      .filter((a) => PHOTO[a.id])
+      .map((a) => ({
+        title: `${a.name} repair`,
+        img: PHOTO[a.id],
+        slot: `mostbooked-${a.id}`,
+        price: a.startingPrice,
+        rating: a.rating,
+        meta: `${a.bookings} booked`,
+        instant: a.id === "microwave",
+        href: `/book?appliance=${a.id}`,
+      })),
+  ];
   const cards: Card[] = [
-    ...CARDS.filter((c) => !overrides[c.slot]?.hidden).map((c) => ({ ...c, ...clean(overrides[c.slot]) })),
+    ...catalogue.filter((c) => !overrides[c.slot]?.hidden).map((c) => ({ ...c, ...clean(overrides[c.slot]) })),
     ...added.map((a) => ({
       title: a.title,
       img: a.src,

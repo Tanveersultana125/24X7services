@@ -3,7 +3,18 @@ export type BrandId = "samsung" | "lg" | "ifb" | "bosch" | "other";
 /** Sentinel problem id used when the customer types their own issue. */
 export const OTHER_PROBLEM_ID = "other";
 
-export type ApplianceId = "refrigerator" | "washing-machine" | "microwave" | "ac" | "other";
+/**
+ * The four that ship with the build, plus "other" — and any id an admin coins
+ * by adding a service of their own. The union is kept for autocomplete; the
+ * `string & {}` arm is what lets a new service exist without a code change.
+ */
+export type ApplianceId =
+  | "refrigerator"
+  | "washing-machine"
+  | "microwave"
+  | "ac"
+  | "other"
+  | (string & NonNullable<unknown>);
 
 export interface Brand {
   id: BrandId;

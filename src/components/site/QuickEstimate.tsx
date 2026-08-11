@@ -16,7 +16,7 @@ import {
   ArrowRight,
   ShieldCheck,
 } from "lucide-react";
-import { APPLIANCES } from "@/lib/data";
+import { useServices } from "@/components/providers/ServicesProvider";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -34,6 +34,7 @@ const RATINGS = [
 
 export function QuickEstimate() {
   const estimateTabletSrc = useSiteImage("estimate-tablet");
+  const services = useServices();
   const [sent, setSent] = useState(false);
 
   return (
@@ -173,7 +174,7 @@ export function QuickEstimate() {
                       <option value="" disabled>
                         Select a service
                       </option>
-                      {APPLIANCES.map((a) => (
+                      {services.map((a) => (
                         <option key={a.id} value={a.id} className="text-ink">
                           {a.name}
                         </option>

@@ -10,9 +10,8 @@ import {
   Lock, Disc3, Cpu, PackageOpen,
 } from "lucide-react";
 import { ApplianceTile, APPLIANCE_ACCENT } from "@/components/ui/Icons";
-import { APPLIANCES } from "@/lib/data";
+import { useServices } from "@/components/providers/ServicesProvider";
 import { formatRange } from "@/lib/utils";
-import type { ApplianceId } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useSiteImage } from "@/components/providers/SiteImagesProvider";
 
@@ -82,8 +81,10 @@ const PRICING_ASSURANCES = [
 export function ServicesDetail() {
   const promiseShieldSrc = useSiteImage("promise-shield");
   const applianceLineupSrc = useSiteImage("appliance-lineup");
-  const [active, setActive] = useState<ApplianceId>("refrigerator");
-  const appliance = APPLIANCES.find((a) => a.id === active)!;
+  const services = useServices();
+  const [active, setActive] = useState<string>("refrigerator");
+  // The chosen tab can be hidden from the panel while someone is on the page.
+  const appliance = services.find((a) => a.id === active) ?? services[0];
 
   return (
     <>
@@ -257,7 +258,7 @@ export function ServicesDetail() {
 
           {/* ---------- appliance tabs ---------- */}
           <div className="mt-8 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap">
-            {APPLIANCES.map((a) => (
+            {services.map((a) => (
               <button
                 key={a.id}
                 onClick={() => setActive(a.id)}
