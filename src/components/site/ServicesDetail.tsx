@@ -348,7 +348,10 @@ export function ServicesDetail() {
                 </span>
                 {BRANDS.filter((b) => brandsFor(appliance).includes(b.id)).map((b) => (
                   <span key={b.id} className="flex items-center gap-1.5">
-                    <span className="grid h-6 w-14 place-items-center rounded-md bg-white px-1.5 ring-1 ring-black/5">
+                    {/* Sized to the wordmark, not to a fixed box: SAMSUNG and
+                        BOSCH carry wide letter-spacing and were being clipped
+                        by a width picked for the shortest of them. */}
+                    <span className="inline-flex h-6 items-center rounded-md bg-white px-2 ring-1 ring-black/5">
                       <BrandMark id={b.id} tone="brand" className={b.id === "lg" ? "text-base" : "text-[0.55rem]"} />
                     </span>
                     {/* Only worth printing when the makes don't all start at
