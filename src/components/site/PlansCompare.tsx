@@ -83,7 +83,11 @@ export function PlansCompare() {
                       transition={{ duration: 0.35, ease }}
                     />
                   )}
-                  <span className={cn("relative", on ? "text-white" : "text-muted")}>{p.name}</span>
+                  {/* The pill is `ink`, which is near-black on paper and
+                      near-white on a dark page — so its label has to be the
+                      page colour, not white, or the selected tab disappears
+                      into its own pill in dark mode. */}
+                  <span className={cn("relative", on ? "text-background" : "text-muted")}>{p.name}</span>
                 </button>
               );
             })}
