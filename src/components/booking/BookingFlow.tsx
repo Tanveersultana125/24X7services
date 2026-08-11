@@ -12,9 +12,9 @@ import { OptionCard } from "./OptionCard";
 import { Confirmation } from "./Confirmation";
 import { Button } from "@/components/ui/Button";
 import { ApplianceTile, BrandMark } from "@/components/ui/Icons";
-import { BRANDS, TIME_SLOTS, PAYMENT_METHODS, getAppliance, brandLabel, applianceLabel } from "@/lib/data";
+import { BRANDS, TIME_SLOTS, PAYMENT_METHODS, brandLabel, applianceLabel } from "@/lib/data";
 import { useServices } from "@/components/providers/ServicesProvider";
-import { brandsFor, priceFor } from "@/lib/catalogue-shared";
+import { bandFor, brandsFor, priceFor } from "@/lib/catalogue-shared";
 import { formatINR, formatRange, cn } from "@/lib/utils";
 import { OTHER_PROBLEM_ID, type BookingDraft, type BrandId, type ApplianceId } from "@/lib/types";
 
@@ -66,17 +66,23 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const appliance = getAppliance(draft.appliance);
+  // The catalogue the panel edits, not the list in data.ts — a price changed
+  // there has to be the price quoted here.
+  const services = useServices();
+  const appliance = services.find((a) => a.id === draft.appliance);
   const selectedProblems = useMemo(
     () => appliance?.problems.filter((p) => draft.problems.includes(p.id)) ?? [],
     [appliance, draft.problems]
   );
 
   const estimate = useMemo(() => {
-    const min = selectedProblems.reduce((s, p) => s + p.price[0], 0);
-    const max = selectedProblems.reduce((s, p) => s + p.price[1], 0);
-    return { min, max };
-  }, [selectedProblems]);
+    if (!appliance) return { min: 0, max: 0 };
+    const bands = selectedProblems.map((p) => bandFor(appliance, p, draft.brand));
+    return {
+      min: bands.reduce((sum, b) => sum + b[0], 0),
+      max: bands.reduce((sum, b) => sum + b[1], 0),
+    };
+  }, [appliance, selectedProblems, draft.brand]);
 
   const total = Math.round((estimate.min + estimate.max) / 2) + VISIT_FEE + (emergency ? 199 : 0);
 
@@ -367,8 +373,9 @@ function ApplianceStep({ draft, setDraft }: StepProps) {
 }
 
 function ProblemStep({ draft, setDraft }: StepProps) {
+  const services = useServices();
   if (!draft.appliance) return null;
-  const appliance = getAppliance(draft.appliance);
+  const appliance = services.find((a) => a.id === draft.appliance);
   const presetProblems = appliance?.problems ?? [];
   const toggle = (id: string) =>
     setDraft((d) => ({
@@ -396,7 +403,12 @@ function ProblemStep({ draft, setDraft }: StepProps) {
                 <span className="truncate">{p.label}</span>
                 {p.common && <span className="rounded-full bg-warning/15 px-1.5 py-0.5 text-[10px] font-bold text-warning">POPULAR</span>}
               </p>
-              <p className="text-sm text-muted">{formatRange(p.price[0], p.price[1])} · {p.eta}</p>
+              <p className="text-sm text-muted">
+                {appliance
+                  ? formatRange(...bandFor(appliance, p, draft.brand))
+                  : formatRange(p.price[0], p.price[1])}{" "}
+                · {p.eta}
+              </p>
             </div>
           </OptionCard>
         ))}

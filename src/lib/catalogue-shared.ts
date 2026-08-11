@@ -34,6 +34,13 @@ export type CatalogueService = Omit<Appliance, "id"> & {
    * in.
    */
   brandPrices?: Partial<Record<BrandId, number>>;
+  /**
+   * What an individual repair costs on a given make, keyed by brand and then
+   * by problem id. A part priced for one manufacturer says nothing about
+   * another, and this is where that is recorded. Anything not set here falls
+   * back to the problem's own band.
+   */
+  brandProblemPrices?: Partial<Record<BrandId, Record<string, [number, number]>>>;
   /** Hidden services stay in the panel and off the site. */
   active: boolean;
   /** Added here rather than shipped in the build — deletable. */
@@ -85,6 +92,16 @@ export function brandsFor(service: CatalogueService): BrandId[] {
 export function priceFor(service: CatalogueService, brand?: BrandId): number {
   const own = brand ? service.brandPrices?.[brand] : undefined;
   return typeof own === "number" && own > 0 ? own : service.startingPrice;
+}
+
+/** What a repair costs on a make — its own band, or the problem's. */
+export function bandFor(
+  service: CatalogueService,
+  problem: ServiceProblem,
+  brand?: BrandId,
+): [number, number] {
+  const own = brand ? service.brandProblemPrices?.[brand]?.[problem.id] : undefined;
+  return Array.isArray(own) && own.length === 2 ? own : problem.price;
 }
 
 /** True when the makes don't all start at the same number. */

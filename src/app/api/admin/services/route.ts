@@ -84,6 +84,28 @@ function brandPrices(value: unknown): Partial<Record<BrandId, number>> | undefin
   return out;
 }
 
+/** Per-repair bands, keyed by make then by problem, with the junk dropped. */
+function brandProblemPrices(
+  value: unknown,
+): Partial<Record<BrandId, Record<string, [number, number]>>> | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const out: Partial<Record<BrandId, Record<string, [number, number]>>> = {};
+  for (const id of BRAND_IDS) {
+    const rows = (value as Record<string, unknown>)[id];
+    if (!rows || typeof rows !== "object") continue;
+    const kept: Record<string, [number, number]> = {};
+    for (const [problem, band] of Object.entries(rows as Record<string, unknown>)) {
+      if (!Array.isArray(band)) continue;
+      const low = num(band[0]);
+      const high = num(band[1]);
+      if (low === undefined || low <= 0) continue;
+      kept[problem.slice(0, 60)] = [Math.round(low), Math.round(Math.max(low, high ?? low))];
+    }
+    if (Object.keys(kept).length) out[id] = kept;
+  }
+  return out;
+}
+
 /** The fields shared by adding and editing, taken only if present. */
 function fields(body: Record<string, unknown>): ServiceEdit {
   const out: ServiceEdit = {};
@@ -106,6 +128,8 @@ function fields(body: Record<string, unknown>): ServiceEdit {
   if (picked) out.brands = picked;
   const perBrand = brandPrices(body.brandPrices);
   if (perBrand) out.brandPrices = perBrand;
+  const perRepair = brandProblemPrices(body.brandProblemPrices);
+  if (perRepair) out.brandProblemPrices = perRepair;
   return out;
 }
 

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Loader2 } from "lucide-react";
-import { brandsFor, type CatalogueService } from "@/lib/catalogue-shared";
+import { Check, ChevronDown, Loader2 } from "lucide-react";
+import { bandFor, brandsFor, type CatalogueService, type ServiceProblem } from "@/lib/catalogue-shared";
 import type { Brand, BrandId } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -38,6 +38,7 @@ export function BrandPricing({ brand, services }: { brand: Brand; services: Cata
           id: s.id,
           brands: brandsFor(s),
           brandPrices: s.brandPrices ?? {},
+          brandProblemPrices: s.brandProblemPrices ?? {},
         }),
       });
       if (!res.ok) {
@@ -101,6 +102,14 @@ export function BrandPricing({ brand, services }: { brand: Brand; services: Cata
               else next[brand.id] = value;
               patch(s.id, { brandPrices: next });
             }}
+            onBand={(problemId, band) => {
+              const all = { ...(s.brandProblemPrices ?? {}) };
+              const mine = { ...(all[brand.id] ?? {}) };
+              if (band === null) delete mine[problemId];
+              else mine[problemId] = band;
+              all[brand.id] = mine;
+              patch(s.id, { brandProblemPrices: all });
+            }}
             onRemove={() => setCovered(s, false)}
             onSave={() => save(s)}
           />
@@ -140,6 +149,7 @@ function Row({
   busy,
   saved,
   onPrice,
+  onBand,
   onRemove,
   onSave,
 }: {
@@ -148,52 +158,147 @@ function Row({
   busy: boolean;
   saved: boolean;
   onPrice: (value: number | null) => void;
+  onBand: (problemId: string, band: [number, number] | null) => void;
   onRemove: () => void;
   onSave: () => void;
 }) {
+  const [open, setOpen] = useState(false);
   const own = s.brandPrices?.[brandId];
+  const priced = Object.keys(s.brandProblemPrices?.[brandId] ?? {}).length;
+
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-surface p-4 shadow-premium-sm">
-      <div className="min-w-0 flex-1">
-        <p className="truncate font-medium">{s.name}</p>
-        <p className="mt-0.5 truncate text-xs text-muted">
-          {s.problems.length} problems · {s.serviceTime}
-          {!s.active && " · hidden from the site"}
-        </p>
+    <div className="rounded-2xl border border-border bg-surface shadow-premium-sm">
+      <div className="flex flex-wrap items-center gap-3 p-4">
+        <button
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          className="min-w-0 flex-1 text-left"
+        >
+          <p className="flex items-center gap-1.5 truncate font-medium">
+            <ChevronDown className={cn("size-4 shrink-0 text-muted transition-transform", open && "rotate-180")} />
+            {s.name}
+          </p>
+          <p className="mt-0.5 truncate pl-5 text-xs text-muted">
+            {s.problems.length} repairs · {s.serviceTime}
+            {priced > 0 && ` · ${priced} priced for this make`}
+            {!s.active && " · hidden from the site"}
+          </p>
+        </button>
+
+        <label className="flex shrink-0 items-center gap-2">
+          <span className="text-xs text-muted">Starts at ₹</span>
+          <input
+            type="number"
+            value={own ?? ""}
+            placeholder={String(s.startingPrice)}
+            onChange={(e) => {
+              const n = Number(e.target.value);
+              onPrice(e.target.value === "" || !Number.isFinite(n) || n <= 0 ? null : Math.round(n));
+            }}
+            aria-label={`${s.name} starting price for this brand`}
+            className="w-24 rounded-lg border border-border bg-surface-2 px-2.5 py-1.5 text-sm outline-none focus:border-royal-bright"
+          />
+        </label>
+
+        <button
+          onClick={onSave}
+          disabled={busy}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-ink px-3.5 py-2 text-sm font-medium text-background hover:opacity-90 disabled:opacity-50"
+        >
+          {busy ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
+          {saved ? "Saved" : "Save"}
+        </button>
+
+        <button
+          onClick={onRemove}
+          className="shrink-0 rounded-xl border border-border px-3 py-2 text-xs font-medium text-muted hover:text-ink"
+        >
+          Not serviced
+        </button>
       </div>
 
-      <label className="flex shrink-0 items-center gap-2">
-        <span className="text-xs text-muted">Starts at ₹</span>
-        <input
-          type="number"
-          value={own ?? ""}
-          placeholder={String(s.startingPrice)}
-          onChange={(e) => {
-            const n = Number(e.target.value);
-            onPrice(e.target.value === "" || !Number.isFinite(n) || n <= 0 ? null : Math.round(n));
-          }}
-          aria-label={`${s.name} price for this brand`}
-          className="w-24 rounded-lg border border-border bg-surface-2 px-2.5 py-1.5 text-sm outline-none focus:border-royal-bright"
-        />
-      </label>
+      {/* Every repair this product can be booked for, priced for this make.
+          A part for one manufacturer says nothing about another. */}
+      {open && (
+        <div className="border-t border-border px-4 py-3">
+          {s.problems.length === 0 ? (
+            <p className="py-3 text-center text-xs text-muted">
+              No repairs listed — add them on the All services page.
+            </p>
+          ) : (
+            <>
+              <div className="grid grid-cols-[1fr_5.5rem_5.5rem] items-end gap-2 pb-2">
+                <span className="text-[0.62rem] font-medium uppercase tracking-[0.08em] text-muted-2">Repair</span>
+                <span className="text-[0.62rem] font-medium uppercase tracking-[0.08em] text-muted-2">From ₹</span>
+                <span className="text-[0.62rem] font-medium uppercase tracking-[0.08em] text-muted-2">Up to ₹</span>
+              </div>
+              <div className="space-y-1.5">
+                {s.problems.map((p) => (
+                  <RepairRow
+                    key={p.id}
+                    problem={p}
+                    service={s}
+                    brandId={brandId}
+                    onBand={(band) => onBand(p.id, band)}
+                  />
+                ))}
+              </div>
+              <p className="mt-3 text-[0.68rem] text-muted-2">
+                Left empty, a repair is charged at the band on the All services page.
+              </p>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
-      <button
-        onClick={onSave}
-        disabled={busy}
-        className={cn(
-          "inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-ink px-3.5 py-2 text-sm font-medium text-background hover:opacity-90 disabled:opacity-50",
-        )}
-      >
-        {busy ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
-        {saved ? "Saved" : "Save"}
-      </button>
+function RepairRow({
+  problem: p,
+  service: s,
+  brandId,
+  onBand,
+}: {
+  problem: ServiceProblem;
+  service: CatalogueService;
+  brandId: BrandId;
+  onBand: (band: [number, number] | null) => void;
+}) {
+  const own = s.brandProblemPrices?.[brandId]?.[p.id];
+  const shown = bandFor(s, p, brandId);
 
-      <button
-        onClick={onRemove}
-        className="shrink-0 rounded-xl border border-border px-3 py-2 text-xs font-medium text-muted hover:text-ink"
-      >
-        Not serviced
-      </button>
+  const set = (i: 0 | 1, raw: string) => {
+    const n = Number(raw);
+    if (raw === "" && i === 0) return onBand(null);
+    const next: [number, number] = [shown[0], shown[1]];
+    next[i] = Number.isFinite(n) && n > 0 ? Math.round(n) : 0;
+    if (next[0] <= 0) return onBand(null);
+    onBand([next[0], Math.max(next[0], next[1])]);
+  };
+
+  return (
+    <div className="grid grid-cols-[1fr_5.5rem_5.5rem] items-center gap-2">
+      <span className="truncate text-xs">
+        {p.label}
+        {own && <span className="ml-1.5 text-[0.62rem] font-medium text-royal-bright">set</span>}
+      </span>
+      <input
+        type="number"
+        value={own?.[0] ?? ""}
+        placeholder={String(p.price[0])}
+        onChange={(e) => set(0, e.target.value)}
+        aria-label={`${p.label} lowest price`}
+        className="w-full rounded-lg border border-border bg-surface-2 px-2 py-1.5 text-xs outline-none focus:border-royal-bright"
+      />
+      <input
+        type="number"
+        value={own?.[1] ?? ""}
+        placeholder={String(p.price[1])}
+        onChange={(e) => set(1, e.target.value)}
+        aria-label={`${p.label} highest price`}
+        className="w-full rounded-lg border border-border bg-surface-2 px-2 py-1.5 text-xs outline-none focus:border-royal-bright"
+      />
     </div>
   );
 }
