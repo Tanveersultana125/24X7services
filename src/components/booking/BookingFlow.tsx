@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/Button";
 import { ApplianceTile, BrandMark } from "@/components/ui/Icons";
 import { BRANDS, TIME_SLOTS, PAYMENT_METHODS, brandLabel, applianceLabel } from "@/lib/data";
 import { useServices } from "@/components/providers/ServicesProvider";
-import { bandFor, brandsFor, priceFor } from "@/lib/catalogue-shared";
+import { bandFor, brandsFor, priceFor, repairsFor } from "@/lib/catalogue-shared";
 import { formatINR, formatRange, cn } from "@/lib/utils";
 import { OTHER_PROBLEM_ID, type BookingDraft, type BrandId, type ApplianceId } from "@/lib/types";
 
@@ -71,8 +71,8 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
   const services = useServices();
   const appliance = services.find((a) => a.id === draft.appliance);
   const selectedProblems = useMemo(
-    () => appliance?.problems.filter((p) => draft.problems.includes(p.id)) ?? [],
-    [appliance, draft.problems]
+    () => (appliance ? repairsFor(appliance, draft.brand).filter((p) => draft.problems.includes(p.id)) : []),
+    [appliance, draft.problems, draft.brand]
   );
 
   const estimate = useMemo(() => {
@@ -376,7 +376,8 @@ function ProblemStep({ draft, setDraft }: StepProps) {
   const services = useServices();
   if (!draft.appliance) return null;
   const appliance = services.find((a) => a.id === draft.appliance);
-  const presetProblems = appliance?.problems ?? [];
+  // Includes anything listed for this make alone.
+  const presetProblems = appliance ? repairsFor(appliance, draft.brand) : [];
   const toggle = (id: string) =>
     setDraft((d) => ({
       ...d,

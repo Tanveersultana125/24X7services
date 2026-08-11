@@ -41,6 +41,12 @@ export type CatalogueService = Omit<Appliance, "id"> & {
    * back to the problem's own band.
    */
   brandProblemPrices?: Partial<Record<BrandId, Record<string, [number, number]>>>;
+  /**
+   * Repairs that exist for one make only — an inverter board on a Samsung
+   * fridge is not a repair every fridge can be booked for. They sit after the
+   * shared list, and only for the make they belong to.
+   */
+  brandProblems?: Partial<Record<BrandId, ServiceProblem[]>>;
   /** Hidden services stay in the panel and off the site. */
   active: boolean;
   /** Added here rather than shipped in the build — deletable. */
@@ -102,6 +108,15 @@ export function bandFor(
 ): [number, number] {
   const own = brand ? service.brandProblemPrices?.[brand]?.[problem.id] : undefined;
   return Array.isArray(own) && own.length === 2 ? own : problem.price;
+}
+
+/**
+ * Everything this service can be booked for on a given make: the repairs every
+ * make shares, then the ones added for this one.
+ */
+export function repairsFor(service: CatalogueService, brand?: BrandId): ServiceProblem[] {
+  const extra = brand ? service.brandProblems?.[brand] ?? [] : [];
+  return [...service.problems, ...extra];
 }
 
 /** True when the makes don't all start at the same number. */

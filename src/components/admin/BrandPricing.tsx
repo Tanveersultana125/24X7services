@@ -1,8 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ChevronDown, Loader2 } from "lucide-react";
-import { bandFor, brandsFor, type CatalogueService, type ServiceProblem } from "@/lib/catalogue-shared";
+import { Check, ChevronDown, Loader2, Plus, X } from "lucide-react";
+import {
+  bandFor,
+  brandsFor,
+  slugify,
+  type CatalogueService,
+  type ServiceProblem,
+} from "@/lib/catalogue-shared";
 import type { Brand, BrandId } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -39,6 +45,7 @@ export function BrandPricing({ brand, services }: { brand: Brand; services: Cata
           brands: brandsFor(s),
           brandPrices: s.brandPrices ?? {},
           brandProblemPrices: s.brandProblemPrices ?? {},
+          brandProblems: s.brandProblems ?? {},
         }),
       });
       if (!res.ok) {
@@ -110,6 +117,11 @@ export function BrandPricing({ brand, services }: { brand: Brand; services: Cata
               all[brand.id] = mine;
               patch(s.id, { brandProblemPrices: all });
             }}
+            onOwn={(list) => {
+              const all = { ...(s.brandProblems ?? {}) };
+              all[brand.id] = list;
+              patch(s.id, { brandProblems: all });
+            }}
             onRemove={() => setCovered(s, false)}
             onSave={() => save(s)}
           />
@@ -150,6 +162,7 @@ function Row({
   saved,
   onPrice,
   onBand,
+  onOwn,
   onRemove,
   onSave,
 }: {
@@ -159,12 +172,14 @@ function Row({
   saved: boolean;
   onPrice: (value: number | null) => void;
   onBand: (problemId: string, band: [number, number] | null) => void;
+  onOwn: (list: ServiceProblem[]) => void;
   onRemove: () => void;
   onSave: () => void;
 }) {
   const [open, setOpen] = useState(false);
-  const own = s.brandPrices?.[brandId];
+  const ownPrice = s.brandPrices?.[brandId];
   const priced = Object.keys(s.brandProblemPrices?.[brandId] ?? {}).length;
+  const own = s.brandProblems?.[brandId] ?? [];
 
   return (
     <div className="rounded-2xl border border-border bg-surface shadow-premium-sm">
@@ -179,7 +194,7 @@ function Row({
             {s.name}
           </p>
           <p className="mt-0.5 truncate pl-5 text-xs text-muted">
-            {s.problems.length} repairs · {s.serviceTime}
+            {s.problems.length + own.length} repairs · {s.serviceTime}
             {priced > 0 && ` · ${priced} priced for this make`}
             {!s.active && " · hidden from the site"}
           </p>
@@ -189,7 +204,7 @@ function Row({
           <span className="text-xs text-muted">Starts at ₹</span>
           <input
             type="number"
-            value={own ?? ""}
+            value={ownPrice ?? ""}
             placeholder={String(s.startingPrice)}
             onChange={(e) => {
               const n = Number(e.target.value);
@@ -221,9 +236,10 @@ function Row({
           A part for one manufacturer says nothing about another. */}
       {open && (
         <div className="border-t border-border px-4 py-3">
-          {s.problems.length === 0 ? (
+          {s.problems.length === 0 && own.length === 0 ? (
             <p className="py-3 text-center text-xs text-muted">
-              No repairs listed — add them on the All services page.
+              No repairs listed — add them on the All services page, or add one just for this make
+              below.
             </p>
           ) : (
             <>
@@ -243,9 +259,41 @@ function Row({
                   />
                 ))}
               </div>
-              <p className="mt-3 text-[0.68rem] text-muted-2">
-                Left empty, a repair is charged at the band on the All services page.
-              </p>
+
+              {/* A repair this make has and the others don't — an inverter
+                  board on one manufacturer's fridge isn't something every
+                  fridge can be booked for. */}
+              {own.length > 0 && (
+                <div className="mt-3 space-y-1.5 border-t border-border pt-3">
+                  {own.map((p, i) => (
+                    <OwnRepairRow
+                      key={i}
+                      problem={p}
+                      onChange={(fields) =>
+                        onOwn(own.map((row, n) => (n === i ? { ...row, ...fields } : row)))
+                      }
+                      onRemove={() => onOwn(own.filter((_, n) => n !== i))}
+                    />
+                  ))}
+                </div>
+              )}
+
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                <p className="text-[0.68rem] text-muted-2">
+                  Left empty, a repair is charged at the band on the All services page.
+                </p>
+                <button
+                  onClick={() =>
+                    onOwn([
+                      ...own,
+                      { id: `custom-${own.length + 1}`, label: "", price: [499, 1499], eta: "60 min" },
+                    ])
+                  }
+                  className="inline-flex items-center gap-1 text-xs font-medium text-royal-bright hover:underline"
+                >
+                  <Plus className="size-3.5" /> Custom repair
+                </button>
+              </div>
             </>
           )}
         </div>
@@ -299,6 +347,53 @@ function RepairRow({
         aria-label={`${p.label} highest price`}
         className="w-full rounded-lg border border-border bg-surface-2 px-2 py-1.5 text-xs outline-none focus:border-royal-bright"
       />
+    </div>
+  );
+}
+
+/**
+ * A repair that belongs to this make alone — so unlike the shared ones, its
+ * name and time are edited here too, not on the All services page.
+ */
+function OwnRepairRow({
+  problem: p,
+  onChange,
+  onRemove,
+}: {
+  problem: ServiceProblem;
+  onChange: (fields: Partial<ServiceProblem>) => void;
+  onRemove: () => void;
+}) {
+  return (
+    <div className="grid grid-cols-[1fr_5.5rem_5.5rem_auto] items-center gap-2">
+      <input
+        value={p.label}
+        onChange={(e) => onChange({ label: e.target.value, id: slugify(e.target.value) || p.id })}
+        placeholder="Inverter board"
+        aria-label="Repair"
+        className="w-full rounded-lg border border-royal-bright/40 bg-surface px-2 py-1.5 text-xs outline-none focus:border-royal-bright"
+      />
+      <input
+        type="number"
+        value={p.price[0]}
+        onChange={(e) => onChange({ price: [Number(e.target.value) || 0, p.price[1]] })}
+        aria-label={`${p.label || "Repair"} lowest price`}
+        className="w-full rounded-lg border border-border bg-surface-2 px-2 py-1.5 text-xs outline-none focus:border-royal-bright"
+      />
+      <input
+        type="number"
+        value={p.price[1]}
+        onChange={(e) => onChange({ price: [p.price[0], Number(e.target.value) || 0] })}
+        aria-label={`${p.label || "Repair"} highest price`}
+        className="w-full rounded-lg border border-border bg-surface-2 px-2 py-1.5 text-xs outline-none focus:border-royal-bright"
+      />
+      <button
+        onClick={onRemove}
+        aria-label={`Remove ${p.label || "repair"}`}
+        className="rounded-lg p-1.5 text-danger hover:bg-danger/10"
+      >
+        <X className="size-3.5" />
+      </button>
     </div>
   );
 }

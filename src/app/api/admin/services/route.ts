@@ -106,6 +106,17 @@ function brandProblemPrices(
   return out;
 }
 
+/** Repairs that belong to one make, validated the same way as the shared ones. */
+function brandProblems(value: unknown): Partial<Record<BrandId, ServiceProblem[]>> | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const out: Partial<Record<BrandId, ServiceProblem[]>> = {};
+  for (const id of BRAND_IDS) {
+    const list = problems((value as Record<string, unknown>)[id]);
+    if (list?.length) out[id] = list;
+  }
+  return out;
+}
+
 /** The fields shared by adding and editing, taken only if present. */
 function fields(body: Record<string, unknown>): ServiceEdit {
   const out: ServiceEdit = {};
@@ -130,6 +141,8 @@ function fields(body: Record<string, unknown>): ServiceEdit {
   if (perBrand) out.brandPrices = perBrand;
   const perRepair = brandProblemPrices(body.brandProblemPrices);
   if (perRepair) out.brandProblemPrices = perRepair;
+  const ownRepairs = brandProblems(body.brandProblems);
+  if (ownRepairs) out.brandProblems = ownRepairs;
   return out;
 }
 
