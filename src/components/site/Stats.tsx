@@ -60,6 +60,9 @@ function RotatingStat() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { margin: "-20%" });
   const [index, setIndex] = useState(0);
+  // Which way the next card comes in from, so a drag left brings the next one
+  // in from the right rather than everything fading in place.
+  const [dir, setDir] = useState(1);
   const [paused, setPaused] = useState(false);
   // Bumped on every tap so a second tap restarts the resume timer, which a
   // boolean alone can't do — the effect wouldn't re-run while already paused.
@@ -68,7 +71,10 @@ function RotatingStat() {
   // Only advance while the section is actually on screen.
   useEffect(() => {
     if (paused || !inView) return;
-    const t = setInterval(() => setIndex((i) => (i + 1) % STATS.length), 2800);
+    const t = setInterval(() => {
+      setDir(1);
+      setIndex((i) => (i + 1) % STATS.length);
+    }, 2800);
     return () => clearInterval(t);
   }, [paused, inView]);
 
@@ -80,12 +86,18 @@ function RotatingStat() {
   }, [paused, pauseNonce]);
 
   const show = (i: number) => {
+    setDir(i === index ? 1 : i > index ? 1 : -1);
     setIndex(i);
     setPaused(true);
     setPauseNonce((n) => n + 1);
   };
 
-  const step = (dir: 1 | -1) => show((index + dir + STATS.length) % STATS.length);
+  const step = (by: 1 | -1) => {
+    setDir(by);
+    setIndex((i) => (i + by + STATS.length) % STATS.length);
+    setPaused(true);
+    setPauseNonce((n) => n + 1);
+  };
 
   /**
    * Drag support, for a finger and for a mouse. This card isn't a scroll
@@ -151,6 +163,7 @@ function RotatingStat() {
            horizontal drags ourselves; the cursor says a mouse can drag it too */
         className="relative flex min-h-[11rem] cursor-grab touch-pan-y select-none items-center overflow-hidden rounded-3xl border border-border bg-surface pl-8 pr-7 shadow-premium-md active:cursor-grabbing"
         style={{
+          "--tint": s.color,
           borderColor: rgba(s.color, 0.28),
           transform: `translate3d(${offset}px, 0, 0)`,
           // Follows the pointer exactly while held, snaps back when let go.
@@ -159,13 +172,12 @@ function RotatingStat() {
           transition: dragging
             ? "border-color 0.7s"
             : "border-color 0.7s, transform 0.35s cubic-bezier(0.16,1,0.3,1)",
-        }}
+        } as React.CSSProperties}
       >
         {/* left accent bar — always the current stat's colour */}
         <span
           aria-hidden
-          className="absolute inset-y-0 left-0 w-1.5 transition-colors duration-700"
-          style={{ background: s.color }}
+          className="absolute inset-y-0 left-0 w-1.5 bg-[var(--tint)] transition-colors duration-700 dark:bg-[color-mix(in_srgb,var(--tint)_55%,white)]"
         />
         {/* soft colour glow */}
         <span
@@ -173,24 +185,28 @@ function RotatingStat() {
           className="pointer-events-none absolute -right-16 -top-16 size-44 rounded-full blur-3xl transition-colors duration-700"
           style={{ background: rgba(s.color, 0.22) }}
         />
-        <AnimatePresence mode="wait">
+        {/* The cards travel sideways, the way they were dragged — a card that
+            faded in place gave no sense of a row you are moving along. */}
+        <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={index}
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -14 }}
+            initial={{ opacity: 0, x: dir * 56 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: dir * -56 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="relative"
           >
+            {/* These accents were picked for paper. Blue lands at 2.5:1 on the
+                dark card and violet at 3.2:1, so the number all but vanishes —
+                dark mixes each one towards white to bring it back. */}
             <div
-              className="font-display flex items-baseline text-[3.75rem] font-semibold leading-none tracking-tighter"
-              style={{ color: s.color }}
+              className="font-display flex items-baseline text-[3.75rem] font-semibold leading-none tracking-tighter text-[var(--tint)] dark:text-[color-mix(in_srgb,var(--tint)_55%,white)]"
             >
               <MountCounter to={s.to} decimals={s.decimals} />
               <span>{s.suffix}</span>
             </div>
-            <p className="mt-4 text-lg font-semibold text-foreground">{s.label}</p>
-            <p className="text-sm text-muted">{s.sub}</p>
+            <p className="mt-4 text-lg font-semibold text-ink">{s.label}</p>
+            <p className="text-sm text-ink-soft">{s.sub}</p>
           </motion.div>
         </AnimatePresence>
       </div>
