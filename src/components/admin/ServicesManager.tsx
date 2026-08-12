@@ -10,6 +10,7 @@ import {
 } from "@/lib/catalogue-shared";
 import Link from "next/link";
 import { BRANDS } from "@/lib/data";
+import { NumberField } from "./NumberField";
 import { cn } from "@/lib/utils";
 
 /**
@@ -235,10 +236,10 @@ function ServiceCard({
 
       <div className="mt-3 grid grid-cols-2 gap-3">
         <Field label="Starting price (₹)">
-          <input
-            type="number"
+          <NumberField
             value={s.startingPrice}
-            onChange={(e) => onChange({ startingPrice: Number(e.target.value) })}
+            onValue={(startingPrice) => onChange({ startingPrice })}
+            min="0"
             className={input}
           />
         </Field>
@@ -246,13 +247,12 @@ function ServiceCard({
           <input value={s.serviceTime} onChange={(e) => onChange({ serviceTime: e.target.value })} className={input} />
         </Field>
         <Field label="Rating">
-          <input
-            type="number"
+          <NumberField
+            value={s.rating}
+            onValue={(rating) => onChange({ rating })}
             step="0.1"
             min="0"
             max="5"
-            value={s.rating}
-            onChange={(e) => onChange({ rating: Number(e.target.value) })}
             className={input}
           />
         </Field>
@@ -349,18 +349,18 @@ function ServiceCard({
                     which — the quote's floor, its ceiling, and how long. */}
                 <div className="mt-2 grid grid-cols-[1fr_1fr_1fr_auto] items-end gap-2">
                   <Small label="From ₹">
-                    <input
-                      type="number"
+                    <NumberField
                       value={p.price[0]}
-                      onChange={(e) => setProblem(i, { price: [Number(e.target.value), p.price[1]] })}
+                      onValue={(low) => setProblem(i, { price: [low, p.price[1]] })}
+                      min="0"
                       className={smallInput}
                     />
                   </Small>
                   <Small label="Up to ₹">
-                    <input
-                      type="number"
+                    <NumberField
                       value={p.price[1]}
-                      onChange={(e) => setProblem(i, { price: [p.price[0], Number(e.target.value)] })}
+                      onValue={(high) => setProblem(i, { price: [p.price[0], high] })}
+                      min="0"
                       className={smallInput}
                     />
                   </Small>

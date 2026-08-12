@@ -10,6 +10,7 @@ import {
   type ServiceProblem,
 } from "@/lib/catalogue-shared";
 import type { Brand, BrandId } from "@/lib/types";
+import { NumberField } from "./NumberField";
 import { cn } from "@/lib/utils";
 
 /**
@@ -373,17 +374,17 @@ function OwnRepairRow({
         aria-label="Repair"
         className="w-full rounded-lg border border-royal-bright/40 bg-surface px-2 py-1.5 text-xs outline-none focus:border-royal-bright"
       />
-      <input
-        type="number"
+      <NumberField
         value={p.price[0]}
-        onChange={(e) => onChange({ price: [Number(e.target.value) || 0, p.price[1]] })}
+        onValue={(low) => onChange({ price: [low, p.price[1]] })}
+        min="0"
         aria-label={`${p.label || "Repair"} lowest price`}
         className="w-full rounded-lg border border-border bg-surface-2 px-2 py-1.5 text-xs outline-none focus:border-royal-bright"
       />
-      <input
-        type="number"
+      <NumberField
         value={p.price[1]}
-        onChange={(e) => onChange({ price: [p.price[0], Number(e.target.value) || 0] })}
+        onValue={(high) => onChange({ price: [p.price[0], high] })}
+        min="0"
         aria-label={`${p.label || "Repair"} highest price`}
         className="w-full rounded-lg border border-border bg-surface-2 px-2 py-1.5 text-xs outline-none focus:border-royal-bright"
       />
