@@ -162,13 +162,12 @@ export function PageHeader({
                   "mt-8 grid gap-12 lg:items-center",
                   logos
                     ? "lg:grid-cols-[0.95fr_1.05fr]"
-                    // The collage reads as the supporting picture, so the copy
-                    // leads on the left and it follows on the right. Barely
-                    // wider, not much: the copy is capped at max-w-xl, so a
-                    // 1.3fr column left 260px of slack that read as a hole
-                    // between the two.
+                    // The collage is a supporting picture, so the copy leads on
+                    // the left and it follows on the right at a fixed, modest
+                    // width — as a fraction it grew with the viewport until
+                    // four photographs filled half the header.
                     : collage
-                      ? "lg:grid-cols-[1fr_0.9fr]"
+                      ? "lg:grid-cols-[1fr_25rem]"
                       : "lg:grid-cols-[0.7fr_1.3fr]",
                 )
           }
@@ -203,7 +202,14 @@ export function PageHeader({
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.25, ease }}
-              className={"mt-6 max-w-xl text-pretty text-lg leading-relaxed " + (onDark ? "text-white/80" : "text-muted")}
+              /* Beside the collage the copy has the wider column, and holding
+                 it to max-w-xl there would leave the slack sitting between the
+                 two as a gap. */
+              className={
+                "mt-6 text-pretty text-lg leading-relaxed " +
+                (collage ? "max-w-2xl " : "max-w-xl ") +
+                (onDark ? "text-white/80" : "text-muted")
+              }
             >
               {subtitle}
             </motion.p>
