@@ -14,7 +14,7 @@ type Shot = { src: string; label: string };
 const SHOTS: Shot[] = [
   { src: "/work/gallery/ac-1.png", label: "AC service" },
   { src: "/work/gallery/fridge-1.png", label: "Refrigerator repair" },
-  { src: "/work/gallery/washing-4.webp", label: "Washing machine repair" },
+  { src: "/work/gallery/washing-1.png", label: "Washing machine repair" },
   { src: "/work/gallery/microwave-1.png", label: "Microwave repair" },
   { src: "/work/gallery/ac-3.png", label: "AC installation" },
   { src: "/work/gallery/washing-2.png", label: "Front-load service" },
