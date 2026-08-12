@@ -11,7 +11,8 @@ import {
 } from "lucide-react";
 import { ApplianceTile, APPLIANCE_ACCENT, BrandMark } from "@/components/ui/Icons";
 import { useServices } from "@/components/providers/ServicesProvider";
-import { brandsFor, priceFor, pricesDiffer } from "@/lib/catalogue-shared";
+import { bestSaving, brandsFor, priceFor, pricesDiffer } from "@/lib/catalogue-shared";
+import { ServiceSheet } from "./ServiceSheet";
 import { BRANDS } from "@/lib/data";
 import { formatINR, formatRange } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -85,6 +86,7 @@ export function ServicesDetail() {
   const applianceLineupSrc = useSiteImage("appliance-lineup");
   const services = useServices();
   const [active, setActive] = useState<string>("refrigerator");
+  const [sheet, setSheet] = useState<string | null>(null);
   // The chosen tab can be hidden from the panel while someone is on the page.
   const appliance = services.find((a) => a.id === active) ?? services[0];
 
@@ -310,6 +312,20 @@ export function ServicesDetail() {
                   <p className="mt-1.5 text-pretty text-[0.75rem] leading-snug text-muted sm:mt-0 sm:text-sm">
                     {appliance.blurb}
                   </p>
+                  {/* The list below is faults and prices. Everything else this
+                      service is — what two units cost, what the visit covers —
+                      is a tap away rather than crammed into the card. */}
+                  <button
+                    onClick={() => setSheet(appliance.id)}
+                    className="mt-2 inline-flex items-center gap-1 text-[0.78rem] font-semibold text-royal-bright hover:underline sm:text-sm"
+                  >
+                    View details
+                    {bestSaving(appliance.tiers) > 0 && (
+                      <span className="ml-1 rounded-full bg-emerald/12 px-1.5 py-0.5 text-[0.6rem] font-bold text-emerald">
+                        SAVE {bestSaving(appliance.tiers)}%
+                      </span>
+                    )}
+                  </button>
                 </div>
                 {/* the unit itself, bleeding in from the right of the header band */}
                 {APPLIANCE_UNIT[appliance.id] && (
@@ -434,6 +450,11 @@ export function ServicesDetail() {
           </div>
         </div>
       </section>
+      <ServiceSheet
+        service={services.find((a) => a.id === sheet) ?? null}
+        photo={APPLIANCE_UNIT[sheet ?? ""]?.src}
+        onClose={() => setSheet(null)}
+      />
     </>
   );
 }

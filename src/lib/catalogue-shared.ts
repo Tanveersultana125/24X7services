@@ -15,6 +15,28 @@ import type { Appliance, BrandId, Problem } from "./types";
 
 export type ServiceProblem = Problem;
 
+export type ServiceTier = {
+  /** How many units this tier covers — 1 AC, 2 ACs. */
+  qty: number;
+  /** What the whole tier costs. */
+  price: number;
+  /** What it would cost at single-unit price; omitted when there is no saving. */
+  was?: number;
+  /** A word on the tier, e.g. "Bestseller". */
+  badge?: string;
+};
+
+/** The saving a tier gives, as a whole percentage. Zero when there isn't one. */
+export function tierSaving(tier: ServiceTier): number {
+  if (!tier.was || tier.was <= tier.price) return 0;
+  return Math.round(((tier.was - tier.price) / tier.was) * 100);
+}
+
+/** The best saving on offer, for the "save up to" line. */
+export function bestSaving(tiers: ServiceTier[] = []): number {
+  return tiers.reduce((best, t) => Math.max(best, tierSaving(t)), 0);
+}
+
 /** A built-in appliance or an added one, with everything either needs. */
 /** The four we are authorised for. A service may cover any subset. */
 export const BRAND_IDS: BrandId[] = BRANDS.map((b) => b.id);
@@ -47,6 +69,16 @@ export type CatalogueService = Omit<Appliance, "id"> & {
    * shared list, and only for the make they belong to.
    */
   brandProblems?: Partial<Record<BrandId, ServiceProblem[]>>;
+  /**
+   * Quantity tiers, the way this trade is actually sold: one AC is one price,
+   * three together are cheaper each. `was` is the price without the bundle, so
+   * the saving is worked out rather than typed and can't drift from the maths.
+   */
+  tiers?: ServiceTier[];
+  /** The line above the highlights — what this service is known for. */
+  headline?: string;
+  /** The ticked list under it. */
+  highlights?: string[];
   /** Hidden services stay in the panel and off the site. */
   active: boolean;
   /** Added here rather than shipped in the build — deletable. */

@@ -5,8 +5,10 @@ import { Check, Loader2, Plus, RotateCcw, Trash2, X } from "lucide-react";
 import {
   blankProblem,
   brandsFor,
+  tierSaving,
   type CatalogueService,
   type ServiceProblem,
+  type ServiceTier,
 } from "@/lib/catalogue-shared";
 import Link from "next/link";
 import { BRANDS } from "@/lib/data";
@@ -63,6 +65,9 @@ export function ServicesManager({ initial }: { initial: CatalogueService[] }) {
       active: s.active,
       brands: brandsFor(s),
       problems: s.problems,
+      tiers: s.tiers ?? [],
+      headline: s.headline ?? "",
+      highlights: s.highlights ?? [],
     });
     setBusy(null);
     if (!ok) return;
@@ -394,6 +399,94 @@ function ServiceCard({
         )}
       </div>
 
+      {/* What the detail sheet shows: the bundle prices and the ticked list. */}
+      <div className="mt-5 border-t border-border pt-4">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-medium text-muted">Quantity offers ({(s.tiers ?? []).length})</p>
+          <button
+            onClick={() => {
+              const next = [...(s.tiers ?? [])];
+              const qty = next.length + 1;
+              next.push({ qty, price: s.startingPrice * qty, was: s.startingPrice * qty });
+              onChange({ tiers: next });
+            }}
+            className="inline-flex items-center gap-1 text-xs font-medium text-royal-bright hover:underline"
+          >
+            <Plus className="size-3.5" /> Add
+          </button>
+        </div>
+
+        {(s.tiers ?? []).length > 0 && (
+          <>
+            <div className="mt-3 grid grid-cols-[3.5rem_1fr_1fr_1fr_auto] items-end gap-2">
+              {["Units", "Price ₹", "Was ₹", "Badge"].map((h) => (
+                <span key={h} className="text-[0.62rem] font-medium uppercase tracking-[0.08em] text-muted-2">
+                  {h}
+                </span>
+              ))}
+              <span />
+            </div>
+            <div className="mt-1.5 space-y-1.5">
+              {(s.tiers ?? []).map((t, i) => (
+                <TierRow
+                  key={i}
+                  tier={t}
+                  onChange={(fields) =>
+                    onChange({ tiers: (s.tiers ?? []).map((row, n) => (n === i ? { ...row, ...fields } : row)) })
+                  }
+                  onRemove={() => onChange({ tiers: (s.tiers ?? []).filter((_, n) => n !== i) })}
+                />
+              ))}
+            </div>
+            <p className="mt-2 text-[0.68rem] text-muted-2">
+              &ldquo;Was&rdquo; is what the units would cost separately — the discount is worked out from it.
+            </p>
+          </>
+        )}
+
+        <Field label="Highlights headline">
+          <input
+            value={s.headline ?? ""}
+            onChange={(e) => onChange({ headline: e.target.value })}
+            placeholder="Highly rated by customers for better cooling"
+            className={input}
+          />
+        </Field>
+
+        <div className="mt-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-muted">Highlights</span>
+            <button
+              onClick={() => onChange({ highlights: [...(s.highlights ?? []), ""] })}
+              className="inline-flex items-center gap-1 text-xs font-medium text-royal-bright hover:underline"
+            >
+              <Plus className="size-3.5" /> Add
+            </button>
+          </div>
+          <div className="mt-1.5 space-y-1.5">
+            {(s.highlights ?? []).map((h, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <input
+                  value={h}
+                  onChange={(e) =>
+                    onChange({ highlights: (s.highlights ?? []).map((row, n) => (n === i ? e.target.value : row)) })
+                  }
+                  placeholder="Applicable for both split & window ACs"
+                  className={smallInput}
+                />
+                <button
+                  onClick={() => onChange({ highlights: (s.highlights ?? []).filter((_, n) => n !== i) })}
+                  aria-label="Remove highlight"
+                  className="shrink-0 rounded-lg p-1.5 text-danger hover:bg-danger/10"
+                >
+                  <X className="size-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <button
           onClick={onSave}
@@ -462,5 +555,49 @@ function Small({ label, children }: { label: string; children: React.ReactNode }
       <span className="text-[0.62rem] font-medium uppercase tracking-[0.08em] text-muted-2">{label}</span>
       <div className="mt-0.5">{children}</div>
     </label>
+  );
+}
+
+/** One quantity offer: how many units, what it costs, and what it saves. */
+function TierRow({
+  tier,
+  onChange,
+  onRemove,
+}: {
+  tier: ServiceTier;
+  onChange: (fields: Partial<ServiceTier>) => void;
+  onRemove: () => void;
+}) {
+  const off = tierSaving(tier);
+  return (
+    <div className="grid grid-cols-[3.5rem_1fr_1fr_1fr_auto] items-center gap-2">
+      <NumberField value={tier.qty} onValue={(qty) => onChange({ qty })} min="1" className={smallInput} />
+      <NumberField value={tier.price} onValue={(price) => onChange({ price })} min="0" className={smallInput} />
+      <NumberField
+        value={tier.was ?? 0}
+        onValue={(was) => onChange({ was: was > 0 ? was : undefined })}
+        min="0"
+        className={smallInput}
+      />
+      <input
+        value={tier.badge ?? ""}
+        onChange={(e) => onChange({ badge: e.target.value || undefined })}
+        placeholder="Bestseller"
+        aria-label="Badge"
+        className={smallInput}
+      />
+      <span className="flex items-center gap-1">
+        <span className="w-9 text-right text-[0.68rem] font-medium text-emerald">
+          {off > 0 ? `${off}%` : ""}
+        </span>
+        <button
+          onClick={onRemove}
+          aria-label="Remove offer"
+          className="rounded-lg p-1.5 text-danger hover:bg-danger/10"
+        >
+          <X className="size-3.5" />
+        </button>
+      </span>
+    </div>
   );
 }

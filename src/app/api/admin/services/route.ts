@@ -17,6 +17,7 @@ import {
   type CatalogueService,
   type ServiceEdit,
   type ServiceProblem,
+  type ServiceTier,
 } from "@/lib/catalogue-shared";
 
 /**
@@ -121,6 +122,36 @@ function brandProblems(value: unknown): Partial<Record<BrandId, ServiceProblem[]
   return out;
 }
 
+/** Quantity tiers, dropping any row that doesn't at least name a price. */
+function tiers(value: unknown): ServiceTier[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const out: ServiceTier[] = [];
+  for (const raw of value.slice(0, 8)) {
+    const row = raw as { qty?: unknown; price?: unknown; was?: unknown; badge?: unknown };
+    const price = num(row.price);
+    if (price === undefined || price <= 0) continue;
+    const qty = num(row.qty);
+    const was = num(row.was);
+    out.push({
+      qty: Math.max(1, Math.round(qty ?? out.length + 1)),
+      price: Math.round(price),
+      // A "was" at or below the price is not a saving, so it isn't kept.
+      ...(was !== undefined && was > price ? { was: Math.round(was) } : {}),
+      ...(text(row.badge) ? { badge: text(row.badge) } : {}),
+    });
+  }
+  return out;
+}
+
+/** The ticked list, empty strings dropped. */
+function highlights(value: unknown): string[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  return value
+    .slice(0, 12)
+    .map((h) => text(h))
+    .filter((h): h is string => Boolean(h));
+}
+
 /** The fields shared by adding and editing, taken only if present. */
 function fields(body: Record<string, unknown>): ServiceEdit {
   const out: ServiceEdit = {};
@@ -147,6 +178,12 @@ function fields(body: Record<string, unknown>): ServiceEdit {
   if (perRepair) out.brandProblemPrices = perRepair;
   const ownRepairs = brandProblems(body.brandProblems);
   if (ownRepairs) out.brandProblems = ownRepairs;
+  const packs = tiers(body.tiers);
+  if (packs) out.tiers = packs;
+  const headline = text(body.headline);
+  if (headline !== undefined) out.headline = headline;
+  const points = highlights(body.highlights);
+  if (points) out.highlights = points;
   return out;
 }
 
