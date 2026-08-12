@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import type { MediaImage } from "@/lib/media";
 import { MediaLibrary } from "./MediaLibrary";
+import { ConfirmDialog } from "./ConfirmDialog";
 import { Loader2, ImageUp, RotateCcw, Link as LinkIcon, Pencil, Trash2, Undo2, X } from "lucide-react";
 import { SECTION_FIELDS, SPOTLIGHT_TINTS, type SectionId } from "@/lib/section-items-shared";
 import type { SectionOverride, SectionOverrides } from "@/lib/section-overrides-shared";
@@ -589,34 +590,13 @@ function SlotCard({
           {/* Takes the photo off the site and leaves the position empty —
               recoverable with Reset, but worth a second press first. */}
           {onEmpty && !emptied && (
-            confirming ? (
-              <>
-                <button
-                  onClick={() => {
-                    setConfirming(false);
-                    onEmpty();
-                  }}
-                  disabled={busy}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-danger px-3 py-2 text-xs font-semibold text-white hover:opacity-90"
-                >
-                  <Trash2 className="size-3.5" /> Delete it
-                </button>
-                <button
-                  onClick={() => setConfirming(false)}
-                  className="inline-flex items-center rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-ink"
-                >
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => setConfirming(true)}
-                disabled={busy}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-danger hover:bg-danger/10"
-              >
-                <Trash2 className="size-3.5" /> Delete
-              </button>
-            )
+            <button
+              onClick={() => setConfirming(true)}
+              disabled={busy}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-danger hover:bg-danger/10"
+            >
+              <Trash2 className="size-3.5" /> Delete
+            </button>
           )}
           {editable && (
             <>
@@ -635,25 +615,6 @@ function SlotCard({
                 >
                   <Undo2 className="size-3.5" /> Restore
                 </button>
-              ) : confirming ? (
-                <>
-                  <button
-                    onClick={() => {
-                      setConfirming(false);
-                      onToggleHidden?.();
-                    }}
-                    disabled={busy}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-danger px-3 py-2 text-xs font-semibold text-white hover:opacity-90"
-                  >
-                    <Trash2 className="size-3.5" /> Delete it
-                  </button>
-                  <button
-                    onClick={() => setConfirming(false)}
-                    className="inline-flex items-center rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-ink"
-                  >
-                    Cancel
-                  </button>
-                </>
               ) : (
                 <button
                   onClick={() => setConfirming(true)}
@@ -707,6 +668,25 @@ function SlotCard({
           </form>
         )}
       </div>
+
+      {/* Both Delete buttons open this: a page position is emptied, a carousel
+          card is taken off the strip. Either is undone from the same card. */}
+      <ConfirmDialog
+        open={confirming}
+        title={`Delete ${label}?`}
+        body={
+          editable
+            ? "The card comes off the site. Restore puts it back exactly as it was."
+            : "The position stays, showing nothing. Bring it back restores the original photo."
+        }
+        confirmLabel="Delete it"
+        onCancel={() => setConfirming(false)}
+        onConfirm={() => {
+          setConfirming(false);
+          if (editable) onToggleHidden?.();
+          else onEmpty?.();
+        }}
+      />
     </div>
   );
 }

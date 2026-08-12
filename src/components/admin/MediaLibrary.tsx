@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Check, ImageUp, Loader2, Trash2 } from "lucide-react";
 import type { MediaImage } from "@/lib/media";
+import { ConfirmDialog } from "./ConfirmDialog";
 import { cn } from "@/lib/utils";
 
 const MAX_BYTES = 10 * 1024 * 1024;
@@ -35,6 +36,7 @@ export function MediaLibrary({
   const [placing, setPlacing] = useState<string | null>(null);
   const [placed, setPlaced] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState<MediaImage | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const upload = async (file: File) => {
@@ -186,7 +188,7 @@ export function MediaLibrary({
                     ))}
                   </select>
                   <button
-                    onClick={() => remove(item.id)}
+                    onClick={() => setConfirming(item)}
                     aria-label={`Remove ${item.name}`}
                     className="rounded-lg p-2 text-danger hover:bg-danger/10"
                   >
@@ -198,6 +200,19 @@ export function MediaLibrary({
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirming !== null}
+        title="Remove this image?"
+        body="It comes off your shelf. Anywhere it is already placed keeps showing it."
+        confirmLabel="Remove"
+        onCancel={() => setConfirming(null)}
+        onConfirm={() => {
+          const item = confirming;
+          setConfirming(null);
+          if (item) remove(item.id);
+        }}
+      />
     </section>
   );
 }

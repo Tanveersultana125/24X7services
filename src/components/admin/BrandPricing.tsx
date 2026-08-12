@@ -11,6 +11,7 @@ import {
 } from "@/lib/catalogue-shared";
 import type { Brand, BrandId } from "@/lib/types";
 import { NumberField } from "./NumberField";
+import { ConfirmDialog } from "./ConfirmDialog";
 import { cn } from "@/lib/utils";
 
 /**
@@ -36,6 +37,7 @@ export function BrandPricing({ brand, services }: { brand: Brand; services: Cata
   const [busy, setBusy] = useState<string | null>(null);
   const [justSaved, setJustSaved] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [dropping, setDropping] = useState<CatalogueService | null>(null);
 
   const covered = rows.filter((s) => brandsFor(s).includes(brand.id));
   const notCovered = rows.filter((s) => !brandsFor(s).includes(brand.id));
@@ -134,11 +136,26 @@ export function BrandPricing({ brand, services }: { brand: Brand; services: Cata
               all[brand.id] = list;
               patch(s.id, { brandProblems: all });
             }}
-            onRemove={() => setCovered(s, false)}
+            onRemove={() => setDropping(s)}
             onSave={() => save(s)}
           />
         ))}
       </div>
+
+      <ConfirmDialog
+        open={dropping !== null}
+        title={`Stop servicing ${dropping?.name ?? "this"} for ${brand.name}?`}
+        body={`It comes off ${brand.name}'s booking list and off their page. Any prices you set for it are kept, so adding it back restores them.`}
+        confirmLabel="Not serviced"
+        onCancel={() => setDropping(null)}
+        onConfirm={async () => {
+          const s = dropping;
+          setDropping(null);
+          if (!s) return;
+          setCovered(s, false);
+          await save({ ...s, brands: brandsFor(s).filter((id) => id !== brand.id) });
+        }}
+      />
 
       {notCovered.length > 0 && (
         <div className="mt-8 border-t border-border pt-6">

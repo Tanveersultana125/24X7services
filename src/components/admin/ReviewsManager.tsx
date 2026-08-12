@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Star, Check, EyeOff, Trash2, Undo2, BadgeCheck, Globe } from "lucide-react";
 import type { Review, ReviewStatus } from "@/lib/reviews";
+import { ConfirmDialog } from "./ConfirmDialog";
 
 const FILTERS: ("all" | ReviewStatus)[] = ["all", "pending", "published", "hidden"];
 
@@ -224,23 +225,32 @@ export function ReviewsManager({
                   <Undo2 className="size-3.5" /> Back to pending
                 </button>
               )}
-              {confirming === r.id ? (
-                <>
-                  <button onClick={() => remove(r.id)} className="inline-flex items-center gap-1.5 rounded-lg bg-danger px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90">
-                    <Trash2 className="size-3.5" /> Delete permanently
-                  </button>
-                  <button onClick={() => setConfirming(null)} className="inline-flex items-center rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted hover:text-ink">
-                    Cancel
-                  </button>
-                </>
-              ) : (
-                <button onClick={() => setConfirming(r.id)} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-danger hover:bg-danger/10">
-                  <Trash2 className="size-3.5" /> Delete
-                </button>
-              )}
+              <button onClick={() => setConfirming(r.id)} className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-danger hover:bg-danger/10">
+                <Trash2 className="size-3.5" /> Delete
+              </button>
             </div>
           </div>
         ))}
+
+        {/* One dialog for the list — which review it means is carried by the
+            id being confirmed, not by a copy of it per row. */}
+        <ConfirmDialog
+          open={confirming !== null}
+          title="Delete this review?"
+          body={
+            <>
+              It is removed for good, for everyone. Hiding it instead keeps it here and takes it
+              off the site.
+            </>
+          }
+          confirmLabel="Delete permanently"
+          onCancel={() => setConfirming(null)}
+          onConfirm={() => {
+            const id = confirming;
+            setConfirming(null);
+            if (id) remove(id);
+          }}
+        />
 
         {shown.length === 0 && (
           <div className="rounded-2xl border border-dashed border-border-strong bg-surface py-14 text-center">

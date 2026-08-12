@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Plus, Trash2, X, Loader2, ImageUp } from "lucide-react";
 import { GALLERY_CATEGORIES, type GalleryPhoto } from "@/lib/gallery-shared";
+import { ConfirmDialog } from "./ConfirmDialog";
 import { cn } from "@/lib/utils";
 
 /** Matches the limit the upload route enforces; fail here with a reason instead. */
@@ -17,6 +18,7 @@ export function GalleryManager({ initial }: { initial: GalleryPhoto[] }) {
   const [draft, setDraft] = useState({ src: "", label: "", category: GALLERY_CATEGORIES[0] as string });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [confirming, setConfirming] = useState<GalleryPhoto | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -154,7 +156,7 @@ export function GalleryManager({ initial }: { initial: GalleryPhoto[] }) {
                 <p className="text-xs text-muted">{item.category}</p>
               </div>
               <button
-                onClick={() => remove(item.id)}
+                onClick={() => setConfirming(item)}
                 aria-label="Remove"
                 /* Always visible on touch: reveal-on-hover leaves the only way to
                    delete a photo unreachable on a phone. Hover-reveal is kept
@@ -258,6 +260,18 @@ export function GalleryManager({ initial }: { initial: GalleryPhoto[] }) {
           </div>
         </div>
       )}
+      <ConfirmDialog
+        open={confirming !== null}
+        title="Remove this photo?"
+        body={`"${confirming?.label ?? ""}" comes off the work gallery on the process page.`}
+        confirmLabel="Remove"
+        onCancel={() => setConfirming(null)}
+        onConfirm={() => {
+          const item = confirming;
+          setConfirming(null);
+          if (item) remove(item.id);
+        }}
+      />
     </div>
   );
 }

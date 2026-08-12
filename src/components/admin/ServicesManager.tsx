@@ -11,6 +11,7 @@ import {
 import Link from "next/link";
 import { BRANDS } from "@/lib/data";
 import { NumberField } from "./NumberField";
+import { ConfirmDialog } from "./ConfirmDialog";
 import { cn } from "@/lib/utils";
 
 /**
@@ -403,26 +404,7 @@ function ServiceCard({
           {saved ? "Saved" : "Save"}
         </button>
 
-        {confirming ? (
-          <>
-            <button
-              onClick={() => {
-                setConfirming(false);
-                onRemove();
-              }}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-danger px-3 py-2 text-sm font-semibold text-white hover:opacity-90"
-            >
-              <Trash2 className="size-4" /> {s.custom ? "Delete it" : "Reset it"}
-            </button>
-            <button
-              onClick={() => setConfirming(false)}
-              className="rounded-xl border border-border px-3 py-2 text-sm font-medium text-muted hover:text-ink"
-            >
-              Cancel
-            </button>
-          </>
-        ) : (
-          <button
+        <button
             onClick={() => setConfirming(true)}
             disabled={busy}
             className={cn(
@@ -432,13 +414,28 @@ function ServiceCard({
           >
             {s.custom ? <Trash2 className="size-4" /> : <RotateCcw className="size-4" />}
             {s.custom ? "Delete" : "Reset"}
-          </button>
-        )}
+        </button>
 
         {!s.custom && (
           <span className="text-xs text-muted-2">Ships with the site — reset puts it back</span>
         )}
       </div>
+
+      <ConfirmDialog
+        open={confirming}
+        title={s.custom ? `Delete ${s.name}?` : `Reset ${s.name}?`}
+        body={
+          s.custom
+            ? "The service comes off the site, along with its repairs and any prices set for it. This can't be undone."
+            : "Everything changed about this service goes back to what the site ships with — its words, its prices and its repairs."
+        }
+        confirmLabel={s.custom ? "Delete it" : "Reset it"}
+        onCancel={() => setConfirming(false)}
+        onConfirm={() => {
+          setConfirming(false);
+          onRemove();
+        }}
+      />
     </div>
   );
 }
