@@ -33,19 +33,7 @@ export const TECHNICIANS = ["Ravi K.", "Imran S.", "Deepak M.", "Sunil P."];
 
 // Reviews are real data now — see `src/lib/reviews.ts` for the Firestore layer.
 
-export type GalleryItem = { id: string; src: string; label: string; category: string };
-
-export const GALLERY: GalleryItem[] = [
-  { id: "G1", src: "/work/gallery/ac-1.png", label: "AC service", category: "AC" },
-  { id: "G2", src: "/work/gallery/ac-2.png", label: "Split-AC deep clean", category: "AC" },
-  { id: "G3", src: "/work/gallery/ac-3.png", label: "AC installation", category: "AC" },
-  { id: "G4", src: "/work/gallery/fridge-1.png", label: "Refrigerator repair", category: "Refrigerator" },
-  { id: "G5", src: "/work/gallery/fridge-2.png", label: "Cooling repair", category: "Refrigerator" },
-  { id: "G6", src: "/work/gallery/washing-1.png", label: "Washing machine repair", category: "Washing Machine" },
-  { id: "G7", src: "/work/gallery/washing-2.png", label: "Front-load service", category: "Washing Machine" },
-  { id: "G8", src: "/work/gallery/microwave-1.png", label: "Microwave repair", category: "Microwave" },
-  { id: "G9", src: "/work/gallery/microwave-2.png", label: "Microwave diagnosis", category: "Microwave" },
-];
+// The work gallery is real data — see `src/lib/gallery.ts`.
 
 export const STATUS_META: Record<BookingStatus, { label: string; color: string }> = {
   new: { label: "New", color: "#2547d0" },

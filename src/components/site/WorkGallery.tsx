@@ -10,24 +10,14 @@ const ease = [0.16, 1, 0.3, 1] as const;
 
 type Shot = { src: string; label: string };
 
-// Interleaved by category for a varied masonry rhythm.
-const SHOTS: Shot[] = [
-  { src: "/work/gallery/ac-1.png", label: "AC service" },
-  { src: "/work/gallery/fridge-1.png", label: "Refrigerator repair" },
-  { src: "/work/gallery/washing-1.png", label: "Washing machine repair" },
-  { src: "/work/gallery/microwave-1.png", label: "Microwave repair" },
-  { src: "/work/gallery/ac-3.png", label: "AC installation" },
-  { src: "/work/gallery/washing-2.png", label: "Front-load service" },
-  { src: "/work/gallery/microwave-2.png", label: "Microwave diagnosis" },
-  { src: "/work/gallery/fridge-2.png", label: "Cooling repair" },
-  { src: "/work/gallery/ac-2.png", label: "Split-AC deep clean" },
-];
-
 export function WorkGallery({ photos }: { photos?: Shot[] }) {
   const [opened, setOpened] = useState<number | null>(null);
-  // The seeded shots keep the section from looking abandoned before the first
-  // upload; once the admin adds photos, those are the gallery.
-  const shots = photos && photos.length > 0 ? photos : SHOTS;
+  // Whatever the panel holds, and nothing else. The shipped photographs are
+  // seeded into it on first read, so falling back to a copy of them here would
+  // only mean "deleting them all put them back".
+  const shots = photos ?? [];
+
+  if (shots.length === 0) return null;
 
   return (
     <section id="work" className="relative scroll-mt-28 py-14 sm:py-20">
