@@ -138,7 +138,18 @@ export function PageHeader({
         </>
       )}
 
-      <div className="relative z-10 mx-auto max-w-[92rem] px-6 sm:px-10">
+      {/* The collage header takes a narrower measure of its own. At 92rem the
+          copy caps out at a readable line length and the collage at 400px, and
+          the 200-odd pixels neither of them wants sit between the two as a
+          gap. At 72rem there is nothing left over: the copy fills its column,
+          the collage fills its own, and breadcrumb, figures and both columns
+          line up on the same two edges. */}
+      <div
+        className={cn(
+          "relative z-10 mx-auto px-6 sm:px-10",
+          collage ? "max-w-[72rem]" : "max-w-[92rem]",
+        )}
+      >
         {/* breadcrumb */}
         <motion.nav
           initial={{ opacity: 0 }}
@@ -159,8 +170,7 @@ export function PageHeader({
             image || bgImage
               ? "mt-10 max-w-2xl"
               : cn(
-                  "mt-8 grid gap-12",
-                  collage ? "lg:items-start" : "lg:items-center",
+                  "mt-8 grid gap-12 lg:items-center",
                   logos
                     ? "lg:grid-cols-[0.95fr_1.05fr]"
                     // The collage is a supporting picture, so the copy leads on
