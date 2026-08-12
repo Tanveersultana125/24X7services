@@ -22,10 +22,19 @@ import { cn } from "@/lib/utils";
  * decided — you compare Samsung against Samsung, not a fridge against a
  * washing machine.
  */
+/** The fields this page owns — what "unsaved" is measured against. */
+function fingerprint(s: CatalogueService): string {
+  return JSON.stringify([s.brands ?? [], s.brandPrices ?? {}, s.brandProblemPrices ?? {}, s.brandProblems ?? {}]);
+}
+
 export function BrandPricing({ brand, services }: { brand: Brand; services: CatalogueService[] }) {
   const [rows, setRows] = useState(services);
+  // What the server last confirmed, so Save can say whether it has work to do.
+  const [saved, setSavedState] = useState<Record<string, string>>(() =>
+    Object.fromEntries(services.map((s) => [s.id, fingerprint(s)])),
+  );
   const [busy, setBusy] = useState<string | null>(null);
-  const [saved, setSaved] = useState<string | null>(null);
+  const [justSaved, setJustSaved] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const covered = rows.filter((s) => brandsFor(s).includes(brand.id));
@@ -60,8 +69,9 @@ export function BrandPricing({ brand, services }: { brand: Brand; services: Cata
         );
         return;
       }
-      setSaved(s.id);
-      window.setTimeout(() => setSaved((cur) => (cur === s.id ? null : cur)), 1800);
+      setSavedState((prev) => ({ ...prev, [s.id]: fingerprint(s) }));
+      setJustSaved(s.id);
+      window.setTimeout(() => setJustSaved((cur) => (cur === s.id ? null : cur)), 2400);
     } catch {
       setError("Couldn't reach the server. Check your connection and try again.");
     } finally {
@@ -103,7 +113,8 @@ export function BrandPricing({ brand, services }: { brand: Brand; services: Cata
             service={s}
             brandId={brand.id}
             busy={busy === s.id}
-            saved={saved === s.id}
+            justSaved={justSaved === s.id}
+            dirty={saved[s.id] !== fingerprint(s)}
             onPrice={(value) => {
               const next = { ...(s.brandPrices ?? {}) };
               if (value === null) delete next[brand.id];
@@ -160,7 +171,8 @@ function Row({
   service: s,
   brandId,
   busy,
-  saved,
+  justSaved,
+  dirty,
   onPrice,
   onBand,
   onOwn,
@@ -170,7 +182,10 @@ function Row({
   service: CatalogueService;
   brandId: BrandId;
   busy: boolean;
-  saved: boolean;
+  /** Briefly true right after a successful save. */
+  justSaved: boolean;
+  /** Something on this card differs from what the server holds. */
+  dirty: boolean;
   onPrice: (value: number | null) => void;
   onBand: (problemId: string, band: [number, number] | null) => void;
   onOwn: (list: ServiceProblem[]) => void;
@@ -216,13 +231,23 @@ function Row({
           />
         </label>
 
+        {/* Dark only while there is something to save. Grey and unclickable
+            otherwise, so pressing it and seeing nothing change can't be
+            mistaken for a save that didn't work. */}
         <button
           onClick={onSave}
-          disabled={busy}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-ink px-3.5 py-2 text-sm font-medium text-background hover:opacity-90 disabled:opacity-50"
+          disabled={busy || !dirty}
+          className={cn(
+            "inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-medium transition-colors",
+            dirty && !busy
+              ? "bg-ink text-background hover:opacity-90"
+              : justSaved
+                ? "bg-emerald/12 text-emerald"
+                : "cursor-default bg-surface-2 text-muted-2",
+          )}
         >
           {busy ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
-          {saved ? "Saved" : "Save"}
+          {busy ? "Saving…" : justSaved ? "Saved" : dirty ? "Save" : "Saved"}
         </button>
 
         <button

@@ -101,7 +101,10 @@ function brandProblemPrices(
       if (low === undefined || low <= 0) continue;
       kept[problem.slice(0, 60)] = [Math.round(low), Math.round(Math.max(low, high ?? low))];
     }
-    if (Object.keys(kept).length) out[id] = kept;
+    // Stored even when empty: the panel sends the whole map every time, so an
+    // empty one is how "I cleared these" arrives. Skipping it would merge the
+    // old prices straight back and the clearing would never stick.
+    out[id] = kept;
   }
   return out;
 }
@@ -112,7 +115,8 @@ function brandProblems(value: unknown): Partial<Record<BrandId, ServiceProblem[]
   const out: Partial<Record<BrandId, ServiceProblem[]>> = {};
   for (const id of BRAND_IDS) {
     const list = problems((value as Record<string, unknown>)[id]);
-    if (list?.length) out[id] = list;
+    // An empty list means the last custom repair was removed — see above.
+    if (list) out[id] = list;
   }
   return out;
 }
