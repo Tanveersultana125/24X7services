@@ -26,6 +26,15 @@ export type ServiceTier = {
   badge?: string;
 };
 
+export type ServiceStep = {
+  title: string;
+  body?: string;
+  /** Shown under the step; the sheet reads better with them but works without. */
+  image?: string;
+};
+
+export type ServiceFaq = { q: string; a: string };
+
 /** The saving a tier gives, as a whole percentage. Zero when there isn't one. */
 export function tierSaving(tier: ServiceTier): number {
   if (!tier.was || tier.was <= tier.price) return 0;
@@ -79,6 +88,16 @@ export type CatalogueService = Omit<Appliance, "id"> & {
   headline?: string;
   /** The ticked list under it. */
   highlights?: string[];
+  /** How the visit runs, in order. */
+  process?: ServiceStep[];
+  /** What the price covers. */
+  included?: string[];
+  /** What the customer has to have ready — a bucket, a power point. */
+  youNeed?: string[];
+  /** The caveats, said before booking rather than at the door. */
+  pleaseNote?: string[];
+  /** Questions about this service in particular. */
+  faqs?: ServiceFaq[];
   /** Hidden services stay in the panel and off the site. */
   active: boolean;
   /** Added here rather than shipped in the build — deletable. */
@@ -155,6 +174,19 @@ export function repairsFor(service: CatalogueService, brand?: BrandId): ServiceP
 export function pricesDiffer(service: CatalogueService): boolean {
   const set = new Set(brandsFor(service).map((b) => priceFor(service, b)));
   return set.size > 1;
+}
+
+/** True when the sheet has more to show than the price. */
+export function hasDetail(s: CatalogueService): boolean {
+  return Boolean(
+    s.tiers?.length ||
+      s.highlights?.length ||
+      s.process?.length ||
+      s.included?.length ||
+      s.youNeed?.length ||
+      s.pleaseNote?.length ||
+      s.faqs?.length,
+  );
 }
 
 /** A new service starts with one problem, because none at all can't be booked. */

@@ -17,6 +17,8 @@ import {
   type CatalogueService,
   type ServiceEdit,
   type ServiceProblem,
+  type ServiceFaq,
+  type ServiceStep,
   type ServiceTier,
 } from "@/lib/catalogue-shared";
 
@@ -152,6 +154,39 @@ function highlights(value: unknown): string[] | undefined {
     .filter((h): h is string => Boolean(h));
 }
 
+/** Steps keep their order; a step with no title is not a step. */
+function steps(value: unknown): ServiceStep[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const out: ServiceStep[] = [];
+  for (const raw of value.slice(0, 12)) {
+    const row = raw as { title?: unknown; body?: unknown; image?: unknown };
+    const title = text(row.title);
+    if (!title) continue;
+    const body = text(row.body);
+    const image = text(row.image);
+    out.push({
+      title,
+      ...(body ? { body } : {}),
+      // Our own asset or an https URL — nothing else is rendered as imagery.
+      ...(image && (image.startsWith("/") || image.startsWith("https://")) ? { image } : {}),
+    });
+  }
+  return out;
+}
+
+/** A question with nothing behind it helps no one. */
+function faqs(value: unknown): ServiceFaq[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const out: ServiceFaq[] = [];
+  for (const raw of value.slice(0, 20)) {
+    const row = raw as { q?: unknown; a?: unknown };
+    const q = text(row.q);
+    const a = typeof row.a === "string" ? row.a.trim().slice(0, 600) : "";
+    if (q && a) out.push({ q, a });
+  }
+  return out;
+}
+
 /** The fields shared by adding and editing, taken only if present. */
 function fields(body: Record<string, unknown>): ServiceEdit {
   const out: ServiceEdit = {};
@@ -184,6 +219,16 @@ function fields(body: Record<string, unknown>): ServiceEdit {
   if (headline !== undefined) out.headline = headline;
   const points = highlights(body.highlights);
   if (points) out.highlights = points;
+  const flow = steps(body.process);
+  if (flow) out.process = flow;
+  const covers = highlights(body.included);
+  if (covers) out.included = covers;
+  const needs = highlights(body.youNeed);
+  if (needs) out.youNeed = needs;
+  const caveats = highlights(body.pleaseNote);
+  if (caveats) out.pleaseNote = caveats;
+  const questions = faqs(body.faqs);
+  if (questions) out.faqs = questions;
   return out;
 }
 

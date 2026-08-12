@@ -7,7 +7,9 @@ import {
   brandsFor,
   tierSaving,
   type CatalogueService,
+  type ServiceFaq,
   type ServiceProblem,
+  type ServiceStep,
   type ServiceTier,
 } from "@/lib/catalogue-shared";
 import Link from "next/link";
@@ -68,6 +70,11 @@ export function ServicesManager({ initial }: { initial: CatalogueService[] }) {
       tiers: s.tiers ?? [],
       headline: s.headline ?? "",
       highlights: s.highlights ?? [],
+      process: s.process ?? [],
+      included: s.included ?? [],
+      youNeed: s.youNeed ?? [],
+      pleaseNote: s.pleaseNote ?? [],
+      faqs: s.faqs ?? [],
     });
     setBusy(null);
     if (!ok) return;
@@ -453,35 +460,78 @@ function ServiceCard({
           />
         </Field>
 
-        <div className="mt-3">
+        <ListEditor
+          label="Highlights"
+          placeholder="Applicable for both split & window ACs"
+          items={s.highlights ?? []}
+          onChange={(highlights) => onChange({ highlights })}
+        />
+
+        {/* How the visit runs — the only list whose rows carry a picture. */}
+        <div className="mt-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted">Highlights</span>
+            <span className="text-xs font-medium text-muted">Our process ({(s.process ?? []).length} steps)</span>
             <button
-              onClick={() => onChange({ highlights: [...(s.highlights ?? []), ""] })}
+              onClick={() => onChange({ process: [...(s.process ?? []), { title: "" }] })}
               className="inline-flex items-center gap-1 text-xs font-medium text-royal-bright hover:underline"
             >
               <Plus className="size-3.5" /> Add
             </button>
           </div>
-          <div className="mt-1.5 space-y-1.5">
-            {(s.highlights ?? []).map((h, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <input
-                  value={h}
-                  onChange={(e) =>
-                    onChange({ highlights: (s.highlights ?? []).map((row, n) => (n === i ? e.target.value : row)) })
-                  }
-                  placeholder="Applicable for both split & window ACs"
-                  className={smallInput}
-                />
-                <button
-                  onClick={() => onChange({ highlights: (s.highlights ?? []).filter((_, n) => n !== i) })}
-                  aria-label="Remove highlight"
-                  className="shrink-0 rounded-lg p-1.5 text-danger hover:bg-danger/10"
-                >
-                  <X className="size-3.5" />
-                </button>
-              </div>
+          <div className="mt-1.5 space-y-2">
+            {(s.process ?? []).map((step, i) => (
+              <StepRow
+                key={i}
+                step={step}
+                index={i}
+                onChange={(fields) =>
+                  onChange({ process: (s.process ?? []).map((row, n) => (n === i ? { ...row, ...fields } : row)) })
+                }
+                onRemove={() => onChange({ process: (s.process ?? []).filter((_, n) => n !== i) })}
+              />
+            ))}
+          </div>
+        </div>
+
+        <ListEditor
+          label="What's included"
+          placeholder="Free inspection followed by a quotation"
+          items={s.included ?? []}
+          onChange={(included) => onChange({ included })}
+        />
+        <ListEditor
+          label="What we'll need from you"
+          placeholder="Bucket & water"
+          items={s.youNeed ?? []}
+          onChange={(youNeed) => onChange({ youNeed })}
+        />
+        <ListEditor
+          label="Please note"
+          placeholder="Warranty does not cover parts supplied by the customer"
+          items={s.pleaseNote ?? []}
+          onChange={(pleaseNote) => onChange({ pleaseNote })}
+        />
+
+        <div className="mt-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-muted">Questions ({(s.faqs ?? []).length})</span>
+            <button
+              onClick={() => onChange({ faqs: [...(s.faqs ?? []), { q: "", a: "" }] })}
+              className="inline-flex items-center gap-1 text-xs font-medium text-royal-bright hover:underline"
+            >
+              <Plus className="size-3.5" /> Add
+            </button>
+          </div>
+          <div className="mt-1.5 space-y-2">
+            {(s.faqs ?? []).map((faq, i) => (
+              <FaqRow
+                key={i}
+                faq={faq}
+                onChange={(fields) =>
+                  onChange({ faqs: (s.faqs ?? []).map((row, n) => (n === i ? { ...row, ...fields } : row)) })
+                }
+                onRemove={() => onChange({ faqs: (s.faqs ?? []).filter((_, n) => n !== i) })}
+              />
             ))}
           </div>
         </div>
@@ -598,6 +648,148 @@ function TierRow({
           <X className="size-3.5" />
         </button>
       </span>
+    </div>
+  );
+}
+
+/**
+ * A list of plain lines — included, needed, caveats, highlights.
+ *
+ * Four sections of the sheet are the same shape, so they share one editor
+ * rather than four copies of the same markup drifting apart.
+ */
+function ListEditor({
+  label,
+  placeholder,
+  items,
+  onChange,
+}: {
+  label: string;
+  placeholder: string;
+  items: string[];
+  onChange: (items: string[]) => void;
+}) {
+  return (
+    <div className="mt-4">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-medium text-muted">
+          {label} ({items.length})
+        </span>
+        <button
+          onClick={() => onChange([...items, ""])}
+          className="inline-flex items-center gap-1 text-xs font-medium text-royal-bright hover:underline"
+        >
+          <Plus className="size-3.5" /> Add
+        </button>
+      </div>
+      <div className="mt-1.5 space-y-1.5">
+        {items.map((item, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <input
+              value={item}
+              onChange={(e) => onChange(items.map((row, n) => (n === i ? e.target.value : row)))}
+              placeholder={placeholder}
+              className={smallInput}
+            />
+            <button
+              onClick={() => onChange(items.filter((_, n) => n !== i))}
+              aria-label={`Remove from ${label}`}
+              className="shrink-0 rounded-lg p-1.5 text-danger hover:bg-danger/10"
+            >
+              <X className="size-3.5" />
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StepRow({
+  step,
+  index,
+  onChange,
+  onRemove,
+}: {
+  step: ServiceStep;
+  index: number;
+  onChange: (fields: Partial<ServiceStep>) => void;
+  onRemove: () => void;
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-surface-2/50 p-2.5">
+      <div className="flex items-center gap-2">
+        <span className="grid size-5 shrink-0 place-items-center rounded-full border border-border text-[0.62rem] font-semibold text-muted">
+          {index + 1}
+        </span>
+        <input
+          value={step.title}
+          onChange={(e) => onChange({ title: e.target.value })}
+          placeholder="Pre-service checks"
+          aria-label="Step"
+          className={smallInput}
+        />
+        <button
+          onClick={onRemove}
+          aria-label="Remove step"
+          className="shrink-0 rounded-lg p-1.5 text-danger hover:bg-danger/10"
+        >
+          <X className="size-3.5" />
+        </button>
+      </div>
+      <input
+        value={step.body ?? ""}
+        onChange={(e) => onChange({ body: e.target.value })}
+        placeholder="What happens in this step"
+        aria-label="Step description"
+        className={cn(smallInput, "mt-2")}
+      />
+      <input
+        value={step.image ?? ""}
+        onChange={(e) => onChange({ image: e.target.value })}
+        placeholder="/work/gallery/ac-1.png — or an https:// link"
+        aria-label="Step photo"
+        className={cn(smallInput, "mt-2")}
+      />
+    </div>
+  );
+}
+
+function FaqRow({
+  faq,
+  onChange,
+  onRemove,
+}: {
+  faq: ServiceFaq;
+  onChange: (fields: Partial<ServiceFaq>) => void;
+  onRemove: () => void;
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-surface-2/50 p-2.5">
+      <div className="flex items-center gap-2">
+        <input
+          value={faq.q}
+          onChange={(e) => onChange({ q: e.target.value })}
+          placeholder="Are spare parts covered under warranty?"
+          aria-label="Question"
+          className={smallInput}
+        />
+        <button
+          onClick={onRemove}
+          aria-label="Remove question"
+          className="shrink-0 rounded-lg p-1.5 text-danger hover:bg-danger/10"
+        >
+          <X className="size-3.5" />
+        </button>
+      </div>
+      <textarea
+        value={faq.a}
+        onChange={(e) => onChange({ a: e.target.value })}
+        rows={2}
+        placeholder="The answer a customer reads before booking."
+        aria-label="Answer"
+        className={cn(smallInput, "mt-2 resize-y")}
+      />
     </div>
   );
 }

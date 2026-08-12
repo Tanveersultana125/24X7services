@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Star, Tag, Sparkles, Check, Clock } from "lucide-react";
+import { X, Star, Tag, Sparkles, Check, Clock, Info, ShieldCheck, ChevronDown } from "lucide-react";
 import { bestSaving, tierSaving, type CatalogueService } from "@/lib/catalogue-shared";
+import { BRANDS } from "@/lib/data";
+import { BrandMark } from "@/components/ui/Icons";
 import { formatINR } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
@@ -165,6 +167,118 @@ export function ServiceSheet({
                   )}
                 </div>
               )}
+
+              {/* How the visit runs, in the order it runs. */}
+              {service.process && service.process.length > 0 && (
+                <Section title="Our process">
+                  <ol className="mt-4 space-y-5">
+                    {service.process.map((step, i) => (
+                      <li key={i} className="relative pl-9">
+                        <span className="absolute left-0 top-0 grid size-6 place-items-center rounded-full border border-border text-[0.68rem] font-semibold text-muted">
+                          {i + 1}
+                        </span>
+                        {/* the rail joins a step to the next, not past the last */}
+                        {i < service.process!.length - 1 && (
+                          <span aria-hidden className="absolute left-3 top-7 h-[calc(100%-0.5rem)] w-px bg-border" />
+                        )}
+                        <p className="text-sm font-semibold">{step.title}</p>
+                        {step.body && (
+                          <p className="mt-1 text-pretty text-sm leading-relaxed text-muted">{step.body}</p>
+                        )}
+                        {step.image && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={step.image}
+                            alt=""
+                            className="mt-3 aspect-[16/10] w-full rounded-xl object-cover"
+                          />
+                        )}
+                      </li>
+                    ))}
+                  </ol>
+                </Section>
+              )}
+
+              {service.included && service.included.length > 0 && (
+                <Section title="What's included">
+                  <ul className="mt-4 space-y-3">
+                    {service.included.map((item) => (
+                      <li key={item} className="flex gap-2.5 text-sm text-ink-soft">
+                        <span className="mt-0.5 grid size-4 shrink-0 place-items-center rounded-full bg-emerald text-white">
+                          <Check className="size-2.5" strokeWidth={3.5} />
+                        </span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </Section>
+              )}
+
+              {service.youNeed && service.youNeed.length > 0 && (
+                <Section title="What we will need from you">
+                  <div className="mt-4 grid grid-cols-3 gap-2.5">
+                    {service.youNeed.map((item) => (
+                      <div
+                        key={item}
+                        className="rounded-xl bg-surface-2 p-3 text-xs font-medium leading-snug text-ink-soft"
+                      >
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </Section>
+              )}
+
+              {service.pleaseNote && service.pleaseNote.length > 0 && (
+                <Section title="Please note">
+                  <ul className="mt-4 space-y-3">
+                    {service.pleaseNote.map((item) => (
+                      <li key={item} className="flex gap-2.5 text-sm text-muted">
+                        <Info className="mt-0.5 size-4 shrink-0 text-muted-2" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </Section>
+              )}
+
+              {/* The four we are authorised for — the same list the site keeps
+                  everywhere, so it can't drift from the brands page. */}
+              <Section title="Brands we service">
+                <div className="mt-4 grid grid-cols-2 gap-2.5">
+                  {BRANDS.map((b) => (
+                    <span
+                      key={b.id}
+                      className="grid h-14 place-items-center rounded-xl bg-white px-3 ring-1 ring-black/5"
+                    >
+                      <BrandMark id={b.id} tone="brand" className={b.id === "lg" ? "text-2xl" : "text-[0.7rem]"} />
+                    </span>
+                  ))}
+                </div>
+              </Section>
+
+              <Section title="Top professionals">
+                <ul className="mt-4 space-y-3">
+                  {["Background verified", "Trained on every brand we service", "90-day written warranty on the repair"].map(
+                    (item) => (
+                      <li key={item} className="flex gap-2.5 text-sm text-ink-soft">
+                        <ShieldCheck className="mt-0.5 size-4 shrink-0 text-emerald" />
+                        {item}
+                      </li>
+                    ),
+                  )}
+                </ul>
+              </Section>
+
+              {service.faqs && service.faqs.length > 0 && (
+                <Section title="Frequently asked questions">
+                  <div className="mt-2 divide-y divide-hairline">
+                    {service.faqs.map((faq, i) => (
+                      <Faq key={i} q={faq.q} a={faq.a} />
+                    ))}
+                  </div>
+                </Section>
+              )}
             </div>
 
             {/* Always reachable, however long the sheet runs. */}
@@ -181,5 +295,32 @@ export function ServiceSheet({
       )}
     </AnimatePresence>,
     document.body,
+  );
+}
+
+/** A titled block, so every section of the sheet is spaced the same way. */
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mt-6 border-t border-hairline px-5 py-5 sm:px-6">
+      <h3 className="font-display text-lg tracking-[-0.02em]">{title}</h3>
+      {children}
+    </div>
+  );
+}
+
+function Faq({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-3 py-3.5 text-left text-sm font-medium"
+      >
+        {q}
+        <ChevronDown className={cn("size-4 shrink-0 text-muted transition-transform", open && "rotate-180")} />
+      </button>
+      {open && <p className="pb-4 text-pretty text-sm leading-relaxed text-muted">{a}</p>}
+    </div>
   );
 }
