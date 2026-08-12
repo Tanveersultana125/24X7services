@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import { Star, Zap, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Kicker } from "./TextReveal";
 import { useSiteImages } from "@/components/providers/SiteImagesProvider";
-import type { SectionItem } from "@/lib/section-items-shared";
 import type { SectionOverrides } from "@/lib/section-overrides-shared";
 import { clean } from "@/lib/section-overrides-apply";
 import { useServices } from "@/components/providers/ServicesProvider";
@@ -36,7 +35,7 @@ type Card = {
 // AC leads the row (real photo, common service); the rest follow the
 // catalogue. Only the four that ship with the site appear here — each card's
 // photo comes from a named image slot, and a service added from the panel has
-// no slot of its own. Those are added to this strip as cards instead.
+// no slot of its own.
 const HEAD: Card[] = [
   {
     title: "AC repair & service",
@@ -60,10 +59,8 @@ const HEAD: Card[] = [
 ];
 
 export function MostBooked({
-  added = [],
   overrides = {},
 }: {
-  added?: SectionItem[];
   overrides?: SectionOverrides;
 }) {
   const images = useSiteImages();
@@ -85,15 +82,6 @@ export function MostBooked({
   ];
   const cards: Card[] = [
     ...catalogue.filter((c) => !overrides[c.slot]?.hidden).map((c) => ({ ...c, ...clean(overrides[c.slot]) })),
-    ...added.map((a) => ({
-      title: a.title,
-      img: a.src,
-      slot: `added-${a.id}`,
-      price: a.price,
-      rating: a.rating || 4.8,
-      meta: a.meta,
-      href: a.href,
-    })),
   ];
   const scroller = useRef<HTMLDivElement>(null);
   const [atStart, setAtStart] = useState(true);

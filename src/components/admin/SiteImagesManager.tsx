@@ -338,7 +338,6 @@ export function SiteImagesManager({
         initial={media}
         targets={groupSlots.map((s) => ({ key: s.key, label: s.label }))}
         onPlace={assign}
-        canAddCard={Boolean(section)}
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

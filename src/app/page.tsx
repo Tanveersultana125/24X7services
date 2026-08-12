@@ -14,7 +14,6 @@ import { Stats } from "@/components/site/Stats";
 import { Faq } from "@/components/site/Faq";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { listPublishedReviews, toTestimonial } from "@/lib/reviews";
-import { listSectionItems } from "@/lib/section-items";
 import { getSectionOverrides } from "@/lib/section-overrides";
 
 // Prerendered and refreshed every 5 minutes; admin approvals revalidate it
@@ -24,9 +23,6 @@ export const revalidate = 300;
 export default async function Home() {
   const reviews = await listPublishedReviews(12).catch(() => []);
   const cards = reviews.map(toTestimonial);
-  // cards an admin added to the strips, on top of the built-in ones
-  const added = await listSectionItems();
-  const inSection = (id: string) => added.filter((i) => i.section === id);
   // rewrites and hidings applied to the cards that ship with each strip
   const overrides = await getSectionOverrides();
 
@@ -36,9 +32,9 @@ export default async function Home() {
       <main className="flex-1">
         <Hero />
         <TrustStrip />
-        <MostBooked added={inSection("most-booked")} overrides={overrides} />
-        <Spotlight added={inSection("spotlight")} overrides={overrides} />
-        <Noteworthy added={inSection("noteworthy")} overrides={overrides} />
+        <MostBooked overrides={overrides} />
+        <Spotlight overrides={overrides} />
+        <Noteworthy overrides={overrides} />
         <CoolingSolutions />
         <FridgeExpertise />
         <BrandShowcase />

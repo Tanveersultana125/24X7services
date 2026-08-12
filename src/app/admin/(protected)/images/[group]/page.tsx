@@ -2,8 +2,6 @@ import { notFound } from "next/navigation";
 import { SiteImagesManager } from "@/components/admin/SiteImagesManager";
 import { getSiteImages } from "@/lib/site-images";
 import { groupBySlug, SITE_IMAGE_GROUP_PAGES } from "@/lib/site-images-shared";
-import { SectionItems } from "@/components/admin/SectionItems";
-import { listSectionItems } from "@/lib/section-items";
 import { SECTION_BY_SLUG } from "@/lib/section-items-shared";
 import { getSectionOverrides } from "@/lib/section-overrides";
 import { listMedia } from "@/lib/media";
@@ -27,9 +25,8 @@ export default async function AdminSiteImageGroupPage({
   if (!group) notFound();
 
   const current = await getSiteImages();
-  // The carousels can take extra cards; the fixed page positions cannot.
+  // Carousel cards carry words of their own; the fixed page positions do not.
   const section = SECTION_BY_SLUG[slug];
-  const added = section ? (await listSectionItems()).filter((i) => i.section === section) : [];
   const overrides = section ? await getSectionOverrides() : {};
   const media = await listMedia();
   const storage = await describeStorage();
@@ -46,7 +43,6 @@ export default async function AdminSiteImageGroupPage({
         overrides={overrides}
         media={media}
       />
-      {section && <SectionItems section={section} label={group.name} initial={added} />}
     </>
   );
 }

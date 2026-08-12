@@ -3,14 +3,11 @@
 import { useRef, useState } from "react";
 import { Check, ImageUp, Loader2, Trash2 } from "lucide-react";
 import type { MediaImage } from "@/lib/media";
-import { requestCardForImage } from "@/lib/admin/add-card-event";
 import { cn } from "@/lib/utils";
 
 const MAX_BYTES = 10 * 1024 * 1024;
 // Kept in step with the upload route, so a rejection is explained here first.
 const TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"];
-
-const NEW_CARD = "new-card";
 
 export type PlaceTarget = { key: string; label: string };
 
@@ -27,14 +24,11 @@ export function MediaLibrary({
   initial,
   targets,
   onPlace,
-  canAddCard,
 }: {
   initial: MediaImage[];
   /** The positions on this page a photo can be dropped into. */
   targets: PlaceTarget[];
   onPlace: (key: string, url: string) => Promise<boolean>;
-  /** Carousel pages can also take a brand-new card. */
-  canAddCard: boolean;
 }) {
   const [items, setItems] = useState(initial);
   const [busy, setBusy] = useState(false);
@@ -84,10 +78,6 @@ export function MediaLibrary({
   };
 
   const place = async (item: MediaImage, choice: string) => {
-    if (choice === NEW_CARD) {
-      requestCardForImage(item.url);
-      return;
-    }
     setPlacing(item.id);
     setError(null);
     const ok = await onPlace(choice, item.url);
@@ -123,7 +113,6 @@ export function MediaLibrary({
           <h2 className="font-display text-xl tracking-[-0.02em]">Your images</h2>
           <p className="mt-1 text-sm text-muted">
             Upload a photo, then pick where it goes — it&apos;s on the site as soon as you choose.
-            {canAddCard && " Pick “a new card” to build a whole card around it instead."}
           </p>
         </div>
         <input
@@ -195,7 +184,6 @@ export function MediaLibrary({
                         {t.label}
                       </option>
                     ))}
-                    {canAddCard && <option value={NEW_CARD}>➕ As a new card</option>}
                   </select>
                   <button
                     onClick={() => remove(item.id)}

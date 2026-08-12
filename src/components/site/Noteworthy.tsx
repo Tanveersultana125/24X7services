@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Zap, ChevronLeft, ChevronRight } from "lucide-react";
 import { Kicker } from "./TextReveal";
 import { useSiteImages } from "@/components/providers/SiteImagesProvider";
-import type { SectionItem } from "@/lib/section-items-shared";
 import type { SectionOverrides } from "@/lib/section-overrides-shared";
 import { clean } from "@/lib/section-overrides-apply";
 import { cn } from "@/lib/utils";
@@ -22,10 +21,8 @@ const ITEMS: Item[] = [
 ];
 
 export function Noteworthy({
-  added = [],
   overrides = {},
 }: {
-  added?: SectionItem[];
   overrides?: SectionOverrides;
 }) {
   const images = useSiteImages();
@@ -37,14 +34,6 @@ export function Noteworthy({
       const meta = typeof o.meta === "string" ? o.meta : undefined;
       return { ...i, ...o, eta: meta ?? i.eta } as Item;
     }),
-    ...added.map((a) => ({
-      title: a.title,
-      img: a.src,
-      slot: `added-${a.id}`,
-      href: a.href,
-      badge: a.badge || undefined,
-      eta: a.meta || undefined,
-    })),
   ];
   const scroller = useRef<HTMLDivElement>(null);
   const [atStart, setAtStart] = useState(true);

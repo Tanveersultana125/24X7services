@@ -5,7 +5,6 @@ import Link from "next/link";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Kicker } from "./TextReveal";
 import { useSiteImages } from "@/components/providers/SiteImagesProvider";
-import type { SectionItem } from "@/lib/section-items-shared";
 import type { SectionOverrides } from "@/lib/section-overrides-shared";
 import { clean } from "@/lib/section-overrides-apply";
 import { cn } from "@/lib/utils";
@@ -20,26 +19,15 @@ const SPOTS: Spot[] = [
 ];
 
 export function Spotlight({
-  added = [],
   overrides = {},
 }: {
-  added?: SectionItem[];
   overrides?: SectionOverrides;
 }) {
   const images = useSiteImages();
-  // Built-in banners take whatever the panel has rewritten, and drop out
-  // entirely if it has hidden them; added ones run after them.
+  // Banners take whatever the panel has rewritten, and drop out entirely if
+  // it has hidden them.
   const spots: Spot[] = [
     ...SPOTS.filter((s) => !overrides[s.slot]?.hidden).map((s) => ({ ...s, ...clean(overrides[s.slot]) })),
-    ...added.map((a) => ({
-      title: a.title,
-      sub: a.sub,
-      img: a.src,
-      slot: `added-${a.id}`,
-      href: a.href,
-      cta: a.cta || "Book now",
-      tint: a.tint,
-    })),
   ];
   const scroller = useRef<HTMLDivElement>(null);
   const [atStart, setAtStart] = useState(true);
