@@ -159,7 +159,8 @@ export function PageHeader({
             image || bgImage
               ? "mt-10 max-w-2xl"
               : cn(
-                  "mt-8 grid gap-12 lg:items-center",
+                  "mt-8 grid gap-12",
+                  collage ? "lg:items-start" : "lg:items-center",
                   logos
                     ? "lg:grid-cols-[0.95fr_1.05fr]"
                     // The collage is a supporting picture, so the copy leads on
@@ -240,8 +241,10 @@ export function PageHeader({
               </motion.dl>
             )}
 
-            {/* everywhere else they stay a simple row under the copy */}
-            {!logos && (image || collage || bgImage) && stats && (
+            {/* Everywhere else they stay a simple row under the copy — except
+                beside the collage, where they run the full width below both
+                columns instead. See the band after the grid. */}
+            {!logos && !collage && (image || bgImage) && stats && (
               <motion.dl
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -338,6 +341,25 @@ export function PageHeader({
             </motion.dl>
           )}
         </div>
+
+        {/* The copy is held to a reading measure and the collage to 400px, so
+            beside each other they leave a hole in the middle of the header.
+            The figures fill it, spread across the full width under both. */}
+        {collage && stats && (
+          <motion.dl
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.35, ease }}
+            className="mt-10 grid grid-cols-3 gap-6 border-t border-hairline pt-7 sm:mt-12 sm:gap-8"
+          >
+            {stats.map((st) => (
+              <div key={st.label}>
+                <dt className="font-display text-3xl tracking-tight sm:text-4xl">{st.value}</dt>
+                <dd className="mt-1.5 text-xs text-muted sm:text-sm">{st.label}</dd>
+              </div>
+            ))}
+          </motion.dl>
+        )}
 
         {/* brand assurances close the header */}
         {logos && (
