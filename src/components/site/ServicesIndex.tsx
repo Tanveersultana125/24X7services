@@ -7,6 +7,8 @@ import { ArrowUpRight, Wrench, Clock, Sparkles, Settings2, PackageOpen, Calendar
 import { Kicker } from "./TextReveal";
 import { ApplianceTile } from "@/components/ui/Icons";
 import { SERVICES, type Service } from "@/lib/services";
+
+/** Falls back to the code's list, so the section renders if the panel is away. */
 import { cn } from "@/lib/utils";
 
 const CARE_ICONS: Record<string, typeof Settings2> = {
@@ -16,9 +18,10 @@ const CARE_ICONS: Record<string, typeof Settings2> = {
   emergency: Siren,
 };
 
-export function ServicesIndex() {
+export function ServicesIndex({ services }: { services?: Service[] }) {
+  const rows = services?.length ? services : SERVICES;
   const [active, setActive] = useState<number | null>(0);
-  const svc = SERVICES[active ?? 0];
+  const svc = rows[active ?? 0];
 
   return (
     <section id="services" className="relative scroll-mt-28 pb-14 pt-10 sm:pb-20 sm:pt-14">
@@ -41,7 +44,7 @@ export function ServicesIndex() {
         <div className="mt-10 grid gap-12 sm:mt-16 lg:grid-cols-12">
           {/* Index list */}
           <ol className="lg:col-span-7">
-            {SERVICES.map((s, i) => (
+            {rows.map((s, i) => (
               <li key={s.id} className="border-b border-hairline">
                 <Link
                   href={s.appliance ? `/book?appliance=${s.appliance}` : "/book"}

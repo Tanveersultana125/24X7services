@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SiteNav } from "@/components/site/SiteNav";
 import { PageHeader } from "@/components/site/PageHeader";
 import { ServicesIndex } from "@/components/site/ServicesIndex";
+import { getServiceIndex } from "@/lib/service-index";
 import { ServicesDetail } from "@/components/site/ServicesDetail";
 import { Contact } from "@/components/site/Contact";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -12,7 +13,8 @@ export const metadata: Metadata = {
     "Eight premium appliance services across Telangana — AC, refrigerator, washing machine and microwave & oven repair, plus installation, uninstallation, annual maintenance and 24×7 emergency repair. Transparent pricing and a 90-day warranty.",
 };
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const services = await getServiceIndex();
   return (
     <>
       <SiteNav />
@@ -28,7 +30,7 @@ export default function ServicesPage() {
           ]}
           image="/work/fridge-hero.png"
         />
-        <ServicesIndex />
+        <ServicesIndex services={services} />
         <ServicesDetail />
         <Contact />
       </main>

@@ -81,7 +81,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 {/* Services opens into one page per manufacturer, where their
                     prices sit side by side — that is how a price is decided,
                     Samsung against Samsung rather than fridge against washer. */}
-                {item.href === "/admin/services" && active && (
+                {item.href === "/admin/services" && (active || pathname.startsWith("/admin/service-list")) && (
                   <div className="mb-2 ml-6 border-l border-border pl-3">
                     <Link
                       href="/admin/services"
@@ -94,6 +94,18 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                       )}
                     >
                       All services
+                    </Link>
+                    <Link
+                      href="/admin/service-list"
+                      onClick={() => setOpen(false)}
+                      className={cn(
+                        "mb-0.5 block rounded-lg px-3 py-2 text-[0.82rem] transition-colors",
+                        pathname === "/admin/service-list"
+                          ? "bg-surface-2 font-medium text-ink"
+                          : "text-muted hover:text-ink",
+                      )}
+                    >
+                      Service list (site page)
                     </Link>
                     {BRANDS.map((b) => {
                       const href = `/admin/services/${b.id}`;
