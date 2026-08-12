@@ -23,10 +23,13 @@ export type PlaceTarget = { key: string; label: string };
  */
 export function MediaLibrary({
   initial,
+  group,
   targets,
   onPlace,
 }: {
   initial: MediaImage[];
+  /** The page this shelf belongs to — an upload stays on it. */
+  group: string;
   /** The positions on this page a photo can be dropped into. */
   targets: PlaceTarget[];
   onPlace: (key: string, url: string) => Promise<boolean>;
@@ -64,14 +67,17 @@ export function MediaLibrary({
       const res = await fetch("/api/admin/media", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: uploaded.url, name }),
+        body: JSON.stringify({ url: uploaded.url, name, group }),
       });
       const saved = await res.json().catch(() => null);
       if (!res.ok || !saved?.id) {
         setError("Uploaded, but couldn't save it to the library.");
         return;
       }
-      setItems((prev) => [{ id: saved.id, url: uploaded.url, name, createdAt: Date.now() }, ...prev]);
+      setItems((prev) => [
+        { id: saved.id, url: uploaded.url, name, group, createdAt: Date.now() },
+        ...prev,
+      ]);
     } catch {
       setError("Couldn't reach the server. Check your connection and try again.");
     } finally {
@@ -114,7 +120,8 @@ export function MediaLibrary({
         <div className="max-w-xl">
           <h2 className="font-display text-xl tracking-[-0.02em]">Your images</h2>
           <p className="mt-1 text-sm text-muted">
-            Upload a photo, then pick where it goes — it&apos;s on the site as soon as you choose.
+            Uploaded here for {group}, and shown on this page only. Pick where it goes and
+            it&apos;s on the site straight away.
           </p>
         </div>
         <input

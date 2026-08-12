@@ -28,7 +28,7 @@ export default async function AdminSiteImageGroupPage({
   // Carousel cards carry words of their own; the fixed page positions do not.
   const section = SECTION_BY_SLUG[slug];
   const overrides = section ? await getSectionOverrides() : {};
-  const media = await listMedia();
+  const media = await listMedia(group.name);
   const storage = await describeStorage();
 
   return (

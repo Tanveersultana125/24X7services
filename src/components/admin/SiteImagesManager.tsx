@@ -337,6 +337,7 @@ export function SiteImagesManager({
 
       <MediaLibrary
         initial={media}
+        group={group}
         targets={groupSlots.map((s) => ({ key: s.key, label: s.label }))}
         onPlace={assign}
       />

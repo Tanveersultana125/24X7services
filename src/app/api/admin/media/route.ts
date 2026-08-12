@@ -22,13 +22,14 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
   const url = typeof body?.url === "string" ? body.url.trim() : "";
   const name = typeof body?.name === "string" ? body.name.trim().slice(0, MAX_NAME) : "";
+  const group = typeof body?.group === "string" ? body.group.trim().slice(0, MAX_NAME) : "";
 
-  if (!(url.startsWith("/") || url.startsWith("https://"))) {
+  if (!(url.startsWith("/") || url.startsWith("https://")) || !group) {
     return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
   }
 
   try {
-    const { id } = await addMedia({ url, name: name || "Untitled" });
+    const { id } = await addMedia({ url, name: name || "Untitled", group });
     return NextResponse.json({ ok: true, id });
   } catch (err) {
     console.error("[admin/media] add failed:", err);
