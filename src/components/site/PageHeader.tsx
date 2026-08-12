@@ -311,17 +311,14 @@ export function PageHeader({
             </div>
           )}
 
-          {/* photo collage */}
+          {/* Photo collage — four tiles on one grid, same shape and same gap.
+              Staggered columns of two different ratios read as four pictures
+              that didn't line up rather than as a composition. */}
           {!image && !bgImage && collage && collage.length >= 4 && (
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:order-2">
-              <div className="flex flex-col gap-3 sm:gap-4">
-                <CollageShot src={collage[0]} ratio="aspect-square" delay={0.25} />
-                <CollageShot src={collage[1]} ratio="aspect-[4/5]" delay={0.4} />
-              </div>
-              <div className="flex flex-col gap-3 pt-8 sm:gap-4">
-                <CollageShot src={collage[2]} ratio="aspect-[4/5]" delay={0.3} />
-                <CollageShot src={collage[3]} ratio="aspect-square" delay={0.45} />
-              </div>
+            <div className="grid grid-cols-2 gap-2.5 lg:order-2">
+              {collage.slice(0, 4).map((src, i) => (
+                <CollageShot key={src + i} src={src} delay={0.25 + i * 0.07} />
+              ))}
             </div>
           )}
 
@@ -395,13 +392,15 @@ function CardMark({ id }: { id: BrandId }) {
   return <BrandMark id={id} tone="brand" className="relative text-lg sm:text-2xl" />;
 }
 
-function CollageShot({ src, ratio, delay }: { src: string; ratio: string; delay: number }) {
+function CollageShot({ src, delay }: { src: string; delay: number }) {
   return (
     <motion.figure
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, delay, ease }}
-      className={`overflow-hidden rounded-2xl border border-card-edge shadow-premium-md ${ratio}`}
+      /* A hairline rather than a card edge, and no drop shadow: on a dark
+         header a shadow does nothing but blur the corner. */
+      className="aspect-[4/5] overflow-hidden rounded-xl ring-1 ring-black/5 dark:ring-white/10"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt="24X7 technician on the job" className="h-full w-full object-cover" />
