@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, Menu, X, UserRound, ChevronRight, LogOut } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { CartButton } from "./CartButton";
 import { Logo } from "@/components/ui/Logo";
 import { SearchTrigger } from "./SearchCommand";
 import { AccountMenu, Avatar, LogOutForm, useSession } from "./AccountMenu";
@@ -81,6 +82,7 @@ export function SiteNav() {
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 xl:ml-0">
             <SearchTrigger variant="icon" />
             <ThemeToggle />
+            <CartButton />
             <AccountMenu />
             <Link
               href="/book"

@@ -8,6 +8,7 @@ import { X, Star, Tag, Sparkles, Check, Clock, Info, ShieldCheck, ChevronDown } 
 import { bestSaving, tierSaving, type CatalogueService } from "@/lib/catalogue-shared";
 import { BRANDS } from "@/lib/data";
 import { BrandMark } from "@/components/ui/Icons";
+import { addToCart } from "@/lib/cart";
 import { formatINR } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +29,8 @@ export function ServiceSheet({
   photo?: string;
   onClose: () => void;
 }) {
+  const [added, setAdded] = useState<number | null>(null);
+
   // The page behind must not scroll while this is over it, and Escape closes.
   useEffect(() => {
     if (!service) return;
@@ -135,12 +138,27 @@ export function ServiceSheet({
                           ({formatINR(Math.round(tier.price / tier.qty))} each)
                         </p>
                         {off > 0 && <p className="mt-1 text-xs font-medium text-emerald">{off}% off</p>}
-                        <Link
-                          href={`/book?appliance=${service.id}&qty=${tier.qty}`}
-                          className="mt-3 block rounded-lg border border-royal-bright px-3 py-1.5 text-center text-xs font-semibold text-royal-bright transition-colors hover:bg-royal-bright hover:text-white"
+                        {/* Adds to the basket rather than leaving for the
+                            booking form — the point of picking a tier is to
+                            keep looking, and the nav carries it from here. */}
+                        <button
+                          onClick={() => {
+                            addToCart({
+                              id: service.id,
+                              name: service.name,
+                              qty: tier.qty,
+                              price: tier.price,
+                            });
+                            setAdded(tier.qty);
+                            window.setTimeout(
+                              () => setAdded((cur) => (cur === tier.qty ? null : cur)),
+                              1600,
+                            );
+                          }}
+                          className="mt-3 w-full rounded-lg border border-royal-bright px-3 py-1.5 text-center text-xs font-semibold text-royal-bright transition-colors hover:bg-royal-bright hover:text-white"
                         >
-                          Add
-                        </Link>
+                          {added === tier.qty ? "Added ✓" : "Add"}
+                        </button>
                       </div>
                     );
                   })}
