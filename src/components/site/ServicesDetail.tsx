@@ -25,15 +25,15 @@ const AMBER = "#d9821b";
 const VIOLET = "#6d5ae0";
 
 /**
- * Shadow, filament and hot core for the molten field inside each card, each
- * one a run of the card's own tint. The component's stock palette is a violet
- * and a pink the site has never used, and a pale hot end washes out on cream —
- * the run tops out at the brand colour itself and darkens from there, so the
- * filaments read as ink drawn on the card rather than a glow laid over it.
+ * Shadow, filament and core for the molten field inside each card, each a run
+ * of the card's own tint — the component's stock violet and pink are colours
+ * the site has never used. Only two steps rather than three: the shader fades
+ * a filament out by dropping its alpha, so a third, paler colour at the top
+ * only desaturates the brand hue into grey without adding any light.
  */
-const FLAME_ROYAL: [string, string, string] = ["#080f28", "#16295e", "#2547d0"];
-const FLAME_EMERALD: [string, string, string] = ["#03201a", "#064e35", "#0b9a63"];
-const FLAME_AMBER: [string, string, string] = ["#2a1704", "#7a4a0d", "#d9821b"];
+const FLAME_ROYAL: [string, string, string] = ["#0b1533", "#2547d0", "#2547d0"];
+const FLAME_EMERALD: [string, string, string] = ["#052a20", "#0b9a63", "#0b9a63"];
+const FLAME_AMBER: [string, string, string] = ["#331c05", "#d9821b", "#d9821b"];
 
 const INCLUDES = [
   { icon: ClipboardCheck, tint: ROYAL, flame: FLAME_ROYAL, title: "Free diagnosis", desc: "A full inspection and honest assessment before any charge." },
@@ -175,30 +175,35 @@ export function ServicesDetail() {
                     shadow still falls outside. */}
                 <span
                   aria-hidden
-                  className="absolute inset-0 -z-10 overflow-hidden rounded-[inherit] opacity-70 transition-opacity duration-500 group-hover:opacity-100 [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,rgba(0,0,0,0.5)_44%,transparent_80%)] [mask-image:linear-gradient(to_bottom,#000_0%,rgba(0,0,0,0.5)_44%,transparent_80%)]"
+                  className="absolute inset-0 -z-10 overflow-hidden rounded-[inherit] opacity-90 transition-opacity duration-500 group-hover:opacity-100 [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,rgba(0,0,0,0.5)_44%,transparent_80%)] [mask-image:linear-gradient(to_bottom,#000_0%,rgba(0,0,0,0.5)_44%,transparent_80%)]"
                 >
+                  {/* The shader divides its accumulated glow by six, so the
+                      stock gain leaves the whole field under a black point of
+                      any size — nothing but the odd hairline survives. Gain
+                      and core thickness go up together to give the filaments a
+                      body, and the black point rises with them so the space
+                      between them stays clean card rather than a wash. */}
                   <MoltenMetal
                     color1={f.flame[0]}
                     color2={f.flame[1]}
                     color3={f.flame[2]}
-                    colorMode="molten"
-                    speed={0.22}
+                    /* mid-point at 0.35 rather than 0.5: the filaments reach
+                       full brand colour sooner, instead of spending their
+                       range in a muddy blend on the way there. */
+                    colorMode="ember"
+                    speed={0.25}
                     scale={3}
-                    detail={3}
-                    glow={1.4}
-                    coreSize={0.09}
+                    detail={4}
+                    glow={5}
+                    coreSize={0.2}
                     swirl={0.8}
                     fold={-0.2}
-                    /* A higher black point drops the dim half of the field to
-                       nothing instead of hazing the card, and the brightness
-                       comes back below 1 so the filaments keep the weight of
-                       the colour rather than blowing out towards white. */
-                    blackPoint={0.11}
-                    brightness={0.95}
+                    blackPoint={0.68}
+                    brightness={2.2}
                     grain={false}
                     mouseInteraction
                     mouseStrength={0.25}
-                    opacity={0.65}
+                    opacity={0.75}
                   />
                 </span>
 
