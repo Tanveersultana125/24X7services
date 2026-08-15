@@ -37,8 +37,7 @@ const VIOLET = "#6d5ae0";
  * core earns its place — on white it only greyed the hue.
  */
 const ROYAL_DEEP = "#1e3a8a";
-const ROYAL_INK = "#0f1f4d"; /* `--royal` taken down; the palette has no darker blue */
-const FLAME: [string, string, string] = [ROYAL_DEEP, ROYAL, "#8fa8ff"];
+const FLAME: [string, string, string] = [ROYAL, "#7d97ff", "#cfd9ff"];
 
 const INCLUDES = [
   { icon: ClipboardCheck, tint: ROYAL, title: "Free diagnosis", desc: "A full inspection and honest assessment before any charge." },
@@ -181,7 +180,10 @@ export function ServicesDetail() {
                     icon on top. */}
                 <div
                   className="relative isolate overflow-hidden px-3 py-3 sm:px-7 sm:py-6"
-                  style={{ background: `linear-gradient(150deg, ${ROYAL_DEEP}, ${ROYAL_INK})` }}
+                  /* Both stops are the site's own blues — `--royal-bright`
+                     falling to `--royal` — rather than a navy taken down past
+                     anything in the palette. */
+                  style={{ background: `linear-gradient(150deg, ${ROYAL}, ${ROYAL_DEEP})` }}
                 >
                   {/* The shader divides its accumulated glow by six, so the
                       black point only means anything relative to gain × core
@@ -225,7 +227,7 @@ export function ServicesDetail() {
                       ground itself — a pale tint chip built for cream turns
                       into a bright sticker here, and the item's own colour
                       carries on below in the rule. */}
-                  <span className="mx-auto grid size-9 place-items-center rounded-lg bg-white/10 text-white ring-1 ring-inset ring-white/25 transition-transform duration-500 group-hover:-translate-y-0.5 sm:mx-0 sm:size-14 sm:rounded-2xl">
+                  <span className="mx-auto grid size-9 place-items-center rounded-lg bg-white/14 text-white ring-1 ring-inset ring-white/30 transition-transform duration-500 group-hover:-translate-y-0.5 sm:mx-0 sm:size-14 sm:rounded-2xl">
                     <f.icon className="size-[1.05rem] sm:size-6" strokeWidth={1.7} />
                   </span>
                 </div>
