@@ -82,7 +82,6 @@ const PRICING_ASSURANCES = [
 ];
 
 export function ServicesDetail() {
-  const promiseShieldSrc = useSiteImage("promise-shield");
   const applianceLineupSrc = useSiteImage("appliance-lineup");
   const services = useServices();
   const [active, setActive] = useState<string>("refrigerator");
@@ -94,15 +93,12 @@ export function ServicesDetail() {
     <>
       {/* What's included */}
       <section className="relative overflow-hidden py-14 sm:py-20">
-        {/* soft field behind the intro, echoing the promise mark on the right */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -right-32 -top-24 hidden size-[34rem] rounded-full opacity-70 blur-3xl lg:block"
-          style={{ background: "radial-gradient(circle, rgba(37,71,208,0.14), transparent 65%)" }}
-        />
-
         <div className="relative mx-auto max-w-[92rem] px-6 sm:px-10">
-          <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between">
+          {/* The promise is stated, not illustrated. A 3D shield floating in a
+              drop-shadowed card is stock decoration: it reads as a sticker laid
+              on the page, and it says nothing the sentence in its place doesn't
+              say better and more plainly. */}
+          <div className="grid gap-9 lg:grid-cols-[1fr_0.85fr] lg:items-stretch lg:gap-16">
             <div className="max-w-xl">
               <span className="inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-royal-bright">
                 Our promise
@@ -120,22 +116,19 @@ export function ServicesDetail() {
               </p>
             </div>
 
-            {/* The illustration is drawn on its own pale ground, and cutting
-                that away took bites out of the shield's white rim — on a dark
-                page they read as notches in the artwork. It keeps its ground
-                and is framed instead, which is what it was drawn for. */}
-            {promiseShieldSrc && (
-              <div aria-hidden className="relative w-full max-w-sm shrink-0 lg:w-[24rem]">
-                <span
-                  className="pointer-events-none absolute -inset-6 -z-10 rounded-full blur-3xl"
-                  style={{ background: "radial-gradient(circle, rgba(37,71,208,0.16), transparent 68%)" }}
-                />
-                <div className="overflow-hidden rounded-[1.75rem] border border-card-edge shadow-premium-xl dark:border-white/10 dark:shadow-[0_30px_70px_-30px_rgba(0,0,0,0.9)]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={promiseShieldSrc} alt="" className="w-full" />
-                </div>
-              </div>
-            )}
+            {/* The warranty in the company's own words, on a rule rather than
+                in a frame — the same hairline-and-serif language the rest of
+                the page is set in. */}
+            <figure className="flex flex-col justify-center border-t border-hairline pt-8 lg:border-l lg:border-t-0 lg:pl-16 lg:pt-0">
+              <blockquote className="font-display text-pretty text-[1.5rem] italic leading-[1.3] tracking-[-0.02em] sm:text-[1.8rem]">
+                If the fault comes back inside ninety days, so do we — at our
+                cost, with no argument.
+              </blockquote>
+              <figcaption className="mt-6 flex items-center gap-3 text-[0.7rem] font-bold uppercase tracking-[0.2em] text-muted">
+                <span aria-hidden className="h-px w-8 bg-royal-bright" />
+                The 24X7 service promise
+              </figcaption>
+            </figure>
           </div>
 
           <div className="mt-10 grid grid-cols-3 gap-2.5 sm:mt-14 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
