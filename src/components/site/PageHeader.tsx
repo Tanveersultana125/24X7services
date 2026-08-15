@@ -126,14 +126,20 @@ export function PageHeader({
           />
           {/* Fills the right of the header rather than sitting on its floor:
               a scene photo is wider than it is tall, so anchoring it to the
-              bottom left a band of empty header above it. */}
+              bottom left a band of empty header above it.
+              Anchored right, not left: the photograph carries its own dark
+              navy sweep down its left edge — held to the left that sweep
+              landed in the middle of a cream header as a black slab, and the
+              subject it was meant to sit beside got cropped off the page.
+              From the right the sweep falls outside the crop and the whole
+              scene — technician and appliance — reads. */}
           <motion.img
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1.1, delay: 0.2, ease }}
             src={image}
             alt="24X7 certified technician on the job"
-            className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[52%] max-w-[46rem] object-cover object-left [-webkit-mask-image:linear-gradient(to_right,transparent_0%,#000_24%)] [mask-image:linear-gradient(to_right,transparent_0%,#000_24%)] lg:block"
+            className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[52%] max-w-[46rem] object-cover object-right [-webkit-mask-image:linear-gradient(to_right,transparent_0%,#000_28%)] [mask-image:linear-gradient(to_right,transparent_0%,#000_28%)] lg:block"
           />
         </>
       )}
@@ -403,7 +409,9 @@ export function PageHeader({
             src={image}
             alt=""
             aria-hidden
-            className="mt-10 w-full rounded-2xl [-webkit-mask-image:linear-gradient(to_right,transparent,#000_18%)] [mask-image:linear-gradient(to_right,transparent,#000_18%)] lg:hidden"
+            /* Same crop as the desktop panel, for the same reason: the photo's
+               own navy sweep is a black slab on a cream page. */
+            className="mt-10 aspect-[4/3] w-full rounded-2xl object-cover object-right lg:hidden"
           />
         )}
       </div>
