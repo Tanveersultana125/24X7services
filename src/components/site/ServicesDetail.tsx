@@ -36,8 +36,16 @@ const VIOLET = "#6d5ae0";
  * than a smudge, so it gets the plinth below to burn on, and there the pale
  * core earns its place — on white it only greyed the hue.
  */
-const ROYAL_DEEP = "#1e3a8a";
-const FLAME: [string, string, string] = [ROYAL, "#7d97ff", "#cfd9ff"];
+/**
+ * The plinth is the cornflower blue picked for it — lighter than `--royal`,
+ * which is the point, so it sits outside the token set. The two stops are that
+ * colour lifted and dropped a little, to keep the ground lit from the top left
+ * like the card it's set into.
+ */
+const PLINTH: [string, string] = ["#7a9be2", "#5a7fd0"];
+
+/** Dim end sits on the ground so it vanishes into it; cores go white. */
+const FLAME: [string, string, string] = ["#5a7fd0", "#a8c0f5", "#ffffff"];
 
 const INCLUDES = [
   { icon: ClipboardCheck, tint: ROYAL, title: "Free diagnosis", desc: "A full inspection and honest assessment before any charge." },
@@ -180,10 +188,7 @@ export function ServicesDetail() {
                     icon on top. */}
                 <div
                   className="relative isolate overflow-hidden px-3 py-3 sm:px-7 sm:py-6"
-                  /* Both stops are the site's own blues — `--royal-bright`
-                     falling to `--royal` — rather than a navy taken down past
-                     anything in the palette. */
-                  style={{ background: `linear-gradient(150deg, ${ROYAL}, ${ROYAL_DEEP})` }}
+                  style={{ background: `linear-gradient(150deg, ${PLINTH[0]}, ${PLINTH[1]})` }}
                 >
                   {/* The shader divides its accumulated glow by six, so the
                       black point only means anything relative to gain × core
@@ -227,7 +232,7 @@ export function ServicesDetail() {
                       ground itself — a pale tint chip built for cream turns
                       into a bright sticker here, and the item's own colour
                       carries on below in the rule. */}
-                  <span className="mx-auto grid size-9 place-items-center rounded-lg bg-white/14 text-white ring-1 ring-inset ring-white/30 transition-transform duration-500 group-hover:-translate-y-0.5 sm:mx-0 sm:size-14 sm:rounded-2xl">
+                  <span className="mx-auto grid size-9 place-items-center rounded-lg bg-white/16 text-white ring-1 ring-inset ring-white/35 transition-transform duration-500 group-hover:-translate-y-0.5 sm:mx-0 sm:size-14 sm:rounded-2xl">
                     <f.icon className="size-[1.05rem] sm:size-6" strokeWidth={1.7} />
                   </span>
                 </div>
