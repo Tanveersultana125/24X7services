@@ -168,21 +168,27 @@ export function ServicesDetail() {
                    then its negative-z children, then everything else. */
                 className="group relative isolate rounded-[1.1rem] border border-card-edge bg-gradient-to-b from-card to-surface p-3 text-center shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_var(--card-edge)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)] sm:rounded-[1.5rem] sm:p-7 sm:text-left"
               >
-                {/* The field burns behind the icon and fades out before the
-                    copy begins — a caustic running under a paragraph is a
-                    legibility problem, not an effect. It clips to the card's
-                    own radius rather than the card clipping it, so the hover
-                    shadow still falls outside. */}
+                {/* Pooled in the far corner rather than washed across the
+                    card. Every piece of the card that has a job — the icon at
+                    the top left, the heading and the blurb down the left — sits
+                    on clean paper, and the field is the one thing in the corner
+                    that doesn't. A caustic running under a paragraph is a
+                    legibility problem, not an effect.
+                    It clips to the card's own radius rather than the card
+                    clipping it, so the hover shadow still falls outside. */}
                 <span
                   aria-hidden
-                  className="absolute inset-0 -z-10 overflow-hidden rounded-[inherit] opacity-90 transition-opacity duration-500 group-hover:opacity-100 [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,rgba(0,0,0,0.5)_44%,transparent_80%)] [mask-image:linear-gradient(to_bottom,#000_0%,rgba(0,0,0,0.5)_44%,transparent_80%)]"
+                  className="absolute inset-0 -z-10 overflow-hidden rounded-[inherit] opacity-85 transition-opacity duration-500 group-hover:opacity-100 [-webkit-mask-image:radial-gradient(115%_95%_at_100%_0%,#000_38%,transparent_75%)] [mask-image:radial-gradient(115%_95%_at_100%_0%,#000_38%,transparent_75%)]"
                 >
                   {/* The shader divides its accumulated glow by six, so the
-                      stock gain leaves the whole field under a black point of
-                      any size — nothing but the odd hairline survives. Gain
-                      and core thickness go up together to give the filaments a
-                      body, and the black point rises with them so the space
-                      between them stays clean card rather than a wash. */}
+                      black point only means anything relative to gain × core
+                      size — at the stock gain nothing clears it, and at a low
+                      one everything does. Measured against the field's own
+                      distribution, the point sits where roughly a third of it
+                      survives: filaments with clean card between them, rather
+                      than a hairline or a wash.
+                      A larger scale is what keeps it from reading as a smear —
+                      the same field drawn finer, at card size. */}
                   <MoltenMetal
                     color1={f.flame[0]}
                     color2={f.flame[1]}
@@ -191,19 +197,19 @@ export function ServicesDetail() {
                        full brand colour sooner, instead of spending their
                        range in a muddy blend on the way there. */
                     colorMode="ember"
-                    speed={0.25}
-                    scale={3}
-                    detail={4}
+                    speed={0.18}
+                    scale={5}
+                    detail={3}
                     glow={5}
-                    coreSize={0.2}
+                    coreSize={0.16}
                     swirl={0.8}
                     fold={-0.2}
-                    blackPoint={0.68}
-                    brightness={2.2}
+                    blackPoint={0.46}
+                    brightness={2.4}
                     grain={false}
                     mouseInteraction
                     mouseStrength={0.25}
-                    opacity={0.75}
+                    opacity={0.5}
                   />
                 </span>
 
