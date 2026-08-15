@@ -27,12 +27,13 @@ const VIOLET = "#6d5ae0";
 /**
  * Shadow, filament and hot core for the molten field inside each card, each
  * one a run of the card's own tint. The component's stock palette is a violet
- * and a pink the site has never used, and its white core would burn out
- * against a cream card — the hot end has to stay inside the hue.
+ * and a pink the site has never used, and a pale hot end washes out on cream —
+ * the run tops out at the brand colour itself and darkens from there, so the
+ * filaments read as ink drawn on the card rather than a glow laid over it.
  */
-const FLAME_ROYAL: [string, string, string] = ["#16295e", "#2547d0", "#8aa4ff"];
-const FLAME_EMERALD: [string, string, string] = ["#064e35", "#0b9a63", "#4ade9f"];
-const FLAME_AMBER: [string, string, string] = ["#7a4a0d", "#d9821b", "#f6bd5e"];
+const FLAME_ROYAL: [string, string, string] = ["#080f28", "#16295e", "#2547d0"];
+const FLAME_EMERALD: [string, string, string] = ["#03201a", "#064e35", "#0b9a63"];
+const FLAME_AMBER: [string, string, string] = ["#2a1704", "#7a4a0d", "#d9821b"];
 
 const INCLUDES = [
   { icon: ClipboardCheck, tint: ROYAL, flame: FLAME_ROYAL, title: "Free diagnosis", desc: "A full inspection and honest assessment before any charge." },
@@ -188,12 +189,16 @@ export function ServicesDetail() {
                     coreSize={0.09}
                     swirl={0.8}
                     fold={-0.2}
-                    blackPoint={0.08}
-                    brightness={1.15}
+                    /* A higher black point drops the dim half of the field to
+                       nothing instead of hazing the card, and the brightness
+                       comes back below 1 so the filaments keep the weight of
+                       the colour rather than blowing out towards white. */
+                    blackPoint={0.11}
+                    brightness={0.95}
                     grain={false}
                     mouseInteraction
                     mouseStrength={0.25}
-                    opacity={0.55}
+                    opacity={0.65}
                   />
                 </span>
 
