@@ -126,12 +126,10 @@ export function ServicesDetail() {
               </p>
             </div>
 
-            {/* No border, no rounded box, no drop shadow: a frame turns the
-                artwork into a card laid on the page. The illustration is drawn
-                on its own pale ground, and cutting that ground away took bites
-                out of the shield's white rim — so the ground stays and is
-                feathered off at the edges instead, dissolving into the section
-                rather than ending on a line. */}
+            {/* No border, no rounded box, no drop shadow — a frame turns the
+                artwork into a card laid on the page. The illustration now
+                ships cut off its ground, so it stands on the section itself,
+                over nothing but a soft wash of the brand blue. */}
             {promiseShieldSrc && (
               <div aria-hidden className="relative mx-auto w-full max-w-md lg:mx-0 lg:max-w-none">
                 <span
@@ -139,11 +137,7 @@ export function ServicesDetail() {
                   style={{ background: "radial-gradient(circle, rgba(37,71,208,0.13), transparent 68%)" }}
                 />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={promiseShieldSrc}
-                  alt=""
-                  className="w-full [-webkit-mask-image:radial-gradient(118%_112%_at_52%_48%,#000_50%,transparent_100%)] [mask-image:radial-gradient(118%_112%_at_52%_48%,#000_50%,transparent_100%)]"
-                />
+                <img src={promiseShieldSrc} alt="" className="w-full" />
               </div>
             )}
           </div>
