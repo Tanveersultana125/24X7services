@@ -150,49 +150,24 @@ export function ServicesDetail() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.6, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
-                /* Depth comes from stacked shadows rather than one big blur: a
-                   tight contact shadow holds the card on the page, a mid one
-                   gives it thickness, and a wide soft one is the ambient
-                   light. One blur alone reads as a sticker with a smudge
-                   under it. */
-                className="group relative overflow-hidden rounded-[1.1rem] border border-card-edge bg-gradient-to-b from-card to-surface p-3 text-center shadow-[0_1px_1px_rgba(23,21,15,0.05),0_6px_12px_-6px_rgba(23,21,15,0.10),0_22px_40px_-20px_rgba(23,21,15,0.20),inset_0_1.5px_0_var(--card-edge)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_2px_3px_rgba(23,21,15,0.06),0_14px_22px_-10px_rgba(23,21,15,0.14),0_40px_64px_-24px_rgba(23,21,15,0.30),inset_0_1.5px_0_var(--card-edge)] sm:rounded-[1.5rem] sm:p-7 sm:text-left"
+                className="group rounded-[1.1rem] border border-card-edge bg-gradient-to-b from-card to-surface p-3 text-center shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_var(--card-edge)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)] sm:rounded-[1.5rem] sm:p-7 sm:text-left"
               >
-                {/* the light this card is lit by, falling from its top-left */}
                 <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 opacity-80 dark:opacity-[0.06]"
-                  style={{ background: "radial-gradient(120% 82% at 0% 0%, rgba(255,255,255,0.95), transparent 58%)" }}
-                />
-
-                {/* A flat wash of tint behind a line icon is a swatch, not an
-                    object. Lit from the top-left, shaded at its foot and
-                    dropping a shadow in its own colour, the chip has a body —
-                    and it lifts off the card as you come to it. */}
-                <span
-                  className="relative mx-auto grid size-9 place-items-center rounded-xl transition-all duration-500 group-hover:-translate-y-1 group-hover:scale-[1.05] sm:mx-0 sm:size-14 sm:rounded-2xl"
-                  style={{
-                    color: f.tint,
-                    background: `linear-gradient(148deg, color-mix(in srgb, ${f.tint} 9%, var(--card)) 0%, color-mix(in srgb, ${f.tint} 27%, var(--card)) 100%)`,
-                    boxShadow: [
-                      "inset 0 1px 0 rgba(255,255,255,0.6)",
-                      `inset 0 -3px 6px -2px color-mix(in srgb, ${f.tint} 32%, transparent)`,
-                      `0 2px 4px -2px color-mix(in srgb, ${f.tint} 45%, transparent)`,
-                      `0 10px 18px -8px color-mix(in srgb, ${f.tint} 55%, transparent)`,
-                    ].join(", "),
-                  }}
+                  className="mx-auto grid size-9 place-items-center rounded-lg transition-transform duration-500 group-hover:-translate-y-0.5 sm:mx-0 sm:size-14 sm:rounded-2xl"
+                  style={{ background: `${f.tint}16`, color: f.tint }}
                 >
                   <f.icon className="size-[1.05rem] sm:size-6" strokeWidth={1.7} />
                 </span>
-                <h3 className="relative mt-3 hyphens-auto text-[0.7rem] font-semibold leading-tight tracking-tight sm:mt-5 sm:text-lg">
+                <h3 className="mt-3 hyphens-auto text-[0.7rem] font-semibold leading-tight tracking-tight sm:mt-5 sm:text-lg">
                   {f.title}
                 </h3>
                 {/* no room for the blurb in a three-up column — it returns at sm */}
-                <p className="relative hidden text-muted sm:mt-2 sm:block sm:text-[0.9rem] sm:leading-relaxed">
+                <p className="hidden text-muted sm:mt-2 sm:block sm:text-[0.9rem] sm:leading-relaxed">
                   {f.desc}
                 </p>
                 <span
                   aria-hidden
-                  className="relative mx-auto mt-3 block h-0.5 w-5 rounded-full transition-all duration-500 group-hover:w-14 sm:mx-0 sm:mt-5 sm:w-8"
+                  className="mx-auto mt-3 block h-0.5 w-5 rounded-full transition-all duration-500 group-hover:w-14 sm:mx-0 sm:mt-5 sm:w-8"
                   style={{ background: f.tint }}
                 />
               </motion.div>
