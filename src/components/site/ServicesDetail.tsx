@@ -25,18 +25,20 @@ const AMBER = "#d9821b";
 const VIOLET = "#6d5ae0";
 
 /**
- * The molten field inside the cards, in the site's own brand blue: `--royal`
- * into `--royal-bright`, nothing invented. It runs the same on all six rather
+ * The molten field, in the site's own brand blue: `--royal` through
+ * `--royal-bright` to a pale core. It runs the same on all six cards rather
  * than following each icon's tint — six cards each glowing a different colour
- * read as six unrelated things, and the green and orange in particular are
- * accents here, not the house colour.
+ * read as six unrelated things, and the green and orange are accents here,
+ * not the house colour.
  *
- * Two stops rather than three: the shader fades a filament out by dropping its
- * alpha, so a paler colour on top only desaturates the hue towards grey
- * without adding any light.
+ * The shader writes `colour × alpha`, which is to say it adds light: it needs
+ * a dark ground to add light *to*. Over a white card no setting made it more
+ * than a smudge, so it gets the plinth below to burn on, and there the pale
+ * core earns its place — on white it only greyed the hue.
  */
 const ROYAL_DEEP = "#1e3a8a";
-const FLAME: [string, string, string] = [ROYAL_DEEP, ROYAL, ROYAL];
+const ROYAL_INK = "#0f1f4d"; /* `--royal` taken down; the palette has no darker blue */
+const FLAME: [string, string, string] = [ROYAL_DEEP, ROYAL, "#8fa8ff"];
 
 const INCLUDES = [
   { icon: ClipboardCheck, tint: ROYAL, title: "Free diagnosis", desc: "A full inspection and honest assessment before any charge." },
@@ -165,81 +167,83 @@ export function ServicesDetail() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.6, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
-                /* `isolate` is what lets the molten layer below sit above the
-                   card's own background and still stay under the copy: inside
-                   a stacking context the card paints its background first,
-                   then its negative-z children, then everything else. */
-                className="group relative isolate rounded-[1.1rem] border border-card-edge bg-gradient-to-b from-card to-surface p-3 text-center shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_var(--card-edge)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)] sm:rounded-[1.5rem] sm:p-7 sm:text-left"
+                /* The padding moves onto the two halves: the plinth has to run
+                   to the card's edges, and `overflow-hidden` is what rounds
+                   its square top corners to the card's radius. It clips the
+                   children, not the card's own shadow, so the hover lift is
+                   untouched. */
+                className="group relative overflow-hidden rounded-[1.1rem] border border-card-edge bg-gradient-to-b from-card to-surface text-center shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_var(--card-edge)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)] sm:rounded-[1.5rem] sm:text-left"
               >
-                {/* Pooled in the far corner rather than washed across the
-                    card. Every piece of the card that has a job — the icon at
-                    the top left, the heading and the blurb down the left — sits
-                    on clean paper, and the field is the one thing in the corner
-                    that doesn't. A caustic running under a paragraph is a
-                    legibility problem, not an effect.
-                    It clips to the card's own radius rather than the card
-                    clipping it, so the hover shadow still falls outside. */}
-                <span
-                  aria-hidden
-                  className="absolute inset-0 -z-10 overflow-hidden rounded-[inherit] opacity-85 transition-opacity duration-500 group-hover:opacity-100 [-webkit-mask-image:radial-gradient(85%_80%_at_100%_0%,#000_12%,transparent_62%)] [mask-image:radial-gradient(85%_80%_at_100%_0%,#000_12%,transparent_62%)]"
+                {/* The plinth the icon stands on, and the dark ground the field
+                    needs. `isolate` is what keeps the canvas between the two:
+                    inside a stacking context the plinth paints its own
+                    background first, then its negative-z children, then the
+                    icon on top. */}
+                <div
+                  className="relative isolate overflow-hidden px-3 py-3 sm:px-7 sm:py-6"
+                  style={{ background: `linear-gradient(150deg, ${ROYAL_DEEP}, ${ROYAL_INK})` }}
                 >
                   {/* The shader divides its accumulated glow by six, so the
                       black point only means anything relative to gain × core
                       size — at the stock gain nothing clears it, and at a low
                       one everything does. Measured against the field's own
-                      distribution, the point sits where roughly a third of it
-                      survives: filaments with clean card between them, rather
-                      than a hairline or a wash.
-                      A larger scale is what keeps it from reading as a smear —
-                      the same field drawn finer, at card size. */}
-                  <MoltenMetal
-                    color1={FLAME[0]}
-                    color2={FLAME[1]}
-                    color3={FLAME[2]}
-                    /* mid-point at 0.35 rather than 0.5: the filaments reach
-                       full brand colour sooner, instead of spending their
-                       range in a muddy blend on the way there. */
-                    colorMode="ember"
-                    /* Six canvases mount together and start their clocks at
-                       zero, so on identical settings the row draws the same
-                       frame six times over — which is what makes a background
-                       read as wallpaper. Each card swirls its field a little
-                       differently and drifts at its own rate, so they never
-                       line up, at the first frame or any after it. */
-                    speed={0.13 + i * 0.011}
-                    swirl={0.7 + i * 0.09}
-                    scale={5}
-                    detail={3}
-                    glow={5}
-                    coreSize={0.16}
-                    fold={-0.2}
-                    blackPoint={0.46}
-                    brightness={2.4}
-                    grain={false}
-                    mouseInteraction
-                    mouseStrength={0.25}
-                    opacity={0.5}
-                  />
-                </span>
+                      distribution, the point sits where about a third of it
+                      survives: filaments with dark ground between them, rather
+                      than a hairline or a flood. */}
+                  <span aria-hidden className="absolute inset-0 -z-10">
+                    <MoltenMetal
+                      color1={FLAME[0]}
+                      color2={FLAME[1]}
+                      color3={FLAME[2]}
+                      /* mid-point at 0.35 rather than 0.5: the filaments reach
+                         full brand colour sooner, instead of spending their
+                         range in a muddy blend on the way there. */
+                      colorMode="ember"
+                      /* Six canvases mount together and start their clocks at
+                         zero, so on identical settings the row draws the same
+                         frame six times over — which is what makes a background
+                         read as wallpaper. Each card swirls its field a little
+                         differently and drifts at its own rate, so they never
+                         line up, at the first frame or any after it. */
+                      speed={0.13 + i * 0.011}
+                      swirl={0.7 + i * 0.09}
+                      scale={3.5}
+                      detail={3}
+                      glow={5}
+                      coreSize={0.16}
+                      fold={-0.2}
+                      blackPoint={0.5}
+                      brightness={2.1}
+                      grain={false}
+                      mouseInteraction
+                      mouseStrength={0.25}
+                      opacity={0.8}
+                    />
+                  </span>
 
-                <span
-                  className="mx-auto grid size-9 place-items-center rounded-lg transition-transform duration-500 group-hover:-translate-y-0.5 sm:mx-0 sm:size-14 sm:rounded-2xl"
-                  style={{ background: `${f.tint}16`, color: f.tint }}
-                >
-                  <f.icon className="size-[1.05rem] sm:size-6" strokeWidth={1.7} />
-                </span>
-                <h3 className="mt-3 hyphens-auto text-[0.7rem] font-semibold leading-tight tracking-tight sm:mt-5 sm:text-lg">
-                  {f.title}
-                </h3>
-                {/* no room for the blurb in a three-up column — it returns at sm */}
-                <p className="hidden text-muted sm:mt-2 sm:block sm:text-[0.9rem] sm:leading-relaxed">
-                  {f.desc}
-                </p>
-                <span
-                  aria-hidden
-                  className="mx-auto mt-3 block h-0.5 w-5 rounded-full transition-all duration-500 group-hover:w-14 sm:mx-0 sm:mt-5 sm:w-8"
-                  style={{ background: f.tint }}
-                />
+                  {/* On the plinth the glyph goes white on a pane of the
+                      ground itself — a pale tint chip built for cream turns
+                      into a bright sticker here, and the item's own colour
+                      carries on below in the rule. */}
+                  <span className="mx-auto grid size-9 place-items-center rounded-lg bg-white/10 text-white ring-1 ring-inset ring-white/25 transition-transform duration-500 group-hover:-translate-y-0.5 sm:mx-0 sm:size-14 sm:rounded-2xl">
+                    <f.icon className="size-[1.05rem] sm:size-6" strokeWidth={1.7} />
+                  </span>
+                </div>
+
+                <div className="p-3 sm:p-7">
+                  <h3 className="hyphens-auto text-[0.7rem] font-semibold leading-tight tracking-tight sm:text-lg">
+                    {f.title}
+                  </h3>
+                  {/* no room for the blurb in a three-up column — it returns at sm */}
+                  <p className="hidden text-muted sm:mt-2 sm:block sm:text-[0.9rem] sm:leading-relaxed">
+                    {f.desc}
+                  </p>
+                  <span
+                    aria-hidden
+                    className="mx-auto mt-3 block h-0.5 w-5 rounded-full transition-all duration-500 group-hover:w-14 sm:mx-0 sm:mt-5 sm:w-8"
+                    style={{ background: f.tint }}
+                  />
+                </div>
               </motion.div>
             ))}
           </div>
