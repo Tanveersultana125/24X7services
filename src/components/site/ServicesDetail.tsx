@@ -10,6 +10,7 @@ import {
   Lock, Disc3, Cpu, PackageOpen,
 } from "lucide-react";
 import { ApplianceTile, APPLIANCE_ACCENT, BrandMark } from "@/components/ui/Icons";
+import MoltenMetal from "@/components/ui/MoltenMetal";
 import { useServices } from "@/components/providers/ServicesProvider";
 import { bestSaving, brandsFor, priceFor, pricesDiffer } from "@/lib/catalogue-shared";
 import { ServiceSheet } from "./ServiceSheet";
@@ -23,13 +24,23 @@ const EMERALD = "#0b9a63";
 const AMBER = "#d9821b";
 const VIOLET = "#6d5ae0";
 
+/**
+ * Shadow, filament and hot core for the molten field inside each card, each
+ * one a run of the card's own tint. The component's stock palette is a violet
+ * and a pink the site has never used, and its white core would burn out
+ * against a cream card — the hot end has to stay inside the hue.
+ */
+const FLAME_ROYAL: [string, string, string] = ["#16295e", "#2547d0", "#8aa4ff"];
+const FLAME_EMERALD: [string, string, string] = ["#064e35", "#0b9a63", "#4ade9f"];
+const FLAME_AMBER: [string, string, string] = ["#7a4a0d", "#d9821b", "#f6bd5e"];
+
 const INCLUDES = [
-  { icon: ClipboardCheck, tint: ROYAL, title: "Free diagnosis", desc: "A full inspection and honest assessment before any charge." },
-  { icon: Package, tint: EMERALD, title: "Genuine parts", desc: "Only brand-approved, traceable spares — never local substitutes." },
-  { icon: ShieldCheck, tint: ROYAL, title: "90-day warranty", desc: "Every repair and part covered in writing for 90 days." },
-  { icon: Sparkles, tint: AMBER, title: "Clean finish", desc: "The technician tidies up and tests the appliance with you." },
-  { icon: Receipt, tint: ROYAL, title: "Digital invoice", desc: "A transparent, itemised GST invoice sent instantly." },
-  { icon: Timer, tint: EMERALD, title: "On-time promise", desc: "Live ETA tracking and a slot you actually choose." },
+  { icon: ClipboardCheck, tint: ROYAL, flame: FLAME_ROYAL, title: "Free diagnosis", desc: "A full inspection and honest assessment before any charge." },
+  { icon: Package, tint: EMERALD, flame: FLAME_EMERALD, title: "Genuine parts", desc: "Only brand-approved, traceable spares — never local substitutes." },
+  { icon: ShieldCheck, tint: ROYAL, flame: FLAME_ROYAL, title: "90-day warranty", desc: "Every repair and part covered in writing for 90 days." },
+  { icon: Sparkles, tint: AMBER, flame: FLAME_AMBER, title: "Clean finish", desc: "The technician tidies up and tests the appliance with you." },
+  { icon: Receipt, tint: ROYAL, flame: FLAME_ROYAL, title: "Digital invoice", desc: "A transparent, itemised GST invoice sent instantly." },
+  { icon: Timer, tint: EMERALD, flame: FLAME_EMERALD, title: "On-time promise", desc: "Live ETA tracking and a slot you actually choose." },
 ];
 
 /** Each fault gets its own glyph — a repeated wrench made every row look identical. */
@@ -150,8 +161,42 @@ export function ServicesDetail() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.6, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
-                className="group rounded-[1.1rem] border border-card-edge bg-gradient-to-b from-card to-surface p-3 text-center shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_var(--card-edge)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)] sm:rounded-[1.5rem] sm:p-7 sm:text-left"
+                /* `isolate` is what lets the molten layer below sit above the
+                   card's own background and still stay under the copy: inside
+                   a stacking context the card paints its background first,
+                   then its negative-z children, then everything else. */
+                className="group relative isolate rounded-[1.1rem] border border-card-edge bg-gradient-to-b from-card to-surface p-3 text-center shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_var(--card-edge)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)] sm:rounded-[1.5rem] sm:p-7 sm:text-left"
               >
+                {/* The field burns behind the icon and fades out before the
+                    copy begins — a caustic running under a paragraph is a
+                    legibility problem, not an effect. It clips to the card's
+                    own radius rather than the card clipping it, so the hover
+                    shadow still falls outside. */}
+                <span
+                  aria-hidden
+                  className="absolute inset-0 -z-10 overflow-hidden rounded-[inherit] opacity-70 transition-opacity duration-500 group-hover:opacity-100 [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,rgba(0,0,0,0.5)_44%,transparent_80%)] [mask-image:linear-gradient(to_bottom,#000_0%,rgba(0,0,0,0.5)_44%,transparent_80%)]"
+                >
+                  <MoltenMetal
+                    color1={f.flame[0]}
+                    color2={f.flame[1]}
+                    color3={f.flame[2]}
+                    colorMode="molten"
+                    speed={0.22}
+                    scale={3}
+                    detail={3}
+                    glow={1.4}
+                    coreSize={0.09}
+                    swirl={0.8}
+                    fold={-0.2}
+                    blackPoint={0.08}
+                    brightness={1.15}
+                    grain={false}
+                    mouseInteraction
+                    mouseStrength={0.25}
+                    opacity={0.55}
+                  />
+                </span>
+
                 <span
                   className="mx-auto grid size-9 place-items-center rounded-lg transition-transform duration-500 group-hover:-translate-y-0.5 sm:mx-0 sm:size-14 sm:rounded-2xl"
                   style={{ background: `${f.tint}16`, color: f.tint }}
