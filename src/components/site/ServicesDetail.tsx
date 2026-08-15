@@ -228,12 +228,17 @@ export function ServicesDetail() {
                     />
                   </span>
 
-                  {/* On the plinth the glyph goes white on a pane of the
-                      ground itself — a pale tint chip built for cream turns
-                      into a bright sticker here, and the item's own colour
-                      carries on below in the rule. */}
-                  <span className="mx-auto grid size-9 place-items-center rounded-lg bg-white/16 text-white ring-1 ring-inset ring-white/35 transition-transform duration-500 group-hover:-translate-y-0.5 sm:mx-0 sm:size-14 sm:rounded-2xl">
-                    <f.icon className="size-[1.05rem] sm:size-6" strokeWidth={1.7} />
+                  {/* A white glyph on a translucent pane of the ground had
+                      almost nothing to separate it from that ground, and the
+                      field drifting underneath took what was left. The pane
+                      goes solid white and the glyph takes the item's own
+                      colour, which is the strongest contrast available here
+                      and brings the tint back onto the card. */}
+                  <span
+                    className="mx-auto grid size-9 place-items-center rounded-lg bg-white shadow-[0_8px_18px_-8px_rgba(16,34,86,0.55)] transition-transform duration-500 group-hover:-translate-y-0.5 sm:mx-0 sm:size-14 sm:rounded-2xl"
+                    style={{ color: f.tint }}
+                  >
+                    <f.icon className="size-[1.05rem] sm:size-6" strokeWidth={1.9} />
                   </span>
                 </div>
 
