@@ -4,7 +4,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ChevronRight, BadgeCheck, ShieldCheck, Award, PackageCheck, Headset } from "lucide-react";
 import { BrandMark } from "@/components/ui/Icons";
-import MoltenMetal from "@/components/ui/MoltenMetal";
 import { BRANDS } from "@/lib/data";
 import type { BrandId } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -13,19 +12,6 @@ const ease = [0.16, 1, 0.3, 1] as const;
 
 const NAVY = "#16295e";
 const GOLD = "#c08a2e";
-
-/**
- * The plinth under the brand medals, and the molten field that burns on it.
- * Amber rather than the promise cards' blue because it is this page's accent —
- * the heading and the medals are already in it — and the field turns it to
- * brass, which is the right note for a page about authorised makes.
- *
- * The shader writes `colour × alpha`: it adds light, so it needs a saturated
- * ground to add light to. On the panel's own cream it was never more than a
- * smudge.
- */
-const BRASS: [string, string] = ["#e59a3e", "#b76a12"];
-const BRASS_FLAME: [string, string, string] = ["#b76a12", "#f6cf94", "#ffffff"];
 
 /** Shared by the headers that ask for a dark scrim and by every header in dark mode. */
 const DARK_SCRIM =
@@ -251,69 +237,23 @@ export function PageHeader({
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.35, ease }}
-                /* The padding moves onto the two halves so the plinth can run
-                   to the panel's edges; `overflow-hidden` rounds its square
-                   top corners to the panel's radius. */
-                className="group mt-10 overflow-hidden rounded-[1.5rem] border border-card-edge bg-card/70 shadow-premium-sm backdrop-blur"
+                className="mt-10 grid grid-cols-3 rounded-[1.5rem] border border-card-edge bg-card/70 px-3 py-5 shadow-premium-sm backdrop-blur sm:px-6 lg:divide-x lg:divide-hairline"
               >
-                {/* One field across the whole strip rather than one behind
-                    each medal: three small canvases would read as three
-                    unrelated smudges, where a single sheet of brass runs
-                    behind all three and ties them together. */}
-                <div
-                  aria-hidden
-                  className="relative isolate grid grid-cols-3 overflow-hidden px-3 py-4 sm:px-6 sm:py-5"
-                  style={{ background: `linear-gradient(150deg, ${BRASS[0]}, ${BRASS[1]})` }}
-                >
-                  <span className="absolute inset-0 -z-10">
-                    <MoltenMetal
-                      color1={BRASS_FLAME[0]}
-                      color2={BRASS_FLAME[1]}
-                      color3={BRASS_FLAME[2]}
-                      colorMode="ember"
-                      speed={0.14}
-                      swirl={0.8}
-                      scale={3}
-                      detail={3}
-                      glow={5}
-                      coreSize={0.16}
-                      fold={-0.2}
-                      blackPoint={0.5}
-                      brightness={2.1}
-                      grain={false}
-                      mouseInteraction
-                      mouseStrength={0.25}
-                      opacity={0.8}
-                    />
-                  </span>
-
-                  {/* Solid white discs: a translucent pane of the ground has
-                      nothing to separate it from that ground, and the field
-                      drifting underneath takes what is left. */}
-                  {stats.map((st, i) => (
-                    <span
-                      key={st.label}
-                      className="mx-auto grid size-10 place-items-center rounded-full bg-white text-amber shadow-[0_8px_18px_-8px_rgba(86,44,4,0.55)] sm:size-12"
-                    >
+                {stats.map((st, i) => (
+                  <div key={st.label} className="px-1 text-center sm:px-4">
+                    <span className="mx-auto grid size-10 place-items-center rounded-full bg-amber/12 text-amber sm:size-12">
                       {i === 0 ? (
-                        <ShieldCheck className="size-5" strokeWidth={1.9} />
+                        <ShieldCheck className="size-5" strokeWidth={1.8} />
                       ) : i === 1 ? (
-                        <Award className="size-5" strokeWidth={1.9} />
+                        <Award className="size-5" strokeWidth={1.8} />
                       ) : (
-                        <BadgeCheck className="size-5" strokeWidth={1.9} />
+                        <BadgeCheck className="size-5" strokeWidth={1.8} />
                       )}
                     </span>
-                  ))}
-                </div>
-
-                <div className="grid grid-cols-3 px-3 py-5 sm:px-6 lg:divide-x lg:divide-hairline">
-                  {stats.map((st) => (
-                    <div key={st.label} className="px-1 text-center sm:px-4">
-                      <dt className="font-display text-2xl tracking-tight sm:text-3xl">{st.value}</dt>
-                      <dd className="mt-1.5 text-[0.68rem] leading-snug text-muted sm:text-xs">{st.label}</dd>
-                    </div>
-                  ))}
-                </div>
+                    <dt className="font-display mt-3 text-2xl tracking-tight sm:text-3xl">{st.value}</dt>
+                    <dd className="mt-1.5 text-[0.68rem] leading-snug text-muted sm:text-xs">{st.label}</dd>
+                  </div>
+                ))}
               </motion.dl>
             )}
 
