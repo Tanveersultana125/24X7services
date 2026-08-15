@@ -4,13 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ShieldCheck, Sparkles, Receipt, Clock,
+  ShieldCheck, Package, ClipboardCheck, Sparkles, Receipt, Timer, Clock,
   Headset, ThumbsUp, ChevronRight, Wrench, Tag, Snowflake, Droplets, Fuel, DoorOpen,
   Cog, Volume2, Flame, Zap, Thermometer, Fan, RotateCw, MonitorSmartphone, Power,
   Lock, Disc3, Cpu, PackageOpen,
 } from "lucide-react";
 import { ApplianceTile, APPLIANCE_ACCENT, BrandMark } from "@/components/ui/Icons";
-import AccordionGallery from "@/components/ui/AccordionGallery";
 import { useServices } from "@/components/providers/ServicesProvider";
 import { bestSaving, brandsFor, priceFor, pricesDiffer } from "@/lib/catalogue-shared";
 import { ServiceSheet } from "./ServiceSheet";
@@ -24,18 +23,13 @@ const EMERALD = "#0b9a63";
 const AMBER = "#d9821b";
 const VIOLET = "#6d5ae0";
 
-/**
- * What every visit includes, shown as a strip of work photographs. The blurb
- * has no room to print on a photograph, so it rides along as the image's
- * description — it stays in the accessible name of each panel.
- */
 const INCLUDES = [
-  { image: "/work/ac-tech-tablet.png", title: "Free diagnosis", desc: "A full inspection and honest assessment before any charge." },
-  { image: "/work/gallery/washing-2.png", title: "Genuine parts", desc: "Only brand-approved, traceable spares — never local substitutes." },
-  { image: "/work/gallery/fridge-2.png", title: "90-day warranty", desc: "Every repair and part covered in writing for 90 days." },
-  { image: "/work/ac-service.png", title: "Clean finish", desc: "The technician tidies up and tests the appliance with you." },
-  { image: "/work/gallery/fridge-1.png", title: "Digital invoice", desc: "A transparent, itemised GST invoice sent instantly." },
-  { image: "/work/gallery/ac-2.png", title: "On-time promise", desc: "Live ETA tracking and a slot you actually choose." },
+  { icon: ClipboardCheck, tint: ROYAL, title: "Free diagnosis", desc: "A full inspection and honest assessment before any charge." },
+  { icon: Package, tint: EMERALD, title: "Genuine parts", desc: "Only brand-approved, traceable spares — never local substitutes." },
+  { icon: ShieldCheck, tint: ROYAL, title: "90-day warranty", desc: "Every repair and part covered in writing for 90 days." },
+  { icon: Sparkles, tint: AMBER, title: "Clean finish", desc: "The technician tidies up and tests the appliance with you." },
+  { icon: Receipt, tint: ROYAL, title: "Digital invoice", desc: "A transparent, itemised GST invoice sent instantly." },
+  { icon: Timer, tint: EMERALD, title: "On-time promise", desc: "Live ETA tracking and a slot you actually choose." },
 ];
 
 /** Each fault gets its own glyph — a repeated wrench made every row look identical. */
@@ -148,29 +142,37 @@ export function ServicesDetail() {
             )}
           </div>
 
-          {/* The overlay is the site's warm ink rather than the component's
-              default near-black violet, and the accent bar the brand royal —
-              a strip of photographs shouldn't introduce two colours the rest
-              of the page has never used. */}
-          <motion.div
-            initial={{ opacity: 0, y: 22 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-10 sm:mt-14"
-          >
-            <AccordionGallery
-              items={INCLUDES.map((f) => ({ image: f.image, label: f.title, alt: f.desc }))}
-              defaultIndex={0}
-              accentColor={ROYAL}
-              overlayColor="#17150f"
-              height={440}
-              gap={12}
-              radius={20}
-              expandRatio={0.44}
-              trigger="hover"
-            />
-          </motion.div>
+          <div className="mt-10 grid grid-cols-3 gap-2.5 sm:mt-14 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+            {INCLUDES.map((f, i) => (
+              <motion.div
+                key={f.title}
+                initial={{ opacity: 0, y: 22 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.6, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
+                className="group rounded-[1.1rem] border border-card-edge bg-gradient-to-b from-card to-surface p-3 text-center shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_var(--card-edge)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)] sm:rounded-[1.5rem] sm:p-7 sm:text-left"
+              >
+                <span
+                  className="mx-auto grid size-9 place-items-center rounded-lg transition-transform duration-500 group-hover:-translate-y-0.5 sm:mx-0 sm:size-14 sm:rounded-2xl"
+                  style={{ background: `${f.tint}16`, color: f.tint }}
+                >
+                  <f.icon className="size-[1.05rem] sm:size-6" strokeWidth={1.7} />
+                </span>
+                <h3 className="mt-3 hyphens-auto text-[0.7rem] font-semibold leading-tight tracking-tight sm:mt-5 sm:text-lg">
+                  {f.title}
+                </h3>
+                {/* no room for the blurb in a three-up column — it returns at sm */}
+                <p className="hidden text-muted sm:mt-2 sm:block sm:text-[0.9rem] sm:leading-relaxed">
+                  {f.desc}
+                </p>
+                <span
+                  aria-hidden
+                  className="mx-auto mt-3 block h-0.5 w-5 rounded-full transition-all duration-500 group-hover:w-14 sm:mx-0 sm:mt-5 sm:w-8"
+                  style={{ background: f.tint }}
+                />
+              </motion.div>
+            ))}
+          </div>
 
         </div>
       </section>
