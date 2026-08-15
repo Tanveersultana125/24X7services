@@ -25,23 +25,26 @@ const AMBER = "#d9821b";
 const VIOLET = "#6d5ae0";
 
 /**
- * Shadow, filament and core for the molten field inside each card, each a run
- * of the card's own tint — the component's stock violet and pink are colours
- * the site has never used. Only two steps rather than three: the shader fades
- * a filament out by dropping its alpha, so a third, paler colour at the top
- * only desaturates the brand hue into grey without adding any light.
+ * The molten field inside the cards, in the site's own brand blue: `--royal`
+ * into `--royal-bright`, nothing invented. It runs the same on all six rather
+ * than following each icon's tint — six cards each glowing a different colour
+ * read as six unrelated things, and the green and orange in particular are
+ * accents here, not the house colour.
+ *
+ * Two stops rather than three: the shader fades a filament out by dropping its
+ * alpha, so a paler colour on top only desaturates the hue towards grey
+ * without adding any light.
  */
-const FLAME_ROYAL: [string, string, string] = ["#0b1533", "#2547d0", "#2547d0"];
-const FLAME_EMERALD: [string, string, string] = ["#052a20", "#0b9a63", "#0b9a63"];
-const FLAME_AMBER: [string, string, string] = ["#331c05", "#d9821b", "#d9821b"];
+const ROYAL_DEEP = "#1e3a8a";
+const FLAME: [string, string, string] = [ROYAL_DEEP, ROYAL, ROYAL];
 
 const INCLUDES = [
-  { icon: ClipboardCheck, tint: ROYAL, flame: FLAME_ROYAL, title: "Free diagnosis", desc: "A full inspection and honest assessment before any charge." },
-  { icon: Package, tint: EMERALD, flame: FLAME_EMERALD, title: "Genuine parts", desc: "Only brand-approved, traceable spares — never local substitutes." },
-  { icon: ShieldCheck, tint: ROYAL, flame: FLAME_ROYAL, title: "90-day warranty", desc: "Every repair and part covered in writing for 90 days." },
-  { icon: Sparkles, tint: AMBER, flame: FLAME_AMBER, title: "Clean finish", desc: "The technician tidies up and tests the appliance with you." },
-  { icon: Receipt, tint: ROYAL, flame: FLAME_ROYAL, title: "Digital invoice", desc: "A transparent, itemised GST invoice sent instantly." },
-  { icon: Timer, tint: EMERALD, flame: FLAME_EMERALD, title: "On-time promise", desc: "Live ETA tracking and a slot you actually choose." },
+  { icon: ClipboardCheck, tint: ROYAL, title: "Free diagnosis", desc: "A full inspection and honest assessment before any charge." },
+  { icon: Package, tint: EMERALD, title: "Genuine parts", desc: "Only brand-approved, traceable spares — never local substitutes." },
+  { icon: ShieldCheck, tint: ROYAL, title: "90-day warranty", desc: "Every repair and part covered in writing for 90 days." },
+  { icon: Sparkles, tint: AMBER, title: "Clean finish", desc: "The technician tidies up and tests the appliance with you." },
+  { icon: Receipt, tint: ROYAL, title: "Digital invoice", desc: "A transparent, itemised GST invoice sent instantly." },
+  { icon: Timer, tint: EMERALD, title: "On-time promise", desc: "Live ETA tracking and a slot you actually choose." },
 ];
 
 /** Each fault gets its own glyph — a repeated wrench made every row look identical. */
@@ -190,9 +193,9 @@ export function ServicesDetail() {
                       A larger scale is what keeps it from reading as a smear —
                       the same field drawn finer, at card size. */}
                   <MoltenMetal
-                    color1={f.flame[0]}
-                    color2={f.flame[1]}
-                    color3={f.flame[2]}
+                    color1={FLAME[0]}
+                    color2={FLAME[1]}
+                    color3={FLAME[2]}
                     /* mid-point at 0.35 rather than 0.5: the filaments reach
                        full brand colour sooner, instead of spending their
                        range in a muddy blend on the way there. */
