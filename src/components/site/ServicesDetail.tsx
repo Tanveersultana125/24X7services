@@ -181,7 +181,7 @@ export function ServicesDetail() {
                     clipping it, so the hover shadow still falls outside. */}
                 <span
                   aria-hidden
-                  className="absolute inset-0 -z-10 overflow-hidden rounded-[inherit] opacity-85 transition-opacity duration-500 group-hover:opacity-100 [-webkit-mask-image:radial-gradient(115%_95%_at_100%_0%,#000_38%,transparent_75%)] [mask-image:radial-gradient(115%_95%_at_100%_0%,#000_38%,transparent_75%)]"
+                  className="absolute inset-0 -z-10 overflow-hidden rounded-[inherit] opacity-85 transition-opacity duration-500 group-hover:opacity-100 [-webkit-mask-image:radial-gradient(85%_80%_at_100%_0%,#000_12%,transparent_62%)] [mask-image:radial-gradient(85%_80%_at_100%_0%,#000_12%,transparent_62%)]"
                 >
                   {/* The shader divides its accumulated glow by six, so the
                       black point only means anything relative to gain × core
@@ -200,12 +200,18 @@ export function ServicesDetail() {
                        full brand colour sooner, instead of spending their
                        range in a muddy blend on the way there. */
                     colorMode="ember"
-                    speed={0.18}
+                    /* Six canvases mount together and start their clocks at
+                       zero, so on identical settings the row draws the same
+                       frame six times over — which is what makes a background
+                       read as wallpaper. Each card swirls its field a little
+                       differently and drifts at its own rate, so they never
+                       line up, at the first frame or any after it. */
+                    speed={0.13 + i * 0.011}
+                    swirl={0.7 + i * 0.09}
                     scale={5}
                     detail={3}
                     glow={5}
                     coreSize={0.16}
-                    swirl={0.8}
                     fold={-0.2}
                     blackPoint={0.46}
                     brightness={2.4}
