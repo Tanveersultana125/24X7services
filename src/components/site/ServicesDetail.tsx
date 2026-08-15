@@ -102,38 +102,48 @@ export function ServicesDetail() {
         />
 
         <div className="relative mx-auto max-w-[92rem] px-6 sm:px-10">
-          <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-xl">
+          {/* Two columns rather than two blocks pushed to opposite ends: a
+              reading measure inside a 92rem row left the copy and the artwork
+              stranded either side of half a screen of nothing. The columns
+              share the row out, so the gap is the gutter and no more. */}
+          <div className="grid gap-10 lg:grid-cols-[1fr_24rem] lg:items-center lg:gap-12 xl:grid-cols-[1fr_30rem]">
+            <div>
               <span className="inline-flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-royal-bright">
                 Our promise
                 <ShieldCheck className="size-4" strokeWidth={2.2} />
               </span>
 
-              <h2 className="font-display mt-4 text-[2.4rem] leading-[1.15] sm:leading-[1.05] tracking-[-0.03em] sm:text-5xl">
+              {/* The copy column grows with the viewport, so the heading grows
+                  with it — held at 3rem it stopped filling its own column. */}
+              <h2 className="font-display mt-4 text-[2.4rem] leading-[1.15] sm:leading-[1.05] tracking-[-0.03em] sm:text-5xl 2xl:text-[3.4rem]">
                 What&apos;s included in <span className="italic text-royal-bright">every</span> service.
               </h2>
 
               <span aria-hidden className="mt-5 block h-1 w-14 rounded-full bg-royal-bright" />
 
-              <p className="mt-5 max-w-md text-pretty leading-relaxed text-muted">
+              <p className="mt-5 max-w-xl text-pretty leading-relaxed text-muted">
                 We believe in complete transparency and providing the best experience at every step.
               </p>
             </div>
 
-            {/* The illustration is drawn on its own pale ground, and cutting
-                that away took bites out of the shield's white rim — on a dark
-                page they read as notches in the artwork. It keeps its ground
-                and is framed instead, which is what it was drawn for. */}
+            {/* No border, no rounded box, no drop shadow: a frame turns the
+                artwork into a card laid on the page. The illustration is drawn
+                on its own pale ground, and cutting that ground away took bites
+                out of the shield's white rim — so the ground stays and is
+                feathered off at the edges instead, dissolving into the section
+                rather than ending on a line. */}
             {promiseShieldSrc && (
-              <div aria-hidden className="relative w-full max-w-sm shrink-0 lg:w-[24rem]">
+              <div aria-hidden className="relative mx-auto w-full max-w-md lg:mx-0 lg:max-w-none">
                 <span
-                  className="pointer-events-none absolute -inset-6 -z-10 rounded-full blur-3xl"
-                  style={{ background: "radial-gradient(circle, rgba(37,71,208,0.16), transparent 68%)" }}
+                  className="pointer-events-none absolute -inset-10 -z-10 rounded-full blur-3xl"
+                  style={{ background: "radial-gradient(circle, rgba(37,71,208,0.13), transparent 68%)" }}
                 />
-                <div className="overflow-hidden rounded-[1.75rem] border border-card-edge shadow-premium-xl dark:border-white/10 dark:shadow-[0_30px_70px_-30px_rgba(0,0,0,0.9)]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={promiseShieldSrc} alt="" className="w-full" />
-                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={promiseShieldSrc}
+                  alt=""
+                  className="w-full [-webkit-mask-image:radial-gradient(118%_112%_at_52%_48%,#000_50%,transparent_100%)] [mask-image:radial-gradient(118%_112%_at_52%_48%,#000_50%,transparent_100%)]"
+                />
               </div>
             )}
           </div>
