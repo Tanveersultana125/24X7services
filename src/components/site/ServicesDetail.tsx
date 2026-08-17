@@ -24,16 +24,17 @@ const AMBER = "#d9821b";
 const VIOLET = "#6d5ae0";
 
 /**
- * The plinth is the cornflower blue picked for it — lighter than `--royal`,
- * which is the point, so it sits outside the token set. The two stops are that
- * colour lifted and dropped a little, to keep the ground lit from the top left
- * like the card it's set into.
+ * The plinth is the site's own blue, `--royal` falling to the deep end of it —
+ * the pairing it carried before a lighter cornflower was tried. The mid blue
+ * only held up while a light field was burning on it; with that gone it read
+ * as washed out, and the deep sweep is what makes the white icon pane and the
+ * cream card below it snap.
  *
- * It stays a flat sweep of that blue. A drifting light field was tried across
- * the six and read as white smears through the colour rather than as light in
- * it — the plinth is a ground for the icon, not artwork of its own.
+ * It stays flat. A drifting field across the six read as white smears through
+ * the colour rather than as light in it — this is a ground for the icon, not
+ * artwork of its own.
  */
-const PLINTH: [string, string] = ["#7a9be2", "#5a7fd0"];
+const PLINTH: [string, string] = [ROYAL, "#1e3a8a"];
 
 const INCLUDES = [
   { icon: ClipboardCheck, tint: ROYAL, title: "Free diagnosis", desc: "A full inspection and honest assessment before any charge." },
