@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import {
   Check,
+  Crop as CropIcon,
   ExternalLink,
   ImageUp,
   Link as LinkIcon,
@@ -18,6 +19,7 @@ import {
   type ServiceIndexRow,
 } from "@/lib/service-index-shared";
 import { ConfirmDialog } from "./ConfirmDialog";
+import { ImageCropper } from "./ImageCropper";
 import { cn } from "@/lib/utils";
 
 type Row = ServiceIndexRow;
@@ -661,6 +663,7 @@ function PhotoPicker({
   const [uploading, setUploading] = useState(false);
   const [urlOpen, setUrlOpen] = useState(false);
   const [url, setUrl] = useState("");
+  const [cropping, setCropping] = useState(false);
 
   const upload = async (file: File) => {
     if (!file.type.startsWith("image/")) return onError("That file isn't an image.");
@@ -734,6 +737,14 @@ function PhotoPicker({
           </button>
           {value && (
             <button
+              onClick={() => setCropping(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-ink"
+            >
+              <CropIcon className="size-3.5" /> Crop
+            </button>
+          )}
+          {value && (
+            <button
               onClick={() => onChange("")}
               className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted hover:text-danger"
             >
@@ -768,9 +779,22 @@ function PhotoPicker({
           </form>
         )}
         <p className="mt-2 text-[0.68rem] leading-snug text-muted-2">
-          Landscape reads best — it sits as a band across the top of the preview card.
+          The site shows the photo whole, at whatever shape it is. Crop it here to change that —
+          landscape sits best as the band across the top of the preview card.
         </p>
       </div>
+
+      {cropping && value && (
+        <ImageCropper
+          src={value}
+          onError={onError}
+          onCancel={() => setCropping(false)}
+          onCropped={(next) => {
+            onChange(next);
+            setCropping(false);
+          }}
+        />
+      )}
     </div>
   );
 }
