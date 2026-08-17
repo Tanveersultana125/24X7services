@@ -147,24 +147,29 @@ function Preview({ svc }: { svc: Service }) {
   const CareIcon = CARE_ICONS[svc.id] ?? Sparkles;
   return (
     <div className="relative">
-      {/* photo band — the service's own work, fading into the card surface */}
-      <div className="relative h-40 w-full overflow-hidden sm:h-52">
+      {/* Photo band — the service's own work, fading into the card surface.
+          The band takes the photo's height rather than cropping it to a fixed
+          one: these are chosen in the panel, and a band that keeps its own
+          shape decides for itself which half of someone's upload is worth
+          seeing. Capped, so a tall portrait can't run the card off the page. */}
+      <div className="relative w-full overflow-hidden">
         {svc.image ? (
           <>
-            {/* each shot frames its subject differently, so the crop point is per service */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={svc.image}
               alt={svc.title}
-              style={{ objectPosition: svc.imagePos }}
-              className="size-full object-cover transition-transform duration-[1.4s] ease-out"
+              className="block h-auto max-h-[24rem] w-full object-contain"
             />
+            {/* The fade is kept to the last fifth: it is there to hand the
+                photo over to the card and to sit the icon tile on something
+                soft, not to swallow the bottom of the picture. */}
             <div
               aria-hidden
               className="absolute inset-0"
               style={{
                 background:
-                  "linear-gradient(to bottom, rgba(23,21,15,0.18) 0%, rgba(23,21,15,0.04) 40%, var(--surface) 100%)",
+                  "linear-gradient(to bottom, rgba(23,21,15,0.12) 0%, rgba(23,21,15,0) 22%, rgba(23,21,15,0) 78%, var(--surface) 100%)",
               }}
             />
           </>
@@ -172,7 +177,7 @@ function Preview({ svc }: { svc: Service }) {
           // no photo on file yet — an accent header reads as deliberate, a wrong photo does not
           <div
             aria-hidden
-            className="size-full"
+            className="h-40 w-full sm:h-52"
             style={{
               background:
                 "radial-gradient(120% 120% at 20% 0%, rgba(37,71,208,0.22), transparent 60%), radial-gradient(100% 100% at 90% 10%, rgba(11,154,99,0.16), transparent 62%), linear-gradient(to bottom, var(--surface-2), var(--surface))",
