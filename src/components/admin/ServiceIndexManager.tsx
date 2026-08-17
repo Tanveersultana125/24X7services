@@ -688,10 +688,13 @@ function PhotoPicker({
 
   return (
     <div className="flex gap-3">
-      <div className="grid aspect-[4/3] w-28 shrink-0 place-items-center overflow-hidden rounded-xl bg-surface-2">
+      {/* Contained, not cropped: this is the check on what was uploaded, so it
+          has to show the whole frame — a cover crop hid whichever half of the
+          photo the card happens not to use. */}
+      <div className="grid aspect-[4/3] w-28 shrink-0 place-items-center overflow-hidden rounded-xl border border-border bg-surface-2 p-1">
         {value ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={value} alt="" className="size-full object-cover" />
+          <img src={value} alt="" className="max-h-full max-w-full rounded-lg object-contain" />
         ) : (
           <span className="px-2 text-center text-[0.62rem] text-muted-2">No photo</span>
         )}
