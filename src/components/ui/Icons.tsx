@@ -41,7 +41,10 @@ export function ApplianceTile({
   onAccent?: boolean;
   className?: string;
 }) {
-  const Icon = APPLIANCE_ICONS[id];
+  // An admin can coin an appliance the build has never heard of — it gets the
+  // generic wrench and slate rather than a blank tile.
+  const Icon = APPLIANCE_ICONS[id] ?? APPLIANCE_ICONS.other;
+  const gradient = APPLIANCE_GRADIENTS[id] ?? APPLIANCE_GRADIENTS.other;
   const dims = size === "lg" ? "size-16" : size === "sm" ? "size-11" : "size-14";
   const icon = size === "lg" ? "size-8" : size === "sm" ? "size-5" : "size-7";
   return (
@@ -50,7 +53,7 @@ export function ApplianceTile({
         "relative grid place-items-center rounded-2xl text-white",
         onAccent
           ? "bg-white/20 ring-1 ring-inset ring-white/30"
-          : cn("bg-gradient-to-br shadow-premium-md", APPLIANCE_GRADIENTS[id]),
+          : cn("bg-gradient-to-br shadow-premium-md", gradient),
         dims,
         className
       )}

@@ -7,6 +7,10 @@ import { ArrowUpRight, Wrench, Clock, Sparkles, Settings2, PackageOpen, Calendar
 import { Kicker } from "./TextReveal";
 import { ApplianceTile } from "@/components/ui/Icons";
 import { SERVICES, type Service } from "@/lib/services";
+import {
+  SERVICE_INDEX_COPY_DEFAULTS,
+  type ServiceIndexCopy,
+} from "@/lib/service-index-shared";
 
 /** Falls back to the code's list, so the section renders if the panel is away. */
 import { cn } from "@/lib/utils";
@@ -18,8 +22,16 @@ const CARE_ICONS: Record<string, typeof Settings2> = {
   emergency: Siren,
 };
 
-export function ServicesIndex({ services }: { services?: Service[] }) {
+export function ServicesIndex({
+  services,
+  copy,
+}: {
+  services?: Service[];
+  /** The section's words, as edited in the panel. Defaults to the code's. */
+  copy?: ServiceIndexCopy;
+}) {
   const rows = services?.length ? services : SERVICES;
+  const words = copy ?? SERVICE_INDEX_COPY_DEFAULTS;
   const [active, setActive] = useState<number | null>(0);
   const svc = rows[active ?? 0];
 
@@ -28,17 +40,18 @@ export function ServicesIndex({ services }: { services?: Service[] }) {
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
-            <Kicker>The work</Kicker>
+            <Kicker>{words.kicker}</Kicker>
             <h2 className="font-display mt-6 max-w-xl text-[2.6rem] leading-[1.15] sm:leading-[1.05] tracking-[-0.03em] sm:text-6xl">
-              Eight services.
-              <br />
-              <span className="italic text-muted">One standard.</span>
+              {words.headline}
+              {words.headlineAccent && (
+                <>
+                  <br />
+                  <span className="italic text-muted">{words.headlineAccent}</span>
+                </>
+              )}
             </h2>
           </div>
-          <p className="max-w-xs text-pretty text-muted md:text-right">
-            Every job — from a quick microwave fix to a full annual contract — held to the
-            same obsessive bar.
-          </p>
+          <p className="max-w-xs text-pretty text-muted md:text-right">{words.intro}</p>
         </div>
 
         <div className="mt-10 grid gap-12 sm:mt-16 lg:grid-cols-12">

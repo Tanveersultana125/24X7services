@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SiteNav } from "@/components/site/SiteNav";
 import { PageHeader } from "@/components/site/PageHeader";
 import { ServicesIndex } from "@/components/site/ServicesIndex";
-import { getServiceIndex } from "@/lib/service-index";
+import { getServiceIndex, getServiceIndexCopy } from "@/lib/service-index";
 import { ServicesDetail } from "@/components/site/ServicesDetail";
 import { Contact } from "@/components/site/Contact";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ServicesPage() {
-  const services = await getServiceIndex();
+  const [services, copy] = await Promise.all([getServiceIndex(), getServiceIndexCopy()]);
   return (
     <>
       <SiteNav />
@@ -30,7 +30,7 @@ export default async function ServicesPage() {
           ]}
           image="/work/fridge-hero.png"
         />
-        <ServicesIndex services={services} />
+        <ServicesIndex services={services} copy={copy} />
         <ServicesDetail />
         <Contact />
       </main>
