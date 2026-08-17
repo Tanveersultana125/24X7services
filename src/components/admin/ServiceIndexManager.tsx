@@ -1,7 +1,17 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Check, ImageUp, Link as LinkIcon, Loader2, Plus, RotateCcw, Trash2, X } from "lucide-react";
+import {
+  Check,
+  ExternalLink,
+  ImageUp,
+  Link as LinkIcon,
+  Loader2,
+  Plus,
+  RotateCcw,
+  Trash2,
+  X,
+} from "lucide-react";
 import {
   SERVICE_INDEX_COPY_DEFAULTS,
   type ServiceIndexCopy,
@@ -115,13 +125,21 @@ export function ServiceIndexManager({
   return (
     <div>
       <div className="mb-6 sm:mb-8">
-        <h1 className="font-display text-2xl tracking-[-0.02em] sm:text-3xl">Service list</h1>
+        <h1 className="font-display text-2xl tracking-[-0.02em] sm:text-3xl">Services page list</h1>
         <p className="mt-1 max-w-2xl text-sm text-muted">
           The section under &ldquo;Eight services. One standard.&rdquo; on the services page — its
           words, its rows and the photo on each preview card. Add a service of your own, rewrite one
           that ships with the site, or take it off. Reset puts a shipped row back to what the site
           ships with; an added row deletes for good.
         </p>
+        <a
+          href="/services#services"
+          target="_blank"
+          rel="noreferrer"
+          className="mt-2 inline-flex items-center gap-1.5 text-sm font-medium text-royal-bright hover:underline"
+        >
+          See it on the site <ExternalLink className="size-3.5" />
+        </a>
       </div>
 
       {error && <p className="mb-4 rounded-xl bg-danger/10 px-4 py-3 text-sm text-danger">{error}</p>}

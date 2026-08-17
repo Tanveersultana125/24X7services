@@ -8,6 +8,7 @@ import {
   CalendarCheck,
   Users,
   Wrench,
+  ListOrdered,
   Images,
   ImagePlay,
   Star,
@@ -26,6 +27,10 @@ const NAV = [
   { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
   { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/services", label: "Services & prices", icon: Wrench },
+  // Its own line rather than a child of Services & prices: that menu only
+  // opened once you were already inside it, so the one page that edits the
+  // services page could not be found from anywhere else.
+  { href: "/admin/service-list", label: "Services page list", icon: ListOrdered },
   { href: "/admin/gallery", label: "Gallery", icon: Images },
   { href: "/admin/images", label: "Site images", icon: ImagePlay },
   { href: "/admin/reviews", label: "Reviews", icon: Star },
@@ -86,7 +91,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 {/* Services opens into one page per manufacturer, where their
                     prices sit side by side — that is how a price is decided,
                     Samsung against Samsung rather than fridge against washer. */}
-                {item.href === "/admin/services" && (active || pathname.startsWith("/admin/service-list")) && (
+                {item.href === "/admin/services" && active && (
                   <div className="mb-2 ml-6 border-l border-border pl-3">
                     <Link
                       href="/admin/services"
@@ -99,18 +104,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                       )}
                     >
                       All services
-                    </Link>
-                    <Link
-                      href="/admin/service-list"
-                      onClick={() => setOpen(false)}
-                      className={cn(
-                        "mb-0.5 block rounded-lg px-3 py-2 text-[0.82rem] transition-colors",
-                        pathname === "/admin/service-list"
-                          ? "bg-surface-2 font-medium text-ink"
-                          : "text-muted hover:text-ink",
-                      )}
-                    >
-                      Service list (site page)
                     </Link>
                     {BRANDS.map((b) => {
                       const href = `/admin/services/${b.id}`;
