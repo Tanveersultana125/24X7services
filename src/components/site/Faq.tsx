@@ -92,16 +92,13 @@ export function Faq() {
             {/* Same technician photo as the desktop rail, framed as a card — the
                 right-hand strip has no room to exist below three columns. */}
             {faqTechnicianSrc && (
-              <div className="relative mx-auto mt-7 w-full max-w-[16rem] overflow-hidden rounded-2xl border border-border shadow-premium-sm sm:max-w-[18rem] xl:hidden">
-                {/* The source photo is portrait (382×676) — a landscape card with
-                    object-cover cropped most of it away on phones, so the card
-                    takes the photo's own ratio and shows it whole. */}
+              <div className="relative mt-7 aspect-[5/4] overflow-hidden rounded-2xl border border-border shadow-premium-sm sm:aspect-[16/9] xl:hidden">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={faqTechnicianSrc}
                   alt="A 24X7 technician servicing a split air conditioner"
                   loading="lazy"
-                  className="block h-auto w-full"
+                  className="size-full object-cover object-[center_32%]"
                 />
               </div>
             )}
