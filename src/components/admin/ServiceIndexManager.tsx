@@ -425,7 +425,7 @@ function NewRowForm({
         />
       </label>
 
-      <div className="mt-3 grid grid-cols-2 gap-3">
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <label className="block">
           <span className="text-xs font-medium text-muted">Price line</span>
           <input value={draft.price} onChange={(e) => set({ price: e.target.value })} placeholder="from ₹499" className={FIELD} />
@@ -441,7 +441,7 @@ function NewRowForm({
         <input value={draft.tags} onChange={(e) => set({ tags: e.target.value })} placeholder="Deep clean, Safety, Filters" className={FIELD} />
       </label>
 
-      <div className="mt-3 grid grid-cols-2 gap-3">
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <ApplianceSelect
           value={draft.appliance}
           appliances={appliances}
@@ -533,7 +533,7 @@ function RowCard({
         />
       </label>
 
-      <div className="mt-3 grid grid-cols-2 gap-3">
+      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <label className="block">
           <span className="text-xs font-medium text-muted">Price line</span>
           <input value={row.price} onChange={(e) => onChange({ price: e.target.value })} placeholder="from ₹299" className={FIELD} />
@@ -557,7 +557,7 @@ function RowCard({
       {/* Which appliance a shipped row books is design, in the code — an added
           row's is not, so only it is asked. */}
       {row.custom && (
-        <div className="mt-3 grid grid-cols-2 gap-3">
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <ApplianceSelect
             value={row.appliance ?? ""}
             appliances={appliances}
@@ -687,11 +687,14 @@ function PhotoPicker({
   };
 
   return (
-    <div className="flex gap-3">
+    // Side by side needs about 300px to hold a thumbnail and three buttons; a
+    // phone hasn't got it, and the buttons were being pushed off the card
+    // rather than wrapping. Below sm the two stack instead.
+    <div className="flex flex-col gap-3 sm:flex-row">
       {/* Contained, not cropped: this is the check on what was uploaded, so it
           has to show the whole frame — a cover crop hid whichever half of the
           photo the card happens not to use. */}
-      <div className="grid aspect-[4/3] w-28 shrink-0 place-items-center overflow-hidden rounded-xl border border-border bg-surface-2 p-1">
+      <div className="grid aspect-[4/3] w-full shrink-0 place-items-center overflow-hidden rounded-xl border border-border bg-surface-2 p-1 sm:w-28">
         {value ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={value} alt="" className="max-h-full max-w-full rounded-lg object-contain" />
