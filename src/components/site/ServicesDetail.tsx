@@ -10,7 +10,6 @@ import {
   Lock, Disc3, Cpu, PackageOpen,
 } from "lucide-react";
 import { ApplianceTile, APPLIANCE_ACCENT, BrandMark } from "@/components/ui/Icons";
-import MoltenMetal from "@/components/ui/MoltenMetal";
 import { useServices } from "@/components/providers/ServicesProvider";
 import { bestSaving, brandsFor, priceFor, pricesDiffer } from "@/lib/catalogue-shared";
 import { ServiceSheet } from "./ServiceSheet";
@@ -25,27 +24,16 @@ const AMBER = "#d9821b";
 const VIOLET = "#6d5ae0";
 
 /**
- * The molten field, in the site's own brand blue: `--royal` through
- * `--royal-bright` to a pale core. It runs the same on all six cards rather
- * than following each icon's tint — six cards each glowing a different colour
- * read as six unrelated things, and the green and orange are accents here,
- * not the house colour.
- *
- * The shader writes `colour × alpha`, which is to say it adds light: it needs
- * a dark ground to add light *to*. Over a white card no setting made it more
- * than a smudge, so it gets the plinth below to burn on, and there the pale
- * core earns its place — on white it only greyed the hue.
- */
-/**
  * The plinth is the cornflower blue picked for it — lighter than `--royal`,
  * which is the point, so it sits outside the token set. The two stops are that
  * colour lifted and dropped a little, to keep the ground lit from the top left
  * like the card it's set into.
+ *
+ * It stays a flat sweep of that blue. A drifting light field was tried across
+ * the six and read as white smears through the colour rather than as light in
+ * it — the plinth is a ground for the icon, not artwork of its own.
  */
 const PLINTH: [string, string] = ["#7a9be2", "#5a7fd0"];
-
-/** Dim end sits on the ground so it vanishes into it; cores go white. */
-const FLAME: [string, string, string] = ["#5a7fd0", "#a8c0f5", "#ffffff"];
 
 const INCLUDES = [
   { icon: ClipboardCheck, tint: ROYAL, title: "Free diagnosis", desc: "A full inspection and honest assessment before any charge." },
@@ -181,56 +169,14 @@ export function ServicesDetail() {
                    untouched. */
                 className="group relative overflow-hidden rounded-[1.1rem] border border-card-edge bg-gradient-to-b from-card to-surface text-center shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_var(--card-edge)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)] sm:rounded-[1.5rem] sm:text-left"
               >
-                {/* The plinth the icon stands on, and the dark ground the field
-                    needs. `isolate` is what keeps the canvas between the two:
-                    inside a stacking context the plinth paints its own
-                    background first, then its negative-z children, then the
-                    icon on top. */}
+                {/* The plinth the icon stands on — a flat sweep of the brand
+                    blue, edge to edge. */}
                 <div
-                  className="relative isolate overflow-hidden px-3 py-3 sm:px-7 sm:py-6"
+                  className="relative overflow-hidden px-3 py-3 sm:px-7 sm:py-6"
                   style={{ background: `linear-gradient(150deg, ${PLINTH[0]}, ${PLINTH[1]})` }}
                 >
-                  {/* The shader divides its accumulated glow by six, so the
-                      black point only means anything relative to gain × core
-                      size — at the stock gain nothing clears it, and at a low
-                      one everything does. Measured against the field's own
-                      distribution, the point sits where about a third of it
-                      survives: filaments with dark ground between them, rather
-                      than a hairline or a flood. */}
-                  <span aria-hidden className="absolute inset-0 -z-10">
-                    <MoltenMetal
-                      color1={FLAME[0]}
-                      color2={FLAME[1]}
-                      color3={FLAME[2]}
-                      /* mid-point at 0.35 rather than 0.5: the filaments reach
-                         full brand colour sooner, instead of spending their
-                         range in a muddy blend on the way there. */
-                      colorMode="ember"
-                      /* Six canvases mount together and start their clocks at
-                         zero, so on identical settings the row draws the same
-                         frame six times over — which is what makes a background
-                         read as wallpaper. Each card swirls its field a little
-                         differently and drifts at its own rate, so they never
-                         line up, at the first frame or any after it. */
-                      speed={0.13 + i * 0.011}
-                      swirl={0.7 + i * 0.09}
-                      scale={3.5}
-                      detail={3}
-                      glow={5}
-                      coreSize={0.16}
-                      fold={-0.2}
-                      blackPoint={0.5}
-                      brightness={2.1}
-                      grain={false}
-                      mouseInteraction
-                      mouseStrength={0.25}
-                      opacity={0.8}
-                    />
-                  </span>
-
                   {/* A white glyph on a translucent pane of the ground had
-                      almost nothing to separate it from that ground, and the
-                      field drifting underneath took what was left. The pane
+                      almost nothing to separate it from that ground. The pane
                       goes solid white and the glyph takes the item's own
                       colour, which is the strongest contrast available here
                       and brings the tint back onto the card. */}
