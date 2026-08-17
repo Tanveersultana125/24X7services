@@ -46,13 +46,18 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     <AdminThemeProvider>
     <div className="min-h-dvh bg-surface-2 text-ink lg:grid lg:grid-cols-[16rem_1fr]">
       {/* Sidebar */}
+      {/* A column, not a box with something pinned to its floor: the links
+          scroll and the footer keeps its own row, so a short window — or a
+          Services menu opened out into its brands — can't run underneath it.
+          Sticky rather than static so the footer stays on screen down a long
+          page instead of sitting at the very bottom of it. */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 border-r border-border bg-surface transition-transform lg:static lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-border bg-surface transition-transform lg:sticky lg:top-0 lg:h-dvh lg:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="flex h-16 items-center justify-between px-5">
+        <div className="flex h-16 shrink-0 items-center justify-between px-5">
           <Link href="/admin" className="font-display text-lg tracking-[-0.02em]">
             24X7 <span className="text-muted">Admin</span>
           </Link>
@@ -61,7 +66,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </button>
         </div>
 
-        <nav className="mt-2 px-3">
+        <nav className="mt-2 min-h-0 flex-1 overflow-y-auto px-3 pb-2">
           {NAV.map((item) => {
             const active = item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
             return (
@@ -162,7 +167,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        <div className="absolute inset-x-0 bottom-0 space-y-1 border-t border-border p-3">
+        <div className="shrink-0 space-y-1 border-t border-border bg-surface p-3">
           {/* The panel's own theme — the site's dark mode doesn't reach here. */}
           <AdminThemeToggle className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted hover:bg-surface-2 hover:text-ink" />
           <Link
