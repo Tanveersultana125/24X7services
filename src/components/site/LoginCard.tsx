@@ -1,16 +1,20 @@
 "use client";
 
-import { useState } from "react";
-import { signInWithPopup } from "firebase/auth";
+import { useEffect, useState } from "react";
 import { FirebaseError } from "firebase/app";
+import type { UserCredential } from "firebase/auth";
 import { ShieldCheck, Loader2, AlertCircle } from "lucide-react";
 import {
   getFirebaseAuth,
-  createGoogleProvider,
   firebaseConfigured,
   logFirebaseConfigProblem,
   describePopupError,
 } from "@/lib/firebase/client";
+import {
+  PopupTimeoutError,
+  pendingGoogleSignIn,
+  signInWithGoogle,
+} from "@/lib/firebase/google-signin";
 
 function GoogleG({ className }: { className?: string }) {
   return (
@@ -47,25 +51,19 @@ export function LoginCard({ next = "/dashboard" }: { next?: string }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const signIn = async () => {
-    setError(null);
-
-    if (!firebaseConfigured) {
-      logFirebaseConfigProblem("customer login");
-      setError("Google sign-in isn't configured yet. Please contact support.");
-      return;
-    }
-
+  /** Trade the Google token for this site's session cookie. */
+  const exchange = async (result: UserCredential, auth: ReturnType<typeof getFirebaseAuth>) => {
     setLoading(true);
     try {
-      const auth = getFirebaseAuth();
-      const result = await signInWithPopup(auth, createGoogleProvider());
       const idToken = await result.user.getIdToken();
 
       const res = await fetch("/api/auth/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken }),
+        // A server that never answers used to leave the button spinning for
+        // good; this turns that into an error the visitor can act on.
+        signal: AbortSignal.timeout(20_000),
       });
 
       if (!res.ok) {
@@ -88,14 +86,73 @@ export function LoginCard({ next = "/dashboard" }: { next?: string }) {
       // again is never what the customer wants.
       window.location.replace(next);
     } catch (err) {
+      // Google's half is finished by this point — whatever failed here is ours.
+      console.warn("[24X7] customer login: the session exchange failed —", err);
+      setError(
+        err instanceof DOMException && err.name === "TimeoutError"
+          ? "The server didn't answer in time. Please try again."
+          : "We couldn't reach the server. Check your connection and try again.",
+      );
+      await auth.signOut().catch(() => {});
+      setLoading(false);
+    }
+  };
+
+  /**
+   * A browser that can't run the popup goes to Google and comes back here as a
+   * fresh page load, with the result waiting to be collected.
+   */
+  useEffect(() => {
+    const auth = firebaseConfigured ? getFirebaseAuth() : null;
+    if (!auth) return;
+    let live = true;
+    pendingGoogleSignIn(auth)
+      .then((credential) => {
+        if (live && credential) return exchange(credential, auth);
+      })
+      .catch((err) => {
+        if (!live) return;
+        const code = err instanceof FirebaseError ? err.code : "";
+        const { message, hint } = describePopupError(code);
+        console.warn(`[24X7] customer login: Google redirect failed — ${code || "no code"}. ${hint}`);
+        setError(message);
+        setLoading(false);
+      });
+    return () => {
+      live = false;
+    };
+    // Runs once: this is the return leg of a redirect, not a subscription.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const signIn = async () => {
+    setError(null);
+
+    if (!firebaseConfigured) {
+      logFirebaseConfigProblem("customer login");
+      setError("Google sign-in isn't configured yet. Please contact support.");
+      return;
+    }
+
+    setLoading(true);
+    const auth = getFirebaseAuth();
+    try {
+      const credential = await signInWithGoogle(auth);
+      // No credential means we're on our way to Google — the page is leaving,
+      // so the button keeps spinning rather than flashing back to idle.
+      if (credential) await exchange(credential, auth);
+    } catch (err) {
       const code = err instanceof FirebaseError ? err.code : "";
-      if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+      if (err instanceof PopupTimeoutError) {
+        console.warn("[24X7] customer login: the popup never reported back — falling back to redirect.");
+        setError("The Google window didn't come back. Press the button again — we'll sign you in without a popup.");
+      } else if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
         // User simply dismissed the popup — no error banner needed.
       } else if (code === "auth/popup-blocked") {
-        setError("Your browser blocked the sign-in popup. Please allow popups and try again.");
+        setError("Your browser blocked the sign-in popup. Press the button again — we'll sign you in without one.");
       } else {
         const { message, hint } = describePopupError(code);
-        console.warn(`[24X7] customer login: Google popup failed — ${code || "no code"}. ${hint}`);
+        console.warn(`[24X7] customer login: Google sign-in failed — ${code || "no code"}. ${hint}`);
         setError(message);
       }
       setLoading(false);
