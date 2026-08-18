@@ -127,19 +127,24 @@ export function PageHeader({
           {/* Fills the right of the header rather than sitting on its floor:
               a scene photo is wider than it is tall, so anchoring it to the
               bottom left a band of empty header above it.
-              Anchored right, not left: the photograph carries its own dark
-              navy sweep down its left edge — held to the left that sweep
-              landed in the middle of a cream header as a black slab, and the
-              subject it was meant to sit beside got cropped off the page.
-              From the right the sweep falls outside the crop and the whole
-              scene — technician and appliance — reads. */}
+              Anchored right: the scene reads from that edge, and what the
+              fade eats into is the empty wall beside the technician rather
+              than the technician. */}
           <motion.img
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 1.1, delay: 0.2, ease }}
             src={image}
             alt="24X7 certified technician on the job"
-            className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[52%] max-w-[46rem] object-cover object-right [-webkit-mask-image:linear-gradient(to_right,transparent_0%,#000_28%)] [mask-image:linear-gradient(to_right,transparent_0%,#000_28%)] lg:block"
+            /* The fade is the only join between photograph and page, so it
+               has to run out over flat wall and nothing else. Its length is
+               capped in rem as well as in percent: as a bare percentage it
+               grew with the panel until it was washing over the technician on
+               a wide screen, and shrank to a hard edge on a narrow one.
+               The crop is held just off the right edge so the wall to his left
+               survives on a narrow panel — that wall is what the fade needs to
+               run out over. */
+            className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[54%] max-w-[64rem] object-cover object-[85%_50%] [-webkit-mask-image:linear-gradient(to_right,transparent_0,rgba(0,0,0,0.35)_12%,#000_min(22rem,32%))] [mask-image:linear-gradient(to_right,transparent_0,rgba(0,0,0,0.35)_12%,#000_min(22rem,32%))] lg:block dark:brightness-[0.94]"
           />
         </>
       )}
@@ -409,9 +414,9 @@ export function PageHeader({
             src={image}
             alt=""
             aria-hidden
-            /* Same crop as the desktop panel, for the same reason: the photo's
-               own navy sweep is a black slab on a cream page. */
-            className="mt-10 aspect-[4/3] w-full rounded-2xl object-cover object-right lg:hidden"
+            /* A shallower frame than the desktop panel would crop the
+               technician's head off the top of it. */
+            className="mt-10 aspect-[5/4] w-full rounded-2xl object-cover object-center lg:hidden"
           />
         )}
       </div>
