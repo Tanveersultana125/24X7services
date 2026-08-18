@@ -5,7 +5,7 @@ import Link from "next/link";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, X, ArrowUpRight } from "lucide-react";
-import { cartTotal, clearCart, removeFromCart, useCart } from "@/lib/cart";
+import { bookHref, cartTotal, clearCart, lineKey, removeFromCart, useCart } from "@/lib/cart";
 import { formatINR } from "@/lib/utils";
 
 /**
@@ -101,14 +101,23 @@ export function CartButton() {
                     <>
                       <ul className="min-h-0 flex-1 divide-y divide-hairline overflow-y-auto">
                         {items.map((item) => (
-                          <li key={`${item.id}-${item.qty}`} className="flex items-start gap-3 px-5 py-4">
+                          <li key={lineKey(item)} className="flex items-start gap-3 px-5 py-4">
                             <div className="min-w-0 flex-1">
                               <p className="truncate text-sm font-medium">{item.name}</p>
+                              {/* The fault is what was actually picked — without
+                                  it two lines of the same appliance read as a
+                                  duplicate rather than as two jobs. */}
+                              {item.problemLabel && (
+                                <p className="mt-0.5 truncate text-xs text-royal-bright">{item.problemLabel}</p>
+                              )}
                               <p className="mt-0.5 text-xs text-muted">
-                                {item.qty} {item.qty === 1 ? "unit" : "units"} · {formatINR(item.price)}
+                                {item.kind === "plan"
+                                  ? "Annual plan"
+                                  : `${item.qty} ${item.qty === 1 ? "unit" : "units"}`}{" "}
+                                · {formatINR(item.price)}
                               </p>
                               <Link
-                                href={`/book?appliance=${item.id}&qty=${item.qty}`}
+                                href={bookHref(item)}
                                 onClick={() => setOpen(false)}
                                 className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-royal-bright hover:underline"
                               >
@@ -116,7 +125,7 @@ export function CartButton() {
                               </Link>
                             </div>
                             <button
-                              onClick={() => removeFromCart(item.id, item.qty)}
+                              onClick={() => removeFromCart(lineKey(item))}
                               aria-label={`Remove ${item.name}`}
                               className="shrink-0 rounded-lg p-1.5 text-muted hover:bg-danger/10 hover:text-danger"
                             >
@@ -139,7 +148,7 @@ export function CartButton() {
                           </p>
                         )}
                         <Link
-                          href={`/book?appliance=${items[0].id}&qty=${items[0].qty}`}
+                          href={bookHref(items[0])}
                           onClick={() => setOpen(false)}
                           className="mt-4 flex h-12 items-center justify-center rounded-full bg-ink text-sm font-semibold text-background transition-opacity hover:opacity-90"
                         >

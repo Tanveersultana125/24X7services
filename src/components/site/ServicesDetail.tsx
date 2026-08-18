@@ -13,6 +13,7 @@ import { ApplianceTile, APPLIANCE_ACCENT, BrandMark } from "@/components/ui/Icon
 import { useServices } from "@/components/providers/ServicesProvider";
 import { bestSaving, brandsFor, priceFor, pricesDiffer } from "@/lib/catalogue-shared";
 import { ServiceSheet } from "./ServiceSheet";
+import { AddToCart } from "./AddToCart";
 import { BRANDS } from "@/lib/data";
 import { formatINR, formatRange } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -421,10 +422,17 @@ export function ServicesDetail() {
 
               <ul className="divide-y divide-hairline">
                 {appliance.problems.map((p) => (
-                  <li key={p.id}>
+                  // The row books the job; the button beside it drops the job in
+                  // the basket instead. A button nested inside the row's link
+                  // would be invalid markup, so they are siblings and the row
+                  // carries the hover.
+                  <li
+                    key={p.id}
+                    className="flex items-center gap-2 pr-4 transition-colors hover:bg-surface-2/40 sm:gap-3 sm:pr-6"
+                  >
                     <Link
                       href={`/book?appliance=${appliance.id}&problem=${p.id}`}
-                      className="group flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-surface-2/40 sm:gap-4 sm:px-6 sm:py-4"
+                      className="group flex min-w-0 flex-1 items-center gap-3 py-3.5 pl-4 sm:gap-4 sm:py-4 sm:pl-6"
                     >
                       <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-royal-bright/10 text-royal-bright sm:size-9">
                         {(() => {
@@ -462,6 +470,20 @@ export function ServicesDetail() {
                         <ChevronRight className="size-4" />
                       </span>
                     </Link>
+
+                    <AddToCart
+                      variant="icon"
+                      item={{
+                        id: appliance.id,
+                        name: appliance.name,
+                        qty: 1,
+                        // The row shows a band; the basket has to carry one
+                        // figure, so it carries the one the band starts at.
+                        price: p.price[0],
+                        problem: p.id,
+                        problemLabel: p.label,
+                      }}
+                    />
                   </li>
                 ))}
               </ul>

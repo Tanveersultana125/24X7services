@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { ChatAssistant } from "@/components/site/ChatAssistant";
+import { CartSync } from "@/components/site/CartSync";
 import { SiteImagesProvider } from "@/components/providers/SiteImagesProvider";
 import { getSiteImages } from "@/lib/site-images";
 import { ServicesProvider } from "@/components/providers/ServicesProvider";
@@ -119,6 +120,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             <ServicesProvider services={services}>
               <SmoothScroll>{children}</SmoothScroll>
               <ChatAssistant />
+              {/* Copies the basket to the panel. Renders nothing. */}
+              <CartSync />
             </ServicesProvider>
           </SiteImagesProvider>
         </ThemeProvider>

@@ -12,14 +12,38 @@ import { useSyncExternalStore } from "react";
  */
 
 export type CartItem = {
-  /** The catalogue service this line is for. */
+  /** What the booking form needs to preselect: an appliance id, or a plan id. */
   id: string;
   name: string;
   /** How many units — an offer's tier, or 1. */
   qty: number;
   /** What the whole line costs. */
   price: number;
+  /** An appliance visit, or an annual contract. Absent reads as a service. */
+  kind?: "service" | "plan";
+  /** The fault this line is for, when it was added from the price list. */
+  problem?: string;
+  problemLabel?: string;
 };
+
+/**
+ * What makes two lines the same line.
+ *
+ * The same appliance can sit in the basket twice for two different faults, so
+ * the service id alone is not an identity — the fault and the quantity are
+ * part of it.
+ */
+export function lineKey(item: Pick<CartItem, "id" | "qty" | "problem">): string {
+  return `${item.id}::${item.problem ?? ""}::${item.qty}`;
+}
+
+/** Where a line goes when someone books it. */
+export function bookHref(item: CartItem): string {
+  if (item.kind === "plan") return `/book?amc=${encodeURIComponent(item.id)}`;
+  const params = new URLSearchParams({ appliance: item.id, qty: String(item.qty) });
+  if (item.problem) params.set("problem", item.problem);
+  return `/book?${params.toString()}`;
+}
 
 const KEY = "24x7-cart";
 const EMPTY: CartItem[] = [];
@@ -77,14 +101,14 @@ export function useCart(): CartItem[] {
   return useSyncExternalStore(subscribe, read, () => EMPTY);
 }
 
-/** Adding the same service again replaces its line rather than doubling it. */
+/** Adding the same line again replaces it rather than doubling it. */
 export function addToCart(item: CartItem) {
-  const rest = read().filter((i) => !(i.id === item.id && i.qty === item.qty));
-  write([...rest, item]);
+  const key = lineKey(item);
+  write([...read().filter((i) => lineKey(i) !== key), item]);
 }
 
-export function removeFromCart(id: string, qty: number) {
-  write(read().filter((i) => !(i.id === id && i.qty === qty)));
+export function removeFromCart(key: string) {
+  write(read().filter((i) => lineKey(i) !== key));
 }
 
 export function clearCart() {

@@ -5,6 +5,7 @@ import { Check, ArrowUpRight, Sparkles } from "lucide-react";
 import { Kicker } from "./TextReveal";
 import { AMC_PLANS } from "@/lib/data";
 import { formatINR } from "@/lib/utils";
+import { AddToCart } from "./AddToCart";
 
 export function Plans() {
   const premium = AMC_PLANS.find((p) => p.highlight)!;
@@ -54,12 +55,27 @@ export function Plans() {
                 </span>
               </div>
               {/* full-bleed tap target on phones, hugging button from sm up */}
-              <a
-                href={`/book?amc=${premium.id}`}
-                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium text-royal transition-transform hover:scale-[1.02] sm:mt-8 sm:w-auto"
-              >
-                Choose {premium.name} <ArrowUpRight className="size-4" />
-              </a>
+              <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:items-center">
+                <a
+                  href={`/book?amc=${premium.id}`}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium text-royal transition-transform hover:scale-[1.02] sm:w-auto"
+                >
+                  Choose {premium.name} <ArrowUpRight className="size-4" />
+                </a>
+                <AddToCart
+                  variant="invert"
+                  className="w-full sm:w-auto"
+                  label="Add to basket"
+                  addedLabel="In your basket"
+                  item={{
+                    id: premium.id,
+                    name: `${premium.name} plan`,
+                    qty: 1,
+                    price: premium.price,
+                    kind: "plan",
+                  }}
+                />
+              </div>
             </div>
             <ul className="grid gap-3.5 sm:grid-cols-2 sm:gap-4">
               {premium.perks.map((perk) => (
@@ -100,13 +116,24 @@ export function Plans() {
                   </li>
                 ))}
               </ul>
-              <a
-                href={`/book?amc=${p.id}`}
-                className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-ink transition-colors group-hover:text-royal-bright sm:mt-8"
-              >
-                Choose {p.name}
-                <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </a>
+              <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 sm:mt-8">
+                <a
+                  href={`/book?amc=${p.id}`}
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-ink transition-colors group-hover:text-royal-bright"
+                >
+                  Choose {p.name}
+                  <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </a>
+                <AddToCart
+                  item={{
+                    id: p.id,
+                    name: `${p.name} plan`,
+                    qty: 1,
+                    price: p.price,
+                    kind: "plan",
+                  }}
+                />
+              </div>
             </motion.div>
           ))}
         </div>

@@ -8,7 +8,7 @@ import { X, Star, Tag, Sparkles, Check, Clock, Info, ShieldCheck, ChevronDown } 
 import { bestSaving, tierSaving, type CatalogueService } from "@/lib/catalogue-shared";
 import { BRANDS } from "@/lib/data";
 import { BrandMark } from "@/components/ui/Icons";
-import { addToCart } from "@/lib/cart";
+import { AddToCart } from "./AddToCart";
 import { formatINR } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
@@ -29,8 +29,6 @@ export function ServiceSheet({
   photo?: string;
   onClose: () => void;
 }) {
-  const [added, setAdded] = useState<number | null>(null);
-
   // The page behind must not scroll while this is over it, and Escape closes.
   useEffect(() => {
     if (!service) return;
@@ -103,6 +101,22 @@ export function ServiceSheet({
                 {service.blurb && (
                   <p className="mt-3 text-pretty text-sm leading-relaxed text-muted">{service.blurb}</p>
                 )}
+                {/* Every service can be added from here, tiers or not — the
+                    tiers below are only a cheaper way to add more than one,
+                    and hanging the only Add off them left the services
+                    without tiers with no way in at all. */}
+                <AddToCart
+                  variant="solid"
+                  className="mt-4 w-full"
+                  label={`Add to basket · ${formatINR(service.startingPrice)}`}
+                  addedLabel="Added to basket"
+                  item={{
+                    id: service.id,
+                    name: service.name,
+                    qty: 1,
+                    price: service.startingPrice,
+                  }}
+                />
               </div>
 
               {/* Quantity tiers — one unit, two, three, each with its saving. */}
@@ -141,24 +155,15 @@ export function ServiceSheet({
                         {/* Adds to the basket rather than leaving for the
                             booking form — the point of picking a tier is to
                             keep looking, and the nav carries it from here. */}
-                        <button
-                          onClick={() => {
-                            addToCart({
-                              id: service.id,
-                              name: service.name,
-                              qty: tier.qty,
-                              price: tier.price,
-                            });
-                            setAdded(tier.qty);
-                            window.setTimeout(
-                              () => setAdded((cur) => (cur === tier.qty ? null : cur)),
-                              1600,
-                            );
+                        <AddToCart
+                          className="mt-3 w-full"
+                          item={{
+                            id: service.id,
+                            name: service.name,
+                            qty: tier.qty,
+                            price: tier.price,
                           }}
-                          className="mt-3 w-full rounded-lg border border-royal-bright px-3 py-1.5 text-center text-xs font-semibold text-royal-bright transition-colors hover:bg-royal-bright hover:text-white"
-                        >
-                          {added === tier.qty ? "Added ✓" : "Add"}
-                        </button>
+                        />
                       </div>
                     );
                   })}

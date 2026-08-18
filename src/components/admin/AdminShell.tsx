@@ -6,6 +6,7 @@ import { useState } from "react";
 import {
   LayoutDashboard,
   CalendarCheck,
+  ShoppingCart,
   Users,
   Wrench,
   ListOrdered,
@@ -25,6 +26,8 @@ import { AdminThemeProvider, AdminThemeToggle } from "@/components/admin/AdminTh
 const NAV = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
   { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
+  // Baskets sit next to bookings: they are the same list one step earlier.
+  { href: "/admin/carts", label: "Baskets", icon: ShoppingCart },
   { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/services", label: "Services & prices", icon: Wrench },
   // Its own line rather than a child of Services & prices: that menu only
