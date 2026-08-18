@@ -30,20 +30,28 @@ export function PageHeader({
   title,
   subtitle,
   stats,
-  image,
   logos,
   collage,
   bgImage,
+  bgImageNarrow,
+  bgPos,
   bgDark,
 }: {
   crumb: string;
   title: React.ReactNode;
   subtitle: string;
   stats?: { value: string; label: string }[];
-  image?: string;
   logos?: boolean;
   collage?: string[];
   bgImage?: string;
+  /**
+   * What a phone gets instead. A header photograph is cut wide for a header;
+   * at the width of a phone that shape is a strip, so a taller crop of the
+   * same scene stands in below sm.
+   */
+  bgImageNarrow?: string;
+  /** object-position for the wide photo, e.g. "75% 50%". Defaults to centre. */
+  bgPos?: string;
   /** show the photo at full strength under a dark scrim, with white copy on top */
   bgDark?: boolean;
 }) {
@@ -53,7 +61,7 @@ export function PageHeader({
     <header
       className={
         "relative overflow-hidden border-b border-hairline pt-32 pb-14 sm:pt-40 sm:pb-20" +
-        (image ? " lg:min-h-[34rem]" : bgImage ? " lg:min-h-[26rem] lg:pb-14" : "")
+        (bgImage ? " lg:min-h-[26rem] lg:pb-14" : "")
       }
     >
       {!bgImage && (
@@ -63,6 +71,25 @@ export function PageHeader({
       {/* full-bleed background photo with a light scrim for readable text */}
       {bgImage && (
         <>
+          {/* A phone header is tall and narrow while these photographs are
+              wide, so filling it meant showing a thin vertical slice of the
+              scene. Below sm the picture keeps its own shape at the full width
+              of the page — the whole scene, as on a laptop — and fades out at
+              its foot rather than stopping on a line. */}
+          {bgImageNarrow && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={bgImageNarrow}
+              alt=""
+              aria-hidden
+              className={
+                "absolute inset-x-0 top-0 h-auto w-full object-cover object-center sm:hidden " +
+                "[-webkit-mask-image:linear-gradient(to_bottom,#000_68%,transparent_100%)] " +
+                "[mask-image:linear-gradient(to_bottom,#000_68%,transparent_100%)]" +
+                (onDark ? "" : " brightness-[0.84]")
+              }
+            />
+          )}
           <motion.img
             initial={{ scale: 1.06, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -70,12 +97,9 @@ export function PageHeader({
             src={bgImage}
             alt=""
             aria-hidden
-            /* A phone header is tall and narrow while these photographs are
-               wide, so filling it meant showing a thin vertical slice of the
-               scene. Below sm the picture keeps its own shape at the full
-               width of the page — the whole scene, as on a laptop — and fades
-               out at its foot rather than stopping on a line. */
+            style={bgPos ? { objectPosition: bgPos } : undefined}
             className={
+              (bgImageNarrow ? "hidden sm:block " : "") +
               "absolute inset-x-0 top-0 h-auto w-full object-cover object-center " +
               "[-webkit-mask-image:linear-gradient(to_bottom,#000_68%,transparent_100%)] " +
               "[mask-image:linear-gradient(to_bottom,#000_68%,transparent_100%)] " +
@@ -113,42 +137,6 @@ export function PageHeader({
         </>
       )}
 
-      {/* full-bleed technician image (desktop) — sits on a soft blue wash so it blends */}
-      {image && (
-        <>
-          {/* The wash is what a cut-out photo used to stand on. A photo that
-              brings its own background covers it, and on a dark page it would
-              only read as a pale slab — so light keeps it, dark doesn't. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 hidden lg:block dark:lg:hidden"
-            style={{ background: "linear-gradient(105deg, transparent 40%, rgba(226,234,251,0.55) 64%, #e3ebfc 100%)" }}
-          />
-          {/* Fills the right of the header rather than sitting on its floor:
-              a scene photo is wider than it is tall, so anchoring it to the
-              bottom left a band of empty header above it.
-              Anchored right: the scene reads from that edge, and what the
-              fade eats into is the empty wall beside the technician rather
-              than the technician. */}
-          <motion.img
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1.1, delay: 0.2, ease }}
-            src={image}
-            alt="24X7 certified technician on the job"
-            /* The fade is the only join between photograph and page, so it
-               has to run out over flat wall and nothing else. Its length is
-               capped in rem as well as in percent: as a bare percentage it
-               grew with the panel until it was washing over the technician on
-               a wide screen, and shrank to a hard edge on a narrow one.
-               The crop is held just off the right edge so the wall to his left
-               survives on a narrow panel — that wall is what the fade needs to
-               run out over. */
-            className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[54%] max-w-[64rem] object-cover object-[85%_50%] [-webkit-mask-image:linear-gradient(to_right,transparent_0,rgba(0,0,0,0.35)_12%,#000_min(22rem,32%))] [mask-image:linear-gradient(to_right,transparent_0,rgba(0,0,0,0.35)_12%,#000_min(22rem,32%))] lg:block dark:brightness-[0.94]"
-          />
-        </>
-      )}
-
       {/* The collage header takes a narrower measure of its own. At 92rem the
           copy caps out at a readable line length and the collage at 400px, and
           the 200-odd pixels neither of them wants sit between the two as a
@@ -178,7 +166,7 @@ export function PageHeader({
             0.7fr squeezed them into stamps beside an oversized column. */}
         <div
           className={
-            image || bgImage
+            bgImage
               ? "mt-10 max-w-2xl"
               : cn(
                   "mt-8 grid gap-12 lg:items-center",
@@ -284,7 +272,7 @@ export function PageHeader({
             )}
 
             {/* Everywhere else they stay a simple row under the copy. */}
-            {!logos && !collage && (image || bgImage) && stats && (
+            {!logos && !collage && bgImage && stats && (
               <motion.dl
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -302,7 +290,7 @@ export function PageHeader({
           </div>
 
           {/* brand-logo cards */}
-          {!image && !bgImage && logos && (
+          {!bgImage && logos && (
             <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:order-1">
               {BRANDS.map((b, i) => (
                 <motion.div
@@ -357,7 +345,7 @@ export function PageHeader({
           {/* Photo collage — four tiles on one grid, same shape and same gap.
               Staggered columns of two different ratios read as four pictures
               that didn't line up rather than as a composition. */}
-          {!image && !bgImage && collage && collage.length >= 4 && (
+          {!bgImage && collage && collage.length >= 4 && (
             <div className="grid grid-cols-2 gap-2.5 lg:order-2">
               {collage.slice(0, 4).map((src, i) => (
                 <CollageShot key={src + i} src={src} delay={0.25 + i * 0.07} />
@@ -365,7 +353,7 @@ export function PageHeader({
             </div>
           )}
 
-          {!image && !bgImage && !logos && !collage && stats && (
+          {!bgImage && !logos && !collage && stats && (
             <motion.dl
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
@@ -407,18 +395,6 @@ export function PageHeader({
           </motion.div>
         )}
 
-        {/* stacked image on mobile */}
-        {image && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={image}
-            alt=""
-            aria-hidden
-            /* A shallower frame than the desktop panel would crop the
-               technician's head off the top of it. */
-            className="mt-10 aspect-[5/4] w-full rounded-2xl object-cover object-center lg:hidden"
-          />
-        )}
       </div>
     </header>
   );

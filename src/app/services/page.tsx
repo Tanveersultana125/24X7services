@@ -28,7 +28,13 @@ export default async function ServicesPage() {
             { value: "free", label: "Diagnosis" },
             { value: "90-day", label: "Warranty" },
           ]}
-          image="/work/fridge-hero-scene.webp"
+          bgImage="/work/fridge-hero-wide.webp"
+          bgImageNarrow="/work/fridge-hero-scene.webp"
+          /* The scene sits at the right of the plate and the navy field it
+             was drawn with runs off to the left, so a narrow crop should eat
+             into the field rather than into the technician. */
+          bgPos="right center"
+          bgDark
         />
         <ServicesIndex services={services} copy={copy} />
         <ServicesDetail />
