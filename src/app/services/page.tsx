@@ -28,7 +28,7 @@ export default async function ServicesPage() {
             { value: "free", label: "Diagnosis" },
             { value: "90-day", label: "Warranty" },
           ]}
-          image="/work/fridge-hero.png"
+          image="/work/fridge-hero-scene.webp"
         />
         <ServicesIndex services={services} copy={copy} />
         <ServicesDetail />
