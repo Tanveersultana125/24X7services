@@ -113,6 +113,37 @@ export function PageHeader({
         </>
       )}
 
+      {/* full-bleed technician image (desktop) — sits on a soft blue wash so it blends */}
+      {image && (
+        <>
+          {/* The wash is what a cut-out photo used to stand on. A photo that
+              brings its own background covers it, and on a dark page it would
+              only read as a pale slab — so light keeps it, dark doesn't. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 hidden lg:block dark:lg:hidden"
+            style={{ background: "linear-gradient(105deg, transparent 40%, rgba(226,234,251,0.55) 64%, #e3ebfc 100%)" }}
+          />
+          {/* Fills the right of the header rather than sitting on its floor:
+              a scene photo is wider than it is tall, so anchoring it to the
+              bottom left a band of empty header above it.
+              Anchored right, not left: the photograph carries its own dark
+              navy sweep down its left edge — held to the left that sweep
+              landed in the middle of a cream header as a black slab, and the
+              subject it was meant to sit beside got cropped off the page.
+              From the right the sweep falls outside the crop and the whole
+              scene — technician and appliance — reads. */}
+          <motion.img
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1.1, delay: 0.2, ease }}
+            src={image}
+            alt="24X7 certified technician on the job"
+            className="pointer-events-none absolute inset-y-0 right-0 hidden h-full w-[52%] max-w-[46rem] object-cover object-right [-webkit-mask-image:linear-gradient(to_right,transparent_0%,#000_28%)] [mask-image:linear-gradient(to_right,transparent_0%,#000_28%)] lg:block"
+          />
+        </>
+      )}
+
       {/* The collage header takes a narrower measure of its own. At 92rem the
           copy caps out at a readable line length and the collage at 400px, and
           the 200-odd pixels neither of them wants sit between the two as a
@@ -142,12 +173,7 @@ export function PageHeader({
             0.7fr squeezed them into stamps beside an oversized column. */}
         <div
           className={
-            image
-              // The photograph is a portrait-ish panel, not a backdrop: it
-              // takes its own column beside the copy so nothing has to be
-              // feathered into the page to hide a crop.
-              ? "mt-8 grid gap-10 lg:grid-cols-[1fr_25rem] lg:items-center lg:gap-16 xl:grid-cols-[1fr_29rem]"
-              : bgImage
+            image || bgImage
               ? "mt-10 max-w-2xl"
               : cn(
                   "mt-8 grid gap-12 lg:items-center",
@@ -198,7 +224,7 @@ export function PageHeader({
                  two as a gap. */
               className={
                 "mt-6 text-pretty text-lg leading-relaxed " +
-                (collage || image ? "max-w-2xl " : "max-w-xl ") +
+                (collage ? "max-w-2xl " : "max-w-xl ") +
                 (onDark ? "text-white/80" : "text-muted")
               }
             >
@@ -269,32 +295,6 @@ export function PageHeader({
               </motion.dl>
             )}
           </div>
-
-          {/* The technician panel. The photograph carries its own soft studio
-              backdrop, so it is shown whole inside a frame rather than bled to
-              the page edge — bleeding it meant masking the backdrop away, and a
-              half-dissolved wash on a near-black page reads as a smudge. */}
-          {image && (
-            <motion.figure
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.25, ease }}
-              className="relative lg:order-2"
-            >
-              <span
-                aria-hidden
-                className="pointer-events-none absolute -inset-5 -z-10 rounded-[2.75rem] bg-royal-bright/10 blur-2xl dark:bg-royal-bright/15"
-              />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={image}
-                alt="24X7 certified technician servicing a refrigerator"
-                /* The frame keeps the photograph's own ratio, so nothing of the
-                   scene is cropped at any width. */
-                className="aspect-[912/976] w-full rounded-[1.75rem] object-cover shadow-premium-lg ring-1 ring-black/5 dark:ring-white/10"
-              />
-            </motion.figure>
-          )}
 
           {/* brand-logo cards */}
           {!image && !bgImage && logos && (
@@ -402,6 +402,18 @@ export function PageHeader({
           </motion.div>
         )}
 
+        {/* stacked image on mobile */}
+        {image && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={image}
+            alt=""
+            aria-hidden
+            /* Same crop as the desktop panel, for the same reason: the photo's
+               own navy sweep is a black slab on a cream page. */
+            className="mt-10 aspect-[4/3] w-full rounded-2xl object-cover object-right lg:hidden"
+          />
+        )}
       </div>
     </header>
   );
