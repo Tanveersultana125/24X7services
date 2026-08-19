@@ -55,7 +55,13 @@ const COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
 
 export function SiteFooter() {
   return (
-    <footer className="relative bg-background pt-14 text-foreground sm:pt-16">
+    // Black in both themes. `theme-dark` pins the dark palette on this subtree
+    // — the same class the admin panel uses — so every child keeps its own
+    // classes and resolves them against a dark ground: text-muted stays
+    // readable, hairlines turn light, and the CTA flips to near-white on black.
+    // Restating each colour with a `dark:` variant would have left two
+    // palettes to keep in step instead of one.
+    <footer className="theme-dark relative bg-background pt-14 text-foreground sm:pt-16">
       {/* oversized wordmark marquee */}
       <div className="border-b border-hairline pb-14">
         <Marquee fade={false}>
