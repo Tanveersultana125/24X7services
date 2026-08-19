@@ -1,10 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // A production build overwrites .next while `next dev` is serving out of it,
-  // and the dev server goes down mid-page — the browser then reports the CSS
-  // and images as ERR_CONNECTION_REFUSED. Set NEXT_DIST_DIR to build somewhere
-  // else while the dev server keeps running. Deploys leave it unset.
+  // Next 16 writes development output to .next/dev, so `next build` no longer
+  // overwrites what `next dev` is serving and the two can run side by side.
+  // NEXT_DIST_DIR stays as the escape hatch for a throwaway verification build
+  // (.next-verify) beside a live dev server: with its own tree, deleting one
+  // cannot disturb the other's caches. Deploys leave it unset.
   distDir: process.env.NEXT_DIST_DIR || ".next",
   // firebase-admin uses Node built-ins and shouldn't be bundled by the server compiler.
   serverExternalPackages: ["firebase-admin"],

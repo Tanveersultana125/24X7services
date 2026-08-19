@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "description": "24X7 Services — premium home appliance service booking platform",
+  "//dev": "Pinned to 3200. `next dev` silently walks to the next free port when its own is taken, so with another project's dev server already on 3000 this one lands on 3001 while the browser stays on 3000 — every route of the wrong app answers 404. A port nothing else claims keeps the URL the same every time.",
   "scripts": {
-    "dev": "next dev",
+    "predev": "node scripts/check-dev-port.mjs 3200",
+    "dev": "next dev -p 3200",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
