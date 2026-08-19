@@ -1,19 +1,57 @@
 "use client";
 
 import Link from "next/link";
-import { Instagram, Twitter, Linkedin, Youtube } from "lucide-react";
 import { Marquee } from "./Marquee";
 import { Logo } from "@/components/ui/Logo";
+import { LEGAL_DOCS } from "@/lib/legal";
+import { BRANDS } from "@/lib/data";
 import { cn } from "@/lib/utils";
 
-const COLUMNS = {
-  Services: ["Refrigerator Repair", "Washing Machine Repair", "Microwave Repair", "Oven Repair", "Installation", "Annual Maintenance"],
-  Company: ["About Us", "Careers", "Press", "Blog", "Contact"],
-  Brands: ["Samsung", "LG", "IFB", "Bosch"],
-  Legal: ["Privacy Policy", "Terms of Service", "Refund Policy", "Warranty"],
-};
-
-const SOCIALS = [Instagram, Twitter, Linkedin, Youtube];
+/**
+ * Every link here goes somewhere.
+ *
+ * The columns used to be lists of words with href="#" behind all of them, so
+ * a footer that looked like a site map was four columns of nothing. A label
+ * with no page behind it was removed rather than pointed at the homepage —
+ * Careers, Press and a Blog we do not have said more about the site than
+ * leaving them out does.
+ *
+ * The repairs point at their own row on the services page rather than at the
+ * booking form: /book asks people to sign in first, and a footer link that
+ * opens a login wall has not taken anyone to the thing they clicked.
+ */
+const COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
+  {
+    title: "Services",
+    links: [
+      { label: "Refrigerator Repair", href: "/services#service-refrigerator" },
+      { label: "Washing Machine Repair", href: "/services#service-washing-machine" },
+      // One service in the catalogue covers both, and both are what people search for.
+      { label: "Microwave Repair", href: "/services#service-microwave" },
+      { label: "Oven Repair", href: "/services#service-microwave" },
+      { label: "AC Repair", href: "/services#service-ac" },
+      { label: "Installation", href: "/services#service-installation" },
+      { label: "Annual Maintenance", href: "/plans" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "About Us", href: "/process" },
+      { label: "Reviews", href: "/reviews" },
+      { label: "Track a Booking", href: "/track" },
+      { label: "Contact", href: "/services#contact" },
+    ],
+  },
+  {
+    title: "Brands",
+    links: BRANDS.map((b) => ({ label: b.name, href: `/brands/${b.id}` })),
+  },
+  {
+    title: "Legal",
+    links: LEGAL_DOCS.map((d) => ({ label: d.title, href: `/legal/${d.slug}` })),
+  },
+];
 
 export function SiteFooter() {
   return (
@@ -48,30 +86,30 @@ export function SiteFooter() {
               Telangana&apos;s premium doorstep appliance service. Certified experts, genuine
               parts, and a warranty on every repair — 24×7.
             </p>
-            <div className="mt-6 flex gap-2.5">
-              {SOCIALS.map((Icon, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  aria-label="Social"
-                  className="grid size-10 place-items-center rounded-full border border-border text-muted transition-all hover:-translate-y-0.5 hover:border-ink hover:text-foreground"
-                >
-                  <Icon className="size-4" />
-                </a>
-              ))}
-            </div>
+            {/* The social row was four icons all pointing at "#". Until there
+                are profiles to point at, a button that does nothing is worse
+                than no button — put them back here with their real URLs. */}
+            <Link
+              href="/book"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-background transition-transform hover:scale-[1.02]"
+            >
+              Book a service
+            </Link>
           </div>
 
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
-            {Object.entries(COLUMNS).map(([title, links], i) => (
+            {COLUMNS.map(({ title, links }, i) => (
               // Nudge the right mobile column (odd index) slightly right; no change from sm up.
               <div key={title} className={cn(i % 2 === 1 && "pl-16 sm:pl-0")}>
                 <h4 className="text-xs font-bold uppercase tracking-[0.18em] text-foreground">{title}</h4>
                 <ul className="mt-5 space-y-3">
                   {links.map((l) => (
-                    <li key={l}>
-                      <Link href="#" className="text-sm text-muted transition-colors hover:text-foreground">
-                        {l}
+                    <li key={l.label}>
+                      <Link
+                        href={l.href}
+                        className="text-sm text-muted transition-colors hover:text-foreground"
+                      >
+                        {l.label}
                       </Link>
                     </li>
                   ))}

@@ -83,7 +83,10 @@ export function ServicesIndex({
             {rows.map((s, i) => {
               const line = lineFor(s);
               return (
-              <li key={s.id} className="border-b border-hairline">
+              // Named so the footer can link straight at one service. The
+              // offset clears the sticky nav, which would otherwise sit over
+              // the row the browser just scrolled to.
+              <li id={`service-${s.id}`} key={s.id} className="scroll-mt-28 border-b border-hairline">
                 {/* The row is the link, so Add sits alongside it rather than
                     inside — and below lg, where the row is the accordion
                     control, Add stays a button and does not toggle the panel. */}

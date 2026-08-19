@@ -106,8 +106,8 @@ export default async function LoginPage({
             vertically rather than nudging the text off-centre. */}
         <p className="px-6 pb-24 text-center text-xs text-muted sm:pb-8">
           By continuing you agree to our{" "}
-          <Link href="#" className="underline underline-offset-2">Terms</Link> &amp;{" "}
-          <Link href="#" className="underline underline-offset-2">Privacy Policy</Link>.
+          <Link href="/legal/terms" className="underline underline-offset-2">Terms</Link> &amp;{" "}
+          <Link href="/legal/privacy" className="underline underline-offset-2">Privacy Policy</Link>.
         </p>
       </main>
     </div>
