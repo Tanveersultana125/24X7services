@@ -24,23 +24,34 @@ export type CartItem = {
   /** The fault this line is for, when it was added from the price list. */
   problem?: string;
   problemLabel?: string;
+  /**
+   * The make this line was picked for, when it came off a brand's page.
+   *
+   * Someone who opens /brands/samsung and adds a fridge has already told us
+   * whose fridge it is; without carrying it, the booking form asks again and
+   * the price they were shown — which is that brand's — is not the one it
+   * quotes back.
+   */
+  brand?: string;
 };
 
 /**
  * What makes two lines the same line.
  *
  * The same appliance can sit in the basket twice for two different faults, so
- * the service id alone is not an identity — the fault and the quantity are
- * part of it.
+ * the service id alone is not an identity — the fault, the make and the
+ * quantity are all part of it. A Samsung fridge and an LG fridge are two jobs
+ * at two prices, and collapsing them would quietly drop one.
  */
-export function lineKey(item: Pick<CartItem, "id" | "qty" | "problem">): string {
-  return `${item.id}::${item.problem ?? ""}::${item.qty}`;
+export function lineKey(item: Pick<CartItem, "id" | "qty" | "problem" | "brand">): string {
+  return `${item.id}::${item.brand ?? ""}::${item.problem ?? ""}::${item.qty}`;
 }
 
 /** Where a line goes when someone books it. */
 export function bookHref(item: CartItem): string {
   if (item.kind === "plan") return `/book?amc=${encodeURIComponent(item.id)}`;
   const params = new URLSearchParams({ appliance: item.id, qty: String(item.qty) });
+  if (item.brand) params.set("brand", item.brand);
   if (item.problem) params.set("problem", item.problem);
   return `/book?${params.toString()}`;
 }

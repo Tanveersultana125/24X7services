@@ -9,6 +9,7 @@ import { useSiteImages } from "@/components/providers/SiteImagesProvider";
 import type { SectionOverrides } from "@/lib/section-overrides-shared";
 import { clean } from "@/lib/section-overrides-apply";
 import { useServices } from "@/components/providers/ServicesProvider";
+import { AddToCart } from "./AddToCart";
 import { cn } from "@/lib/utils";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -30,6 +31,17 @@ type Card = {
   meta: string;
   instant?: boolean;
   href: string;
+  /**
+   * The catalogue service this card sells, so it can be added to the basket
+   * and not only clicked through to the booking form. The card's own title and
+   * price are what goes in — an admin who renames a card or reprices it has
+   * changed what the visitor was offered, and that is what the basket owes
+   * them.
+   */
+  service: string;
+  /** The specific job, where the card is for one rather than the appliance at large. */
+  problem?: string;
+  problemLabel?: string;
 };
 
 // AC leads the row (real photo, common service); the rest follow the
@@ -46,6 +58,7 @@ const HEAD: Card[] = [
     meta: "1.4M+ booked",
     instant: true,
     href: "/book",
+    service: "ac",
   },
   {
     title: "AC installation",
@@ -55,6 +68,13 @@ const HEAD: Card[] = [
     rating: 4.7,
     meta: "620K+ booked",
     href: "/book",
+    // Both AC cards sell the same appliance, so without naming the job they
+    // would key to one basket line and adding the second would replace the
+    // first. "installation" is a real repair id, so the booking form opens on
+    // it too.
+    service: "ac",
+    problem: "installation",
+    problemLabel: "Installation",
   },
 ];
 
@@ -78,6 +98,7 @@ export function MostBooked({
         meta: `${a.bookings} booked`,
         instant: a.id === "microwave",
         href: `/book?appliance=${a.id}`,
+        service: a.id,
       })),
   ];
   const cards: Card[] = [
@@ -229,40 +250,59 @@ export function MostBooked({
                  content width and a sliver of the next one showing. */
               className="w-full shrink-0 grow-0 snap-start pr-5 sm:w-1/2 lg:w-1/3"
             >
-              <Link
-                href={c.href}
-                className="group block overflow-hidden rounded-2xl border border-card-edge bg-surface shadow-premium-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-premium-md"
-              >
-                <div className="relative aspect-[5/4] overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={images[c.slot] ?? c.img}
-                    alt={c.title}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
-                  />
-                  <span aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/25 via-transparent to-transparent" />
-                  {c.instant && (
-                    <span className="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-white/95 px-2 py-0.5 text-[0.62rem] font-semibold text-on-white shadow-premium-sm backdrop-blur">
-                      <Zap className="size-2.5 text-emerald" /> Instant
-                    </span>
-                  )}
-                </div>
-
-                <div className="p-3.5">
-                  <h3 className="text-sm font-medium tracking-[-0.01em]">{c.title}</h3>
-                  <div className="mt-1.5 flex items-center gap-1.5 text-xs text-muted">
-                    <span className="inline-flex items-center gap-1 font-medium text-ink">
-                      <Star className="size-3 fill-amber text-amber" /> {c.rating}
-                    </span>
-                    <span className="size-1 rounded-full bg-border" />
-                    <span>{c.meta}</span>
+              {/* The card is a link end to end, and a button inside an anchor
+                  is neither valid nor clickable on its own — so Add sits
+                  beside the link and floats over the photo's free corner. The
+                  lift lives on this wrapper rather than on the link, or the
+                  card would slide out from under a stationary button. */}
+              <div className="group relative transition-transform duration-500 hover:-translate-y-1">
+                <Link
+                  href={c.href}
+                  className="block overflow-hidden rounded-2xl border border-card-edge bg-surface shadow-premium-sm transition-shadow duration-500 group-hover:shadow-premium-md"
+                >
+                  <div className="relative aspect-[5/4] overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={images[c.slot] ?? c.img}
+                      alt={c.title}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+                    />
+                    <span aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/25 via-transparent to-transparent" />
+                    {c.instant && (
+                      <span className="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-white/95 px-2 py-0.5 text-[0.62rem] font-semibold text-on-white shadow-premium-sm backdrop-blur">
+                        <Zap className="size-2.5 text-emerald" /> Instant
+                      </span>
+                    )}
                   </div>
-                  <p className="mt-2 text-xs text-muted">
-                    From <span className="text-sm font-semibold text-ink">₹{c.price}</span>
-                  </p>
-                </div>
-              </Link>
+
+                  <div className="p-3.5">
+                    <h3 className="text-sm font-medium tracking-[-0.01em]">{c.title}</h3>
+                    <div className="mt-1.5 flex items-center gap-1.5 text-xs text-muted">
+                      <span className="inline-flex items-center gap-1 font-medium text-ink">
+                        <Star className="size-3 fill-amber text-amber" /> {c.rating}
+                      </span>
+                      <span className="size-1 rounded-full bg-border" />
+                      <span>{c.meta}</span>
+                    </div>
+                    <p className="mt-2 text-xs text-muted">
+                      From <span className="text-sm font-semibold text-ink">₹{c.price}</span>
+                    </p>
+                  </div>
+                </Link>
+
+                <AddToCart
+                  variant="icon"
+                  className="absolute right-2.5 top-2.5 z-10 border-transparent bg-white/95 text-on-white shadow-premium-sm backdrop-blur hover:border-transparent hover:bg-royal-bright hover:text-white sm:size-9"
+                  item={{
+                    id: c.service,
+                    name: c.title,
+                    qty: 1,
+                    price: c.price,
+                    ...(c.problem ? { problem: c.problem, problemLabel: c.problemLabel } : {}),
+                  }}
+                />
+              </div>
             </motion.div>
           ))}
           </div>

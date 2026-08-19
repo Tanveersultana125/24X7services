@@ -9,6 +9,7 @@ import { priceFor, repairsFor, type CatalogueService } from "@/lib/catalogue-sha
 import { formatINR } from "@/lib/utils";
 import type { Brand } from "@/lib/types";
 import { Kicker } from "./TextReveal";
+import { AddToCart } from "./AddToCart";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -93,12 +94,28 @@ export function BrandServices({ brand, services }: { brand: Brand; services: Cat
                     {repairsFor(s, brand.id).length} repairs covered
                   </p>
 
-                  <Link
-                    href={`/book?brand=${brand.id}&appliance=${s.id}`}
-                    className="mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-background transition-transform hover:scale-[1.02]"
-                  >
-                    <Phone className="size-4" /> Book now
-                  </Link>
+                  <div className="mt-5 flex items-center gap-2.5">
+                    <Link
+                      href={`/book?brand=${brand.id}&appliance=${s.id}`}
+                      className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-background transition-transform hover:scale-[1.02]"
+                    >
+                      <Phone className="size-4" /> Book now
+                    </Link>
+                    {/* The make travels with the line: the price on this card
+                        is Samsung's, and a basket that forgets whose fridge it
+                        is sends the booking form back to asking. */}
+                    <AddToCart
+                      variant="icon"
+                      className="size-11 sm:size-11"
+                      item={{
+                        id: s.id,
+                        name: `${brand.name} ${s.name}`,
+                        qty: 1,
+                        price: priceFor(s, brand.id),
+                        brand: brand.id,
+                      }}
+                    />
+                  </div>
                 </motion.article>
               );
             })}

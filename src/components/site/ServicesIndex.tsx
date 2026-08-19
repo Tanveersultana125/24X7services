@@ -7,6 +7,9 @@ import { ArrowUpRight, Wrench, Clock, Sparkles, Settings2, PackageOpen, Calendar
 import { Kicker } from "./TextReveal";
 import { ApplianceTile } from "@/components/ui/Icons";
 import { SERVICES, type Service } from "@/lib/services";
+import { useServices } from "@/components/providers/ServicesProvider";
+import { AddToCart } from "./AddToCart";
+import type { CartItem } from "@/lib/cart";
 import {
   SERVICE_INDEX_COPY_DEFAULTS,
   type ServiceIndexCopy,
@@ -32,8 +35,28 @@ export function ServicesIndex({
 }) {
   const rows = services?.length ? services : SERVICES;
   const words = copy ?? SERVICE_INDEX_COPY_DEFAULTS;
+  const catalogue = useServices();
   const [active, setActive] = useState<number | null>(0);
   const svc = rows[active ?? 0];
+
+  /**
+   * The basket line a row stands for, or nothing.
+   *
+   * Only the rows that name an appliance can be added: the care rows price
+   * themselves as a sentence — "from ₹1,499/yr", "express +₹199" — and a
+   * number scraped out of one of those is a figure nobody quoted. Those keep
+   * their Book link, which is where the real price is worked out.
+   *
+   * The figure comes from the catalogue rather than the row's own text so a
+   * service added here, from /services, or from a brand's page is one line at
+   * one price instead of three spellings of the same job.
+   */
+  const lineFor = (s: Service): CartItem | null => {
+    if (!s.appliance) return null;
+    const entry = catalogue.find((a) => a.id === s.appliance);
+    if (!entry) return null;
+    return { id: entry.id, name: entry.name, qty: 1, price: entry.startingPrice };
+  };
 
   return (
     <section id="services" className="relative scroll-mt-28 pb-14 pt-10 sm:pb-20 sm:pt-14">
@@ -57,48 +80,57 @@ export function ServicesIndex({
         <div className="mt-10 grid gap-12 sm:mt-16 lg:grid-cols-12">
           {/* Index list */}
           <ol className="lg:col-span-7">
-            {rows.map((s, i) => (
+            {rows.map((s, i) => {
+              const line = lineFor(s);
+              return (
               <li key={s.id} className="border-b border-hairline">
-                <Link
-                  href={s.appliance ? `/book?appliance=${s.appliance}` : "/book"}
-                  onPointerEnter={(e) => { if (e.pointerType === "mouse") setActive(i); }}
-                  onFocus={() => setActive(i)}
-                  onClick={(e) => {
-                    // below lg the row is the accordion control, not the link — booking
-                    // is the button inside the panel it opens. Keyed off width rather
-                    // than hover support, so a narrow desktop window behaves the same.
-                    // Tapping the open row again closes it.
-                    if (typeof window !== "undefined" && window.innerWidth < 1024) {
-                      e.preventDefault();
-                      setActive((cur) => (cur === i ? null : i));
-                    }
-                  }}
-                  className={cn(
-                    "group flex items-center gap-4 py-5 transition-colors sm:gap-8 sm:py-6",
-                    active === i ? "text-ink" : "text-muted"
-                  )}
-                >
-                  <span className="w-8 shrink-0 font-mono text-xs tabular-nums sm:w-10 sm:text-sm">{s.no}</span>
-                  <span className="font-display flex-1 text-[1.5rem] tracking-[-0.02em] transition-transform duration-500 group-hover:translate-x-2 sm:text-[2.1rem]">
-                    {s.title}
-                  </span>
-                  <span className="hidden shrink-0 text-sm text-muted sm:block">{s.price}</span>
-                  {/* the list is a menu on touch, so show open/closed state there */}
-                  <ChevronDown
+                {/* The row is the link, so Add sits alongside it rather than
+                    inside — and below lg, where the row is the accordion
+                    control, Add stays a button and does not toggle the panel. */}
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <Link
+                    href={s.appliance ? `/book?appliance=${s.appliance}` : "/book"}
+                    onPointerEnter={(e) => { if (e.pointerType === "mouse") setActive(i); }}
+                    onFocus={() => setActive(i)}
+                    onClick={(e) => {
+                      // below lg the row is the accordion control, not the link — booking
+                      // is the button inside the panel it opens. Keyed off width rather
+                      // than hover support, so a narrow desktop window behaves the same.
+                      // Tapping the open row again closes it.
+                      if (typeof window !== "undefined" && window.innerWidth < 1024) {
+                        e.preventDefault();
+                        setActive((cur) => (cur === i ? null : i));
+                      }
+                    }}
                     className={cn(
-                      "size-5 shrink-0 transition-transform duration-500 lg:hidden",
-                      active === i ? "rotate-180 text-royal-bright" : "text-muted-2"
+                      "group flex min-w-0 flex-1 items-center gap-4 py-5 transition-colors sm:gap-8 sm:py-6",
+                      active === i ? "text-ink" : "text-muted"
                     )}
-                  />
-                  <ArrowUpRight
-                    className={cn(
-                      "hidden size-6 shrink-0 transition-all duration-500 lg:block",
-                      active === i
-                        ? "translate-x-0 translate-y-0 text-royal-bright opacity-100"
-                        : "-translate-x-2 translate-y-2 opacity-0"
-                    )}
-                  />
-                </Link>
+                  >
+                    <span className="w-8 shrink-0 font-mono text-xs tabular-nums sm:w-10 sm:text-sm">{s.no}</span>
+                    <span className="font-display flex-1 text-[1.5rem] tracking-[-0.02em] transition-transform duration-500 group-hover:translate-x-2 sm:text-[2.1rem]">
+                      {s.title}
+                    </span>
+                    <span className="hidden shrink-0 text-sm text-muted sm:block">{s.price}</span>
+                    {/* the list is a menu on touch, so show open/closed state there */}
+                    <ChevronDown
+                      className={cn(
+                        "size-5 shrink-0 transition-transform duration-500 lg:hidden",
+                        active === i ? "rotate-180 text-royal-bright" : "text-muted-2"
+                      )}
+                    />
+                    <ArrowUpRight
+                      className={cn(
+                        "hidden size-6 shrink-0 transition-all duration-500 lg:block",
+                        active === i
+                          ? "translate-x-0 translate-y-0 text-royal-bright opacity-100"
+                          : "-translate-x-2 translate-y-2 opacity-0"
+                      )}
+                    />
+                  </Link>
+
+                  {line && <AddToCart variant="icon" item={line} className="shrink-0" />}
+                </div>
 
                 {/* below lg the detail opens inline, right under the service tapped */}
                 <AnimatePresence initial={false}>
@@ -111,13 +143,14 @@ export function ServicesIndex({
                       className="overflow-hidden lg:hidden"
                     >
                       <div className="overflow-hidden rounded-[1.5rem] border border-border bg-surface shadow-premium-md mb-6">
-                        <Preview svc={s} />
+                        <Preview svc={s} line={line} />
                       </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </li>
-            ))}
+              );
+            })}
           </ol>
 
           {/* Sticky preview — desktop only */}
@@ -132,7 +165,7 @@ export function ServicesIndex({
                   transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                   className="relative overflow-hidden rounded-[2rem] border border-border bg-surface shadow-premium-lg"
                 >
-                  <Preview svc={svc} />
+                  <Preview svc={svc} line={lineFor(svc)} />
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -143,7 +176,7 @@ export function ServicesIndex({
   );
 }
 
-function Preview({ svc }: { svc: Service }) {
+function Preview({ svc, line }: { svc: Service; line: CartItem | null }) {
   const CareIcon = CARE_ICONS[svc.id] ?? Sparkles;
   return (
     <div className="relative">
@@ -225,6 +258,17 @@ function Preview({ svc }: { svc: Service }) {
           Book {svc.title.replace(" Repair", "").replace(" Service & Repair", "")}
           <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </Link>
+
+        {/* Booking takes one job at a time; adding is how someone keeps
+            looking. The care rows have no line to add, and show Book alone. */}
+        {line && (
+          <AddToCart
+            item={line}
+            label="Add to basket"
+            addedLabel="Added to basket"
+            className="mt-2.5 w-full py-3 text-[0.85rem]"
+          />
+        )}
       </div>
     </div>
   );
