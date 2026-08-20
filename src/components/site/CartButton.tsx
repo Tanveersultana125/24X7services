@@ -5,7 +5,7 @@ import Link from "next/link";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, X, ArrowUpRight } from "lucide-react";
-import { bookHref, cartTotal, clearCart, lineKey, removeFromCart, useCart } from "@/lib/cart";
+import { bookHref, cartTotal, clearCart, lineKey, OPEN_CART_EVENT, removeFromCart, useCart } from "@/lib/cart";
 import { formatINR } from "@/lib/utils";
 
 /**
@@ -26,6 +26,14 @@ export function CartButton() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
+
+  // "View" on the bar that confirms an addition opens this, so the basket is
+  // one press away from the card rather than a hunt up in the nav.
+  useEffect(() => {
+    const show = () => setOpen(true);
+    window.addEventListener(OPEN_CART_EVENT, show);
+    return () => window.removeEventListener(OPEN_CART_EVENT, show);
+  }, []);
 
   const count = items.reduce((n, i) => n + i.qty, 0);
 

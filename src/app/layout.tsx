@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { ChatAssistant } from "@/components/site/ChatAssistant";
+import { Toaster } from "@/components/site/Toaster";
 import { CartSync } from "@/components/site/CartSync";
 import { ActivityTracker } from "@/components/site/ActivityTracker";
 import { SiteImagesProvider } from "@/components/providers/SiteImagesProvider";
@@ -121,6 +122,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             <ServicesProvider services={services}>
               <SmoothScroll>{children}</SmoothScroll>
               <ChatAssistant />
+              {/* Says what a press just did, over whichever page did it. */}
+              <Toaster />
               {/* Copy the basket, and the trail that led to it, to the panel.
                   Both render nothing. */}
               <CartSync />

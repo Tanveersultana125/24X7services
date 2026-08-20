@@ -56,6 +56,17 @@ export function bookHref(item: CartItem): string {
   return `/book?${params.toString()}`;
 }
 
+/**
+ * The basket panel lives in the nav and owns its own open state, so anything
+ * else that wants to show it — the bar that confirms an addition — fires this
+ * rather than threading a callback up through the layout.
+ */
+export const OPEN_CART_EVENT = "24x7:open-cart";
+
+export function openCart() {
+  window.dispatchEvent(new CustomEvent(OPEN_CART_EVENT));
+}
+
 const KEY = "24x7-cart";
 const EMPTY: CartItem[] = [];
 

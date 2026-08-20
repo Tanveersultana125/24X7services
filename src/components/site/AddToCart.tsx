@@ -2,6 +2,7 @@
 
 import { Check, Minus, Plus } from "lucide-react";
 import { addToCart, lineKey, removeFromCart, useCart, type CartItem } from "@/lib/cart";
+import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 
 /**
@@ -89,6 +90,14 @@ export function AddToCart({
           if (inBasket) removeFromCart(lineKey(line));
           else addToCart(line);
         }
+        // The button itself changes, but on a card near the foot of a long
+        // strip that is a change nobody sees — so say it where the eye is.
+        toast({
+          tone: inBasket ? "removed" : "added",
+          title: inBasket ? "Removed from basket" : "Added to basket",
+          detail: what,
+          basket: !inBasket,
+        });
       }}
       aria-pressed={inBasket}
       aria-label={`${inBasket ? "Remove" : "Add"} ${what} ${inBasket ? "from" : "to"} basket`}
