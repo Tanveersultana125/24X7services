@@ -81,6 +81,25 @@ function problemSummary(job: BookingJob, services: CatalogueService[]): string {
     .join(", ");
 }
 
+/**
+ * The job inside a draft, without the visit around it.
+ *
+ * Spelled out field by field rather than spread-and-delete: `{...draft, more:
+ * undefined}` leaves a `more` key holding undefined, and spreading that job
+ * back over a draft later wipes the list of everything else on the visit.
+ */
+function jobOf(d: BookingJob): BookingJob {
+  return {
+    brand: d.brand,
+    otherBrand: d.otherBrand,
+    appliance: d.appliance,
+    otherAppliance: d.otherAppliance,
+    units: d.units,
+    problems: d.problems,
+    otherProblem: d.otherProblem,
+  };
+}
+
 /** Has anything been said about this job yet? */
 function jobStarted(job: BookingJob): boolean {
   return Boolean(job.brand || job.appliance || job.problems.length);
@@ -239,7 +258,7 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
   const addAnother = () => {
     setDraft((d) => ({
       ...d,
-      more: [...(d.more ?? []), { ...d, more: undefined }],
+      more: [...(d.more ?? []), jobOf(d)],
       brand: undefined,
       otherBrand: undefined,
       appliance: undefined,
@@ -265,7 +284,7 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
       const held = clampUnits(d.units);
       return {
         ...d,
-        more: [...(d.more ?? []), { ...d, units: held > 1 ? held - 1 : held, more: undefined }],
+        more: [...(d.more ?? []), { ...jobOf(d), units: held > 1 ? held - 1 : held }],
         units: 1,
         problems: [],
         otherProblem: undefined,
@@ -274,12 +293,55 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
     jumpTo(land);
   };
 
+  /**
+   * One of them is a different make, said here rather than three steps back.
+   *
+   * The faults travel with it. Two washing machines are usually two washing
+   * machines with the same thing wrong, whoever built them — and if they
+   * aren't, the fault step has its own way to say so. Nothing is lost either
+   * way, whereas emptying them means asking again for an answer already given.
+   */
+  const splitMake = (brand: BrandId) => {
+    setDraft((d) => {
+      const held = clampUnits(d.units);
+      return {
+        ...d,
+        more: [...(d.more ?? []), { ...jobOf(d), units: held > 1 ? held - 1 : held }],
+        brand,
+        otherBrand: undefined,
+        units: 1,
+      };
+    });
+  };
+
   const removeJob = (index: number) =>
     setDraft((d) => ({ ...d, more: (d.more ?? []).filter((_, i) => i !== index) }));
 
   // Somebody who pressed "add another" and then thought better of it needs a
   // way out that isn't the back button through three empty steps.
   const skippable = more.length > 0 && !jobStarted(draft) && step < 3;
+
+  /**
+   * Splitting a line before its faults were chosen leaves one behind.
+   *
+   * The three steps only ever describe the job in hand, so a line pushed aside
+   * at the appliance step — "this one is an LG" — would have been carried to
+   * the date with nothing wrong with it and quietly dropped. Continuing from
+   * the fault step swaps in the next line still missing them, and only moves
+   * on once none are.
+   */
+  const unfinished = () => more.findIndex((job) => job.problems.length === 0);
+
+  const continueFromProblem = () => {
+    const at = unfinished();
+    if (at < 0) return go(1);
+    setDraft((d) => {
+      const rest = [...(d.more ?? [])];
+      const [next] = rest.splice(at, 1);
+      return { ...d, more: [...rest, jobOf(d)], ...next };
+    });
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const canProceed = () => {
     switch (STEPS[step].id) {
@@ -397,7 +459,12 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
               Nothing else — continue <ArrowRight className="size-4" />
             </Button>
           ) : step < STEPS.length - 1 ? (
-            <Button onClick={() => go(1)} disabled={!canProceed()} size="lg" className="ml-auto shrink-0">
+            <Button
+              onClick={STEPS[step].id === "problem" ? continueFromProblem : () => go(1)}
+              disabled={!canProceed()}
+              size="lg"
+              className="ml-auto shrink-0"
+            >
               Continue <ArrowRight className="size-4" />
             </Button>
           ) : (
@@ -434,8 +501,7 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
                   draft={draft}
                   setDraft={setDraft}
                   units={units}
-                  onSplitMake={() => splitOne(0)}
-                  onSplitFault={() => splitOne(2)}
+                  onSplitMake={splitMake}
                 />
               )}
               {STEPS[step].id === "problem" && (
@@ -558,8 +624,7 @@ function ApplianceStep({
   setDraft,
   units,
   onSplitMake,
-  onSplitFault,
-}: StepProps & { units: number; onSplitMake: () => void; onSplitFault: () => void }) {
+}: StepProps & { units: number; onSplitMake: (brand: BrandId) => void }) {
   const services = useServices();
   const isOther = draft.appliance === "other";
   const chosen = services.find((a) => a.id === draft.appliance);
@@ -619,12 +684,11 @@ function ApplianceStep({
           number almost everybody leaves at one is a step everybody pays for. */}
       {draft.appliance && (
         <UnitsPicker
+          draft={draft}
           setDraft={setDraft}
           units={units}
           name={chosen?.name ?? applianceLabel(draft) ?? "appliance"}
-          make={brandLabel(draft)}
           onSplitMake={onSplitMake}
-          onSplitFault={onSplitFault}
         />
       )}
     </div>
@@ -640,30 +704,48 @@ function ApplianceStep({
  * so the row reads as a quantity rather than as a pair of controls.
  */
 function UnitsPicker({
+  draft,
   setDraft,
   units,
   name,
-  make,
   onSplitMake,
-  onSplitFault,
-}: Pick<StepProps, "setDraft"> & {
-  units: number;
-  name: string;
-  /** The make chosen a step ago — what every one of them is, until told otherwise. */
-  make?: string;
-  onSplitMake: () => void;
-  onSplitFault: () => void;
-}) {
+}: StepProps & { units: number; name: string; onSplitMake: (brand: BrandId) => void }) {
+  const [pickingFor, setPickingFor] = useState<number | null>(null);
   const set = (next: number) =>
     setDraft((d) => ({ ...d, units: Math.min(MAX_UNITS, Math.max(1, next)) }));
-  const plural = units === 1 ? name : `${name}s`;
+
+  // Every one of this appliance on the visit, not only the ones on the line in
+  // hand: once somebody says the second is an LG it becomes a line of its own,
+  // and a card still counting the first alone would report one washing machine
+  // while the summary beside it reported two.
+  const lines = [
+    ...(draft.more ?? []).filter((job) => job.appliance === draft.appliance),
+    jobOf(draft),
+  ];
+  const rows = lines.flatMap((job, line) =>
+    Array.from({ length: clampUnits(job.units) }, () => ({ line, job })),
+  );
+  const total = rows.length;
+  const plural = total === 1 ? name : `${name}s`;
 
   return (
     <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-4 rounded-2xl border border-border bg-surface-2/60 px-4 py-4 sm:px-5">
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold">How many {name.toLowerCase()}s need work?</p>
+        {/* Once one of them has been split onto its own make, the stepper is
+            about the line in hand rather than the whole visit — and a "1"
+            sitting over a card headed "your 2 washing machines" is a
+            contradiction the card cannot talk anybody out of. */}
+        <p className="text-sm font-semibold">
+          {/* The make keeps its capitals — "lg washing machines" is not a
+              make, it is a typo. */}
+          {lines.length > 1
+            ? `How many ${[brandLabel(draft), name.toLowerCase()].filter(Boolean).join(" ")}s?`
+            : `How many ${name.toLowerCase()}s need work?`}
+        </p>
         <p className="mt-1 text-sm text-muted">
-          One visit covers them all — the visit fee is charged once, the repair per unit.
+          {lines.length > 1
+            ? "The others are listed below, each with its own make."
+            : "One visit covers them all — the visit fee is charged once, the repair per unit."}
         </p>
       </div>
 
@@ -677,12 +759,9 @@ function UnitsPicker({
         >
           <Minus className="size-4" strokeWidth={2.4} />
         </button>
-        {/* Fixed width and tabular figures, so stepping from 9 to 10 doesn't
+        {/* Fixed width and tabular figures, so stepping from 9 to 10 does not
             shove the buttons sideways under the finger pressing them. */}
-        <span
-          aria-live="polite"
-          className="w-9 text-center text-base font-semibold tabular-nums"
-        >
+        <span aria-live="polite" className="w-9 text-center text-base font-semibold tabular-nums">
           {units}
         </span>
         <button
@@ -702,61 +781,86 @@ function UnitsPicker({
         </p>
       )}
 
-      {/* Raising the number is a claim that they are the same appliance, the
-          same make and the same job. Usually true, and when it isn't, nothing
-          on the old stepper said so — two air conditioners quietly became two
-          of the first one. So the number spells itself out: here they are, one
-          per row, with what each is, and a way to say that one of them is not
-          like the others. */}
-      {units > 1 && (
+      {/* Raising the number is a claim that they are the same appliance and the
+          same make. Usually true, and when it is not, nothing on a bare stepper
+          said so &mdash; two washing machines quietly became two of the first
+          one. So the number spells itself out, and a make that differs is
+          answered here rather than three steps back. */}
+      {total > 1 && (
         <div className="w-full rounded-xl border border-border bg-surface">
           <p className="border-b border-hairline px-3.5 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted">
-            Your {units} {plural}
+            Your {total} {plural}
           </p>
-          {/* Stacked on a phone. Sharing the row there left the name in a 90px
-              column, one word to a line, beside two buttons. */}
           <ul className="divide-y divide-hairline">
-            {Array.from({ length: units }, (_, i) => (
-              <li key={i} className="px-3.5 py-3 text-sm sm:flex sm:items-center sm:gap-3">
-                <span className="flex items-center gap-3 sm:min-w-0 sm:flex-1">
-                  <span className="grid size-6 shrink-0 place-items-center rounded-full bg-surface-2 text-xs font-bold tabular-nums text-muted">
-                    {i + 1}
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block font-medium">
-                      {[make, name].filter(Boolean).join(" ")}
+            {rows.map(({ line, job }, i) => {
+              const make = brandLabel(job);
+              // The last row only. Splitting always leaves the new make on the
+              // end of the list, so offering it beside row 1 would change row
+              // 2 — and the ones already set aside are their own lines now,
+              // edited from the summary.
+              const splittable =
+                i === rows.length - 1 && line === lines.length - 1 && clampUnits(job.units) > 1;
+              return (
+                /* Stacked on a phone. Sharing the row there left the name in a
+                   90px column, one word to a line, beside the buttons. */
+                <li key={i} className="px-3.5 py-3 text-sm sm:flex sm:items-center sm:gap-3">
+                  <span className="flex items-center gap-3 sm:min-w-0 sm:flex-1">
+                    <span className="grid size-6 shrink-0 place-items-center rounded-full bg-surface-2 text-xs font-bold tabular-nums text-muted">
+                      {i + 1}
                     </span>
-                    <span className="mt-0.5 block text-xs text-muted">
-                      {/* Every row says the same thing on purpose: that is what
-                          raising the number means, and seeing it repeated is
-                          how somebody notices it is wrong for one of them. */}
-                      {make ? `${make}, ` : ""}same fault as the rest
+                    <span className="min-w-0">
+                      <span className="block font-medium">
+                        {[make, name].filter(Boolean).join(" ")}
+                      </span>
+                      <span className="mt-0.5 block text-xs text-muted">
+                        {job.problems.length
+                          ? `${job.problems.length} fault${job.problems.length === 1 ? "" : "s"} chosen`
+                          : "faults on the next step"}
+                      </span>
                     </span>
                   </span>
-                </span>
-                {/* The first one is the line itself; splitting it off and
-                    splitting any other off do the same thing, so only the
-                    others carry the buttons. */}
-                {i > 0 && (
-                  <span className="mt-2.5 flex flex-wrap gap-1.5 pl-9 sm:mt-0 sm:shrink-0 sm:pl-0">
-                    <button
-                      type="button"
-                      onClick={onSplitMake}
-                      className="rounded-full border border-border px-2.5 py-1 text-xs text-muted transition-colors hover:border-border-strong hover:text-ink"
-                    >
-                      Different make
-                    </button>
-                    <button
-                      type="button"
-                      onClick={onSplitFault}
-                      className="rounded-full border border-border px-2.5 py-1 text-xs text-muted transition-colors hover:border-border-strong hover:text-ink"
-                    >
-                      Different fault
-                    </button>
-                  </span>
-                )}
-              </li>
-            ))}
+
+                  {splittable && (
+                    <span className="mt-2.5 flex flex-wrap items-center gap-1.5 pl-9 sm:mt-0 sm:shrink-0 sm:pl-0">
+                      {pickingFor === i ? (
+                        <>
+                          {BRANDS.map((b) => (
+                            <button
+                              key={b.id}
+                              type="button"
+                              onClick={() => {
+                                onSplitMake(b.id);
+                                setPickingFor(null);
+                              }}
+                              className="rounded-full border border-border px-2.5 py-1 text-xs font-medium transition-colors hover:border-ink"
+                              style={{ color: b.accent }}
+                            >
+                              {b.name}
+                            </button>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() => setPickingFor(null)}
+                            aria-label="Keep the same make"
+                            className="grid size-6 place-items-center rounded-full text-muted-2 transition-colors hover:text-ink"
+                          >
+                            <X className="size-3.5" />
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setPickingFor(i)}
+                          className="rounded-full border border-border px-2.5 py-1 text-xs text-muted transition-colors hover:border-border-strong hover:text-ink"
+                        >
+                          Different make
+                        </button>
+                      )}
+                    </span>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}
@@ -792,11 +896,21 @@ function ProblemStep({
 
   const otherSelected = draft.problems.includes(OTHER_PROBLEM_ID);
   const name = appliance?.name ?? applianceLabel(draft) ?? "appliance";
+  const others = (draft.more ?? []).length;
 
   return (
     <div>
       <StepTitle
-        title={units > 1 ? `What's wrong with the ${name.toLowerCase()}s?` : "What's the problem?"}
+        title={
+          units > 1
+            ? `What's wrong with the ${name.toLowerCase()}s?`
+            : // With several on the visit this step comes round more than
+              // once, and "What's the problem?" the second time is a question
+              // about something the visitor has to guess at.
+              others
+              ? `What's wrong with the ${[brandLabel(draft), name].filter(Boolean).join(" ")}?`
+              : "What's the problem?"
+        }
         hint={
           units > 1
             ? // Said before anything is ticked, not after: somebody choosing
