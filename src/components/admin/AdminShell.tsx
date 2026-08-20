@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import {
@@ -17,6 +17,7 @@ import {
   LogOut,
   Menu,
   X,
+  Loader2,
   ExternalLink,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -41,6 +42,30 @@ const NAV = [
   { href: "/admin/images", label: "Site images", icon: ImagePlay },
   { href: "/admin/reviews", label: "Reviews", icon: Star },
 ];
+
+/**
+ * The spinner on a link that has been pressed but not yet arrived.
+ *
+ * `loading.tsx` covers the page itself, but the sidebar stays on screen across
+ * the navigation and would otherwise show nothing at all where the press
+ * landed. It renders at a fixed size whatever the state, so nothing shifts
+ * when it starts or stops.
+ */
+function Pending() {
+  const { pending } = useLinkStatus();
+  return (
+    <Loader2
+      aria-hidden
+      className={cn(
+        // The box is always there so nothing shifts when it appears; only the
+        // one that is actually waiting is drawn, and only it spins — ten
+        // invisible spinners still cost ten animations a frame.
+        "ml-auto size-4 shrink-0 transition-opacity",
+        pending ? "animate-spin opacity-70" : "opacity-0",
+      )}
+    />
+  );
+}
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -90,8 +115,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                     active ? "bg-ink text-background" : "text-muted hover:bg-surface-2 hover:text-ink"
                   )}
                 >
-                  <item.icon className="size-4.5" />
-                  {item.label}
+                  <item.icon className="size-4.5 shrink-0" />
+                  <span className="min-w-0 truncate">{item.label}</span>
+                  <Pending />
                 </Link>
 
                 {/* Services opens into one page per manufacturer, where their
@@ -109,7 +135,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                           : "text-muted hover:text-ink",
                       )}
                     >
-                      All services
+                      <span className="flex items-center">
+                        All services
+                        <Pending />
+                      </span>
                     </Link>
                     {BRANDS.map((b) => {
                       const href = `/admin/services/${b.id}`;
@@ -130,7 +159,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                             className="size-2 shrink-0 rounded-full"
                             style={{ background: b.accent }}
                           />
-                          {b.name}
+                          <span className="min-w-0 truncate">{b.name}</span>
+                          <Pending />
                         </Link>
                       );
                     })}
@@ -155,7 +185,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                               : "text-muted hover:text-ink"
                           )}
                         >
-                          {g.name}
+                          <span className="flex items-center">
+                            <span className="min-w-0 truncate">{g.name}</span>
+                            <Pending />
+                          </span>
                         </Link>
                       );
                     })}
