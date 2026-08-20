@@ -71,6 +71,12 @@ export interface BookingDraft {
   appliance?: ApplianceId;
   /** Free-text appliance name when `appliance === "other"`. */
   otherAppliance?: string;
+  /**
+   * How many of that appliance the visit covers — two air conditioners in the
+   * same flat is one visit, not two bookings. Absent reads as one, so a draft
+   * made before this existed still means what it meant.
+   */
+  units?: number;
   problems: string[];
   /** Free-text problem description when `problems` includes `OTHER_PROBLEM_ID`. */
   otherProblem?: string;

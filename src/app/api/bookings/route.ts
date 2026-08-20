@@ -23,7 +23,7 @@ export async function POST(request: Request) {
   }
 
   const {
-    brand, appliance, problem, date, slot, payment, price, address, emergency,
+    brand, appliance, units, problem, date, slot, payment, price, address, emergency,
   } = body as Record<string, unknown>;
 
   const a = address as Partial<BookingAddress> | undefined;
@@ -48,6 +48,12 @@ export async function POST(request: Request) {
       customer: a!.fullName || user.name,
       brand,
       appliance,
+      // A whole number of appliances, and a plausible one: the body is the
+      // browser's claim, and the panel prints what it says.
+      units:
+        typeof units === "number" && Number.isFinite(units)
+          ? Math.min(10, Math.max(1, Math.round(units)))
+          : 1,
       problem: typeof problem === "string" ? problem : "",
       date,
       slot,

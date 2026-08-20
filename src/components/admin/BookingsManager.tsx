@@ -89,7 +89,16 @@ export function BookingsManager({ initial }: { initial: Booking[] }) {
               </p>
             </div>
 
-            <p className="mt-3 text-sm">{b.brand ? `${b.brand} ` : ""}{b.appliance}</p>
+            <p className="mt-3 text-sm">
+              {b.brand ? `${b.brand} ` : ""}{b.appliance}
+              {/* The count changes what the technician packs for, so it is
+                  said beside the appliance rather than buried in the price. */}
+              {b.units > 1 && (
+                <span className="ml-2 rounded-full bg-royal-bright/12 px-2 py-0.5 text-[0.68rem] font-bold text-royal-bright">
+                  × {b.units}
+                </span>
+              )}
+            </p>
             <p className="text-xs text-muted">{b.problem || "—"} · {b.city}</p>
 
             <div className="mt-4 grid grid-cols-2 gap-2">
@@ -150,7 +159,14 @@ export function BookingsManager({ initial }: { initial: Booking[] }) {
                   <p className="text-xs text-muted-2">{b.email}</p>
                 </td>
                 <td className="px-4 py-3">
-                  <p>{b.brand ? `${b.brand} ` : ""}{b.appliance}</p>
+                  <p>
+                    {b.brand ? `${b.brand} ` : ""}{b.appliance}
+                    {b.units > 1 && (
+                      <span className="ml-2 rounded-full bg-royal-bright/12 px-2 py-0.5 text-[0.68rem] font-bold text-royal-bright">
+                        × {b.units}
+                      </span>
+                    )}
+                  </p>
                   <p className="text-xs text-muted">{b.problem || "—"} · {b.city}</p>
                 </td>
                 <td className="px-4 py-3 tabular-nums">₹{b.price.toLocaleString("en-IN")}</td>

@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft, ArrowRight, Clock, MapPin, Wrench, ShieldCheck,
-  Sparkles, Zap, CheckCircle2, MoreHorizontal, PencilLine, ShoppingCart,
+  Sparkles, Zap, CheckCircle2, MoreHorizontal, PencilLine, ShoppingCart, Minus, Plus,
 } from "lucide-react";
 import { Stepper, type Step } from "./Stepper";
 import { OptionCard } from "./OptionCard";
@@ -36,6 +36,14 @@ const STEPS: Step[] = [
 const VISIT_FEE = 99;
 
 /**
+ * The most appliances one visit is quoted for here.
+ *
+ * Past this it stops being a household call — a building's worth of air
+ * conditioners is a job somebody prices by hand, not a form.
+ */
+const MAX_UNITS = 10;
+
+/**
  * The basket lines a half-finished booking stands for.
  *
  * The form takes several faults on one appliance, and a fault is already a
@@ -51,17 +59,18 @@ function cartLines(
   draft: BookingDraft,
   appliance: CatalogueService | undefined,
   problems: ServiceProblem[],
+  units: number,
 ): CartItem[] {
   if (!appliance) return [];
   const make = brandLabel(draft);
   const name = make ? `${make} ${appliance.name}` : appliance.name;
-  const base = { id: appliance.id, name, qty: 1, kind: "service" as const, brand: draft.brand };
+  const base = { id: appliance.id, name, qty: units, kind: "service" as const, brand: draft.brand };
 
   const lines: CartItem[] = problems.map((p) => ({
     ...base,
     // The step shows a band; a line carries one figure, so it carries the one
     // the band starts at — the same figure the price list puts in the basket.
-    price: bandFor(appliance, p, draft.brand)[0],
+    price: bandFor(appliance, p, draft.brand)[0] * units,
     problem: p.id,
     problemLabel: p.label,
   }));
@@ -72,7 +81,7 @@ function cartLines(
   if (draft.problems.includes(OTHER_PROBLEM_ID) && described) {
     lines.push({
       ...base,
-      price: priceFor(appliance, draft.brand),
+      price: priceFor(appliance, draft.brand) * units,
       problem: OTHER_PROBLEM_ID,
       problemLabel: described,
     });
@@ -103,10 +112,14 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
     const brand = params.get("brand") as BrandId | null;
     const appliance = params.get("appliance") as ApplianceId | null;
     const problem = params.get("problem");
+    // A basket line carries how many it was for; arriving here and being asked
+    // again — or worse, quoted for one — is the basket forgetting itself.
+    const qty = Number(params.get("qty"));
     setDraft((d) => ({
       ...d,
       brand: brand ?? d.brand,
       appliance: appliance ?? d.appliance,
+      units: Number.isFinite(qty) && qty >= 1 ? Math.min(MAX_UNITS, Math.round(qty)) : d.units,
       problems: problem ? [problem] : d.problems,
     }));
     // Jump to the first incomplete step
@@ -125,21 +138,27 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
     [appliance, draft.problems, draft.brand]
   );
 
+  const units = Math.min(MAX_UNITS, Math.max(1, draft.units ?? 1));
+
   const estimate = useMemo(() => {
     if (!appliance) return { min: 0, max: 0 };
     const bands = selectedProblems.map((p) => bandFor(appliance, p, draft.brand));
+    // The same fault on two appliances is two repairs, so the band doubles.
     return {
-      min: bands.reduce((sum, b) => sum + b[0], 0),
-      max: bands.reduce((sum, b) => sum + b[1], 0),
+      min: bands.reduce((sum, b) => sum + b[0], 0) * units,
+      max: bands.reduce((sum, b) => sum + b[1], 0) * units,
     };
-  }, [appliance, selectedProblems, draft.brand]);
+  }, [appliance, selectedProblems, draft.brand, units]);
 
+  // The visit fee stays a visit fee. One technician comes to one address once,
+  // whether they open one appliance there or three — charging it per unit
+  // would be charging for journeys nobody makes.
   const total = Math.round((estimate.min + estimate.max) / 2) + VISIT_FEE + (emergency ? 199 : 0);
 
   // What "add to basket" would put there, from wherever in the form they are.
   const lines = useMemo(
-    () => cartLines(draft, appliance, selectedProblems),
-    [draft, appliance, selectedProblems],
+    () => cartLines(draft, appliance, selectedProblems, units),
+    [draft, appliance, selectedProblems, units],
   );
 
   const go = (d: number) => {
@@ -182,6 +201,7 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
         body: JSON.stringify({
           brand: brandLabel(draft),
           appliance: applianceLabel(draft),
+          units,
           problem: problemSummary,
           date: draft.date,
           slot: draft.slot,
@@ -280,7 +300,7 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             >
               {STEPS[step].id === "brand" && <BrandStep draft={draft} setDraft={setDraft} />}
-              {STEPS[step].id === "appliance" && <ApplianceStep draft={draft} setDraft={setDraft} />}
+              {STEPS[step].id === "appliance" && <ApplianceStep draft={draft} setDraft={setDraft} units={units} />}
               {STEPS[step].id === "problem" && <ProblemStep draft={draft} setDraft={setDraft} lines={lines} />}
               {STEPS[step].id === "date" && <DateStep draft={draft} setDraft={setDraft} />}
               {STEPS[step].id === "time" && <TimeStep draft={draft} setDraft={setDraft} />}
@@ -291,7 +311,7 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
         </div>
       </div>
 
-      <SummaryCard draft={draft} estimate={estimate} total={total} emergency={emergency} lines={lines} />
+      <SummaryCard draft={draft} estimate={estimate} total={total} emergency={emergency} lines={lines} units={units} />
     </div>
   );
 }
@@ -377,9 +397,10 @@ function BrandStep({ draft, setDraft }: StepProps) {
   );
 }
 
-function ApplianceStep({ draft, setDraft }: StepProps) {
+function ApplianceStep({ draft, setDraft, units }: StepProps & { units: number }) {
   const services = useServices();
   const isOther = draft.appliance === "other";
+  const chosen = services.find((a) => a.id === draft.appliance);
   return (
     <div>
       <StepTitle title="Which appliance needs care?" hint="Pick the appliance — or add your own if it's not listed." />
@@ -429,6 +450,83 @@ function ApplianceStep({ draft, setDraft }: StepProps) {
             className="w-full rounded-2xl border border-border bg-surface px-4 py-3.5 text-sm outline-none transition-colors placeholder:text-muted-2 focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
         </div>
+      )}
+
+      {/* Two air conditioners in the same flat is one visit, not two bookings.
+          It sits here rather than in a step of its own — an eighth step for a
+          number almost everybody leaves at one is a step everybody pays for. */}
+      {draft.appliance && (
+        <UnitsPicker
+          draft={draft}
+          setDraft={setDraft}
+          units={units}
+          name={chosen?.name ?? applianceLabel(draft) ?? "appliance"}
+        />
+      )}
+    </div>
+  );
+}
+
+/**
+ * How many of the chosen appliance the visit covers.
+ *
+ * A stepper rather than a number field: the answer is one for nearly everyone
+ * and two or three for the rest, and picking that from a keyboard on a phone
+ * is more work than pressing a button twice. The figure is typed in the middle
+ * so the row reads as a quantity rather than as a pair of controls.
+ */
+function UnitsPicker({
+  draft,
+  setDraft,
+  units,
+  name,
+}: StepProps & { units: number; name: string }) {
+  const set = (next: number) =>
+    setDraft((d) => ({ ...d, units: Math.min(MAX_UNITS, Math.max(1, next)) }));
+  const plural = units === 1 ? name : `${name}s`;
+
+  return (
+    <div className="mt-6 flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-surface-2/60 px-4 py-4 sm:px-5">
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-semibold">How many {name.toLowerCase()}s need work?</p>
+        <p className="mt-1 text-sm text-muted">
+          One visit covers them all — the visit fee is charged once, the repair per unit.
+        </p>
+      </div>
+
+      <div className="flex items-center gap-1 rounded-full border border-border bg-surface p-1">
+        <button
+          type="button"
+          onClick={() => set(units - 1)}
+          disabled={units <= 1}
+          aria-label={`One fewer ${name.toLowerCase()}`}
+          className="grid size-9 place-items-center rounded-full text-ink transition-colors hover:bg-surface-2 disabled:cursor-not-allowed disabled:text-muted-2 disabled:hover:bg-transparent"
+        >
+          <Minus className="size-4" strokeWidth={2.4} />
+        </button>
+        {/* Fixed width and tabular figures, so stepping from 9 to 10 doesn't
+            shove the buttons sideways under the finger pressing them. */}
+        <span
+          aria-live="polite"
+          className="w-9 text-center text-base font-semibold tabular-nums"
+        >
+          {units}
+        </span>
+        <button
+          type="button"
+          onClick={() => set(units + 1)}
+          disabled={units >= MAX_UNITS}
+          aria-label={`One more ${name.toLowerCase()}`}
+          className="grid size-9 place-items-center rounded-full text-ink transition-colors hover:bg-surface-2 disabled:cursor-not-allowed disabled:text-muted-2 disabled:hover:bg-transparent"
+        >
+          <Plus className="size-4" strokeWidth={2.4} />
+        </button>
+      </div>
+
+      {units >= MAX_UNITS && (
+        <p className="w-full text-xs text-muted-2">
+          More than {MAX_UNITS} {plural}? Call us and we&apos;ll quote the lot together.
+        </p>
       )}
     </div>
   );
@@ -778,13 +876,14 @@ function PaymentStep({ draft, setDraft, total }: StepProps & { total: number }) 
 /* ---------------- Summary ---------------- */
 
 function SummaryCard({
-  draft, estimate, total, emergency, lines,
+  draft, estimate, total, emergency, lines, units,
 }: {
   draft: BookingDraft;
   estimate: { min: number; max: number };
   total: number;
   emergency: boolean;
   lines: CartItem[];
+  units: number;
 }) {
   return (
     <aside className="min-w-0 lg:sticky lg:top-24 lg:h-fit">
@@ -794,6 +893,9 @@ function SummaryCard({
         <dl className="mt-5 space-y-3.5 text-sm">
           <Row label="Brand" value={brandLabel(draft)} />
           <Row label="Appliance" value={applianceLabel(draft)} />
+          {/* Only worth a row once it isn't one — "1 unit" on every booking is
+              a line that never tells anybody anything. */}
+          {units > 1 && <Row label="Units" value={`${units} appliances`} />}
           <Row label="Problems" value={draft.problems.length ? `${draft.problems.length} selected` : undefined} />
           <Row label="Date" value={draft.date} />
           <Row label="Slot" value={draft.slot} />
@@ -804,11 +906,11 @@ function SummaryCard({
             <div className="my-5 border-t border-border" />
             <div className="space-y-2.5 text-sm">
               <div className="flex justify-between text-muted">
-                <span>Repair estimate</span>
+                <span>Repair estimate{units > 1 ? ` (${units} units)` : ""}</span>
                 <span>{formatRange(estimate.min, estimate.max)}</span>
               </div>
               <div className="flex justify-between text-muted">
-                <span>Visit fee</span>
+                <span>Visit fee{units > 1 ? " (once)" : ""}</span>
                 <span>{formatINR(99)}</span>
               </div>
               {emergency && (

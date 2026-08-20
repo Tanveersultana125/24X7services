@@ -33,6 +33,8 @@ export type Booking = {
   phone: string;
   brand: string;
   appliance: string;
+  /** How many of it the visit covers. One unless someone said otherwise. */
+  units: number;
   problem: string;
   city: string;
   address: BookingAddress;
@@ -52,6 +54,7 @@ export type NewBooking = {
   customer: string;
   brand: string;
   appliance: string;
+  units?: number;
   problem: string;
   date: string;
   slot: string;
@@ -100,6 +103,7 @@ export async function createBooking(input: NewBooking): Promise<{ id: string; co
     phone: a.phone,
     brand: input.brand,
     appliance: input.appliance,
+    units: input.units ?? 1,
     problem: input.problem,
     city: a.line2 || a.pincode,
     address: a,
@@ -132,6 +136,8 @@ function mapBooking(id: string, data: FirebaseFirestore.DocumentData): Booking {
     phone: data.phone ?? "",
     brand: data.brand ?? "",
     appliance: data.appliance ?? "",
+    // Bookings taken before units existed were all for one.
+    units: typeof data.units === "number" && data.units > 0 ? data.units : 1,
     problem: data.problem ?? "",
     city: data.city ?? "",
     address: data.address ?? { fullName: "", phone: "", line1: "", pincode: "" },

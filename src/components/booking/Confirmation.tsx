@@ -23,6 +23,9 @@ const TIMELINE = [
 export function Confirmation({ draft, total, code }: { draft: BookingDraft; total: number; code?: string }) {
   const appliance = applianceLabel(draft);
   const brand = brandLabel(draft);
+  // A booking taken for two says two, or the confirmation quietly disagrees
+  // with the price above it.
+  const units = Math.max(1, draft.units ?? 1);
   const id = code ?? `24X7-${String(Math.floor(100000 + Math.random() * 899999))}`;
 
   return (
@@ -39,7 +42,8 @@ export function Confirmation({ draft, total, code }: { draft: BookingDraft; tota
         </div>
         <h1 className="mt-6 text-3xl font-extrabold tracking-tight sm:text-4xl">Booking Confirmed!</h1>
         <p className="mt-3 text-balance text-muted">
-          Your {brand} {appliance} service is booked for{" "}
+          Your {units > 1 ? `${units} ` : ""}{brand} {appliance}{units > 1 ? "s" : ""} service is
+          booked for{" "}
           <span className="font-semibold text-foreground">{draft.date}</span> ·{" "}
           <span className="font-semibold text-foreground">{draft.slot}</span>.
         </p>
