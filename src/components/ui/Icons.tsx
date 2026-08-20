@@ -1,8 +1,51 @@
 "use client";
 
-import { Refrigerator, WashingMachine, Microwave, AirVent, Wrench, type LucideIcon } from "lucide-react";
+import {
+  Refrigerator, WashingMachine, Microwave, AirVent, Wrench, Snowflake, Droplets, Fuel,
+  DoorOpen, Lock, Cog, Volume2, Disc3, RotateCw, Power, Zap, MonitorSmartphone, Flame,
+  Thermometer, Fan, Sparkles, Cpu, PackageOpen, type LucideIcon,
+} from "lucide-react";
 import type { ApplianceId, BrandId } from "@/lib/types";
 import { cn } from "@/lib/utils";
+
+/**
+ * Each fault gets its own glyph — a repeated wrench made every row look
+ * identical. Shared, because the same repairs are listed on the services page
+ * and on each brand's page, and a fault that changes its face between the two
+ * reads as a different fault.
+ */
+export const PROBLEM_ICONS: Record<string, LucideIcon> = {
+  "not-cooling": Snowflake,
+  "water-leakage": Droplets,
+  "gas-filling": Fuel,
+  "door-issue": DoorOpen,
+  "door-lock": Lock,
+  compressor: Cog,
+  "ice-build-up": Snowflake,
+  noise: Volume2,
+  installation: Wrench,
+  "drum-issue": Disc3,
+  "spin-issue": RotateCw,
+  "motor-problem": Cog,
+  "not-starting": Power,
+  "power-problem": Zap,
+  "display-issue": MonitorSmartphone,
+  "display-problem": MonitorSmartphone,
+  "heating-issue": Flame,
+  "not-heating": Flame,
+  "plate-not-rotating": RotateCw,
+  spark: Zap,
+  thermostat: Thermometer,
+  "fan-issue": Fan,
+  "deep-clean": Sparkles,
+  "pcb-issue": Cpu,
+  uninstallation: PackageOpen,
+};
+
+/** The glyph for a fault, falling back to a wrench for one we don't know. */
+export function problemIcon(id: string): LucideIcon {
+  return PROBLEM_ICONS[id] ?? Wrench;
+}
 
 export const APPLIANCE_ICONS: Record<ApplianceId, LucideIcon> = {
   refrigerator: Refrigerator,

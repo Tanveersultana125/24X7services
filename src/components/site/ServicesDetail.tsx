@@ -5,11 +5,9 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ShieldCheck, Package, ClipboardCheck, Sparkles, Receipt, Timer, Clock,
-  Headset, ThumbsUp, ChevronRight, Wrench, Tag, Snowflake, Droplets, Fuel, DoorOpen,
-  Cog, Volume2, Flame, Zap, Thermometer, Fan, RotateCw, MonitorSmartphone, Power,
-  Lock, Disc3, Cpu, PackageOpen,
+  Headset, ThumbsUp, ChevronRight, Tag,
 } from "lucide-react";
-import { ApplianceTile, APPLIANCE_ACCENT, BrandMark } from "@/components/ui/Icons";
+import { ApplianceTile, APPLIANCE_ACCENT, BrandMark, problemIcon } from "@/components/ui/Icons";
 import { useServices } from "@/components/providers/ServicesProvider";
 import { bestSaving, brandsFor, priceFor, pricesDiffer } from "@/lib/catalogue-shared";
 import { ServiceSheet } from "./ServiceSheet";
@@ -45,35 +43,6 @@ const INCLUDES = [
   { icon: Receipt, tint: ROYAL, title: "Digital invoice", desc: "A transparent, itemised GST invoice sent instantly." },
   { icon: Timer, tint: EMERALD, title: "On-time promise", desc: "Live ETA tracking and a slot you actually choose." },
 ];
-
-/** Each fault gets its own glyph — a repeated wrench made every row look identical. */
-const PROBLEM_ICONS: Record<string, typeof Wrench> = {
-  "not-cooling": Snowflake,
-  "water-leakage": Droplets,
-  "gas-filling": Fuel,
-  "door-issue": DoorOpen,
-  "door-lock": Lock,
-  compressor: Cog,
-  "ice-build-up": Snowflake,
-  noise: Volume2,
-  installation: Wrench,
-  "drum-issue": Disc3,
-  "spin-issue": RotateCw,
-  "motor-problem": Cog,
-  "not-starting": Power,
-  "power-problem": Zap,
-  "display-issue": MonitorSmartphone,
-  "display-problem": MonitorSmartphone,
-  "heating-issue": Flame,
-  "not-heating": Flame,
-  "plate-not-rotating": RotateCw,
-  spark: Zap,
-  thermostat: Thermometer,
-  "fan-issue": Fan,
-  "deep-clean": Sparkles,
-  "pcb-issue": Cpu,
-  uninstallation: PackageOpen,
-};
 
 /** A shot of the actual unit, shown beside the appliance name. */
 const APPLIANCE_UNIT: Record<string, { src: string; fit: "cover" | "contain"; pos?: string }> = {
@@ -436,7 +405,7 @@ export function ServicesDetail() {
                     >
                       <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-royal-bright/10 text-royal-bright sm:size-9">
                         {(() => {
-                          const Glyph = PROBLEM_ICONS[p.id] ?? Wrench;
+                          const Glyph = problemIcon(p.id);
                           return <Glyph className="size-4" strokeWidth={1.9} />;
                         })()}
                       </span>

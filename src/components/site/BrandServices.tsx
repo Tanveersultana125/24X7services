@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Phone, ShieldCheck, Clock, Star } from "lucide-react";
-import { ApplianceTile } from "@/components/ui/Icons";
+import { ApplianceTile, BrandMark } from "@/components/ui/Icons";
 import { useSiteImages } from "@/components/providers/SiteImagesProvider";
 import { priceFor, repairsFor, type CatalogueService } from "@/lib/catalogue-shared";
 import { formatINR } from "@/lib/utils";
@@ -33,7 +33,7 @@ export function BrandServices({ brand, services }: { brand: Brand; services: Cat
   const images = useSiteImages();
 
   return (
-    <section className="relative py-14 sm:py-20">
+    <section id="services" className="relative scroll-mt-28 py-14 sm:py-20">
       <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
         <Kicker>{brand.name} service</Kicker>
         <h2 className="font-display mt-6 max-w-2xl text-[2.4rem] leading-[1.15] tracking-[-0.03em] sm:leading-[1.05] sm:text-5xl">
@@ -60,17 +60,29 @@ export function BrandServices({ brand, services }: { brand: Brand; services: Cat
                   transition={{ duration: 0.6, delay: i * 0.06, ease }}
                   className="group flex flex-col overflow-hidden rounded-[1.75rem] border border-card-edge bg-gradient-to-b from-card to-surface p-5 shadow-[0_18px_40px_-20px_rgba(23,21,15,0.18),inset_0_1.5px_0_var(--card-edge)] transition-all duration-500 hover:-translate-y-1 dark:border-white/[0.12] dark:shadow-[0_26px_60px_-30px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)]"
                 >
-                  <div className="grid aspect-[4/3] place-items-center overflow-hidden rounded-2xl bg-surface-2">
+                  <div className="relative grid aspect-[4/3] place-items-center overflow-hidden rounded-2xl bg-surface-2">
                     {photo ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={photo}
                         alt={`${brand.name} ${s.name} service`}
+                        loading="lazy"
+                        decoding="async"
                         className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                     ) : (
                       <ApplianceTile id={s.id} size="lg" className="size-16" />
                     )}
+                    {/* The mark rides the photograph so a card lifted out of
+                        the page still says whose appliance it is. It keeps its
+                        white plate in both themes — see BrandHeader. */}
+                    <span className="absolute left-3 top-3 inline-flex h-6 items-center rounded-md bg-white px-2 shadow-premium-sm ring-1 ring-black/5">
+                      <BrandMark
+                        id={brand.id}
+                        tone="brand"
+                        className={brand.id === "lg" ? "text-base" : "text-[0.55rem]"}
+                      />
+                    </span>
                   </div>
 
                   <h3 className="font-display mt-5 text-pretty text-xl leading-tight tracking-[-0.02em]">
