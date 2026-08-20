@@ -251,10 +251,13 @@ export function MostBooked({
               className="w-full shrink-0 grow-0 snap-start pr-5 sm:w-1/2 lg:w-1/3"
             >
               {/* The card is a link end to end, and a button inside an anchor
-                  is neither valid nor clickable on its own — so Add sits
-                  beside the link and floats over the photo's free corner. The
-                  lift lives on this wrapper rather than on the link, or the
-                  card would slide out from under a stationary button. */}
+                  is neither valid nor clickable on its own — so Add is a
+                  sibling laid over the card rather than a child of it. It sits
+                  in the bottom corner, level with the price: that is the pair
+                  a decision is made from, and over the photograph it read as a
+                  badge on the picture instead. The lift lives on this wrapper
+                  rather than on the link, or the card would slide out from
+                  under a stationary button. */}
               <div className="group relative transition-transform duration-500 hover:-translate-y-1">
                 <Link
                   href={c.href}
@@ -285,7 +288,9 @@ export function MostBooked({
                       <span className="size-1 rounded-full bg-border" />
                       <span>{c.meta}</span>
                     </div>
-                    <p className="mt-2 text-xs text-muted">
+                    {/* The gutter is the button's, kept clear so a four
+                        figure price never runs under it. */}
+                    <p className="mt-2 pr-11 text-xs text-muted">
                       From <span className="text-sm font-semibold text-ink">₹{c.price}</span>
                     </p>
                   </div>
@@ -296,7 +301,7 @@ export function MostBooked({
                   /* Position only — the button carries its own colours now,
                      so that "in the basket" cannot be painted back to "add"
                      by whatever card it happens to sit on. */
-                  className="absolute right-2.5 top-2.5 z-10"
+                  className="absolute bottom-3 right-3 z-10"
                   item={{
                     id: c.service,
                     name: c.title,
