@@ -24,7 +24,11 @@ export function OptionCard({
       whileHover={{ y: -3 }}
       whileTap={{ scale: 0.98 }}
       className={cn(
-        "group relative flex w-full items-center gap-4 rounded-2xl border-2 bg-surface p-4 text-left transition-colors",
+        // min-w-0: a card is a grid item, whose minimum size is its content
+        // unless told otherwise. Without it a long option label — an admin can
+        // name a repair anything — widens the track, and a track that grows to
+        // fit never lets the label's `truncate` do its job.
+        "group relative flex w-full min-w-0 items-center gap-4 rounded-2xl border-2 bg-surface p-4 text-left transition-colors",
         selected
           ? "border-primary shadow-premium-md"
           : "border-border hover:border-border-strong",

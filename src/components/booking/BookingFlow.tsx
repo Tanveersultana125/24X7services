@@ -5,16 +5,21 @@ import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft, ArrowRight, Clock, MapPin, Wrench, ShieldCheck,
-  Sparkles, Zap, CheckCircle2, MoreHorizontal, PencilLine,
+  Sparkles, Zap, CheckCircle2, MoreHorizontal, PencilLine, ShoppingCart,
 } from "lucide-react";
 import { Stepper, type Step } from "./Stepper";
 import { OptionCard } from "./OptionCard";
 import { Confirmation } from "./Confirmation";
 import { Button } from "@/components/ui/Button";
+import { AddToCart } from "@/components/site/AddToCart";
 import { ApplianceTile, BrandMark } from "@/components/ui/Icons";
 import { BRANDS, TIME_SLOTS, PAYMENT_METHODS, brandLabel, applianceLabel } from "@/lib/data";
 import { useServices } from "@/components/providers/ServicesProvider";
-import { bandFor, brandsFor, priceFor, repairsFor } from "@/lib/catalogue-shared";
+import type { CartItem } from "@/lib/cart";
+import {
+  bandFor, brandsFor, priceFor, repairsFor,
+  type CatalogueService, type ServiceProblem,
+} from "@/lib/catalogue-shared";
 import { formatINR, formatRange, cn } from "@/lib/utils";
 import { OTHER_PROBLEM_ID, type BookingDraft, type BrandId, type ApplianceId } from "@/lib/types";
 
@@ -29,6 +34,51 @@ const STEPS: Step[] = [
 ];
 
 const VISIT_FEE = 99;
+
+/**
+ * The basket lines a half-finished booking stands for.
+ *
+ * The form takes several faults on one appliance, and a fault is already a
+ * line of its own everywhere else — the same fridge with two faults is two
+ * jobs at two prices. So a draft becomes one line per fault rather than one
+ * line that quietly forgets all but the first.
+ *
+ * Nothing is offered until an appliance and a fault are both chosen: before
+ * that there is no price to put on a line, and a basket entry without one is
+ * a promise we haven't made.
+ */
+function cartLines(
+  draft: BookingDraft,
+  appliance: CatalogueService | undefined,
+  problems: ServiceProblem[],
+): CartItem[] {
+  if (!appliance) return [];
+  const make = brandLabel(draft);
+  const name = make ? `${make} ${appliance.name}` : appliance.name;
+  const base = { id: appliance.id, name, qty: 1, kind: "service" as const, brand: draft.brand };
+
+  const lines: CartItem[] = problems.map((p) => ({
+    ...base,
+    // The step shows a band; a line carries one figure, so it carries the one
+    // the band starts at — the same figure the price list puts in the basket.
+    price: bandFor(appliance, p, draft.brand)[0],
+    problem: p.id,
+    problemLabel: p.label,
+  }));
+
+  // A described fault has no band until somebody has looked at it, so it
+  // carries the service's own starting price rather than nothing at all.
+  const described = draft.otherProblem?.trim();
+  if (draft.problems.includes(OTHER_PROBLEM_ID) && described) {
+    lines.push({
+      ...base,
+      price: priceFor(appliance, draft.brand),
+      problem: OTHER_PROBLEM_ID,
+      problemLabel: described,
+    });
+  }
+  return lines;
+}
 
 export function BookingFlow({ customer }: { customer?: { name: string; email: string } }) {
   const params = useSearchParams();
@@ -85,6 +135,12 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
   }, [appliance, selectedProblems, draft.brand]);
 
   const total = Math.round((estimate.min + estimate.max) / 2) + VISIT_FEE + (emergency ? 199 : 0);
+
+  // What "add to basket" would put there, from wherever in the form they are.
+  const lines = useMemo(
+    () => cartLines(draft, appliance, selectedProblems),
+    [draft, appliance, selectedProblems],
+  );
 
   const go = (d: number) => {
     setDir(d);
@@ -161,7 +217,13 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_20rem]">
-      <div>
+      {/* min-w-0, because a grid item's minimum size is its content and this
+          column holds text nobody here controls. One fault named "wire issue
+          with friege battery replacement" in the panel was enough to widen the
+          column past a phone, and with it the form, the page and the body —
+          the labels have `truncate`, but a track that grows to fit them never
+          gives truncation anything to do. */}
+      <div className="min-w-0">
         {emergency && (
           <div className="mb-6 flex items-center gap-3 rounded-2xl border border-danger/30 bg-danger/10 p-4 text-sm">
             <Zap className="size-5 shrink-0 text-danger" />
@@ -219,7 +281,7 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
             >
               {STEPS[step].id === "brand" && <BrandStep draft={draft} setDraft={setDraft} />}
               {STEPS[step].id === "appliance" && <ApplianceStep draft={draft} setDraft={setDraft} />}
-              {STEPS[step].id === "problem" && <ProblemStep draft={draft} setDraft={setDraft} />}
+              {STEPS[step].id === "problem" && <ProblemStep draft={draft} setDraft={setDraft} lines={lines} />}
               {STEPS[step].id === "date" && <DateStep draft={draft} setDraft={setDraft} />}
               {STEPS[step].id === "time" && <TimeStep draft={draft} setDraft={setDraft} />}
               {STEPS[step].id === "address" && <AddressStep draft={draft} setDraft={setDraft} />}
@@ -229,7 +291,7 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
         </div>
       </div>
 
-      <SummaryCard draft={draft} estimate={estimate} total={total} emergency={emergency} />
+      <SummaryCard draft={draft} estimate={estimate} total={total} emergency={emergency} lines={lines} />
     </div>
   );
 }
@@ -372,7 +434,7 @@ function ApplianceStep({ draft, setDraft }: StepProps) {
   );
 }
 
-function ProblemStep({ draft, setDraft }: StepProps) {
+function ProblemStep({ draft, setDraft, lines }: StepProps & { lines: CartItem[] }) {
   const services = useServices();
   if (!draft.appliance) return null;
   const appliance = services.find((a) => a.id === draft.appliance);
@@ -401,7 +463,12 @@ function ProblemStep({ draft, setDraft }: StepProps) {
             </div>
             <div className="min-w-0">
               <p className="flex items-center gap-2 font-semibold">
-                <span className="truncate">{p.label}</span>
+                {/* `truncate` sets white-space: nowrap, and a flex item's
+                    default min-width is its content — so a long fault name an
+                    admin coined ("wire issue with friege battery replacement")
+                    refused to shrink and stretched the whole form past the
+                    width of a phone. min-w-0 lets the ellipsis do its job. */}
+                <span className="min-w-0 truncate">{p.label}</span>
                 {p.common && <span className="rounded-full bg-warning/15 px-1.5 py-0.5 text-[10px] font-bold text-warning">POPULAR</span>}
               </p>
               <p className="text-sm text-muted">
@@ -436,6 +503,36 @@ function ProblemStep({ draft, setDraft }: StepProps) {
             onChange={(e) => setDraft((d) => ({ ...d, otherProblem: e.target.value }))}
             placeholder="e.g. Strange noise while spinning, water leaking from the bottom…"
             className="w-full resize-none rounded-2xl border border-border bg-surface px-4 py-3.5 text-sm outline-none transition-colors placeholder:text-muted-2 focus:border-primary focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
+      )}
+
+      {/* Picking the fault is the moment the job becomes a priced thing, and
+          the first moment somebody can be sure they are not booking it today.
+          Until this the form had one way out — a date, a slot, an address and
+          a card — so anyone who only wanted to keep the price left with
+          nothing.
+
+          Stacked on a phone: sharing one row there left the sentence in a
+          140px column five lines tall beside the button. */}
+      {lines.length > 0 && (
+        <div className="mt-6 rounded-2xl border border-border bg-surface-2/60 px-4 py-3.5 sm:flex sm:items-center sm:gap-3">
+          <p className="flex items-start gap-2.5 text-sm text-muted sm:min-w-0 sm:flex-1">
+            <ShoppingCart className="mt-0.5 size-5 shrink-0" />
+            <span>
+              Not booking today?{" "}
+              <span className="text-foreground">
+                Keep {lines.length === 1 ? "it" : `all ${lines.length}`} in your basket
+              </span>{" "}
+              and finish whenever you like.
+            </span>
+          </p>
+          <AddToCart
+            item={lines}
+            variant="solid"
+            label={lines.length === 1 ? "Add to basket" : `Add ${lines.length} to basket`}
+            addedLabel="In your basket"
+            className="mt-3.5 w-full sm:mt-0 sm:w-auto"
           />
         </div>
       )}
@@ -589,7 +686,8 @@ function TimeStep({ draft, setDraft }: StepProps) {
             >
               <span className="flex min-w-0 items-center gap-2.5 font-medium">
                 <Clock className={cn("size-5 shrink-0", selected ? "text-white" : state === "now" ? "text-warning" : "text-muted")} />
-                <span className="truncate">{slot.label}</span>
+                {/* min-w-0 for the same reason as the fault label above. */}
+                <span className="min-w-0 truncate">{slot.label}</span>
               </span>
 
               {selected ? (
@@ -680,15 +778,16 @@ function PaymentStep({ draft, setDraft, total }: StepProps & { total: number }) 
 /* ---------------- Summary ---------------- */
 
 function SummaryCard({
-  draft, estimate, total, emergency,
+  draft, estimate, total, emergency, lines,
 }: {
   draft: BookingDraft;
   estimate: { min: number; max: number };
   total: number;
   emergency: boolean;
+  lines: CartItem[];
 }) {
   return (
-    <aside className="lg:sticky lg:top-24 lg:h-fit">
+    <aside className="min-w-0 lg:sticky lg:top-24 lg:h-fit">
       <div className="rounded-3xl border border-border bg-surface p-6 shadow-premium-md">
         <h3 className="text-lg font-bold tracking-tight">Booking summary</h3>
 
@@ -724,6 +823,19 @@ function SummaryCard({
               </div>
             </div>
           </>
+        )}
+
+        {/* The fault step carries this too, but the summary is the only part
+            of the form that is still on screen four steps later — which is
+            where somebody actually decides the visit can wait. */}
+        {lines.length > 0 && (
+          <AddToCart
+            item={lines}
+            variant="outline"
+            label={lines.length === 1 ? "Add to basket" : `Add ${lines.length} to basket`}
+            addedLabel="In your basket"
+            className="mt-5 w-full px-4 py-2.5 text-sm"
+          />
         )}
 
         <div className="mt-5 flex items-center gap-2 rounded-2xl bg-accent/10 p-3 text-xs text-accent">

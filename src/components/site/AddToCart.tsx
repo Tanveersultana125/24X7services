@@ -13,6 +13,11 @@ import { cn } from "@/lib/utils";
  * ones that could. Every place that knows a name and a price now uses this, so
  * the button looks and behaves the same wherever it appears — and confirms
  * itself in place rather than silently bumping a number in the nav.
+ *
+ * `item` takes a list as well as a single line, because one choice does not
+ * always mean one line: the booking form lets somebody tick three faults on
+ * the same fridge, and each fault is its own job at its own price. Three lines
+ * is what the basket already models, so three lines is what it gets.
  */
 export function AddToCart({
   item,
@@ -21,13 +26,14 @@ export function AddToCart({
   variant = "outline",
   className,
 }: {
-  item: CartItem;
+  item: CartItem | CartItem[];
   label?: string;
   addedLabel?: string;
   /** `icon` is the compact square used in dense price rows. */
   variant?: "outline" | "solid" | "invert" | "icon";
   className?: string;
 }) {
+  const lines = Array.isArray(item) ? item : [item];
   const [added, setAdded] = useState(false);
   const timer = useRef<number | null>(null);
 
@@ -64,12 +70,16 @@ export function AddToCart({
         // the booking form — adding must not also navigate away from it.
         e.preventDefault();
         e.stopPropagation();
-        addToCart(item);
+        for (const line of lines) addToCart(line);
         setAdded(true);
         if (timer.current) window.clearTimeout(timer.current);
         timer.current = window.setTimeout(() => setAdded(false), 1800);
       }}
-      aria-label={variant === "icon" ? `Add ${item.name} to basket` : undefined}
+      aria-label={
+        variant === "icon"
+          ? `Add ${lines.length === 1 ? lines[0].name : `${lines.length} services`} to basket`
+          : undefined
+      }
       className={cn(base, shape, className)}
     >
       {added ? <Check className="size-3.5" strokeWidth={2.6} /> : <Plus className="size-3.5" strokeWidth={2.4} />}
