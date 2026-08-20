@@ -24,6 +24,8 @@ import { cn } from "@/lib/utils";
 import { SITE_IMAGE_GROUP_PAGES } from "@/lib/site-images-shared";
 import { BRANDS } from "@/lib/data";
 import { AdminThemeProvider, AdminThemeToggle } from "@/components/admin/AdminTheme";
+import { AdminFooter } from "@/components/admin/AdminFooter";
+import { AdminAssistant } from "@/components/admin/AdminAssistant";
 
 const NAV = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
@@ -229,7 +231,13 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </button>
           <span className="font-display text-lg">24X7 Admin</span>
         </header>
+        {/* flex-1 on the main so a short page still pushes the footer to the
+            bottom of the window rather than leaving it halfway up. The room
+            for the assistant belongs to the footer, which is what sits under
+            it — see AdminFooter. */}
         <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+        <AdminFooter />
+        <AdminAssistant />
       </div>
     </div>
     </AdminThemeProvider>

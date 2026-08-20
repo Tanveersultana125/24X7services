@@ -1,3 +1,14 @@
+/**
+ * The model both assistants ask.
+ *
+ * It lived as a default inside each route, which is how they came to be
+ * pointing at `llama-3.3-70b-versatile` long after this key stopped being able
+ * to reach it — the customer widget had been quietly answering from its own
+ * canned replies ever since. One name, overridable with GROQ_MODEL, so a
+ * model going away is one line rather than a hunt.
+ */
+export const GROQ_MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-20b";
+
 import { APPLIANCES, BRANDS, AMC_PLANS } from "@/lib/data";
 import { SERVICES } from "@/lib/services";
 

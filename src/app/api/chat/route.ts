@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { SYSTEM_PROMPT, sanitizeHref } from "@/lib/ai/assistant";
+import { GROQ_MODEL, SYSTEM_PROMPT, sanitizeHref } from "@/lib/ai/assistant";
 
 /**
  * The assistant's brain. Talks to Groq's OpenAI-compatible chat endpoint with
@@ -13,7 +13,6 @@ import { SYSTEM_PROMPT, sanitizeHref } from "@/lib/ai/assistant";
 export const dynamic = "force-dynamic";
 
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-const DEFAULT_MODEL = "llama-3.3-70b-versatile";
 
 /** Enough history for the assistant to follow a thread, short enough to stay cheap. */
 const MAX_TURNS = 12;
@@ -113,9 +112,14 @@ export async function POST(request: Request) {
       method: "POST",
       headers: { "content-type": "application/json", authorization: `Bearer ${key}` },
       body: JSON.stringify({
-        model: process.env.GROQ_MODEL || DEFAULT_MODEL,
+        model: GROQ_MODEL,
         temperature: 0.3,
-        max_tokens: 400,
+        // Reasoning tokens are spent out of this same budget, so the old 400
+        // left nothing for the answer and Groq rejected an empty generation as
+        // invalid JSON. Low effort and a wider budget: the question is which
+        // repair somebody needs, not a proof.
+        max_tokens: 1200,
+        reasoning_effort: "low",
         response_format: { type: "json_object" },
         messages: [{ role: "system", content: SYSTEM_PROMPT }, ...turns],
       }),
