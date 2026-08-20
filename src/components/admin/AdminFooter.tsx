@@ -26,11 +26,10 @@ function currentYear() {
 
 export function AdminFooter() {
   return (
-    // The tall bottom padding is the assistant's. It is fixed to the window,
-    // and the footer is the last thing on the page — without the room it would
-    // be reading its links out from underneath a search bar. Taller on a phone,
-    // where the suggested questions wrap onto three lines.
-    <footer className="mt-10 border-t border-border px-4 pb-52 pt-6 text-sm text-muted sm:px-6 lg:px-8">
+    // The bottom padding is the assistant's. It is fixed to the window and the
+    // footer is the last thing on the page, so without the room the links would
+    // be read out from underneath a search bar.
+    <footer className="mt-10 border-t border-border px-4 pb-40 pt-6 text-sm text-muted sm:px-6 lg:px-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <p>
           © {currentYear()} 24X7 Services Pvt. Ltd. · <span className="text-ink">Admin panel</span>

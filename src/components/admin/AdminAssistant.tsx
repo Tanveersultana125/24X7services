@@ -33,6 +33,7 @@ export function AdminAssistant() {
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
   const [open, setOpen] = useState(false);
+  const [focused, setFocused] = useState(false);
   const nextId = useRef(0);
   const thread = useRef<HTMLDivElement>(null);
 
@@ -80,12 +81,27 @@ export function AdminAssistant() {
     setThinking(false);
   };
 
+  const showPrompts = messages.length === 0 && focused;
+
   return (
     // Fixed to the window rather than to the page, so it is in reach at the
     // foot of a long table. It clears the sidebar from lg up, where the
     // sidebar is a column rather than a drawer.
     <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 lg:left-64">
-      <div className="pointer-events-auto mx-auto max-w-3xl px-4 pb-4 sm:px-6">
+      {/* The page scrolls under this. Without a ground of its own the bar sat
+          on whatever happened to be behind it — a row of gallery photographs,
+          in the case that made this obvious — and the gaps between the chips
+          showed the pictures through. The panel's own background, faded up, so
+          the page ends rather than being covered. */}
+      <div aria-hidden className="absolute inset-x-0 bottom-0">
+        {/* Solid where the bar actually sits, fading only above it: a gradient
+            the whole way left the photographs half-visible behind the words.
+            It grows with the suggestions, which would otherwise stand on the
+            page rather than on this. */}
+        <div className="h-16 bg-gradient-to-t from-surface-2 to-transparent" />
+        <div className={cn("bg-surface-2 transition-all", showPrompts ? "h-52" : "h-28")} />
+      </div>
+      <div className="pointer-events-auto relative mx-auto max-w-3xl px-4 pb-4 sm:px-6">
         <AnimatePresence initial={false}>
           {open && messages.length > 0 && (
             <motion.div
@@ -143,13 +159,15 @@ export function AdminAssistant() {
           )}
         </AnimatePresence>
 
-        {/* The suggestions only stand in for an empty thread. Once there is a
-            conversation they are in the way of it.
+        {/* The suggestions stand in for an empty thread, and only once
+            somebody is actually asking: four chips floating over every admin
+            page, all day, is furniture nobody asked for. Once there is a
+            conversation they are in the way of it too.
 
             One line that scrolls on a phone, where four wrapped chips made the
             dock tall enough to sit on the footer; wrapped from sm up, where
             there is width for two rows and no scrolling to discover. */}
-        {messages.length === 0 && (
+        {showPrompts && (
           <div className="no-scrollbar mb-2 flex gap-2 overflow-x-auto sm:flex-wrap sm:overflow-visible">
             {PROMPTS.map((p) => (
               <button
@@ -175,7 +193,14 @@ export function AdminAssistant() {
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onFocus={() => messages.length > 0 && setOpen(true)}
+            onFocus={() => {
+              setFocused(true);
+              if (messages.length > 0) setOpen(true);
+            }}
+            // A blur straight onto a suggestion would take the suggestion away
+            // before the press landed, so the chips outlive the focus by a
+            // moment.
+            onBlur={() => window.setTimeout(() => setFocused(false), 150)}
             placeholder="Ask about your bookings, baskets or activity…"
             aria-label="Ask the panel assistant"
             className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-2"
