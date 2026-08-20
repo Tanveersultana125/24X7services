@@ -173,6 +173,13 @@ export function AdminAssistant() {
               <button
                 key={p}
                 type="button"
+                // Pressing a suggestion used to take it away before the press
+                // finished. Mouse-down blurred the input, the input losing
+                // focus unmounted the suggestions, and the button was gone by
+                // the time the mouse came back up — so nothing was clicked at
+                // all unless you were quick about it. Keeping focus on the
+                // input is the whole fix: the row never moves mid-press.
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => ask(p)}
                 className="shrink-0 whitespace-nowrap rounded-full border border-border bg-surface/90 px-3 py-1.5 text-xs text-muted shadow-premium-sm backdrop-blur transition-colors hover:border-border-strong hover:text-ink"
               >
@@ -197,10 +204,7 @@ export function AdminAssistant() {
               setFocused(true);
               if (messages.length > 0) setOpen(true);
             }}
-            // A blur straight onto a suggestion would take the suggestion away
-            // before the press landed, so the chips outlive the focus by a
-            // moment.
-            onBlur={() => window.setTimeout(() => setFocused(false), 150)}
+            onBlur={() => setFocused(false)}
             placeholder="Ask about your bookings, baskets or activity…"
             aria-label="Ask the panel assistant"
             className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-2"
