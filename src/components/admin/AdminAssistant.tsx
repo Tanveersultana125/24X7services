@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUp, Loader2, Sparkles, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -28,30 +28,92 @@ const PROMPTS = [
 
 type Message = { id: number; role: "user" | "assistant"; text: string };
 
+/**
+ * The conversation, kept where a page load cannot take it.
+ *
+ * The panel is server-rendered pages, and its footer links out to the site —
+ * so anything from a refresh to a policy opened in the same tab would have
+ * emptied the thread. An answer given and then lost to a reload reads exactly
+ * like an answer that never came.
+ *
+ * Session storage, because one tab is one conversation and it should not
+ * outlive the tab. Read through an external store rather than an effect: the
+ * server snapshot is empty, so the first client render agrees with the markup
+ * it is hydrating and the real thread arrives immediately after.
+ */
+const KEPT = "24x7-panel-assistant";
+const EMPTY: Message[] = [];
+
+let thread: Message[] = EMPTY;
+let loaded = false;
+const listeners = new Set<() => void>();
+
+function readThread(): Message[] {
+  if (typeof window === "undefined") return EMPTY;
+  if (loaded) return thread;
+  loaded = true;
+  try {
+    const raw = window.sessionStorage.getItem(KEPT);
+    const parsed = raw ? JSON.parse(raw) : [];
+    thread = Array.isArray(parsed)
+      ? parsed.filter(
+          (m): m is Message =>
+            Boolean(m) &&
+            typeof m.text === "string" &&
+            (m.role === "user" || m.role === "assistant"),
+        )
+      : EMPTY;
+  } catch {
+    thread = EMPTY;
+  }
+  return thread;
+}
+
+function writeThread(next: Message[]) {
+  thread = next;
+  loaded = true;
+  try {
+    if (next.length) window.sessionStorage.setItem(KEPT, JSON.stringify(next));
+    else window.sessionStorage.removeItem(KEPT);
+  } catch {
+    // A blocked store only costs the conversation a reload.
+  }
+  for (const listen of listeners) listen();
+}
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
 export function AdminAssistant() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const messages = useSyncExternalStore(subscribe, readThread, () => EMPTY);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
-  const [open, setOpen] = useState(false);
+  // Closed only by hand. A thread that survived a reload should be on screen
+  // when the page comes back, which is the whole point of keeping it.
+  const [hidden, setHidden] = useState(false);
   const [focused, setFocused] = useState(false);
   const nextId = useRef(0);
-  const thread = useRef<HTMLDivElement>(null);
+  const box = useRef<HTMLDivElement>(null);
 
   // A new answer lands at the bottom of the thread, which is where the eye
   // already is — so the thread follows it rather than the reader chasing it.
   useEffect(() => {
-    thread.current?.scrollTo({ top: thread.current.scrollHeight, behavior: "smooth" });
+    box.current?.scrollTo({ top: box.current.scrollHeight, behavior: "smooth" });
   }, [messages, thinking]);
 
   const ask = async (question: string) => {
     const value = question.trim();
     if (!value || thinking) return;
     setInput("");
-    setOpen(true);
+    setHidden(false);
 
     const asked: Message = { id: nextId.current++, role: "user", text: value };
     const history = [...messages, asked];
-    setMessages(history);
+    writeThread(history);
     setThinking(true);
 
     let reply: string;
@@ -77,7 +139,7 @@ export function AdminAssistant() {
       reply = "I couldn't reach the assistant just now. Try again in a moment.";
     }
 
-    setMessages((m) => [...m, { id: nextId.current++, role: "assistant", text: reply }]);
+    writeThread([...history, { id: nextId.current++, role: "assistant", text: reply }]);
     setThinking(false);
   };
 
@@ -103,7 +165,7 @@ export function AdminAssistant() {
       </div>
       <div className="pointer-events-auto relative mx-auto max-w-3xl px-4 pb-4 sm:px-6">
         <AnimatePresence initial={false}>
-          {open && messages.length > 0 && (
+          {!hidden && messages.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -118,7 +180,7 @@ export function AdminAssistant() {
                 <span className="flex items-center gap-1">
                   <button
                     type="button"
-                    onClick={() => setMessages([])}
+                    onClick={() => writeThread([])}
                     aria-label="Clear this conversation"
                     className="grid size-8 place-items-center rounded-full text-muted transition-colors hover:bg-surface-2 hover:text-ink"
                   >
@@ -126,7 +188,7 @@ export function AdminAssistant() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setOpen(false)}
+                    onClick={() => setHidden(true)}
                     aria-label="Hide the conversation"
                     className="grid size-8 place-items-center rounded-full text-muted transition-colors hover:bg-surface-2 hover:text-ink"
                   >
@@ -135,7 +197,7 @@ export function AdminAssistant() {
                 </span>
               </div>
 
-              <div ref={thread} className="max-h-[22rem] space-y-3 overflow-y-auto px-4 py-4">
+              <div ref={box} className="max-h-[22rem] space-y-3 overflow-y-auto px-4 py-4">
                 {messages.map((m) => (
                   <p
                     key={m.id}
@@ -202,7 +264,7 @@ export function AdminAssistant() {
             onChange={(e) => setInput(e.target.value)}
             onFocus={() => {
               setFocused(true);
-              if (messages.length > 0) setOpen(true);
+              if (messages.length > 0) setHidden(false);
             }}
             onBlur={() => setFocused(false)}
             placeholder="Ask about your bookings, baskets or activity…"
