@@ -293,7 +293,10 @@ export function MostBooked({
 
                 <AddToCart
                   variant="icon"
-                  className="absolute right-2.5 top-2.5 z-10 border-transparent bg-white/95 text-on-white shadow-premium-sm backdrop-blur hover:border-transparent hover:bg-royal-bright hover:text-white sm:size-9"
+                  /* Position only — the button carries its own colours now,
+                     so that "in the basket" cannot be painted back to "add"
+                     by whatever card it happens to sit on. */
+                  className="absolute right-2.5 top-2.5 z-10"
                   item={{
                     id: c.service,
                     name: c.title,
