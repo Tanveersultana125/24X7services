@@ -100,6 +100,37 @@ function jobOf(d: BookingJob): BookingJob {
   };
 }
 
+/** The same faults, in any order. */
+function sameFaults(a: string[], b: string[]): boolean {
+  return a.length === b.length && a.every((id) => b.includes(id));
+}
+
+/**
+ * Fold lines that have become the same thing back into one.
+ *
+ * Setting the second washing machine to Samsung when the fourth is already a
+ * Samsung should leave two Samsungs, not two lines of one — the technician
+ * reads a count, and a list that says the same thing twice is a list somebody
+ * has to add up by eye. Lines with nothing left in them go entirely.
+ */
+function mergeJobs(jobs: BookingJob[]): BookingJob[] {
+  const out: BookingJob[] = [];
+  for (const job of jobs) {
+    if ((job.units ?? 1) < 1) continue;
+    const twin = out.find(
+      (j) =>
+        j.appliance === job.appliance &&
+        j.brand === job.brand &&
+        j.otherBrand === job.otherBrand &&
+        j.otherProblem === job.otherProblem &&
+        sameFaults(j.problems, job.problems),
+    );
+    if (twin) twin.units = clampUnits(twin.units) + clampUnits(job.units);
+    else out.push({ ...job });
+  }
+  return out;
+}
+
 /** Has anything been said about this job yet? */
 function jobStarted(job: BookingJob): boolean {
   return Boolean(job.brand || job.appliance || job.problems.length);
@@ -294,23 +325,39 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
   };
 
   /**
-   * One of them is a different make, said here rather than three steps back.
+   * Give one of them a make of its own.
    *
-   * The faults travel with it. Two washing machines are usually two washing
-   * machines with the same thing wrong, whoever built them — and if they
-   * aren't, the fault step has its own way to say so. Nothing is lost either
-   * way, whereas emptying them means asking again for an answer already given.
+   * `from` is where that one currently sits — an index into the list of other
+   * appliances on the visit, or null for the line being filled in. Any of them
+   * can be changed, not only the last: somebody looking at four washing
+   * machines means a particular one when they say the second is a Samsung.
+   *
+   * One unit moves, not the line: a line of three where one is a Samsung
+   * becomes two and one. The faults travel with it, because two washing
+   * machines are usually two washing machines with the same thing wrong
+   * whoever built them — and if they are not, the fault step has its own way
+   * to say so.
    */
-  const splitMake = (brand: BrandId) => {
+  const setUnitMake = (from: number | null, brand: BrandId) => {
     setDraft((d) => {
-      const held = clampUnits(d.units);
-      return {
-        ...d,
-        more: [...(d.more ?? []), { ...jobOf(d), units: held > 1 ? held - 1 : held }],
-        brand,
-        otherBrand: undefined,
-        units: 1,
-      };
+      const list: BookingJob[] = [...(d.more ?? []), jobOf(d)];
+      const at = from ?? list.length - 1;
+      const source = list[at];
+      // Choosing the make it already is asks for nothing.
+      if (!source || source.brand === brand) return d;
+
+      const held = clampUnits(source.units);
+      const moved: BookingJob = { ...source, brand, otherBrand: undefined, units: 1 };
+      const rest =
+        held > 1
+          ? [...list.slice(0, at), { ...source, units: held - 1 }, ...list.slice(at + 1)]
+          : [...list.slice(0, at), ...list.slice(at + 1)];
+
+      // The one just changed goes last and so becomes the line in hand: it is
+      // the one that was being talked about, and the fault step describes it.
+      const merged = mergeJobs([...rest, moved]);
+      const current = merged[merged.length - 1];
+      return { ...d, ...current, more: merged.slice(0, -1) };
     });
   };
 
@@ -501,7 +548,7 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
                   draft={draft}
                   setDraft={setDraft}
                   units={units}
-                  onSplitMake={splitMake}
+                  onSetMake={setUnitMake}
                 />
               )}
               {STEPS[step].id === "problem" && (
@@ -623,8 +670,8 @@ function ApplianceStep({
   draft,
   setDraft,
   units,
-  onSplitMake,
-}: StepProps & { units: number; onSplitMake: (brand: BrandId) => void }) {
+  onSetMake,
+}: StepProps & { units: number; onSetMake: (from: number | null, brand: BrandId) => void }) {
   const services = useServices();
   const isOther = draft.appliance === "other";
   const chosen = services.find((a) => a.id === draft.appliance);
@@ -688,7 +735,7 @@ function ApplianceStep({
           setDraft={setDraft}
           units={units}
           name={chosen?.name ?? applianceLabel(draft) ?? "appliance"}
-          onSplitMake={onSplitMake}
+          onSetMake={onSetMake}
         />
       )}
     </div>
@@ -708,22 +755,29 @@ function UnitsPicker({
   setDraft,
   units,
   name,
-  onSplitMake,
-}: StepProps & { units: number; name: string; onSplitMake: (brand: BrandId) => void }) {
+  onSetMake,
+}: StepProps & {
+  units: number;
+  name: string;
+  onSetMake: (from: number | null, brand: BrandId) => void;
+}) {
   const [pickingFor, setPickingFor] = useState<number | null>(null);
   const set = (next: number) =>
     setDraft((d) => ({ ...d, units: Math.min(MAX_UNITS, Math.max(1, next)) }));
 
-  // Every one of this appliance on the visit, not only the ones on the line in
+  // Every one of this appliance on the visit, not only the units of the line in
   // hand: once somebody says the second is an LG it becomes a line of its own,
   // and a card still counting the first alone would report one washing machine
-  // while the summary beside it reported two.
-  const lines = [
-    ...(draft.more ?? []).filter((job) => job.appliance === draft.appliance),
-    jobOf(draft),
+  // while the summary beside it reported two. Each keeps the index it has in
+  // the visit, so a row knows which line it is asking to change.
+  const lines: { job: BookingJob; from: number | null }[] = [
+    ...(draft.more ?? [])
+      .map((job, from) => ({ job, from: from as number | null }))
+      .filter(({ job }) => job.appliance === draft.appliance),
+    { job: jobOf(draft), from: null },
   ];
-  const rows = lines.flatMap((job, line) =>
-    Array.from({ length: clampUnits(job.units) }, () => ({ line, job })),
+  const rows = lines.flatMap(({ job, from }) =>
+    Array.from({ length: clampUnits(job.units) }, () => ({ job, from })),
   );
   const total = rows.length;
   const plural = total === 1 ? name : `${name}s`;
@@ -731,13 +785,12 @@ function UnitsPicker({
   return (
     <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-4 rounded-2xl border border-border bg-surface-2/60 px-4 py-4 sm:px-5">
       <div className="min-w-0 flex-1">
-        {/* Once one of them has been split onto its own make, the stepper is
-            about the line in hand rather than the whole visit — and a "1"
-            sitting over a card headed "your 2 washing machines" is a
-            contradiction the card cannot talk anybody out of. */}
+        {/* Once one of them has been given its own make, the stepper is about
+            the line in hand rather than the whole visit — and a "1" sitting
+            over a card headed "your 2 washing machines" is a contradiction the
+            card cannot talk anybody out of. The make keeps its capitals; "lg
+            washing machines" is not a make, it is a typo. */}
         <p className="text-sm font-semibold">
-          {/* The make keeps its capitals — "lg washing machines" is not a
-              make, it is a typo. */}
           {lines.length > 1
             ? `How many ${[brandLabel(draft), name.toLowerCase()].filter(Boolean).join(" ")}s?`
             : `How many ${name.toLowerCase()}s need work?`}
@@ -783,23 +836,17 @@ function UnitsPicker({
 
       {/* Raising the number is a claim that they are the same appliance and the
           same make. Usually true, and when it is not, nothing on a bare stepper
-          said so &mdash; two washing machines quietly became two of the first
-          one. So the number spells itself out, and a make that differs is
-          answered here rather than three steps back. */}
+          said so — two washing machines quietly became two of the first one. So
+          the number spells itself out, and any of them can be given its own
+          make here rather than three steps back. */}
       {total > 1 && (
         <div className="w-full rounded-xl border border-border bg-surface">
           <p className="border-b border-hairline px-3.5 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted">
             Your {total} {plural}
           </p>
           <ul className="divide-y divide-hairline">
-            {rows.map(({ line, job }, i) => {
+            {rows.map(({ job, from }, i) => {
               const make = brandLabel(job);
-              // The last row only. Splitting always leaves the new make on the
-              // end of the list, so offering it beside row 1 would change row
-              // 2 — and the ones already set aside are their own lines now,
-              // edited from the summary.
-              const splittable =
-                i === rows.length - 1 && line === lines.length - 1 && clampUnits(job.units) > 1;
               return (
                 /* Stacked on a phone. Sharing the row there left the name in a
                    90px column, one word to a line, beside the buttons. */
@@ -820,44 +867,55 @@ function UnitsPicker({
                     </span>
                   </span>
 
-                  {splittable && (
-                    <span className="mt-2.5 flex flex-wrap items-center gap-1.5 pl-9 sm:mt-0 sm:shrink-0 sm:pl-0">
-                      {pickingFor === i ? (
-                        <>
-                          {BRANDS.map((b) => (
+                  <span className="mt-2.5 flex flex-wrap items-center gap-1.5 pl-9 sm:mt-0 sm:shrink-0 sm:pl-0">
+                    {pickingFor === i ? (
+                      <>
+                        {BRANDS.map((b) => {
+                          const current = job.brand === b.id;
+                          return (
                             <button
                               key={b.id}
                               type="button"
+                              // The one it already is stays on screen and stays
+                              // pressable — it is the way back out of the
+                              // picker, and hiding it would leave somebody
+                              // wondering what this one is.
                               onClick={() => {
-                                onSplitMake(b.id);
+                                if (!current) onSetMake(from, b.id);
                                 setPickingFor(null);
                               }}
-                              className="rounded-full border border-border px-2.5 py-1 text-xs font-medium transition-colors hover:border-ink"
-                              style={{ color: b.accent }}
+                              aria-pressed={current}
+                              className={cn(
+                                "rounded-full border px-2.5 py-1 text-xs font-medium transition-colors",
+                                current
+                                  ? "border-ink bg-ink text-background"
+                                  : "border-border hover:border-ink",
+                              )}
+                              style={current ? undefined : { color: b.accent }}
                             >
                               {b.name}
                             </button>
-                          ))}
-                          <button
-                            type="button"
-                            onClick={() => setPickingFor(null)}
-                            aria-label="Keep the same make"
-                            className="grid size-6 place-items-center rounded-full text-muted-2 transition-colors hover:text-ink"
-                          >
-                            <X className="size-3.5" />
-                          </button>
-                        </>
-                      ) : (
+                          );
+                        })}
                         <button
                           type="button"
-                          onClick={() => setPickingFor(i)}
-                          className="rounded-full border border-border px-2.5 py-1 text-xs text-muted transition-colors hover:border-border-strong hover:text-ink"
+                          onClick={() => setPickingFor(null)}
+                          aria-label="Leave this one as it is"
+                          className="grid size-6 place-items-center rounded-full text-muted-2 transition-colors hover:text-ink"
                         >
-                          Different make
+                          <X className="size-3.5" />
                         </button>
-                      )}
-                    </span>
-                  )}
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setPickingFor(i)}
+                        className="rounded-full border border-border px-2.5 py-1 text-xs text-muted transition-colors hover:border-border-strong hover:text-ink"
+                      >
+                        Different make
+                      </button>
+                    )}
+                  </span>
                 </li>
               );
             })}
@@ -901,14 +959,15 @@ function ProblemStep({
   return (
     <div>
       <StepTitle
+        // With several on the visit this step comes round more than once, and
+        // "What's the problem?" the second time is a question about something
+        // the visitor has to guess at — so it names the make and the count of
+        // whichever line it is asking about.
         title={
-          units > 1
-            ? `What's wrong with the ${name.toLowerCase()}s?`
-            : // With several on the visit this step comes round more than
-              // once, and "What's the problem?" the second time is a question
-              // about something the visitor has to guess at.
-              others
-              ? `What's wrong with the ${[brandLabel(draft), name].filter(Boolean).join(" ")}?`
+          others
+            ? `What's wrong with the ${units > 1 ? `${units} ` : ""}${[brandLabel(draft), name].filter(Boolean).join(" ")}${units > 1 ? "s" : ""}?`
+            : units > 1
+              ? `What's wrong with the ${name.toLowerCase()}s?`
               : "What's the problem?"
         }
         hint={
