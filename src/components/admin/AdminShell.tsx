@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   CalendarCheck,
   ShoppingCart,
+  MousePointerClick,
   Users,
   Wrench,
   ListOrdered,
@@ -29,6 +30,8 @@ const NAV = [
   // Baskets sit next to bookings: they are the same list one step earlier.
   { href: "/admin/carts", label: "Baskets", icon: ShoppingCart },
   { href: "/admin/customers", label: "Customers", icon: Users },
+  // After customers: the trail is who they were before they were customers.
+  { href: "/admin/activity", label: "Activity", icon: MousePointerClick },
   { href: "/admin/services", label: "Services & prices", icon: Wrench },
   // Its own line rather than a child of Services & prices: that menu only
   // opened once you were already inside it, so the one page that edits the

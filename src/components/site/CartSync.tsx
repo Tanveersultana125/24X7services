@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useCart } from "@/lib/cart";
+import { visitorId } from "@/lib/visitor";
 import { useSession } from "./AccountMenu";
 
 /**
@@ -16,23 +17,7 @@ import { useSession } from "./AccountMenu";
  * working exactly as before.
  */
 
-const VISITOR_KEY = "24x7-visitor";
 const SENT_KEY = "24x7-cart-sent";
-
-function visitorId(): string {
-  let id = "";
-  try {
-    id = window.localStorage.getItem(VISITOR_KEY) ?? "";
-    if (!id) {
-      id = crypto.randomUUID();
-      window.localStorage.setItem(VISITOR_KEY, id);
-    }
-  } catch {
-    // A blocked store means this browser can't be followed across reloads.
-    // Sending nothing is better than sending a new basket on every page view.
-  }
-  return id;
-}
 
 export function CartSync() {
   const items = useCart();
