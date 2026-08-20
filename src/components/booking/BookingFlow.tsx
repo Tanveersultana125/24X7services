@@ -252,15 +252,15 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
   };
 
   /**
-   * Describe one of them on its own, because it needs something different.
+   * Describe one of them on its own, because it is not like the others.
    *
-   * Two air conditioners are one line while they share a fault and two the
-   * moment they don't. This takes one off the line being filled in — rather
-   * than adding a third appliance to a flat that has two — keeps the make and
-   * the appliance, and drops straight onto the faults, which is the only
-   * question left to answer about it.
+   * Two air conditioners are one line while they share a make and a fault, and
+   * two lines the moment they don't. This takes one off the line being filled
+   * in — rather than adding a third air conditioner to a flat that has two —
+   * and lands on whichever question makes it different: the make, or the
+   * fault. Everything else about it is already right.
    */
-  const splitOne = () => {
+  const splitOne = (land: number) => {
     setDraft((d) => {
       const held = clampUnits(d.units);
       return {
@@ -271,7 +271,7 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
         otherProblem: undefined,
       };
     });
-    jumpTo(2);
+    jumpTo(land);
   };
 
   const removeJob = (index: number) =>
@@ -429,14 +429,22 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             >
               {STEPS[step].id === "brand" && <BrandStep draft={draft} setDraft={setDraft} />}
-              {STEPS[step].id === "appliance" && <ApplianceStep draft={draft} setDraft={setDraft} units={units} />}
+              {STEPS[step].id === "appliance" && (
+                <ApplianceStep
+                  draft={draft}
+                  setDraft={setDraft}
+                  units={units}
+                  onSplitMake={() => splitOne(0)}
+                  onSplitFault={() => splitOne(2)}
+                />
+              )}
               {STEPS[step].id === "problem" && (
                 <ProblemStep
                   draft={draft}
                   setDraft={setDraft}
                   lines={lines}
                   onAddAnother={addAnother}
-                  onSplitOne={splitOne}
+                  onSplitOne={() => splitOne(2)}
                   count={jobs.length}
                   units={units}
                 />
@@ -545,7 +553,13 @@ function BrandStep({ draft, setDraft }: StepProps) {
   );
 }
 
-function ApplianceStep({ draft, setDraft, units }: StepProps & { units: number }) {
+function ApplianceStep({
+  draft,
+  setDraft,
+  units,
+  onSplitMake,
+  onSplitFault,
+}: StepProps & { units: number; onSplitMake: () => void; onSplitFault: () => void }) {
   const services = useServices();
   const isOther = draft.appliance === "other";
   const chosen = services.find((a) => a.id === draft.appliance);
@@ -608,6 +622,9 @@ function ApplianceStep({ draft, setDraft, units }: StepProps & { units: number }
           setDraft={setDraft}
           units={units}
           name={chosen?.name ?? applianceLabel(draft) ?? "appliance"}
+          make={brandLabel(draft)}
+          onSplitMake={onSplitMake}
+          onSplitFault={onSplitFault}
         />
       )}
     </div>
@@ -626,13 +643,23 @@ function UnitsPicker({
   setDraft,
   units,
   name,
-}: Pick<StepProps, "setDraft"> & { units: number; name: string }) {
+  make,
+  onSplitMake,
+  onSplitFault,
+}: Pick<StepProps, "setDraft"> & {
+  units: number;
+  name: string;
+  /** The make chosen a step ago — what every one of them is, until told otherwise. */
+  make?: string;
+  onSplitMake: () => void;
+  onSplitFault: () => void;
+}) {
   const set = (next: number) =>
     setDraft((d) => ({ ...d, units: Math.min(MAX_UNITS, Math.max(1, next)) }));
   const plural = units === 1 ? name : `${name}s`;
 
   return (
-    <div className="mt-6 flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-surface-2/60 px-4 py-4 sm:px-5">
+    <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-4 rounded-2xl border border-border bg-surface-2/60 px-4 py-4 sm:px-5">
       <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold">How many {name.toLowerCase()}s need work?</p>
         <p className="mt-1 text-sm text-muted">
@@ -673,6 +700,65 @@ function UnitsPicker({
         <p className="w-full text-xs text-muted-2">
           More than {MAX_UNITS} {plural}? Call us and we&apos;ll quote the lot together.
         </p>
+      )}
+
+      {/* Raising the number is a claim that they are the same appliance, the
+          same make and the same job. Usually true, and when it isn't, nothing
+          on the old stepper said so — two air conditioners quietly became two
+          of the first one. So the number spells itself out: here they are, one
+          per row, with what each is, and a way to say that one of them is not
+          like the others. */}
+      {units > 1 && (
+        <div className="w-full rounded-xl border border-border bg-surface">
+          <p className="border-b border-hairline px-3.5 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted">
+            Your {units} {plural}
+          </p>
+          {/* Stacked on a phone. Sharing the row there left the name in a 90px
+              column, one word to a line, beside two buttons. */}
+          <ul className="divide-y divide-hairline">
+            {Array.from({ length: units }, (_, i) => (
+              <li key={i} className="px-3.5 py-3 text-sm sm:flex sm:items-center sm:gap-3">
+                <span className="flex items-center gap-3 sm:min-w-0 sm:flex-1">
+                  <span className="grid size-6 shrink-0 place-items-center rounded-full bg-surface-2 text-xs font-bold tabular-nums text-muted">
+                    {i + 1}
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block font-medium">
+                      {[make, name].filter(Boolean).join(" ")}
+                    </span>
+                    <span className="mt-0.5 block text-xs text-muted">
+                      {/* Every row says the same thing on purpose: that is what
+                          raising the number means, and seeing it repeated is
+                          how somebody notices it is wrong for one of them. */}
+                      {make ? `${make}, ` : ""}same fault as the rest
+                    </span>
+                  </span>
+                </span>
+                {/* The first one is the line itself; splitting it off and
+                    splitting any other off do the same thing, so only the
+                    others carry the buttons. */}
+                {i > 0 && (
+                  <span className="mt-2.5 flex flex-wrap gap-1.5 pl-9 sm:mt-0 sm:shrink-0 sm:pl-0">
+                    <button
+                      type="button"
+                      onClick={onSplitMake}
+                      className="rounded-full border border-border px-2.5 py-1 text-xs text-muted transition-colors hover:border-border-strong hover:text-ink"
+                    >
+                      Different make
+                    </button>
+                    <button
+                      type="button"
+                      onClick={onSplitFault}
+                      className="rounded-full border border-border px-2.5 py-1 text-xs text-muted transition-colors hover:border-border-strong hover:text-ink"
+                    >
+                      Different fault
+                    </button>
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );
@@ -1101,6 +1187,7 @@ function SummaryCard({
   onRemove: (index: number) => void;
 }) {
   const services = useServices();
+  const covered = jobs.reduce((n, job) => n + clampUnits(job.units), 0);
   // The list as soon as there is more than one appliance on the visit, not
   // only once the newest is finished: mid-split the labelled rows described
   // the empty job being filled in while pricing the one already added, which
@@ -1171,8 +1258,11 @@ function SummaryCard({
               <div className="flex justify-between text-muted">
                 <span>
                   Repair estimate
+                  {/* Appliances, not lines: two Samsungs on one line and an
+                      LG on another is three of them, and the estimate is for
+                      three. */}
                   {many
-                    ? ` (${jobs.length} ${jobs.length === 1 ? "appliance" : "appliances"})`
+                    ? ` (${covered} ${covered === 1 ? "appliance" : "appliances"})`
                     : units > 1
                       ? ` (${units} units)`
                       : ""}
