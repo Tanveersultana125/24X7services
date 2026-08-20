@@ -26,6 +26,9 @@ export function Confirmation({ draft, total, code }: { draft: BookingDraft; tota
   // A booking taken for two says two, or the confirmation quietly disagrees
   // with the price above it.
   const units = Math.max(1, draft.units ?? 1);
+  // A visit can cover several appliances; naming only the last one asked about
+  // would leave somebody wondering whether the rest were taken down.
+  const others = draft.more?.length ?? 0;
   const id = code ?? `24X7-${String(Math.floor(100000 + Math.random() * 899999))}`;
 
   return (
@@ -42,7 +45,12 @@ export function Confirmation({ draft, total, code }: { draft: BookingDraft; tota
         </div>
         <h1 className="mt-6 text-3xl font-extrabold tracking-tight sm:text-4xl">Booking Confirmed!</h1>
         <p className="mt-3 text-balance text-muted">
-          Your {units > 1 ? `${units} ` : ""}{brand} {appliance}{units > 1 ? "s" : ""} service is
+          {/* With several on the visit the fields above hold only the last one
+              asked about, which is nobody's idea of the main one — so it says
+              how many rather than picking one to name. */}
+          {others > 0
+            ? `Your ${others + 1} appliances are`
+            : `Your ${units > 1 ? `${units} ` : ""}${brand ?? ""} ${appliance ?? ""}${units > 1 ? "s" : ""} service is`}{" "}
           booked for{" "}
           <span className="font-semibold text-foreground">{draft.date}</span> ·{" "}
           <span className="font-semibold text-foreground">{draft.slot}</span>.

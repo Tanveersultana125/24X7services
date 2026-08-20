@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft, ArrowRight, Clock, MapPin, Wrench, ShieldCheck,
-  Sparkles, Zap, CheckCircle2, MoreHorizontal, PencilLine, ShoppingCart, Minus, Plus,
+  Sparkles, Zap, CheckCircle2, MoreHorizontal, PencilLine, ShoppingCart, Minus, Plus, X,
 } from "lucide-react";
 import { Stepper, type Step } from "./Stepper";
 import { OptionCard } from "./OptionCard";
@@ -21,7 +21,7 @@ import {
   type CatalogueService, type ServiceProblem,
 } from "@/lib/catalogue-shared";
 import { formatINR, formatRange, cn } from "@/lib/utils";
-import { OTHER_PROBLEM_ID, type BookingDraft, type BrandId, type ApplianceId } from "@/lib/types";
+import { OTHER_PROBLEM_ID, type BookingDraft, type BookingJob, type BrandId, type ApplianceId } from "@/lib/types";
 
 const STEPS: Step[] = [
   { id: "brand", label: "Brand" },
@@ -42,6 +42,51 @@ const VISIT_FEE = 99;
  * conditioners is a job somebody prices by hand, not a form.
  */
 const MAX_UNITS = 10;
+
+/** Appliances one visit is taken for. Past this somebody should be phoned. */
+const MAX_ITEMS = 12;
+
+const clampUnits = (n?: number) => Math.min(MAX_UNITS, Math.max(1, n ?? 1));
+
+/** The faults picked on a job, as the catalogue knows them. */
+function problemsOf(job: BookingJob, services: CatalogueService[]): ServiceProblem[] {
+  const service = services.find((s) => s.id === job.appliance);
+  if (!service) return [];
+  return repairsFor(service, job.brand).filter((p) => job.problems.includes(p.id));
+}
+
+/** What one job is worth, its unit count included. */
+function jobEstimate(job: BookingJob, services: CatalogueService[]): { min: number; max: number } {
+  const service = services.find((s) => s.id === job.appliance);
+  if (!service) return { min: 0, max: 0 };
+  const units = clampUnits(job.units);
+  const bands = problemsOf(job, services).map((p) => bandFor(service, p, job.brand));
+  // The same fault on two appliances is two repairs, so the band multiplies.
+  return {
+    min: bands.reduce((sum, b) => sum + b[0], 0) * units,
+    max: bands.reduce((sum, b) => sum + b[1], 0) * units,
+  };
+}
+
+/** The faults on a job in words, the typed-in one included. */
+function problemSummary(job: BookingJob, services: CatalogueService[]): string {
+  return [
+    ...problemsOf(job, services).map((p) => p.label),
+    job.problems.includes(OTHER_PROBLEM_ID) && job.otherProblem ? job.otherProblem : null,
+  ]
+    .filter(Boolean)
+    .join(", ");
+}
+
+/** Has anything been said about this job yet? */
+function jobStarted(job: BookingJob): boolean {
+  return Boolean(job.brand || job.appliance || job.problems.length);
+}
+
+/** Is it finished enough to be part of a booking? */
+function jobComplete(job: BookingJob): boolean {
+  return Boolean(job.appliance && job.problems.length);
+}
 
 /**
  * The basket lines a half-finished booking stands for.
@@ -97,6 +142,7 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
   const [dir, setDir] = useState(1);
   const [draft, setDraft] = useState<BookingDraft>({
     problems: [],
+    more: [],
     // Prefill the service address with the signed-in customer's name.
     address: customer
       ? { fullName: customer.name, phone: "", line1: "", pincode: "" }
@@ -138,17 +184,25 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
     [appliance, draft.problems, draft.brand]
   );
 
-  const units = Math.min(MAX_UNITS, Math.max(1, draft.units ?? 1));
+  const units = clampUnits(draft.units);
+  const more = draft.more ?? [];
+
+  // Everything on the visit: the ones already added, then the one being
+  // filled in, once there is enough of it to price.
+  const jobs = useMemo<BookingJob[]>(
+    () => (jobComplete(draft) ? [...more, draft] : more),
+    [more, draft],
+  );
 
   const estimate = useMemo(() => {
-    if (!appliance) return { min: 0, max: 0 };
-    const bands = selectedProblems.map((p) => bandFor(appliance, p, draft.brand));
-    // The same fault on two appliances is two repairs, so the band doubles.
-    return {
-      min: bands.reduce((sum, b) => sum + b[0], 0) * units,
-      max: bands.reduce((sum, b) => sum + b[1], 0) * units,
-    };
-  }, [appliance, selectedProblems, draft.brand, units]);
+    return jobs.reduce(
+      (sum, job) => {
+        const e = jobEstimate(job, services);
+        return { min: sum.min + e.min, max: sum.max + e.max };
+      },
+      { min: 0, max: 0 },
+    );
+  }, [jobs, services]);
 
   // The visit fee stays a visit fee. One technician comes to one address once,
   // whether they open one appliance there or three — charging it per unit
@@ -166,6 +220,40 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
     setStep((s) => Math.min(Math.max(s + d, 0), STEPS.length - 1));
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const jumpTo = (n: number) => {
+    setDir(n > step ? 1 : -1);
+    setStep(n);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  /**
+   * Put the appliance just described aside and start another.
+   *
+   * The three steps that build a job stay exactly as they are and simply run
+   * again on an empty one — a second pass rather than a second form.
+   */
+  const addAnother = () => {
+    setDraft((d) => ({
+      ...d,
+      more: [...(d.more ?? []), { ...d, more: undefined }],
+      brand: undefined,
+      otherBrand: undefined,
+      appliance: undefined,
+      otherAppliance: undefined,
+      units: undefined,
+      problems: [],
+      otherProblem: undefined,
+    }));
+    jumpTo(0);
+  };
+
+  const removeJob = (index: number) =>
+    setDraft((d) => ({ ...d, more: (d.more ?? []).filter((_, i) => i !== index) }));
+
+  // Somebody who pressed "add another" and then thought better of it needs a
+  // way out that isn't the back button through three empty steps.
+  const skippable = more.length > 0 && !jobStarted(draft) && step < 3;
 
   const canProceed = () => {
     switch (STEPS[step].id) {
@@ -186,12 +274,12 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
     setError(null);
     setProcessing(true);
 
-    const problemSummary = [
-      ...selectedProblems.map((p) => p.label),
-      draft.problems.includes(OTHER_PROBLEM_ID) && draft.otherProblem ? draft.otherProblem : null,
-    ]
-      .filter(Boolean)
-      .join(", ");
+    const items = jobs.map((job) => ({
+      brand: brandLabel(job) ?? "",
+      appliance: applianceLabel(job) ?? "",
+      units: clampUnits(job.units),
+      problem: problemSummary(job, services),
+    }));
     const paymentLabel = PAYMENT_METHODS.find((m) => m.id === draft.payment)?.label ?? draft.payment ?? "";
 
     try {
@@ -199,10 +287,14 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          brand: brandLabel(draft),
-          appliance: applianceLabel(draft),
-          units,
-          problem: problemSummary,
+          // The first appliance stays flat as well as being in the list:
+          // everything written before a visit could cover several expects to
+          // find it there, the panel's own list included.
+          brand: items[0]?.brand ?? "",
+          appliance: items[0]?.appliance ?? "",
+          units: items[0]?.units ?? 1,
+          problem: items[0]?.problem ?? "",
+          items,
           date: draft.date,
           slot: draft.slot,
           payment: paymentLabel,
@@ -263,11 +355,22 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
             <ArrowLeft className="size-4" /> Back
           </Button>
 
-          <span className="mx-auto hidden text-sm text-muted sm:block">
+          <span className="mx-auto hidden items-center gap-2 text-sm text-muted sm:flex">
+            {/* Which appliance this pass is for. Without it the stepper reads
+                as having gone backwards to Brand for no reason. */}
+            {more.length > 0 && step < 3 && (
+              <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                Appliance {more.length + 1}
+              </span>
+            )}
             Step {step + 1} of {STEPS.length}
           </span>
 
-          {step < STEPS.length - 1 ? (
+          {skippable ? (
+            <Button onClick={() => jumpTo(3)} size="lg" className="ml-auto shrink-0">
+              Nothing else — continue <ArrowRight className="size-4" />
+            </Button>
+          ) : step < STEPS.length - 1 ? (
             <Button onClick={() => go(1)} disabled={!canProceed()} size="lg" className="ml-auto shrink-0">
               Continue <ArrowRight className="size-4" />
             </Button>
@@ -301,7 +404,15 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
             >
               {STEPS[step].id === "brand" && <BrandStep draft={draft} setDraft={setDraft} />}
               {STEPS[step].id === "appliance" && <ApplianceStep draft={draft} setDraft={setDraft} units={units} />}
-              {STEPS[step].id === "problem" && <ProblemStep draft={draft} setDraft={setDraft} lines={lines} />}
+              {STEPS[step].id === "problem" && (
+                <ProblemStep
+                  draft={draft}
+                  setDraft={setDraft}
+                  lines={lines}
+                  onAddAnother={addAnother}
+                  count={jobs.length}
+                />
+              )}
               {STEPS[step].id === "date" && <DateStep draft={draft} setDraft={setDraft} />}
               {STEPS[step].id === "time" && <TimeStep draft={draft} setDraft={setDraft} />}
               {STEPS[step].id === "address" && <AddressStep draft={draft} setDraft={setDraft} />}
@@ -311,7 +422,16 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
         </div>
       </div>
 
-      <SummaryCard draft={draft} estimate={estimate} total={total} emergency={emergency} lines={lines} units={units} />
+      <SummaryCard
+        draft={draft}
+        estimate={estimate}
+        total={total}
+        emergency={emergency}
+        lines={lines}
+        units={units}
+        jobs={jobs}
+        onRemove={removeJob}
+      />
     </div>
   );
 }
@@ -532,7 +652,13 @@ function UnitsPicker({
   );
 }
 
-function ProblemStep({ draft, setDraft, lines }: StepProps & { lines: CartItem[] }) {
+function ProblemStep({
+  draft,
+  setDraft,
+  lines,
+  onAddAnother,
+  count,
+}: StepProps & { lines: CartItem[]; onAddAnother: () => void; count: number }) {
   const services = useServices();
   if (!draft.appliance) return null;
   const appliance = services.find((a) => a.id === draft.appliance);
@@ -613,8 +739,32 @@ function ProblemStep({ draft, setDraft, lines }: StepProps & { lines: CartItem[]
 
           Stacked on a phone: sharing one row there left the sentence in a
           140px column five lines tall beside the button. */}
+      {/* The visit, not the appliance, is the thing being booked — so this is
+          where somebody says the fridge needs looking at too, rather than
+          finishing, paying, and starting again for a second technician. */}
+      {jobComplete(draft) && (
+        <div className="mt-6 rounded-2xl border border-dashed border-border-strong px-4 py-3.5 sm:flex sm:items-center sm:gap-3">
+          <p className="flex items-start gap-2.5 text-sm text-muted sm:min-w-0 sm:flex-1">
+            <Wrench className="mt-0.5 size-5 shrink-0" />
+            <span>
+              Anything else while we&apos;re there?{" "}
+              <span className="text-foreground">One visit can cover several appliances</span> — the
+              visit fee is charged once.
+            </span>
+          </p>
+          <button
+            type="button"
+            onClick={onAddAnother}
+            disabled={count >= MAX_ITEMS}
+            className="mt-3.5 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-ink px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-ink hover:text-background disabled:cursor-not-allowed disabled:border-border disabled:text-muted-2 disabled:hover:bg-transparent sm:mt-0 sm:w-auto"
+          >
+            <Plus className="size-4" strokeWidth={2.4} /> Add another appliance
+          </button>
+        </div>
+      )}
+
       {lines.length > 0 && (
-        <div className="mt-6 rounded-2xl border border-border bg-surface-2/60 px-4 py-3.5 sm:flex sm:items-center sm:gap-3">
+        <div className="mt-4 rounded-2xl border border-border bg-surface-2/60 px-4 py-3.5 sm:flex sm:items-center sm:gap-3">
           <p className="flex items-start gap-2.5 text-sm text-muted sm:min-w-0 sm:flex-1">
             <ShoppingCart className="mt-0.5 size-5 shrink-0" />
             <span>
@@ -876,7 +1026,7 @@ function PaymentStep({ draft, setDraft, total }: StepProps & { total: number }) 
 /* ---------------- Summary ---------------- */
 
 function SummaryCard({
-  draft, estimate, total, emergency, lines, units,
+  draft, estimate, total, emergency, lines, units, jobs, onRemove,
 }: {
   draft: BookingDraft;
   estimate: { min: number; max: number };
@@ -884,19 +1034,65 @@ function SummaryCard({
   emergency: boolean;
   lines: CartItem[];
   units: number;
+  jobs: BookingJob[];
+  onRemove: (index: number) => void;
 }) {
+  const services = useServices();
+  const many = jobs.length > 1;
   return (
     <aside className="min-w-0 lg:sticky lg:top-24 lg:h-fit">
       <div className="rounded-3xl border border-border bg-surface p-6 shadow-premium-md">
         <h3 className="text-lg font-bold tracking-tight">Booking summary</h3>
 
-        <dl className="mt-5 space-y-3.5 text-sm">
-          <Row label="Brand" value={brandLabel(draft)} />
-          <Row label="Appliance" value={applianceLabel(draft)} />
-          {/* Only worth a row once it isn't one — "1 unit" on every booking is
-              a line that never tells anybody anything. */}
-          {units > 1 && <Row label="Units" value={`${units} appliances`} />}
-          <Row label="Problems" value={draft.problems.length ? `${draft.problems.length} selected` : undefined} />
+        {/* One appliance reads better as a few labelled rows; several read
+            better as a list, where each is a thing you can take back off. */}
+        {many ? (
+          <ul className="mt-5 space-y-2.5">
+            {jobs.map((job, i) => {
+              const faults = problemSummary(job, services);
+              // The last of them is the one still being filled in, which has
+              // no place in `more` yet and so cannot be removed from it.
+              const removable = i < (draft.more?.length ?? 0);
+              return (
+                <li
+                  key={`${job.appliance}-${i}`}
+                  className="flex items-start gap-2.5 rounded-xl bg-surface-2 px-3 py-2.5 text-sm"
+                >
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-medium">
+                      {[brandLabel(job), applianceLabel(job)].filter(Boolean).join(" ")}
+                      {clampUnits(job.units) > 1 && (
+                        <span className="ml-1.5 text-muted">× {clampUnits(job.units)}</span>
+                      )}
+                    </span>
+                    {faults && <span className="mt-0.5 block text-xs text-muted">{faults}</span>}
+                  </span>
+                  {removable && (
+                    <button
+                      type="button"
+                      onClick={() => onRemove(i)}
+                      aria-label={`Remove ${applianceLabel(job) ?? "appliance"} from this visit`}
+                      className="grid size-6 shrink-0 place-items-center rounded-full text-muted-2 transition-colors hover:bg-surface hover:text-danger"
+                    >
+                      <X className="size-3.5" />
+                    </button>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <dl className="mt-5 space-y-3.5 text-sm">
+            <Row label="Brand" value={brandLabel(draft)} />
+            <Row label="Appliance" value={applianceLabel(draft)} />
+            {/* Only worth a row once it isn't one — "1 unit" on every booking
+                is a line that never tells anybody anything. */}
+            {units > 1 && <Row label="Units" value={`${units} appliances`} />}
+            <Row label="Problems" value={draft.problems.length ? `${draft.problems.length} selected` : undefined} />
+          </dl>
+        )}
+
+        <dl className={"space-y-3.5 text-sm " + (many ? "mt-4" : "mt-3.5")}>
           <Row label="Date" value={draft.date} />
           <Row label="Slot" value={draft.slot} />
         </dl>
@@ -906,11 +1102,18 @@ function SummaryCard({
             <div className="my-5 border-t border-border" />
             <div className="space-y-2.5 text-sm">
               <div className="flex justify-between text-muted">
-                <span>Repair estimate{units > 1 ? ` (${units} units)` : ""}</span>
+                <span>
+                  Repair estimate
+                  {many
+                    ? ` (${jobs.length} appliances)`
+                    : units > 1
+                      ? ` (${units} units)`
+                      : ""}
+                </span>
                 <span>{formatRange(estimate.min, estimate.max)}</span>
               </div>
               <div className="flex justify-between text-muted">
-                <span>Visit fee{units > 1 ? " (once)" : ""}</span>
+                <span>Visit fee{many || units > 1 ? " (once)" : ""}</span>
                 <span>{formatINR(99)}</span>
               </div>
               {emergency && (

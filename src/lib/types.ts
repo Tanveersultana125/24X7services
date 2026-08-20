@@ -64,7 +64,14 @@ export type BookingStepId =
   | "payment"
   | "confirmed";
 
-export interface BookingDraft {
+/**
+ * One appliance the visit is for, and what is wrong with it.
+ *
+ * A visit can cover more than one: two air conditioners and the fridge is one
+ * technician at one address, not three bookings. The first three steps of the
+ * form fill in one of these at a time.
+ */
+export interface BookingJob {
   brand?: BrandId;
   /** Free-text brand name when `brand === "other"`. */
   otherBrand?: string;
@@ -72,14 +79,23 @@ export interface BookingDraft {
   /** Free-text appliance name when `appliance === "other"`. */
   otherAppliance?: string;
   /**
-   * How many of that appliance the visit covers — two air conditioners in the
-   * same flat is one visit, not two bookings. Absent reads as one, so a draft
-   * made before this existed still means what it meant.
+   * How many of that appliance — two air conditioners in the same flat is one
+   * job, not two. Absent reads as one, so a draft made before this existed
+   * still means what it meant.
    */
   units?: number;
   problems: string[];
   /** Free-text problem description when `problems` includes `OTHER_PROBLEM_ID`. */
   otherProblem?: string;
+}
+
+export interface BookingDraft extends BookingJob {
+  /**
+   * The appliances already added to this visit. The job being filled in lives
+   * in the fields above rather than at the end of this list, so the three
+   * steps that build it never have to know how many came before.
+   */
+  more?: BookingJob[];
   date?: string;
   slot?: string;
   address?: {

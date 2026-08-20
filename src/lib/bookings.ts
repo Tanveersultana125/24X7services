@@ -23,6 +23,20 @@ export type BookingAddress = {
   landmark?: string;
 };
 
+/**
+ * One appliance on a booking, as words rather than ids.
+ *
+ * What the office reads is a name and a fault, and the catalogue those ids
+ * point at can be renamed after the booking is taken — a record that resolves
+ * itself against today's catalogue is a record that changes what it says.
+ */
+export type BookingItem = {
+  brand: string;
+  appliance: string;
+  units: number;
+  problem: string;
+};
+
 /** Shape stored in Firestore + returned to the app (createdAt as epoch millis). */
 export type Booking = {
   id: string;
@@ -36,6 +50,14 @@ export type Booking = {
   /** How many of it the visit covers. One unless someone said otherwise. */
   units: number;
   problem: string;
+  /**
+   * Every appliance on the visit, the one above included and first.
+   *
+   * The three fields above are that first one, kept flat because everything
+   * written before this existed had exactly one and everything that reads a
+   * booking expects to find it there.
+   */
+  items: BookingItem[];
   city: string;
   address: BookingAddress;
   date: string;
@@ -56,6 +78,7 @@ export type NewBooking = {
   appliance: string;
   units?: number;
   problem: string;
+  items?: BookingItem[];
   date: string;
   slot: string;
   payment: string;
@@ -105,6 +128,17 @@ export async function createBooking(input: NewBooking): Promise<{ id: string; co
     appliance: input.appliance,
     units: input.units ?? 1,
     problem: input.problem,
+    items:
+      input.items?.length
+        ? input.items
+        : [
+            {
+              brand: input.brand,
+              appliance: input.appliance,
+              units: input.units ?? 1,
+              problem: input.problem,
+            },
+          ],
     city: a.line2 || a.pincode,
     address: a,
     date: input.date,
@@ -139,6 +173,17 @@ function mapBooking(id: string, data: FirebaseFirestore.DocumentData): Booking {
     // Bookings taken before units existed were all for one.
     units: typeof data.units === "number" && data.units > 0 ? data.units : 1,
     problem: data.problem ?? "",
+    // Bookings taken before a visit could cover several are that one appliance.
+    items: Array.isArray(data.items) && data.items.length
+      ? (data.items as BookingItem[])
+      : [
+          {
+            brand: data.brand ?? "",
+            appliance: data.appliance ?? "",
+            units: typeof data.units === "number" && data.units > 0 ? data.units : 1,
+            problem: data.problem ?? "",
+          },
+        ],
     city: data.city ?? "",
     address: data.address ?? { fullName: "", phone: "", line1: "", pincode: "" },
     date: data.date ?? "",
