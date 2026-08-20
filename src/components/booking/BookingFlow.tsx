@@ -48,6 +48,9 @@ const MAX_ITEMS = 12;
 
 const clampUnits = (n?: number) => Math.min(MAX_UNITS, Math.max(1, n ?? 1));
 
+/** One shared empty list, so "no other appliances" is the same value each render. */
+const NO_JOBS: BookingJob[] = [];
+
 /** The faults picked on a job, as the catalogue knows them. */
 function problemsOf(job: BookingJob, services: CatalogueService[]): ServiceProblem[] {
   const service = services.find((s) => s.id === job.appliance);
@@ -185,7 +188,7 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
   );
 
   const units = clampUnits(draft.units);
-  const more = draft.more ?? [];
+  const more = draft.more ?? NO_JOBS;
 
   // Everything on the visit: the ones already added, then the one being
   // filled in, once there is enough of it to price.
@@ -246,6 +249,29 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
       otherProblem: undefined,
     }));
     jumpTo(0);
+  };
+
+  /**
+   * Describe one of them on its own, because it needs something different.
+   *
+   * Two air conditioners are one line while they share a fault and two the
+   * moment they don't. This takes one off the line being filled in — rather
+   * than adding a third appliance to a flat that has two — keeps the make and
+   * the appliance, and drops straight onto the faults, which is the only
+   * question left to answer about it.
+   */
+  const splitOne = () => {
+    setDraft((d) => {
+      const held = clampUnits(d.units);
+      return {
+        ...d,
+        more: [...(d.more ?? []), { ...d, units: held > 1 ? held - 1 : held, more: undefined }],
+        units: 1,
+        problems: [],
+        otherProblem: undefined,
+      };
+    });
+    jumpTo(2);
   };
 
   const removeJob = (index: number) =>
@@ -410,7 +436,9 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
                   setDraft={setDraft}
                   lines={lines}
                   onAddAnother={addAnother}
+                  onSplitOne={splitOne}
                   count={jobs.length}
+                  units={units}
                 />
               )}
               {STEPS[step].id === "date" && <DateStep draft={draft} setDraft={setDraft} />}
@@ -577,7 +605,6 @@ function ApplianceStep({ draft, setDraft, units }: StepProps & { units: number }
           number almost everybody leaves at one is a step everybody pays for. */}
       {draft.appliance && (
         <UnitsPicker
-          draft={draft}
           setDraft={setDraft}
           units={units}
           name={chosen?.name ?? applianceLabel(draft) ?? "appliance"}
@@ -596,11 +623,10 @@ function ApplianceStep({ draft, setDraft, units }: StepProps & { units: number }
  * so the row reads as a quantity rather than as a pair of controls.
  */
 function UnitsPicker({
-  draft,
   setDraft,
   units,
   name,
-}: StepProps & { units: number; name: string }) {
+}: Pick<StepProps, "setDraft"> & { units: number; name: string }) {
   const set = (next: number) =>
     setDraft((d) => ({ ...d, units: Math.min(MAX_UNITS, Math.max(1, next)) }));
   const plural = units === 1 ? name : `${name}s`;
@@ -657,8 +683,16 @@ function ProblemStep({
   setDraft,
   lines,
   onAddAnother,
+  onSplitOne,
   count,
-}: StepProps & { lines: CartItem[]; onAddAnother: () => void; count: number }) {
+  units,
+}: StepProps & {
+  lines: CartItem[];
+  onAddAnother: () => void;
+  onSplitOne: () => void;
+  count: number;
+  units: number;
+}) {
   const services = useServices();
   if (!draft.appliance) return null;
   const appliance = services.find((a) => a.id === draft.appliance);
@@ -671,10 +705,21 @@ function ProblemStep({
     }));
 
   const otherSelected = draft.problems.includes(OTHER_PROBLEM_ID);
+  const name = appliance?.name ?? applianceLabel(draft) ?? "appliance";
 
   return (
     <div>
-      <StepTitle title="What's the problem?" hint="Select one or more symptoms — or describe your own below." />
+      <StepTitle
+        title={units > 1 ? `What's wrong with the ${name.toLowerCase()}s?` : "What's the problem?"}
+        hint={
+          units > 1
+            ? // Said before anything is ticked, not after: somebody choosing
+              // one fault for two appliances should know that is what they are
+              // doing while they are doing it.
+              `Whatever you pick here is booked for all ${units}. If one of them needs something different, say so below.`
+            : "Select one or more symptoms — or describe your own below."
+        }
+      />
       <div className="mb-5 flex items-center gap-2.5 rounded-2xl border border-primary/30 bg-primary/5 p-3.5 text-sm">
         <Sparkles className="size-5 shrink-0 text-primary" />
         <p><span className="font-semibold">AI Diagnosis:</span> Not sure? Describe it and we&apos;ll detect the fault. Popular issues are marked below.</p>
@@ -743,8 +788,8 @@ function ProblemStep({
           where somebody says the fridge needs looking at too, rather than
           finishing, paying, and starting again for a second technician. */}
       {jobComplete(draft) && (
-        <div className="mt-6 rounded-2xl border border-dashed border-border-strong px-4 py-3.5 sm:flex sm:items-center sm:gap-3">
-          <p className="flex items-start gap-2.5 text-sm text-muted sm:min-w-0 sm:flex-1">
+        <div className="mt-6 rounded-2xl border border-dashed border-border-strong px-4 py-4">
+          <p className="flex items-start gap-2.5 text-sm text-muted">
             <Wrench className="mt-0.5 size-5 shrink-0" />
             <span>
               Anything else while we&apos;re there?{" "}
@@ -752,14 +797,32 @@ function ProblemStep({
               visit fee is charged once.
             </span>
           </p>
-          <button
-            type="button"
-            onClick={onAddAnother}
-            disabled={count >= MAX_ITEMS}
-            className="mt-3.5 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-ink px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-ink hover:text-background disabled:cursor-not-allowed disabled:border-border disabled:text-muted-2 disabled:hover:bg-transparent sm:mt-0 sm:w-auto"
-          >
-            <Plus className="size-4" strokeWidth={2.4} /> Add another appliance
-          </button>
+
+          <div className="mt-3.5 flex flex-col gap-2.5 sm:flex-row">
+            {/* The commoner of the two, so it leads: two of the same appliance
+                where only one of them has this fault. It keeps the make and
+                the appliance and asks the one question left. */}
+            <button
+              type="button"
+              onClick={onSplitOne}
+              disabled={count >= MAX_ITEMS}
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-ink px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-ink hover:text-background disabled:cursor-not-allowed disabled:border-border disabled:text-muted-2 disabled:hover:bg-transparent sm:w-auto"
+            >
+              <Plus className="size-4" strokeWidth={2.4} />
+              {units > 1
+                ? `One ${name.toLowerCase()} needs something else`
+                : `Another ${name.toLowerCase()}, different fault`}
+            </button>
+
+            <button
+              type="button"
+              onClick={onAddAnother}
+              disabled={count >= MAX_ITEMS}
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-border px-5 py-2.5 text-sm font-medium text-muted transition-colors hover:border-border-strong hover:text-ink disabled:cursor-not-allowed disabled:text-muted-2 sm:w-auto"
+            >
+              <Plus className="size-4" strokeWidth={2.2} /> A different appliance
+            </button>
+          </div>
         </div>
       )}
 
@@ -1038,7 +1101,11 @@ function SummaryCard({
   onRemove: (index: number) => void;
 }) {
   const services = useServices();
-  const many = jobs.length > 1;
+  // The list as soon as there is more than one appliance on the visit, not
+  // only once the newest is finished: mid-split the labelled rows described
+  // the empty job being filled in while pricing the one already added, which
+  // read as a booking with no fault and a price.
+  const many = jobs.length > 1 || (draft.more?.length ?? 0) > 0;
   return (
     <aside className="min-w-0 lg:sticky lg:top-24 lg:h-fit">
       <div className="rounded-3xl border border-border bg-surface p-6 shadow-premium-md">
@@ -1105,7 +1172,7 @@ function SummaryCard({
                 <span>
                   Repair estimate
                   {many
-                    ? ` (${jobs.length} appliances)`
+                    ? ` (${jobs.length} ${jobs.length === 1 ? "appliance" : "appliances"})`
                     : units > 1
                       ? ` (${units} units)`
                       : ""}
