@@ -36,6 +36,9 @@ function cleanItems(value: unknown): BookingItem[] {
       appliance: i.appliance.trim().slice(0, 80),
       units: cleanUnits(i.units),
       problem: typeof i.problem === "string" ? i.problem.slice(0, 400) : "",
+      ...(typeof i.variant === "string" && i.variant.trim()
+        ? { variant: i.variant.trim().slice(0, 60) }
+        : {}),
     });
   }
   return items;

@@ -33,6 +33,8 @@ export type BookingAddress = {
 export type BookingItem = {
   brand: string;
   appliance: string;
+  /** Front load, split, double door — absent when the appliance has no kinds. */
+  variant?: string;
   units: number;
   problem: string;
 };

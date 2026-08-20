@@ -42,6 +42,13 @@ export interface Appliance {
   serviceTime: string;
   rating: number;
   bookings: string;
+  /**
+   * The kinds this appliance comes in — front load and top load, split and
+   * window. It decides what the technician packs and how long the job takes,
+   * and it is not something anybody can tell from the word "washing machine".
+   * Absent means the appliance has no meaningful kinds and none is asked for.
+   */
+  variants?: string[];
   problems: Problem[];
 }
 
@@ -78,6 +85,8 @@ export interface BookingJob {
   appliance?: ApplianceId;
   /** Free-text appliance name when `appliance === "other"`. */
   otherAppliance?: string;
+  /** Which kind of it — front load, split, double door. */
+  variant?: string;
   /**
    * How many of that appliance — two air conditioners in the same flat is one
    * job, not two. Absent reads as one, so a draft made before this existed

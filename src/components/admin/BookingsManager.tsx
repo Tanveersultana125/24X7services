@@ -96,6 +96,9 @@ export function BookingsManager({ initial }: { initial: Booking[] }) {
               {b.items.map((item, i) => (
                 <p key={`${item.appliance}-${i}`}>
                   {item.brand ? `${item.brand} ` : ""}{item.appliance}
+                  {/* The kind decides what goes in the van as much as the
+                      count does, so it is said beside the name. */}
+                  {item.variant && <span className="text-muted"> · {item.variant}</span>}
                   {item.units > 1 && (
                     <span className="ml-2 rounded-full bg-royal-bright/12 px-2 py-0.5 text-[0.68rem] font-bold text-royal-bright">
                       × {item.units}
@@ -167,6 +170,7 @@ export function BookingsManager({ initial }: { initial: Booking[] }) {
                   {b.items.map((item, i) => (
                     <p key={`${item.appliance}-${i}`}>
                       {item.brand ? `${item.brand} ` : ""}{item.appliance}
+                      {item.variant && <span className="text-muted"> · {item.variant}</span>}
                       {item.units > 1 && (
                         <span className="ml-2 rounded-full bg-royal-bright/12 px-2 py-0.5 text-[0.68rem] font-bold text-royal-bright">
                           × {item.units}

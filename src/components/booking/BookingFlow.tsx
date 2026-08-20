@@ -17,7 +17,7 @@ import { BRANDS, TIME_SLOTS, PAYMENT_METHODS, brandLabel, applianceLabel } from 
 import { useServices } from "@/components/providers/ServicesProvider";
 import type { CartItem } from "@/lib/cart";
 import {
-  bandFor, brandsFor, priceFor, repairsFor,
+  bandFor, brandsFor, priceFor, repairsFor, variantsFor, UNSURE_VARIANT,
   type CatalogueService, type ServiceProblem,
 } from "@/lib/catalogue-shared";
 import { formatINR, formatRange, cn } from "@/lib/utils";
@@ -94,6 +94,7 @@ function jobOf(d: BookingJob): BookingJob {
     otherBrand: d.otherBrand,
     appliance: d.appliance,
     otherAppliance: d.otherAppliance,
+    variant: d.variant,
     units: d.units,
     problems: d.problems,
     otherProblem: d.otherProblem,
@@ -120,6 +121,7 @@ function mergeJobs(jobs: BookingJob[]): BookingJob[] {
     const twin = out.find(
       (j) =>
         j.appliance === job.appliance &&
+        j.variant === job.variant &&
         j.brand === job.brand &&
         j.otherBrand === job.otherBrand &&
         j.otherProblem === job.otherProblem &&
@@ -161,7 +163,8 @@ function cartLines(
 ): CartItem[] {
   if (!appliance) return [];
   const make = brandLabel(draft);
-  const name = make ? `${make} ${appliance.name}` : appliance.name;
+  const kind = draft.variant && draft.variant !== UNSURE_VARIANT ? ` (${draft.variant})` : "";
+  const name = (make ? `${make} ${appliance.name}` : appliance.name) + kind;
   const base = { id: appliance.id, name, qty: units, kind: "service" as const, brand: draft.brand };
 
   const lines: CartItem[] = problems.map((p) => ({
@@ -325,12 +328,12 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
   };
 
   /**
-   * Give one of them a make of its own.
+   * Give one of them a make, or a kind, of its own.
    *
    * `from` is where that one currently sits — an index into the list of other
    * appliances on the visit, or null for the line being filled in. Any of them
    * can be changed, not only the last: somebody looking at four washing
-   * machines means a particular one when they say the second is a Samsung.
+   * machines means a particular one when they say the second is a top load.
    *
    * One unit moves, not the line: a line of three where one is a Samsung
    * becomes two and one. The faults travel with it, because two washing
@@ -338,16 +341,20 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
    * whoever built them — and if they are not, the fault step has its own way
    * to say so.
    */
-  const setUnitMake = (from: number | null, brand: BrandId) => {
+  const setUnit = (from: number | null, patch: Partial<BookingJob>) => {
     setDraft((d) => {
       const list: BookingJob[] = [...(d.more ?? []), jobOf(d)];
       const at = from ?? list.length - 1;
       const source = list[at];
-      // Choosing the make it already is asks for nothing.
-      if (!source || source.brand === brand) return d;
+      // Choosing what it already is asks for nothing.
+      if (!source) return d;
+      const same = (Object.keys(patch) as (keyof BookingJob)[]).every(
+        (key) => source[key] === patch[key],
+      );
+      if (same) return d;
 
       const held = clampUnits(source.units);
-      const moved: BookingJob = { ...source, brand, otherBrand: undefined, units: 1 };
+      const moved: BookingJob = { ...source, ...patch, units: 1 };
       const rest =
         held > 1
           ? [...list.slice(0, at), { ...source, units: held - 1 }, ...list.slice(at + 1)]
@@ -393,7 +400,15 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
   const canProceed = () => {
     switch (STEPS[step].id) {
       case "brand": return !!draft.brand && (draft.brand !== "other" || !!draft.otherBrand?.trim());
-      case "appliance": return !!draft.appliance && (draft.appliance !== "other" || !!draft.otherAppliance?.trim());
+      case "appliance": {
+        if (!draft.appliance) return false;
+        if (draft.appliance === "other") return !!draft.otherAppliance?.trim();
+        // Asked, so answered: a form that lets the question be skipped is a
+        // form that has not asked it. "Not sure" is one of the answers.
+        const service = services.find((a) => a.id === draft.appliance);
+        if (service && variantsFor(service).length && !draft.variant) return false;
+        return true;
+      }
       case "problem":
         return draft.problems.length > 0 && (!draft.problems.includes(OTHER_PROBLEM_ID) || !!draft.otherProblem?.trim());
       case "date": return !!draft.date;
@@ -412,6 +427,7 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
     const items = jobs.map((job) => ({
       brand: brandLabel(job) ?? "",
       appliance: applianceLabel(job) ?? "",
+      ...(job.variant ? { variant: job.variant } : {}),
       units: clampUnits(job.units),
       problem: problemSummary(job, services),
     }));
@@ -427,6 +443,7 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
           // find it there, the panel's own list included.
           brand: items[0]?.brand ?? "",
           appliance: items[0]?.appliance ?? "",
+          variant: items[0]?.variant,
           units: items[0]?.units ?? 1,
           problem: items[0]?.problem ?? "",
           items,
@@ -548,7 +565,7 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
                   draft={draft}
                   setDraft={setDraft}
                   units={units}
-                  onSetMake={setUnitMake}
+                  onSetUnit={setUnit}
                 />
               )}
               {STEPS[step].id === "problem" && (
@@ -670,8 +687,11 @@ function ApplianceStep({
   draft,
   setDraft,
   units,
-  onSetMake,
-}: StepProps & { units: number; onSetMake: (from: number | null, brand: BrandId) => void }) {
+  onSetUnit,
+}: StepProps & {
+  units: number;
+  onSetUnit: (from: number | null, patch: Partial<BookingJob>) => void;
+}) {
   const services = useServices();
   const isOther = draft.appliance === "other";
   const chosen = services.find((a) => a.id === draft.appliance);
@@ -683,7 +703,9 @@ function ApplianceStep({
           <OptionCard
             key={a.id}
             selected={draft.appliance === a.id}
-            onClick={() => setDraft((d) => ({ ...d, appliance: a.id, problems: [] }))}
+            onClick={() =>
+              setDraft((d) => ({ ...d, appliance: a.id, variant: undefined, problems: [] }))
+            }
           >
             <ApplianceTile id={a.id} />
             <div>
@@ -701,7 +723,9 @@ function ApplianceStep({
         {/* Other — for any appliance we don't list yet */}
         <OptionCard
           selected={isOther}
-          onClick={() => setDraft((d) => ({ ...d, appliance: "other", problems: [] }))}
+          onClick={() =>
+            setDraft((d) => ({ ...d, appliance: "other", variant: undefined, problems: [] }))
+          }
         >
           <div className="grid size-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#64748b] to-[#475569] text-white">
             <MoreHorizontal className="size-6" />
@@ -726,6 +750,44 @@ function ApplianceStep({
         </div>
       )}
 
+      {/* A washing machine is a front load or a top load and the visit is not
+          the same job. Asked here, beside the appliance it belongs to, rather
+          than left for the technician to discover at the door. */}
+      {chosen && variantsFor(chosen).length > 0 && (
+        <div className="mt-6 rounded-2xl border border-border bg-surface-2/60 px-4 py-4 sm:px-5">
+          <p className="text-sm font-semibold">
+            Which kind of {chosen.name.toLowerCase()}?
+          </p>
+          <p className="mt-1 text-sm text-muted">
+            It decides what the technician brings — and how long the job takes.
+          </p>
+          <div className="mt-3.5 flex flex-wrap gap-2">
+            {[...variantsFor(chosen), UNSURE_VARIANT].map((kind) => {
+              const picked = draft.variant === kind;
+              return (
+                <button
+                  key={kind}
+                  type="button"
+                  onClick={() => setDraft((d) => ({ ...d, variant: kind }))}
+                  aria-pressed={picked}
+                  className={cn(
+                    "rounded-full border px-4 py-2 text-sm font-medium transition-colors",
+                    picked
+                      ? "border-ink bg-ink text-background"
+                      : "border-border bg-surface text-muted hover:border-border-strong hover:text-ink",
+                    // "Not sure" is a real answer, but it should not look like
+                    // the one to reach for.
+                    kind === UNSURE_VARIANT && !picked && "text-muted-2",
+                  )}
+                >
+                  {kind}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Two air conditioners in the same flat is one visit, not two bookings.
           It sits here rather than in a step of its own — an eighth step for a
           number almost everybody leaves at one is a step everybody pays for. */}
@@ -735,7 +797,8 @@ function ApplianceStep({
           setDraft={setDraft}
           units={units}
           name={chosen?.name ?? applianceLabel(draft) ?? "appliance"}
-          onSetMake={onSetMake}
+          kinds={chosen ? variantsFor(chosen) : []}
+          onSetUnit={onSetUnit}
         />
       )}
     </div>
@@ -755,13 +818,15 @@ function UnitsPicker({
   setDraft,
   units,
   name,
-  onSetMake,
+  kinds,
+  onSetUnit,
 }: StepProps & {
   units: number;
   name: string;
-  onSetMake: (from: number | null, brand: BrandId) => void;
+  kinds: string[];
+  onSetUnit: (from: number | null, patch: Partial<BookingJob>) => void;
 }) {
-  const [pickingFor, setPickingFor] = useState<number | null>(null);
+  const [picking, setPicking] = useState<{ row: number; field: "make" | "kind" } | null>(null);
   const set = (next: number) =>
     setDraft((d) => ({ ...d, units: Math.min(MAX_UNITS, Math.max(1, next)) }));
 
@@ -860,46 +925,63 @@ function UnitsPicker({
                         {[make, name].filter(Boolean).join(" ")}
                       </span>
                       <span className="mt-0.5 block text-xs text-muted">
-                        {job.problems.length
-                          ? `${job.problems.length} fault${job.problems.length === 1 ? "" : "s"} chosen`
-                          : "faults on the next step"}
+                        {[
+                          job.variant,
+                          job.problems.length
+                            ? `${job.problems.length} fault${job.problems.length === 1 ? "" : "s"} chosen`
+                            : "faults on the next step",
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")}
                       </span>
                     </span>
                   </span>
 
                   <span className="mt-2.5 flex flex-wrap items-center gap-1.5 pl-9 sm:mt-0 sm:shrink-0 sm:pl-0">
-                    {pickingFor === i ? (
+                    {picking?.row === i ? (
                       <>
-                        {BRANDS.map((b) => {
-                          const current = job.brand === b.id;
-                          return (
-                            <button
-                              key={b.id}
-                              type="button"
-                              // The one it already is stays on screen and stays
-                              // pressable — it is the way back out of the
-                              // picker, and hiding it would leave somebody
-                              // wondering what this one is.
-                              onClick={() => {
-                                if (!current) onSetMake(from, b.id);
-                                setPickingFor(null);
-                              }}
-                              aria-pressed={current}
-                              className={cn(
-                                "rounded-full border px-2.5 py-1 text-xs font-medium transition-colors",
-                                current
-                                  ? "border-ink bg-ink text-background"
-                                  : "border-border hover:border-ink",
-                              )}
-                              style={current ? undefined : { color: b.accent }}
-                            >
-                              {b.name}
-                            </button>
-                          );
-                        })}
+                        {(picking.field === "make"
+                          ? BRANDS.map((b) => ({
+                              key: b.id,
+                              label: b.name,
+                              tint: b.accent,
+                              current: job.brand === b.id,
+                              patch: { brand: b.id, otherBrand: undefined } as Partial<BookingJob>,
+                            }))
+                          : [...kinds, UNSURE_VARIANT].map((k) => ({
+                              key: k,
+                              label: k,
+                              tint: undefined,
+                              current: job.variant === k,
+                              patch: { variant: k } as Partial<BookingJob>,
+                            }))
+                        ).map((choice) => (
+                          <button
+                            key={choice.key}
+                            type="button"
+                            // The one it already is stays on screen and stays
+                            // pressable — it is the way back out of the picker,
+                            // and hiding it would leave somebody wondering what
+                            // this one is.
+                            onClick={() => {
+                              if (!choice.current) onSetUnit(from, choice.patch);
+                              setPicking(null);
+                            }}
+                            aria-pressed={choice.current}
+                            className={cn(
+                              "rounded-full border px-2.5 py-1 text-xs font-medium transition-colors",
+                              choice.current
+                                ? "border-ink bg-ink text-background"
+                                : "border-border hover:border-ink",
+                            )}
+                            style={choice.current ? undefined : { color: choice.tint }}
+                          >
+                            {choice.label}
+                          </button>
+                        ))}
                         <button
                           type="button"
-                          onClick={() => setPickingFor(null)}
+                          onClick={() => setPicking(null)}
                           aria-label="Leave this one as it is"
                           className="grid size-6 place-items-center rounded-full text-muted-2 transition-colors hover:text-ink"
                         >
@@ -907,13 +989,24 @@ function UnitsPicker({
                         </button>
                       </>
                     ) : (
-                      <button
-                        type="button"
-                        onClick={() => setPickingFor(i)}
-                        className="rounded-full border border-border px-2.5 py-1 text-xs text-muted transition-colors hover:border-border-strong hover:text-ink"
-                      >
-                        Different make
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setPicking({ row: i, field: "make" })}
+                          className="rounded-full border border-border px-2.5 py-1 text-xs text-muted transition-colors hover:border-border-strong hover:text-ink"
+                        >
+                          Different make
+                        </button>
+                        {kinds.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => setPicking({ row: i, field: "kind" })}
+                            className="rounded-full border border-border px-2.5 py-1 text-xs text-muted transition-colors hover:border-border-strong hover:text-ink"
+                          >
+                            Different kind
+                          </button>
+                        )}
+                      </>
                     )}
                   </span>
                 </li>
@@ -1392,7 +1485,11 @@ function SummaryCard({
                         <span className="ml-1.5 text-muted">× {clampUnits(job.units)}</span>
                       )}
                     </span>
-                    {faults && <span className="mt-0.5 block text-xs text-muted">{faults}</span>}
+                    {(job.variant || faults) && (
+                      <span className="mt-0.5 block text-xs text-muted">
+                        {[job.variant, faults].filter(Boolean).join(" · ")}
+                      </span>
+                    )}
                   </span>
                   {removable && (
                     <button

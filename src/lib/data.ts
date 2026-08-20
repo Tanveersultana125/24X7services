@@ -16,6 +16,7 @@ export const APPLIANCES: Appliance[] = [
     serviceTime: "45–90 min",
     rating: 4.9,
     bookings: "1.2M+",
+    variants: ["Single door", "Double door", "Side-by-side", "French door"],
     problems: [
       { id: "not-cooling", label: "Not Cooling", price: [499, 1499], eta: "60 min", common: true },
       { id: "water-leakage", label: "Water Leakage", price: [399, 899], eta: "45 min", common: true },
@@ -35,6 +36,7 @@ export const APPLIANCES: Appliance[] = [
     serviceTime: "40–80 min",
     rating: 4.8,
     bookings: "980K+",
+    variants: ["Front load", "Top load", "Semi-automatic"],
     problems: [
       { id: "not-starting", label: "Not Starting", price: [399, 1299], eta: "50 min", common: true },
       { id: "motor-problem", label: "Motor Problem", price: [1499, 3499], eta: "90 min" },
@@ -53,6 +55,7 @@ export const APPLIANCES: Appliance[] = [
     serviceTime: "30–75 min",
     rating: 4.8,
     bookings: "1.05M+",
+    variants: ["Solo", "Grill", "Convection", "OTG / built-in oven"],
     problems: [
       { id: "not-heating", label: "Not Heating", price: [499, 1799], eta: "60 min", common: true },
       { id: "spark", label: "Sparking", price: [399, 999], eta: "45 min", common: true },
@@ -73,6 +76,7 @@ export const APPLIANCES: Appliance[] = [
     serviceTime: "45–120 min",
     rating: 4.9,
     bookings: "890K+",
+    variants: ["Split", "Window", "Cassette", "Portable"],
     problems: [
       { id: "not-cooling", label: "Not Cooling", price: [599, 1999], eta: "60 min", common: true },
       { id: "gas-filling", label: "Gas Charging", price: [1999, 3999], eta: "90 min", common: true },

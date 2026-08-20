@@ -140,6 +140,21 @@ export function slugify(name: string): string {
     .slice(0, 40);
 }
 
+/**
+ * The kinds this appliance comes in.
+ *
+ * A washing machine is a front load or a top load and the visit is not the
+ * same job; an air conditioner is a split or a window unit and the technician
+ * carries different things. A service with none listed is one where the
+ * question does not arise, and nothing is asked.
+ */
+export function variantsFor(service: CatalogueService): string[] {
+  return service.variants ?? [];
+}
+
+/** Said by somebody who genuinely does not know, which is an answer too. */
+export const UNSURE_VARIANT = "Not sure";
+
 /** The brands a service covers, treating "unset" as all of them. */
 export function brandsFor(service: CatalogueService): BrandId[] {
   return service.brands?.length ? service.brands : BRAND_IDS;
