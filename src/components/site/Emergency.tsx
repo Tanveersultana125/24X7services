@@ -6,10 +6,11 @@ import { MagneticButton } from "./MagneticButton";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
+/** Hyderabad and Secunderabad only — the two cities we actually run out of. */
 const LIVE = [
   { city: "Hyderabad", job: "fridge", status: "dispatched 2m ago", tint: "#d64545" },
-  { city: "Warangal", job: "washer", status: "en route", tint: "#d9821b" },
-  { city: "Secunderabad", job: "microwave", status: "completed", tint: "#0b9a63" },
+  { city: "Secunderabad", job: "washer", status: "en route", tint: "#d9821b" },
+  { city: "Hyderabad", job: "microwave", status: "completed", tint: "#0b9a63" },
 ];
 
 export function Emergency() {
@@ -94,9 +95,9 @@ export function Emergency() {
               transition={{ duration: 0.7, delay: 0.4 }}
               className="mt-9 flex flex-wrap items-center justify-center gap-2"
             >
-              {LIVE.map((l) => (
+              {LIVE.map((l, i) => (
                 <span
-                  key={l.city}
+                  key={`${l.city}-${i}`}
                   className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[0.68rem] text-white/55 backdrop-blur"
                 >
                   <span className="size-1.5 shrink-0 rounded-full" style={{ background: l.tint }} />
