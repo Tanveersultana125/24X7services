@@ -87,53 +87,49 @@ export function ServicesIndex({
               // offset clears the sticky nav, which would otherwise sit over
               // the row the browser just scrolled to.
               <li id={`service-${s.id}`} key={s.id} className="scroll-mt-28 border-b border-hairline">
-                {/* The row is the link, so Add sits alongside it rather than
-                    inside — and below lg, where the row is the accordion
-                    control, Add stays a button and does not toggle the panel. */}
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <Link
-                    href={s.appliance ? `/book?appliance=${s.appliance}` : "/book"}
-                    onPointerEnter={(e) => { if (e.pointerType === "mouse") setActive(i); }}
-                    onFocus={() => setActive(i)}
-                    onClick={(e) => {
-                      // below lg the row is the accordion control, not the link — booking
-                      // is the button inside the panel it opens. Keyed off width rather
-                      // than hover support, so a narrow desktop window behaves the same.
-                      // Tapping the open row again closes it.
-                      if (typeof window !== "undefined" && window.innerWidth < 1024) {
-                        e.preventDefault();
-                        setActive((cur) => (cur === i ? null : i));
-                      }
-                    }}
+                {/* The whole row is the link. Adding to the basket is done
+                    from the panel it opens, where the service has been read
+                    rather than guessed at from its name. */}
+                <Link
+                  href={s.appliance ? `/book?appliance=${s.appliance}` : "/book"}
+                  onPointerEnter={(e) => { if (e.pointerType === "mouse") setActive(i); }}
+                  onFocus={() => setActive(i)}
+                  onClick={(e) => {
+                    // below lg the row is the accordion control, not the link — booking
+                    // is the button inside the panel it opens. Keyed off width rather
+                    // than hover support, so a narrow desktop window behaves the same.
+                    // Tapping the open row again closes it.
+                    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+                      e.preventDefault();
+                      setActive((cur) => (cur === i ? null : i));
+                    }
+                  }}
+                  className={cn(
+                    "group flex items-center gap-4 py-5 transition-colors sm:gap-8 sm:py-6",
+                    active === i ? "text-ink" : "text-muted"
+                  )}
+                >
+                  <span className="w-8 shrink-0 font-mono text-xs tabular-nums sm:w-10 sm:text-sm">{s.no}</span>
+                  <span className="font-display flex-1 text-[1.5rem] tracking-[-0.02em] transition-transform duration-500 group-hover:translate-x-2 sm:text-[2.1rem]">
+                    {s.title}
+                  </span>
+                  <span className="hidden shrink-0 text-sm text-muted sm:block">{s.price}</span>
+                  {/* the list is a menu on touch, so show open/closed state there */}
+                  <ChevronDown
                     className={cn(
-                      "group flex min-w-0 flex-1 items-center gap-4 py-5 transition-colors sm:gap-8 sm:py-6",
-                      active === i ? "text-ink" : "text-muted"
+                      "size-5 shrink-0 transition-transform duration-500 lg:hidden",
+                      active === i ? "rotate-180 text-royal-bright" : "text-muted-2"
                     )}
-                  >
-                    <span className="w-8 shrink-0 font-mono text-xs tabular-nums sm:w-10 sm:text-sm">{s.no}</span>
-                    <span className="font-display flex-1 text-[1.5rem] tracking-[-0.02em] transition-transform duration-500 group-hover:translate-x-2 sm:text-[2.1rem]">
-                      {s.title}
-                    </span>
-                    <span className="hidden shrink-0 text-sm text-muted sm:block">{s.price}</span>
-                    {/* the list is a menu on touch, so show open/closed state there */}
-                    <ChevronDown
-                      className={cn(
-                        "size-5 shrink-0 transition-transform duration-500 lg:hidden",
-                        active === i ? "rotate-180 text-royal-bright" : "text-muted-2"
-                      )}
-                    />
-                    <ArrowUpRight
-                      className={cn(
-                        "hidden size-6 shrink-0 transition-all duration-500 lg:block",
-                        active === i
-                          ? "translate-x-0 translate-y-0 text-royal-bright opacity-100"
-                          : "-translate-x-2 translate-y-2 opacity-0"
-                      )}
-                    />
-                  </Link>
-
-                  {line && <AddToCart variant="icon" item={line} className="shrink-0" />}
-                </div>
+                  />
+                  <ArrowUpRight
+                    className={cn(
+                      "hidden size-6 shrink-0 transition-all duration-500 lg:block",
+                      active === i
+                        ? "translate-x-0 translate-y-0 text-royal-bright opacity-100"
+                        : "-translate-x-2 translate-y-2 opacity-0"
+                    )}
+                  />
+                </Link>
 
                 {/* below lg the detail opens inline, right under the service tapped */}
                 <AnimatePresence initial={false}>
