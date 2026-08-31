@@ -22,19 +22,6 @@ const EMERALD = "#0b9a63";
 const AMBER = "#d9821b";
 const VIOLET = "#6d5ae0";
 
-/**
- * The plinth is the site's own blue, `--royal` falling to the deep end of it —
- * the pairing it carried before a lighter cornflower was tried. The mid blue
- * only held up while a light field was burning on it; with that gone it read
- * as washed out, and the deep sweep is what makes the white icon pane and the
- * cream card below it snap.
- *
- * It stays flat. A drifting field across the six read as white smears through
- * the colour rather than as light in it — this is a ground for the icon, not
- * artwork of its own.
- */
-const PLINTH: [string, string] = [ROYAL, "#1e3a8a"];
-
 const INCLUDES = [
   { icon: ClipboardCheck, tint: ROYAL, title: "Free diagnosis", desc: "A full inspection and honest assessment before any charge." },
   { icon: Package, tint: EMERALD, title: "Genuine parts", desc: "Only brand-approved, traceable spares — never local substitutes." },
@@ -134,46 +121,43 @@ export function ServicesPromise() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.6, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
-                /* The padding moves onto the two halves: the plinth has to run
-                   to the card's edges, and `overflow-hidden` is what rounds
-                   its square top corners to the card's radius. It clips the
-                   children, not the card's own shadow, so the hover lift is
-                   untouched. */
-                className="group relative overflow-hidden rounded-[1.1rem] border border-card-edge bg-gradient-to-b from-card to-surface text-center shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_var(--card-edge)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)] sm:rounded-[1.5rem] sm:text-left"
+                style={{ "--tint": f.tint } as React.CSSProperties}
+                /* Six solid blue slabs, two rows deep, read as a wall of colour
+                   with the writing pushed out from under it. The card is one
+                   surface now — the lit card the rest of the site uses — and
+                   the colour arrives as the icon's own tint and a wash in the
+                   corner it comes from.
+                   A column, so the rule can be pushed to the floor: the blurbs
+                   run to different lengths, and a rule that simply followed the
+                   last line sat at a different height in all six. */
+                className="group relative flex h-full flex-col overflow-hidden rounded-[1.1rem] border border-card-edge bg-gradient-to-b from-card to-surface p-4 shadow-[0_16px_36px_-18px_rgba(23,21,15,0.16),inset_0_1.5px_0_var(--card-edge)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_32px_56px_-22px_rgba(23,21,15,0.26)] dark:border-white/[0.12] dark:shadow-[0_26px_60px_-30px_rgba(0,0,0,0.9),inset_0_1px_0_rgba(255,255,255,0.08)] dark:hover:border-white/[0.2] sm:rounded-[1.5rem] sm:p-7"
               >
-                {/* The plinth the icon stands on — a flat sweep of the brand
-                    blue, edge to edge. */}
-                <div
-                  className="relative overflow-hidden px-3 py-3 sm:px-7 sm:py-6"
-                  style={{ background: `linear-gradient(150deg, ${PLINTH[0]}, ${PLINTH[1]})` }}
-                >
-                  {/* A white glyph on a translucent pane of the ground had
-                      almost nothing to separate it from that ground. The pane
-                      goes solid white and the glyph takes the item's own
-                      colour, which is the strongest contrast available here
-                      and brings the tint back onto the card. */}
-                  <span
-                    className="mx-auto grid size-9 place-items-center rounded-lg bg-white shadow-[0_8px_18px_-8px_rgba(16,34,86,0.55)] transition-transform duration-500 group-hover:-translate-y-0.5 sm:mx-0 sm:size-14 sm:rounded-2xl"
-                    style={{ color: f.tint }}
-                  >
-                    <f.icon className="size-[1.05rem] sm:size-6" strokeWidth={1.9} />
-                  </span>
-                </div>
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -right-12 -top-12 size-32 rounded-full opacity-[0.14] blur-2xl transition-opacity duration-500 group-hover:opacity-25 dark:opacity-25 dark:group-hover:opacity-40"
+                  style={{ background: "var(--tint)" }}
+                />
 
-                <div className="p-3 sm:p-7">
-                  <h3 className="hyphens-auto text-[0.7rem] font-semibold leading-tight tracking-tight sm:text-lg">
-                    {f.title}
-                  </h3>
-                  {/* no room for the blurb in a three-up column — it returns at sm */}
-                  <p className="hidden text-muted sm:mt-2 sm:block sm:text-[0.9rem] sm:leading-relaxed">
-                    {f.desc}
-                  </p>
-                  <span
-                    aria-hidden
-                    className="mx-auto mt-3 block h-0.5 w-5 rounded-full transition-all duration-500 group-hover:w-14 sm:mx-0 sm:mt-5 sm:w-8"
-                    style={{ background: f.tint }}
-                  />
-                </div>
+                {/* A tint at 10% is a colour on paper and a smudge on black. */}
+                <span className="relative grid size-9 shrink-0 place-items-center rounded-xl bg-[color-mix(in_srgb,var(--tint)_12%,transparent)] text-[var(--tint)] ring-1 ring-inset ring-[color-mix(in_srgb,var(--tint)_22%,transparent)] transition-transform duration-500 group-hover:scale-105 dark:bg-[color-mix(in_srgb,var(--tint)_24%,transparent)] dark:text-[color-mix(in_srgb,var(--tint)_55%,white)] dark:ring-white/10 sm:size-12 sm:rounded-2xl">
+                  <f.icon className="size-[1.05rem] sm:size-6" strokeWidth={1.7} />
+                </span>
+
+                <h3 className="relative mt-3 mb-3 hyphens-auto text-[0.7rem] font-semibold leading-tight tracking-tight sm:mt-5 sm:mb-0 sm:text-[1.05rem]">
+                  {f.title}
+                </h3>
+                {/* no room for the blurb in a three-up column — it returns at sm */}
+                <p className="relative hidden text-muted sm:mt-2 sm:mb-5 sm:block sm:text-[0.88rem] sm:leading-relaxed">
+                  {f.desc}
+                </p>
+
+                {/* mt-auto, and the gap above it is the margin below — so the
+                    six rules sit on one line across the row. */}
+                <span
+                  aria-hidden
+                  className="relative mt-auto block h-0.5 w-5 shrink-0 rounded-full transition-all duration-500 group-hover:w-14 sm:w-8"
+                  style={{ background: "var(--tint)" }}
+                />
               </motion.div>
             ))}
           </div>
