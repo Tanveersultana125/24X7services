@@ -303,16 +303,16 @@ export function PageHeader({
                   {/* Wordmark plate — white in both themes. A brand mark is
                       fixed artwork: Samsung's navy on a near-black card reads
                       as a different, muddier logo, which is not ours to do. */}
-                  <div className="relative grid h-28 place-items-center bg-white sm:h-36">
+                  <div className="relative flex items-center justify-between gap-2 bg-white px-3 py-3 sm:px-4 sm:py-3.5">
                     <span
                       aria-hidden
                       className="pointer-events-none absolute inset-0 opacity-[0.07]"
                       style={{ background: `radial-gradient(120% 90% at 70% 110%, ${b.accent}, transparent 62%)` }}
                     />
-                    <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-emerald/10 px-2 py-1 text-[0.56rem] font-semibold uppercase tracking-[0.1em] text-emerald ring-1 ring-inset ring-emerald/20 sm:text-[0.6rem]">
-                      <BadgeCheck className="size-3" /> Authorised
-                    </span>
                     <CardMark id={b.id} />
+                    <span className="relative inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald/10 px-2 py-1 text-[0.5rem] font-semibold uppercase tracking-[0.1em] text-emerald ring-1 ring-inset ring-emerald/20 sm:text-[0.55rem]">
+                      <BadgeCheck className="size-2.5 sm:size-3" /> Authorised
+                    </span>
                   </div>
 
                   {/* brand-colour footer */}
@@ -404,13 +404,13 @@ export function PageHeader({
 function CardMark({ id }: { id: BrandId }) {
   if (id === "lg") {
     return (
-      <span className="relative flex items-center gap-2">
-        <BrandMark id="lg" tone="brand" className="text-xl sm:text-2xl" />
-        <span className="text-xl font-extrabold tracking-tight text-muted sm:text-2xl">LG</span>
+      <span className="relative flex min-w-0 items-center gap-1.5">
+        <BrandMark id="lg" tone="brand" className="text-base sm:text-lg" />
+        <span className="text-base font-extrabold tracking-tight text-muted sm:text-lg">LG</span>
       </span>
     );
   }
-  return <BrandMark id={id} tone="brand" className="relative text-lg sm:text-2xl" />;
+  return <BrandMark id={id} tone="brand" className="relative min-w-0 text-[0.8rem] sm:text-base" />;
 }
 
 function CollageShot({ src, delay }: { src: string; delay: number }) {
