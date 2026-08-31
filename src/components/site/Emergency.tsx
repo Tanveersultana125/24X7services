@@ -6,11 +6,15 @@ import { MagneticButton } from "./MagneticButton";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
-/** Hyderabad and Secunderabad only — the two cities we actually run out of. */
+/**
+ * One line per city we run out of, and there are two of them.
+ *
+ * A third chip wrapped onto its own row and sat centred under the other two,
+ * which reads as a feed that couldn't fit rather than a considered pair.
+ */
 const LIVE = [
   { city: "Hyderabad", job: "fridge", status: "dispatched 2m ago", tint: "#d64545" },
   { city: "Secunderabad", job: "washer", status: "en route", tint: "#d9821b" },
-  { city: "Hyderabad", job: "microwave", status: "completed", tint: "#0b9a63" },
 ];
 
 export function Emergency() {
@@ -93,16 +97,21 @@ export function Emergency() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.7, delay: 0.4 }}
-              className="mt-9 flex flex-wrap items-center justify-center gap-2"
+              className="mt-9 flex flex-wrap items-center justify-center gap-2.5"
             >
-              {LIVE.map((l, i) => (
+              {LIVE.map((l) => (
                 <span
-                  key={`${l.city}-${i}`}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[0.68rem] text-white/55 backdrop-blur"
+                  key={l.city}
+                  className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-[0.68rem] text-white/55 backdrop-blur"
                 >
-                  <span className="size-1.5 shrink-0 rounded-full" style={{ background: l.tint }} />
+                  {/* Lit rather than filled: a flat 6px dot on near-black is a
+                      speck, and this one is standing in for a live status. */}
+                  <span
+                    className="size-1.5 shrink-0 rounded-full"
+                    style={{ background: l.tint, boxShadow: `0 0 0 3px ${l.tint}26` }}
+                  />
                   <span className="font-medium text-white/75">{l.city}</span>
-                  <span className="text-white/30">·</span>
+                  <span className="text-white/25">·</span>
                   {l.job} {l.status}
                 </span>
               ))}
