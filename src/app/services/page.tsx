@@ -3,7 +3,7 @@ import { SiteNav } from "@/components/site/SiteNav";
 import { PageHeader } from "@/components/site/PageHeader";
 import { ServicesIndex } from "@/components/site/ServicesIndex";
 import { getServiceIndex, getServiceIndexCopy } from "@/lib/service-index";
-import { ServicesDetail } from "@/components/site/ServicesDetail";
+import { ServicesPricing, ServicesPromise } from "@/components/site/ServicesDetail";
 import { Contact } from "@/components/site/Contact";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
@@ -36,8 +36,12 @@ export default async function ServicesPage() {
           bgPos="right center"
           bgDark
         />
+        {/* Prices first: what a repair costs is the question people arrive
+            with, and it used to sit three sections down. The eight-service
+            index follows it. */}
+        <ServicesPricing />
+        <ServicesPromise />
         <ServicesIndex services={services} copy={copy} />
-        <ServicesDetail />
         <Contact />
       </main>
       <SiteFooter />

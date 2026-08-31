@@ -64,15 +64,15 @@ const PRICING_ASSURANCES = [
   { icon: ThumbsUp, tint: ROYAL, title: "Satisfaction Guaranteed", desc: "Quality service, always" },
 ];
 
-export function ServicesDetail() {
-  const brands = useBrands();
+/**
+ * What every visit includes, and the promise behind it.
+ *
+ * Its own export, and the price list below is another: the services page puts
+ * the price list first, before the eight-service index, and these two can no
+ * longer be one block if only one of them is to move.
+ */
+export function ServicesPromise() {
   const promiseShieldSrc = useSiteImage("promise-shield");
-  const applianceLineupSrc = useSiteImage("appliance-lineup");
-  const services = useServices();
-  const [active, setActive] = useState<string>("refrigerator");
-  const [sheet, setSheet] = useState<string | null>(null);
-  // The chosen tab can be hidden from the panel while someone is on the page.
-  const appliance = services.find((a) => a.id === active) ?? services[0];
 
   return (
     <>
@@ -180,7 +180,22 @@ export function ServicesDetail() {
 
         </div>
       </section>
+    </>
+  );
+}
 
+/** What each fault costs, per appliance and per make. */
+export function ServicesPricing() {
+  const brands = useBrands();
+  const applianceLineupSrc = useSiteImage("appliance-lineup");
+  const services = useServices();
+  const [active, setActive] = useState<string>("refrigerator");
+  const [sheet, setSheet] = useState<string | null>(null);
+  // The chosen tab can be hidden from the panel while someone is on the page.
+  const appliance = services.find((a) => a.id === active) ?? services[0];
+
+  return (
+    <>
       {/* Problems & pricing */}
       <section className="bg-surface py-14 sm:py-20">
         <div className="mx-auto max-w-[92rem] px-6 sm:px-10">
