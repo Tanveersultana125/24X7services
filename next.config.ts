@@ -32,6 +32,21 @@ const nextConfig: NextConfig = {
     if (!handler) return [];
     return [{ source: "/__/auth/:path*", destination: `https://${handler}/__/auth/:path*` }];
   },
+  /**
+   * The field app is at /tech, and nobody types that first.
+   *
+   * A technician handed the address says "technician", and typing it got a 404
+   * — a dead end at the one door somebody standing on a doorstep needs to get
+   * through. The obvious spellings land on the real one instead.
+   */
+  async redirects() {
+    return ["/technician", "/technicians", "/technician-login", "/tech-login"].map((source) => ({
+      source,
+      destination: "/tech",
+      permanent: false,
+    }));
+  },
+
   // The dev-only badge sat over the page's bottom-left corner while reviewing
   // layouts. Compile and runtime errors are still surfaced without it.
   devIndicators: false,
