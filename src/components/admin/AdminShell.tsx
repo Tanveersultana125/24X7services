@@ -9,6 +9,7 @@ import {
   ShoppingCart,
   MousePointerClick,
   Users,
+  HardHat,
   Wrench,
   Tags,
   ListOrdered,
@@ -34,6 +35,9 @@ const NAV = [
   // Baskets sit next to bookings: they are the same list one step earlier.
   { href: "/admin/carts", label: "Baskets", icon: ShoppingCart },
   { href: "/admin/customers", label: "Customers", icon: Users },
+  // Next to the customers: the two halves of every visit, the people who book
+  // it and the people who do it.
+  { href: "/admin/technicians", label: "Technicians", icon: HardHat },
   // After customers: the trail is who they were before they were customers.
   { href: "/admin/activity", label: "Activity", icon: MousePointerClick },
   { href: "/admin/services", label: "Services & prices", icon: Wrench },

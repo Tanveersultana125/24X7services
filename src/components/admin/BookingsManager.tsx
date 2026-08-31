@@ -2,12 +2,19 @@
 
 import { useMemo, useState } from "react";
 import { Search } from "lucide-react";
-import { TECHNICIANS, STATUS_META, type BookingStatus } from "@/lib/admin/data";
+import { STATUS_META, type BookingStatus } from "@/lib/admin/data";
 import type { Booking } from "@/lib/bookings";
 
 const STATUSES: BookingStatus[] = ["new", "assigned", "in-progress", "completed", "cancelled"];
 
-export function BookingsManager({ initial }: { initial: Booking[] }) {
+export function BookingsManager({
+  initial,
+  technicians,
+}: {
+  initial: Booking[];
+  /** Who is on the books and still working — the assignment list. */
+  technicians: { id: string; name: string }[];
+}) {
   const [rows, setRows] = useState<Booking[]>(initial);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<BookingStatus | "all">("all");
@@ -32,12 +39,47 @@ export function BookingsManager({ initial }: { initial: Booking[] }) {
       const res = await fetch("/api/admin/bookings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status: patch.status, tech: patch.tech ?? null }),
+        // Only what this change actually touches. Sending `tech: null` on a
+        // status change — which is what a blanket `?? null` did — unassigned
+        // the technician every time somebody moved a job along.
+        body: JSON.stringify({
+          id,
+          ...("status" in patch ? { status: patch.status } : {}),
+          ...("tech" in patch ? { tech: patch.tech ?? null } : {}),
+          ...("techId" in patch ? { techId: patch.techId ?? null } : {}),
+        }),
       });
       if (!res.ok) throw new Error("failed");
     } catch {
       setRows(prev); // revert
     }
+  };
+
+  /**
+   * Which option is selected for a booking.
+   *
+   * Bookings taken before technicians were records carry a name and no id, and
+   * a name that matches nobody on the books still has to show — dropping it
+   * would silently read as unassigned.
+   */
+  const assignedValue = (b: Booking) =>
+    b.techId ?? technicians.find((t) => t.name === b.tech)?.id ?? (b.tech ? `name:${b.tech}` : "");
+
+  /** Assigning writes both: the id the field app finds jobs by, the name everything prints. */
+  const assign = (b: Booking, value: string) => {
+    const tech = technicians.find((t) => t.id === value);
+    update(b.id, {
+      techId: tech?.id,
+      tech: tech?.name,
+      status: value && b.status === "new" ? "assigned" : b.status,
+    });
+  };
+
+  /** The list, plus a legacy name that isn't on it, so it can still be seen. */
+  const optionsFor = (b: Booking) => {
+    const value = assignedValue(b);
+    const legacy = value.startsWith("name:") ? [{ id: value, name: b.tech ?? "" }] : [];
+    return [...legacy, ...technicians];
   };
 
   return (
@@ -113,13 +155,13 @@ export function BookingsManager({ initial }: { initial: Booking[] }) {
               <label className="block">
                 <span className="mb-1 block text-[0.65rem] font-medium uppercase tracking-wider text-muted">Technician</span>
                 <select
-                  value={b.tech ?? ""}
-                  onChange={(e) => update(b.id, { tech: e.target.value || undefined, status: e.target.value && b.status === "new" ? "assigned" : b.status })}
+                  value={assignedValue(b)}
+                  onChange={(e) => assign(b, e.target.value)}
                   className="w-full rounded-lg border border-border bg-surface-2 px-2 py-2 text-xs outline-none focus:border-royal-bright"
                 >
                   <option value="">Unassigned</option>
-                  {TECHNICIANS.map((t) => (
-                    <option key={t} value={t}>{t}</option>
+                  {optionsFor(b).map((t) => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
                   ))}
                 </select>
               </label>
@@ -183,13 +225,13 @@ export function BookingsManager({ initial }: { initial: Booking[] }) {
                 <td className="px-4 py-3 tabular-nums">₹{b.price.toLocaleString("en-IN")}</td>
                 <td className="px-4 py-3">
                   <select
-                    value={b.tech ?? ""}
-                    onChange={(e) => update(b.id, { tech: e.target.value || undefined, status: e.target.value && b.status === "new" ? "assigned" : b.status })}
+                    value={assignedValue(b)}
+                    onChange={(e) => assign(b, e.target.value)}
                     className="rounded-lg border border-border bg-surface-2 px-2 py-1.5 text-xs outline-none focus:border-royal-bright"
                   >
                     <option value="">Unassigned</option>
-                    {TECHNICIANS.map((t) => (
-                      <option key={t} value={t}>{t}</option>
+                    {optionsFor(b).map((t) => (
+                      <option key={t.id} value={t.id}>{t.name}</option>
                     ))}
                   </select>
                 </td>

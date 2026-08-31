@@ -17,12 +17,17 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
   }
 
-  const patch: { status?: BookingStatus; tech?: string | null } = {};
+  const patch: { status?: BookingStatus; tech?: string | null; techId?: string | null } = {};
   if (typeof body.status === "string" && STATUSES.includes(body.status as BookingStatus)) {
     patch.status = body.status as BookingStatus;
   }
   if (body.tech === null || typeof body.tech === "string") {
     patch.tech = body.tech;
+  }
+  // The id is what the field app finds a technician's jobs by; the name above
+  // is what every list prints. The panel writes both, so both are read.
+  if (body.techId === null || typeof body.techId === "string") {
+    patch.techId = body.techId;
   }
 
   try {

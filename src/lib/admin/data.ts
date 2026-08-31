@@ -25,7 +25,10 @@ export const BOOKINGS: Booking[] = [
   { id: "BK-2034", customer: "Karan Malhotra", phone: "90000 65432", appliance: "AC", problem: "Deep Clean", city: "Ramagundam", date: "2026-07-15", price: 599, status: "completed", tech: "Deepak M." },
 ];
 
-export const TECHNICIANS = ["Ravi K.", "Imran S.", "Deepak M.", "Sunil P."];
+// Technicians are real records now — see `src/lib/technicians.ts` for the
+// Firestore layer and `/admin/technicians` for the page that manages them.
+// The four names that used to live here were a dropdown and nothing else; a
+// technician needs a login before the field app can show them anything.
 
 // Services are real data now — see `src/lib/catalogue.ts` for the Firestore
 // layer and `catalogue-shared.ts` for how a saved change is merged with what

@@ -155,7 +155,10 @@ export function ChatAssistant() {
   }, []);
 
   // The assistant is a customer-facing widget — never show it in the admin panel.
-  const hidden = pathname?.startsWith("/admin") ?? false;
+  // Not over the back office, and not over the field app either: both are
+  // staff tools, and a customer-facing chat bubble on them is noise sitting on
+  // top of the address a technician is trying to read.
+  const hidden = pathname?.startsWith("/admin") || pathname?.startsWith("/tech") || false;
 
   const send = async (text: string) => {
     const value = text.trim();

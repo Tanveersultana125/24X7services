@@ -67,7 +67,17 @@ export type Booking = {
   payment: string;
   price: number;
   status: BookingStatus;
+  /** The technician's name, as it is printed beside the booking. */
   tech?: string;
+  /**
+   * Which technician record that name belongs to.
+   *
+   * The name alone was enough while a technician was a string in a dropdown.
+   * The field app signs somebody in and has to find *their* jobs, and two
+   * people can be called Ravi K. — so the id is what a job is really carried
+   * by, and the name stays for everything that only prints it.
+   */
+  techId?: string;
   emergency: boolean;
   createdAt: number;
 };
@@ -194,6 +204,7 @@ function mapBooking(id: string, data: FirebaseFirestore.DocumentData): Booking {
     price: data.price ?? 0,
     status: (data.status ?? "new") as BookingStatus,
     tech: data.tech ?? undefined,
+    techId: data.techId ?? undefined,
     emergency: Boolean(data.emergency),
     createdAt: toMillis(data.createdAt),
   };
@@ -219,14 +230,67 @@ export async function listCustomerBookings(uid: string): Promise<Booking[]> {
 /** Update a booking's status / assigned technician (admin). */
 export async function updateBooking(
   id: string,
-  patch: { status?: BookingStatus; tech?: string | null },
+  patch: { status?: BookingStatus; tech?: string | null; techId?: string | null },
 ): Promise<void> {
   const db = getAdminDb();
   const data: Record<string, unknown> = {};
   if (patch.status) data.status = patch.status;
   if (patch.tech !== undefined) data.tech = patch.tech || FieldValue.delete();
+  if (patch.techId !== undefined) data.techId = patch.techId || FieldValue.delete();
   if (Object.keys(data).length === 0) return;
   await db.collection(BOOKINGS).doc(id).update(data);
+}
+
+/**
+ * One technician's jobs, newest first.
+ *
+ * Two queries, because bookings assigned before `techId` existed carry only
+ * the name. Neither is sorted in Firestore — a `where` plus an `orderBy` wants
+ * a composite index, and a technician's list is short enough to sort here.
+ */
+export async function listTechnicianBookings(techId: string, name: string): Promise<Booking[]> {
+  const db = getAdminDb();
+  const [byId, byName] = await Promise.all([
+    db.collection(BOOKINGS).where("techId", "==", techId).get(),
+    name ? db.collection(BOOKINGS).where("tech", "==", name).get() : Promise.resolve(null),
+  ]);
+
+  const seen = new Map<string, Booking>();
+  for (const doc of byId.docs) seen.set(doc.id, mapBooking(doc.id, doc.data()));
+  for (const doc of byName?.docs ?? []) {
+    // A job handed to somebody else since keeps their id and this one's name
+    // only if the panel wrote one without the other — the id wins.
+    const row = mapBooking(doc.id, doc.data());
+    if (!seen.has(doc.id) && (!row.techId || row.techId === techId)) seen.set(doc.id, row);
+  }
+
+  return [...seen.values()].sort((a, b) => b.createdAt - a.createdAt);
+}
+
+/**
+ * A status change made from the field app.
+ *
+ * The check that the job is actually theirs happens here rather than in the
+ * route: it is the reason this function exists separately from
+ * `updateBooking`, and it should not be possible to call the write without it.
+ */
+export async function setBookingStatusByTech(
+  id: string,
+  tech: { id: string; name: string },
+  status: BookingStatus,
+): Promise<"ok" | "not_found" | "not_yours"> {
+  const db = getAdminDb();
+  const ref = db.collection(BOOKINGS).doc(id);
+  const doc = await ref.get();
+  if (!doc.exists) return "not_found";
+
+  const data = doc.data()!;
+  const mine = data.techId ? data.techId === tech.id : data.tech === tech.name;
+  if (!mine) return "not_yours";
+
+  // Taking a job on also claims it by id, so the name match is needed once only.
+  await ref.update({ status, techId: tech.id, tech: tech.name });
+  return "ok";
 }
 
 /** Record / refresh a customer on login. Sets `createdAt` only on first sight. */
