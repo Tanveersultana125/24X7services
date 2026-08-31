@@ -204,7 +204,13 @@ function BrandPlate({ brand }: { brand: Brand }) {
             <span className="text-3xl font-extrabold tracking-tight text-muted sm:text-4xl">LG</span>
           </span>
         ) : (
-          <BrandMark id={brand.id} tone="brand" className="relative text-xl sm:text-2xl" />
+          <BrandMark
+            id={brand.id}
+            name={brand.name}
+            accent={brand.accent}
+            tone="brand"
+            className="relative text-xl sm:text-2xl"
+          />
         )}
       </div>
 

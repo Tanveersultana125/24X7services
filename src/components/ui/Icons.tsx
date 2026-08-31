@@ -110,7 +110,7 @@ export function ApplianceTile({
 }
 
 /** Official brand colours, for on-brand logo rendering. */
-export const BRAND_COLOR: Record<BrandId, string> = {
+export const BRAND_COLOR: Record<string, string> = {
   samsung: "#1428A0",
   lg: "#A50034",
   ifb: "#005EB8",
@@ -126,17 +126,26 @@ export const BRAND_COLOR: Record<BrandId, string> = {
  *  - "current" (default) inherits `currentColor` — keeps existing usages untouched.
  *  - "brand" paints each mark in its official brand colour.
  *  - "white" renders for use on a coloured background.
+ *
+ * A company added in the admin panel has no artwork in here, so `name` and
+ * `accent` are what it is drawn from: its name set as a wordmark, in the house
+ * colour that was picked for it. Pass them whenever the brand record is to
+ * hand — for the four that ship with the build they are ignored.
  */
 export function BrandMark({
   id,
+  name,
+  accent,
   className,
   tone = "current",
 }: {
   id: BrandId;
+  name?: string;
+  accent?: string;
   className?: string;
   tone?: "current" | "brand" | "white";
 }) {
-  const marks: Record<BrandId, { label: string; className: string }> = {
+  const marks: Record<string, { label: string; className: string }> = {
     samsung: { label: "SAMSUNG", className: "tracking-[0.12em] font-bold" },
     lg: { label: "LG", className: "tracking-tight font-extrabold text-2xl" },
     ifb: { label: "IFB", className: "tracking-[0.15em] font-extrabold" },
@@ -169,9 +178,15 @@ export function BrandMark({
     );
   }
 
-  const m = marks[id];
+  // An added company falls back to its own name, spaced like the wordmarks
+  // beside it so a mixed row still reads as one set of logos.
+  const m = marks[id] ?? {
+    label: (name || String(id)).toUpperCase(),
+    className: "tracking-[0.12em] font-bold",
+  };
+  const brandColor = BRAND_COLOR[id] ?? accent ?? BRAND_COLOR.other;
   const style =
-    tone === "brand" ? { color: BRAND_COLOR[id] } : tone === "white" ? { color: "#ffffff" } : undefined;
+    tone === "brand" ? { color: brandColor } : tone === "white" ? { color: "#ffffff" } : undefined;
   return (
     <span
       className={cn(tone === "current" && "text-foreground", m.className, className)}

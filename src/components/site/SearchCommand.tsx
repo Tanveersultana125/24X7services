@@ -9,7 +9,7 @@ import {
   LayoutDashboard, LogIn, Wrench, Sparkles, FileText,
 } from "lucide-react";
 import { SERVICES } from "@/lib/services";
-import { BRANDS } from "@/lib/data";
+import { useBrands } from "@/components/providers/BrandsProvider";
 import { cn } from "@/lib/utils";
 
 interface Item {
@@ -46,16 +46,18 @@ const SERVICE_ITEMS: Item[] = SERVICES.map((s) => ({
   keywords: s.tags.join(" "),
 }));
 
-const BRAND_ITEMS: Item[] = BRANDS.map((b) => ({
-  group: "Brands",
-  label: `${b.name} service`,
-  hint: b.tagline,
-  href: `/book?brand=${b.id}`,
-  icon: Sparkles,
-  keywords: b.name,
-}));
+/** Brands are admin-editable, so this row is built per render, not per module. */
+function brandItems(brands: { id: string; name: string; tagline: string }[]): Item[] {
+  return brands.map((b) => ({
+    group: "Brands",
+    label: `${b.name} service`,
+    hint: b.tagline,
+    href: `/book?brand=${b.id}`,
+    icon: Sparkles,
+    keywords: b.name,
+  }));
+}
 
-const ALL = [...ACTIONS, ...SERVICE_ITEMS, ...BRAND_ITEMS, ...PAGES];
 const GROUP_ORDER = ["Actions", "Services", "Brands", "Pages"];
 
 export function SearchTrigger({
@@ -126,18 +128,24 @@ function SearchModal({ open, onClose }: { open: boolean; onClose: () => void }) 
 
 function SearchPalette({ open, onClose }: { open: boolean; onClose: () => void }) {
   const router = useRouter();
+  const brands = useBrands();
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
+  const all = useMemo(
+    () => [...ACTIONS, ...SERVICE_ITEMS, ...brandItems(brands), ...PAGES],
+    [brands],
+  );
+
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return ALL;
-    return ALL.filter((i) =>
+    if (!q) return all;
+    return all.filter((i) =>
       `${i.label} ${i.hint ?? ""} ${i.keywords ?? ""} ${i.group}`.toLowerCase().includes(q)
     );
-  }, [query]);
+  }, [query, all]);
 
   const grouped = useMemo(() => {
     const map = new Map<string, Item[]>();

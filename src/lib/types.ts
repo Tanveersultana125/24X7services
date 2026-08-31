@@ -1,4 +1,15 @@
-export type BrandId = "samsung" | "lg" | "ifb" | "bosch" | "other";
+/**
+ * The four that ship with the build, plus "other" — and any id an admin coins
+ * by adding a company of their own. The union is kept for autocomplete; the
+ * `string & {}` arm is what lets a new make exist without a code change.
+ */
+export type BrandId =
+  | "samsung"
+  | "lg"
+  | "ifb"
+  | "bosch"
+  | "other"
+  | (string & NonNullable<unknown>);
 
 /** Sentinel problem id used when the customer types their own issue. */
 export const OTHER_PROBLEM_ID = "other";

@@ -5,7 +5,10 @@ import { motion } from "framer-motion";
 import { Package, ShieldCheck, Wrench, ArrowUpRight, Check } from "lucide-react";
 import { Kicker } from "./TextReveal";
 import { BrandMark } from "@/components/ui/Icons";
-import { BRANDS } from "@/lib/data";
+import { useBrands } from "@/components/providers/BrandsProvider";
+import { useServices } from "@/components/providers/ServicesProvider";
+import { brandsFor, type CatalogueService } from "@/lib/catalogue-shared";
+import type { AdminBrand } from "@/lib/brands-shared";
 
 const COVERAGE: Record<string, { appliances: string[]; specialties: string[] }> = {
   samsung: { appliances: ["Refrigerator", "Washing Machine", "Microwave & Oven", "Air Conditioner"], specialties: ["Digital Inverter", "Twin Cooling", "SmartThings panels"] },
@@ -21,7 +24,23 @@ const WHY = [
   { icon: ShieldCheck, tint: "#d9821b", title: "Warranty-safe service", desc: "Authorised repairs keep your manufacturer warranty intact and add our own 90-day cover." },
 ];
 
+/**
+ * A company added in the panel has no hand-written coverage, so it takes the
+ * services it was actually ticked on and lists no specialties — better an
+ * honest short card than four invented bullet points.
+ */
+function coverageFor(b: AdminBrand, services: CatalogueService[]) {
+  const hand = COVERAGE[b.id];
+  if (hand) return hand;
+  return {
+    appliances: services.filter((s) => brandsFor(s).includes(b.id)).map((s) => s.name),
+    specialties: [] as string[],
+  };
+}
+
 export function BrandsDetail() {
+  const brands = useBrands();
+  const services = useServices();
   return (
     <>
       {/* Coverage per brand */}
@@ -33,8 +52,8 @@ export function BrandsDetail() {
           </h2>
 
           <div className="mt-10 sm:mt-14 grid gap-5 md:grid-cols-2">
-            {BRANDS.map((b, i) => {
-              const c = COVERAGE[b.id];
+            {brands.map((b, i) => {
+              const c = coverageFor(b, services);
               return (
                 <motion.div
                   key={b.id}
@@ -51,7 +70,7 @@ export function BrandsDetail() {
                   <div className="flex items-start justify-between">
                     {/* white plate so the mark keeps its official colours in both themes */}
                     <span className="grid h-12 min-w-[7rem] place-items-center rounded-xl bg-white px-4 ring-1 ring-black/5">
-                      <BrandMark id={b.id} tone="brand" className="text-xl" />
+                      <BrandMark id={b.id} name={b.name} accent={b.accent} tone="brand" className="text-xl" />
                     </span>
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald/10 px-3 py-1 text-xs font-semibold text-emerald">
                       <ShieldCheck className="size-3.5" /> Authorised
@@ -70,16 +89,18 @@ export function BrandsDetail() {
                     </div>
                   </div>
 
-                  <div className="mt-5">
-                    <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-2">Specialties</p>
-                    <ul className="mt-2.5 flex flex-col gap-1.5">
-                      {c.specialties.map((s) => (
-                        <li key={s} className="flex items-center gap-2 text-sm text-ink-soft">
-                          <Check className="size-4 text-emerald" strokeWidth={2.5} /> {s}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  {c.specialties.length > 0 && (
+                    <div className="mt-5">
+                      <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-muted-2">Specialties</p>
+                      <ul className="mt-2.5 flex flex-col gap-1.5">
+                        {c.specialties.map((s) => (
+                          <li key={s} className="flex items-center gap-2 text-sm text-ink-soft">
+                            <Check className="size-4 text-emerald" strokeWidth={2.5} /> {s}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                   {/* Its own page first, booking from there — someone looking
                       for their make wants to see what we do for it before

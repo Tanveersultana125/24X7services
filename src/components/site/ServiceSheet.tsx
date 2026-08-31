@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Star, Tag, Sparkles, Check, Clock, Info, ShieldCheck, ChevronDown } from "lucide-react";
 import { bestSaving, tierSaving, type CatalogueService } from "@/lib/catalogue-shared";
-import { BRANDS } from "@/lib/data";
+import { useBrands } from "@/components/providers/BrandsProvider";
 import { BrandMark } from "@/components/ui/Icons";
 import { AddToCart } from "./AddToCart";
 import { formatINR } from "@/lib/utils";
@@ -29,6 +29,7 @@ export function ServiceSheet({
   photo?: string;
   onClose: () => void;
 }) {
+  const brands = useBrands();
   // The page behind must not scroll while this is over it, and Escape closes.
   useEffect(() => {
     if (!service) return;
@@ -269,12 +270,18 @@ export function ServiceSheet({
                   everywhere, so it can't drift from the brands page. */}
               <Section title="Brands we service">
                 <div className="mt-4 grid grid-cols-2 gap-2.5">
-                  {BRANDS.map((b) => (
+                  {brands.map((b) => (
                     <span
                       key={b.id}
                       className="grid h-14 place-items-center rounded-xl bg-white px-3 ring-1 ring-black/5"
                     >
-                      <BrandMark id={b.id} tone="brand" className={b.id === "lg" ? "text-2xl" : "text-[0.7rem]"} />
+                      <BrandMark
+                        id={b.id}
+                        name={b.name}
+                        accent={b.accent}
+                        tone="brand"
+                        className={b.id === "lg" ? "text-2xl" : "text-[0.7rem]"}
+                      />
                     </span>
                   ))}
                 </div>

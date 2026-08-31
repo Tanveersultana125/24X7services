@@ -11,6 +11,8 @@ import { SiteImagesProvider } from "@/components/providers/SiteImagesProvider";
 import { getSiteImages } from "@/lib/site-images";
 import { ServicesProvider } from "@/components/providers/ServicesProvider";
 import { getServices } from "@/lib/catalogue";
+import { BrandsProvider } from "@/components/providers/BrandsProvider";
+import { getBrands } from "@/lib/brands";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -112,7 +114,11 @@ const orgJsonLd = {
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   // Resolved once per request (cached for a minute) so every section renders
   // the photo the admin panel currently has assigned.
-  const [siteImages, services] = await Promise.all([getSiteImages(), getServices()]);
+  const [siteImages, services, brands] = await Promise.all([
+    getSiteImages(),
+    getServices(),
+    getBrands(),
+  ]);
 
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${fraunces.variable} h-full`}>
@@ -120,14 +126,16 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <ThemeProvider>
           <SiteImagesProvider images={siteImages}>
             <ServicesProvider services={services}>
-              <SmoothScroll>{children}</SmoothScroll>
-              <ChatAssistant />
-              {/* Says what a press just did, over whichever page did it. */}
-              <Toaster />
-              {/* Copy the basket, and the trail that led to it, to the panel.
-                  Both render nothing. */}
-              <CartSync />
-              <ActivityTracker />
+              <BrandsProvider brands={brands}>
+                <SmoothScroll>{children}</SmoothScroll>
+                <ChatAssistant />
+                {/* Says what a press just did, over whichever page did it. */}
+                <Toaster />
+                {/* Copy the basket, and the trail that led to it, to the panel.
+                    Both render nothing. */}
+                <CartSync />
+                <ActivityTracker />
+              </BrandsProvider>
             </ServicesProvider>
           </SiteImagesProvider>
         </ThemeProvider>

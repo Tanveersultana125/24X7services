@@ -8,11 +8,17 @@ import { Contact } from "@/components/site/Contact";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { getServices } from "@/lib/catalogue";
 import { brandsFor } from "@/lib/catalogue-shared";
-import { BRANDS } from "@/lib/data";
+import { getBrands } from "@/lib/brands";
+import { DEFAULT_BRANDS } from "@/lib/brands-shared";
 
-/** One page per manufacturer — what people search for is "Samsung AC repair". */
+/**
+ * One page per manufacturer — what people search for is "Samsung AC repair".
+ *
+ * Only the makes that ship with the build are prerendered; a company added in
+ * the panel is not known at build time and renders on first request instead.
+ */
 export function generateStaticParams() {
-  return BRANDS.map((b) => ({ brand: b.id }));
+  return DEFAULT_BRANDS.map((b) => ({ brand: b.id }));
 }
 
 export async function generateMetadata({
@@ -21,7 +27,7 @@ export async function generateMetadata({
   params: Promise<{ brand: string }>;
 }): Promise<Metadata> {
   const { brand: id } = await params;
-  const brand = BRANDS.find((b) => b.id === id);
+  const brand = (await getBrands()).find((b) => b.id === id);
   if (!brand) return { title: "Brand" };
   const title = `${brand.name} appliance repair`;
   const description = `Authorised ${brand.name} repair across Telangana — refrigerators, washing machines, microwaves and air conditioners. Genuine parts, 90-day warranty, technicians trained on ${brand.name} models.`;
@@ -43,7 +49,7 @@ export async function generateMetadata({
 
 export default async function BrandPage({ params }: { params: Promise<{ brand: string }> }) {
   const { brand: id } = await params;
-  const brand = BRANDS.find((b) => b.id === id);
+  const brand = (await getBrands()).find((b) => b.id === id);
   if (!brand) notFound();
 
   const services = (await getServices()).filter((s) => brandsFor(s).includes(brand.id));

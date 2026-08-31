@@ -10,6 +10,7 @@ import {
   MousePointerClick,
   Users,
   Wrench,
+  Tags,
   ListOrdered,
   Images,
   ImagePlay,
@@ -22,7 +23,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SITE_IMAGE_GROUP_PAGES } from "@/lib/site-images-shared";
-import { BRANDS } from "@/lib/data";
+import type { AdminBrand } from "@/lib/brands-shared";
 import { AdminThemeProvider, AdminThemeToggle } from "@/components/admin/AdminTheme";
 import { AdminFooter } from "@/components/admin/AdminFooter";
 import { AdminAssistant } from "@/components/admin/AdminAssistant";
@@ -36,6 +37,9 @@ const NAV = [
   // After customers: the trail is who they were before they were customers.
   { href: "/admin/activity", label: "Activity", icon: MousePointerClick },
   { href: "/admin/services", label: "Services & prices", icon: Wrench },
+  // The makes themselves, next to the services they are priced against: a
+  // company has to exist here before a service can be ticked for it.
+  { href: "/admin/brands", label: "Brands & companies", icon: Tags },
   // Its own line rather than a child of Services & prices: that menu only
   // opened once you were already inside it, so the one page that edits the
   // services page could not be found from anywhere else.
@@ -69,7 +73,13 @@ function Pending() {
   );
 }
 
-export function AdminShell({ children }: { children: React.ReactNode }) {
+export function AdminShell({
+  brands,
+  children,
+}: {
+  brands: AdminBrand[];
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -142,7 +152,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                         <Pending />
                       </span>
                     </Link>
-                    {BRANDS.map((b) => {
+                    {brands.map((b) => {
                       const href = `/admin/services/${b.id}`;
                       return (
                         <Link

@@ -6,7 +6,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, BadgeCheck, ChevronDown } from "lucide-react";
 import { Kicker } from "./TextReveal";
 import { BrandMark } from "@/components/ui/Icons";
-import { BRANDS } from "@/lib/data";
+import { useBrands } from "@/components/providers/BrandsProvider";
+import { useServices } from "@/components/providers/ServicesProvider";
+import { brandsFor } from "@/lib/catalogue-shared";
+import type { AdminBrand } from "@/lib/brands-shared";
+import type { CatalogueService } from "@/lib/catalogue-shared";
 import { cn } from "@/lib/utils";
 
 const DETAIL: Record<string, { services: string[]; note: string }> = {
@@ -16,7 +20,25 @@ const DETAIL: Record<string, { services: string[]; note: string }> = {
   bosch: { services: ["Refrigerator", "Washing Machine", "Microwave & Oven", "AC"], note: "German-engineered precision servicing" },
 };
 
+/**
+ * What a company added in the panel says about itself.
+ *
+ * The four in `DETAIL` are written by hand; a make added later has no such
+ * copy, so it is assembled from the two things the panel does know — the
+ * tagline typed for it, and the services it was ticked on.
+ */
+function detailFor(b: AdminBrand, services: CatalogueService[]) {
+  const hand = DETAIL[b.id];
+  if (hand) return hand;
+  return {
+    services: services.filter((s) => brandsFor(s).includes(b.id)).map((s) => s.name),
+    note: b.tagline,
+  };
+}
+
 export function BrandShowcase() {
+  const brands = useBrands();
+  const services = useServices();
   const [active, setActive] = useState<number | null>(null);
   // separate from `active`, which the desktop panels drive on hover
   const [tapped, setTapped] = useState<number | null>(0);
@@ -39,9 +61,9 @@ export function BrandShowcase() {
           style={{ height: "26rem" }}
           onMouseLeave={() => setActive(null)}
         >
-          {BRANDS.map((b, i) => {
+          {brands.map((b, i) => {
             const open = active === i;
-            const d = DETAIL[b.id];
+            const d = detailFor(b, services);
             return (
               <motion.div
                 key={b.id}
@@ -81,6 +103,8 @@ export function BrandShowcase() {
                     {b.id === "lg" ? (
                       <BrandMark
                         id={b.id}
+                        name={b.name}
+                        accent={b.accent}
                         tone="brand"
                         className="relative h-9 w-9 drop-shadow-[0_6px_10px_rgba(23,21,15,0.18)]"
                       />
@@ -88,7 +112,7 @@ export function BrandShowcase() {
                       <span
                         className="relative [writing-mode:vertical-rl] rotate-180 drop-shadow-[0_3px_6px_rgba(23,21,15,0.14)]"
                       >
-                        <BrandMark id={b.id} tone="brand" className="text-lg" />
+                        <BrandMark id={b.id} name={b.name} accent={b.accent} tone="brand" className="text-lg" />
                       </span>
                     )}
                     <BadgeCheck className="relative size-5 text-emerald drop-shadow-sm" />
@@ -111,7 +135,7 @@ export function BrandShowcase() {
                       </div>
 
                       <div>
-                        <BrandMark id={b.id} tone="white" className="text-4xl" />
+                        <BrandMark id={b.id} name={b.name} tone="white" className="text-4xl" />
                         <p className="mt-3 max-w-sm text-white/85">{d.note}</p>
 
                         <div className="mt-6 flex flex-wrap gap-2">
@@ -140,9 +164,9 @@ export function BrandShowcase() {
 
         {/* Mobile: tap to expand — the same reveal the desktop panels give on hover */}
         <div className="mt-10 grid gap-3 lg:hidden">
-          {BRANDS.map((b, i) => {
+          {brands.map((b, i) => {
             const open = tapped === i;
-            const d = DETAIL[b.id];
+            const d = detailFor(b, services);
             return (
               <motion.div
                 key={b.id}
@@ -184,7 +208,13 @@ export function BrandShowcase() {
                     {`0${i + 1}`}
                   </span>
                   <span className="flex flex-1 items-center">
-                    <BrandMark id={b.id} tone={open ? "white" : "brand"} className="text-lg" />
+                    <BrandMark
+                      id={b.id}
+                      name={b.name}
+                      accent={b.accent}
+                      tone={open ? "white" : "brand"}
+                      className="text-lg"
+                    />
                   </span>
                   <BadgeCheck className={cn("size-5 transition-colors", open ? "text-white" : "text-emerald")} />
                   <ChevronDown

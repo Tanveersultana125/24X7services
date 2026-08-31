@@ -13,7 +13,7 @@ import {
   type ServiceTier,
 } from "@/lib/catalogue-shared";
 import Link from "next/link";
-import { BRANDS } from "@/lib/data";
+import type { AdminBrand } from "@/lib/brands-shared";
 import { NumberField } from "./NumberField";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { cn } from "@/lib/utils";
@@ -26,7 +26,13 @@ import { cn } from "@/lib/utils";
  * changed and hidden but not deleted — Reset puts one back to what the code
  * says. Services added here can be deleted outright.
  */
-export function ServicesManager({ initial }: { initial: CatalogueService[] }) {
+export function ServicesManager({
+  initial,
+  brands,
+}: {
+  initial: CatalogueService[];
+  brands: AdminBrand[];
+}) {
   const [rows, setRows] = useState(initial);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -112,7 +118,7 @@ export function ServicesManager({ initial }: { initial: CatalogueService[] }) {
         rating: 4.8,
         bookings: "New",
         problems: [blankProblem()],
-        brands: BRANDS.map((b) => b.id),
+        brands: brands.map((b) => b.id),
         active: true,
         custom: true,
         createdAt: Date.now(),
@@ -183,6 +189,7 @@ export function ServicesManager({ initial }: { initial: CatalogueService[] }) {
           <ServiceCard
             key={s.id}
             service={s}
+            brands={brands}
             busy={busy === s.id}
             saved={saved === s.id}
             onChange={(fields) => patch(s.id, fields)}
@@ -197,6 +204,7 @@ export function ServicesManager({ initial }: { initial: CatalogueService[] }) {
 
 function ServiceCard({
   service: s,
+  brands,
   busy,
   saved,
   onChange,
@@ -204,6 +212,7 @@ function ServiceCard({
   onRemove,
 }: {
   service: CatalogueService;
+  brands: AdminBrand[];
   busy: boolean;
   saved: boolean;
   onChange: (fields: Partial<CatalogueService>) => void;
@@ -274,13 +283,13 @@ function ServiceCard({
         </Field>
       </div>
 
-      {/* Which of the four we are authorised for cover this appliance. What
+      {/* Which of the makes we are authorised for cover this appliance. What
           each of them is charged is set on that brand's own page — one job
-          per page, rather than the same four boxes in two places. */}
+          per page, rather than the same boxes in two places. */}
       <div className="mt-4">
         <span className="text-xs font-medium text-muted">Brands we service this for</span>
         <div className="mt-2 flex flex-wrap gap-2">
-          {BRANDS.map((b) => {
+          {brands.map((b) => {
             const on = brandsFor(s).includes(b.id);
             return (
               <button
@@ -310,7 +319,7 @@ function ServiceCard({
         ) : (
           <p className="mt-2 text-[0.68rem] text-muted-2">
             What each brand pays is set on its own page —{" "}
-            {BRANDS.filter((b) => brandsFor(s).includes(b.id)).map((b, i, list) => (
+            {brands.filter((b) => brandsFor(s).includes(b.id)).map((b, i, list) => (
               <span key={b.id}>
                 <Link href={`/admin/services/${b.id}`} className="font-medium text-royal-bright hover:underline">
                   {b.name}

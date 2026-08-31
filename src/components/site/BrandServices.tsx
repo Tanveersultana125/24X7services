@@ -79,6 +79,8 @@ export function BrandServices({ brand, services }: { brand: Brand; services: Cat
                     <span className="absolute left-3 top-3 inline-flex h-6 items-center rounded-md bg-white px-2 shadow-premium-sm ring-1 ring-black/5">
                       <BrandMark
                         id={brand.id}
+                        name={brand.name}
+                        accent={brand.accent}
                         tone="brand"
                         className={brand.id === "lg" ? "text-base" : "text-[0.55rem]"}
                       />

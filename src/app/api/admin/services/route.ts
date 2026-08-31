@@ -10,8 +10,8 @@ import {
   serviceExists,
   updateAddedService,
 } from "@/lib/catalogue";
+import { getAllBrands } from "@/lib/brands";
 import {
-  BRAND_IDS,
   DEFAULT_SERVICES,
   slugify,
   type CatalogueService,
@@ -69,18 +69,23 @@ function problems(value: unknown): ServiceProblem[] | undefined {
   return out;
 }
 
-/** Only the brands we actually list — anything else is dropped. */
-function brands(value: unknown): BrandId[] | undefined {
+/**
+ * Only the brands we actually list — anything else is dropped.
+ *
+ * The list is passed in rather than read from the code: a company added in the
+ * panel is a brand a service can be ticked for, and filtering against the four
+ * built-ins would silently throw that tick away on every save.
+ */
+function brands(value: unknown, known: Set<string>): BrandId[] | undefined {
   if (!Array.isArray(value)) return undefined;
-  const known = new Set<string>(BRAND_IDS);
   return value.filter((b): b is BrandId => typeof b === "string" && known.has(b));
 }
 
 /** A price per make, keeping only the makes we list and the numbers that parse. */
-function brandPrices(value: unknown): Partial<Record<BrandId, number>> | undefined {
+function brandPrices(value: unknown, known: Set<string>): Partial<Record<BrandId, number>> | undefined {
   if (!value || typeof value !== "object") return undefined;
   const out: Partial<Record<BrandId, number>> = {};
-  for (const id of BRAND_IDS) {
+  for (const id of known) {
     const n = num((value as Record<string, unknown>)[id]);
     if (n !== undefined && n > 0) out[id] = Math.round(n);
   }
@@ -90,10 +95,11 @@ function brandPrices(value: unknown): Partial<Record<BrandId, number>> | undefin
 /** Per-repair bands, keyed by make then by problem, with the junk dropped. */
 function brandProblemPrices(
   value: unknown,
+  known: Set<string>,
 ): Partial<Record<BrandId, Record<string, [number, number]>>> | undefined {
   if (!value || typeof value !== "object") return undefined;
   const out: Partial<Record<BrandId, Record<string, [number, number]>>> = {};
-  for (const id of BRAND_IDS) {
+  for (const id of known) {
     const rows = (value as Record<string, unknown>)[id];
     if (!rows || typeof rows !== "object") continue;
     const kept: Record<string, [number, number]> = {};
@@ -113,10 +119,13 @@ function brandProblemPrices(
 }
 
 /** Repairs that belong to one make, validated the same way as the shared ones. */
-function brandProblems(value: unknown): Partial<Record<BrandId, ServiceProblem[]>> | undefined {
+function brandProblems(
+  value: unknown,
+  known: Set<string>,
+): Partial<Record<BrandId, ServiceProblem[]>> | undefined {
   if (!value || typeof value !== "object") return undefined;
   const out: Partial<Record<BrandId, ServiceProblem[]>> = {};
-  for (const id of BRAND_IDS) {
+  for (const id of known) {
     const list = problems((value as Record<string, unknown>)[id]);
     // An empty list means the last custom repair was removed — see above.
     if (list) out[id] = list;
@@ -188,7 +197,7 @@ function faqs(value: unknown): ServiceFaq[] | undefined {
 }
 
 /** The fields shared by adding and editing, taken only if present. */
-function fields(body: Record<string, unknown>): ServiceEdit {
+function fields(body: Record<string, unknown>, known: Set<string>): ServiceEdit {
   const out: ServiceEdit = {};
   const name = text(body.name);
   if (name) out.name = name;
@@ -205,13 +214,13 @@ function fields(body: Record<string, unknown>): ServiceEdit {
   if (typeof body.active === "boolean") out.active = body.active;
   const list = problems(body.problems);
   if (list) out.problems = list;
-  const picked = brands(body.brands);
+  const picked = brands(body.brands, known);
   if (picked) out.brands = picked;
-  const perBrand = brandPrices(body.brandPrices);
+  const perBrand = brandPrices(body.brandPrices, known);
   if (perBrand) out.brandPrices = perBrand;
-  const perRepair = brandProblemPrices(body.brandProblemPrices);
+  const perRepair = brandProblemPrices(body.brandProblemPrices, known);
   if (perRepair) out.brandProblemPrices = perRepair;
-  const ownRepairs = brandProblems(body.brandProblems);
+  const ownRepairs = brandProblems(body.brandProblems, known);
   if (ownRepairs) out.brandProblems = ownRepairs;
   const packs = tiers(body.tiers);
   if (packs) out.tiers = packs;
@@ -230,6 +239,11 @@ function fields(body: Record<string, unknown>): ServiceEdit {
   const questions = faqs(body.faqs);
   if (questions) out.faqs = questions;
   return out;
+}
+
+/** Every make that currently exists, added ones included. */
+async function knownBrands(): Promise<Set<string>> {
+  return new Set((await getAllBrands()).map((b) => b.id));
 }
 
 function refresh() {
@@ -257,7 +271,8 @@ export async function POST(request: Request) {
     if (await serviceExists(id)) {
       return NextResponse.json({ ok: false, error: "already_exists" }, { status: 409 });
     }
-    const patch = fields(body);
+    const known = await knownBrands();
+    const patch = fields(body, known);
     const service: Omit<CatalogueService, "id"> = {
       name,
       blurb: patch.blurb ?? "",
@@ -266,7 +281,7 @@ export async function POST(request: Request) {
       rating: patch.rating ?? 4.8,
       bookings: patch.bookings ?? "New",
       problems: patch.problems ?? [],
-      brands: patch.brands ?? BRAND_IDS,
+      brands: patch.brands ?? [...known],
       brandPrices: patch.brandPrices ?? {},
       active: patch.active ?? true,
       custom: true,
@@ -293,7 +308,7 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
   }
 
-  const patch = fields(body);
+  const patch = fields(body, await knownBrands());
   if (Object.keys(patch).length === 0) {
     return NextResponse.json({ ok: false, error: "nothing_to_change" }, { status: 400 });
   }

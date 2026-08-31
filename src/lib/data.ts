@@ -172,9 +172,25 @@ export function getBrand(id?: string) {
   return BRANDS.find((b) => b.id === id);
 }
 
-/** Display name for a chosen brand, resolving the free-text "other" case. */
-export function brandLabel(draft: { brand?: string; otherBrand?: string }) {
+/**
+ * Display name for a chosen brand, resolving the free-text "other" case.
+ *
+ * `brands` is the live list, which includes any company added in the admin
+ * panel. It defaults to what ships with the build so a caller that has no list
+ * to hand still names the four correctly; an id that matches nothing in either
+ * is read back from its own slug rather than printed as a blank.
+ */
+export function brandLabel(
+  draft: { brand?: string; otherBrand?: string },
+  brands: { id: string; name: string }[] = BRANDS,
+) {
   if (!draft.brand) return undefined;
   if (draft.brand === "other") return draft.otherBrand?.trim() || "Other brand";
-  return getBrand(draft.brand)?.name;
+  const known = brands.find((b) => b.id === draft.brand);
+  if (known) return known.name;
+  return draft.brand
+    .split("-")
+    .filter(Boolean)
+    .map((word) => word[0].toUpperCase() + word.slice(1))
+    .join(" ");
 }

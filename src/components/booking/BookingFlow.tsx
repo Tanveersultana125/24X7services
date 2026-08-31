@@ -13,7 +13,9 @@ import { Confirmation } from "./Confirmation";
 import { Button } from "@/components/ui/Button";
 import { AddToCart } from "@/components/site/AddToCart";
 import { ApplianceTile, BrandMark } from "@/components/ui/Icons";
-import { BRANDS, TIME_SLOTS, PAYMENT_METHODS, brandLabel, applianceLabel } from "@/lib/data";
+import { TIME_SLOTS, PAYMENT_METHODS, brandLabel, applianceLabel } from "@/lib/data";
+import { useBrands } from "@/components/providers/BrandsProvider";
+import type { AdminBrand } from "@/lib/brands-shared";
 import { useServices } from "@/components/providers/ServicesProvider";
 import type { CartItem } from "@/lib/cart";
 import {
@@ -160,9 +162,10 @@ function cartLines(
   appliance: CatalogueService | undefined,
   problems: ServiceProblem[],
   units: number,
+  brands: AdminBrand[],
 ): CartItem[] {
   if (!appliance) return [];
-  const make = brandLabel(draft);
+  const make = brandLabel(draft, brands);
   const kind = draft.variant && draft.variant !== UNSURE_VARIANT ? ` (${draft.variant})` : "";
   const name = (make ? `${make} ${appliance.name}` : appliance.name) + kind;
   const base = { id: appliance.id, name, qty: units, kind: "service" as const, brand: draft.brand };
@@ -191,6 +194,7 @@ function cartLines(
 }
 
 export function BookingFlow({ customer }: { customer?: { name: string; email: string } }) {
+  const brands = useBrands();
   const params = useSearchParams();
   const emergency = params.get("emergency") === "1";
 
@@ -267,8 +271,8 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
 
   // What "add to basket" would put there, from wherever in the form they are.
   const lines = useMemo(
-    () => cartLines(draft, appliance, selectedProblems, units),
-    [draft, appliance, selectedProblems, units],
+    () => cartLines(draft, appliance, selectedProblems, units, brands),
+    [draft, appliance, selectedProblems, units, brands],
   );
 
   const go = (d: number) => {
@@ -425,7 +429,7 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
     setProcessing(true);
 
     const items = jobs.map((job) => ({
-      brand: brandLabel(job) ?? "",
+      brand: brandLabel(job, brands) ?? "",
       appliance: applianceLabel(job) ?? "",
       ...(job.variant ? { variant: job.variant } : {}),
       units: clampUnits(job.units),
@@ -620,12 +624,13 @@ function StepTitle({ title, hint }: { title: string; hint?: string }) {
 
 function BrandStep({ draft, setDraft }: StepProps) {
   const services = useServices();
+  const brands = useBrands();
   const isOther = draft.brand === "other";
   // Only the makers we are authorised for on the appliance they picked —
   // offering a brand we don't service is a booking we have to call back and
   // cancel. Before an appliance is chosen, all of them stand.
   const chosen = services.find((a) => a.id === draft.appliance);
-  const offered = chosen ? BRANDS.filter((b) => brandsFor(chosen).includes(b.id)) : BRANDS;
+  const offered = chosen ? brands.filter((b) => brandsFor(chosen).includes(b.id)) : brands;
   return (
     <div>
       <StepTitle title="Choose your brand" hint="Select the manufacturer — or add your own if it's not listed." />
@@ -641,6 +646,8 @@ function BrandStep({ draft, setDraft }: StepProps) {
             <div className="grid h-12 w-[5.25rem] shrink-0 place-items-center overflow-hidden rounded-xl bg-white px-2 ring-1 ring-black/5">
               <BrandMark
                 id={b.id}
+                name={b.name}
+                accent={b.accent}
                 tone="brand"
                 className={b.id === "lg" ? "text-2xl" : "text-[0.7rem]"}
               />
@@ -826,6 +833,7 @@ function UnitsPicker({
   kinds: string[];
   onSetUnit: (from: number | null, patch: Partial<BookingJob>) => void;
 }) {
+  const brands = useBrands();
   const [picking, setPicking] = useState<{ row: number; field: "make" | "kind" } | null>(null);
   const set = (next: number) =>
     setDraft((d) => ({ ...d, units: Math.min(MAX_UNITS, Math.max(1, next)) }));
@@ -857,7 +865,7 @@ function UnitsPicker({
             washing machines" is not a make, it is a typo. */}
         <p className="text-sm font-semibold">
           {lines.length > 1
-            ? `How many ${[brandLabel(draft), name.toLowerCase()].filter(Boolean).join(" ")}s?`
+            ? `How many ${[brandLabel(draft, brands), name.toLowerCase()].filter(Boolean).join(" ")}s?`
             : `How many ${name.toLowerCase()}s need work?`}
         </p>
         <p className="mt-1 text-sm text-muted">
@@ -911,7 +919,7 @@ function UnitsPicker({
           </p>
           <ul className="divide-y divide-hairline">
             {rows.map(({ job, from }, i) => {
-              const make = brandLabel(job);
+              const make = brandLabel(job, brands);
               return (
                 /* Stacked on a phone. Sharing the row there left the name in a
                    90px column, one word to a line, beside the buttons. */
@@ -941,7 +949,7 @@ function UnitsPicker({
                     {picking?.row === i ? (
                       <>
                         {(picking.field === "make"
-                          ? BRANDS.map((b) => ({
+                          ? brands.map((b) => ({
                               key: b.id,
                               label: b.name,
                               tint: b.accent,
@@ -1035,6 +1043,7 @@ function ProblemStep({
   units: number;
 }) {
   const services = useServices();
+  const brands = useBrands();
   if (!draft.appliance) return null;
   const appliance = services.find((a) => a.id === draft.appliance);
   // Includes anything listed for this make alone.
@@ -1058,7 +1067,7 @@ function ProblemStep({
         // whichever line it is asking about.
         title={
           others
-            ? `What's wrong with the ${units > 1 ? `${units} ` : ""}${[brandLabel(draft), name].filter(Boolean).join(" ")}${units > 1 ? "s" : ""}?`
+            ? `What's wrong with the ${units > 1 ? `${units} ` : ""}${[brandLabel(draft, brands), name].filter(Boolean).join(" ")}${units > 1 ? "s" : ""}?`
             : units > 1
               ? `What's wrong with the ${name.toLowerCase()}s?`
               : "What's the problem?"
@@ -1453,6 +1462,7 @@ function SummaryCard({
   onRemove: (index: number) => void;
 }) {
   const services = useServices();
+  const brands = useBrands();
   const covered = jobs.reduce((n, job) => n + clampUnits(job.units), 0);
   // The list as soon as there is more than one appliance on the visit, not
   // only once the newest is finished: mid-split the labelled rows described
@@ -1480,7 +1490,7 @@ function SummaryCard({
                 >
                   <span className="min-w-0 flex-1">
                     <span className="block font-medium">
-                      {[brandLabel(job), applianceLabel(job)].filter(Boolean).join(" ")}
+                      {[brandLabel(job, brands), applianceLabel(job)].filter(Boolean).join(" ")}
                       {clampUnits(job.units) > 1 && (
                         <span className="ml-1.5 text-muted">× {clampUnits(job.units)}</span>
                       )}
@@ -1507,7 +1517,7 @@ function SummaryCard({
           </ul>
         ) : (
           <dl className="mt-5 space-y-3.5 text-sm">
-            <Row label="Brand" value={brandLabel(draft)} />
+            <Row label="Brand" value={brandLabel(draft, brands)} />
             <Row label="Appliance" value={applianceLabel(draft)} />
             {/* Only worth a row once it isn't one — "1 unit" on every booking
                 is a line that never tells anybody anything. */}

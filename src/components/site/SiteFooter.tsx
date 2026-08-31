@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Marquee } from "./Marquee";
 import { Logo } from "@/components/ui/Logo";
 import { LEGAL_DOCS } from "@/lib/legal";
-import { BRANDS } from "@/lib/data";
+import { useBrands } from "@/components/providers/BrandsProvider";
 import { cn } from "@/lib/utils";
 
 /**
@@ -44,16 +44,21 @@ const COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
     ],
   },
   {
-    title: "Brands",
-    links: BRANDS.map((b) => ({ label: b.name, href: `/brands/${b.id}` })),
-  },
-  {
     title: "Legal",
     links: LEGAL_DOCS.map((d) => ({ label: d.title, href: `/legal/${d.slug}` })),
   },
 ];
 
 export function SiteFooter() {
+  const brands = useBrands();
+  // Brands are the one column an admin can change, so it is assembled here
+  // rather than sitting frozen in COLUMNS — and it keeps its place, third.
+  const columns = [
+    ...COLUMNS.slice(0, 2),
+    { title: "Brands", links: brands.map((b) => ({ label: b.name, href: `/brands/${b.id}` })) },
+    ...COLUMNS.slice(2),
+  ];
+
   return (
     // Black in both themes. `theme-dark` pins the dark palette on this subtree
     // — the same class the admin panel uses — so every child keeps its own
@@ -104,7 +109,7 @@ export function SiteFooter() {
           </div>
 
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
-            {COLUMNS.map(({ title, links }, i) => (
+            {columns.map(({ title, links }, i) => (
               // Nudge the right mobile column (odd index) slightly right; no change from sm up.
               <div key={title} className={cn(i % 2 === 1 && "pl-16 sm:pl-0")}>
                 <h4 className="text-xs font-bold uppercase tracking-[0.18em] text-foreground">{title}</h4>

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ChevronRight, BadgeCheck, ShieldCheck, Award, PackageCheck, Headset } from "lucide-react";
 import { BrandMark } from "@/components/ui/Icons";
-import { BRANDS } from "@/lib/data";
+import { useBrands } from "@/components/providers/BrandsProvider";
 import type { BrandId } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -55,6 +55,7 @@ export function PageHeader({
   /** show the photo at full strength under a dark scrim, with white copy on top */
   bgDark?: boolean;
 }) {
+  const brands = useBrands();
   const onDark = Boolean(bgImage && bgDark);
 
   return (
@@ -292,7 +293,7 @@ export function PageHeader({
           {/* brand-logo cards */}
           {!bgImage && logos && (
             <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:order-1">
-              {BRANDS.map((b, i) => (
+              {brands.map((b, i) => (
                 <motion.div
                   key={b.id}
                   initial={{ opacity: 0, y: 18 }}
@@ -312,7 +313,7 @@ export function PageHeader({
                     <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-emerald/10 px-2 py-1 text-[0.56rem] font-semibold uppercase tracking-[0.1em] text-emerald ring-1 ring-inset ring-emerald/20 sm:text-[0.6rem]">
                       <BadgeCheck className="size-3" /> Authorised
                     </span>
-                    <CardMark id={b.id} />
+                    <CardMark id={b.id} name={b.name} accent={b.accent} />
                   </div>
 
                   {/* brand-colour footer */}
@@ -401,7 +402,7 @@ export function PageHeader({
 }
 
 /** LG's identity is the face mark plus the wordmark — render both on the brand card. */
-function CardMark({ id }: { id: BrandId }) {
+function CardMark({ id, name, accent }: { id: BrandId; name?: string; accent?: string }) {
   if (id === "lg") {
     return (
       <span className="relative flex items-center gap-2">
@@ -410,7 +411,15 @@ function CardMark({ id }: { id: BrandId }) {
       </span>
     );
   }
-  return <BrandMark id={id} tone="brand" className="relative text-lg sm:text-2xl" />;
+  return (
+    <BrandMark
+      id={id}
+      name={name}
+      accent={accent}
+      tone="brand"
+      className="relative text-lg sm:text-2xl"
+    />
+  );
 }
 
 function CollageShot({ src, delay }: { src: string; delay: number }) {

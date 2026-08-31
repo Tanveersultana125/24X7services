@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { brandLabel, applianceLabel } from "@/lib/data";
+import { useBrands } from "@/components/providers/BrandsProvider";
 import { formatINR } from "@/lib/utils";
 import { openChatAssistant } from "@/lib/chat-widget";
 import type { BookingDraft } from "@/lib/types";
@@ -21,8 +22,9 @@ const TIMELINE = [
 ];
 
 export function Confirmation({ draft, total, code }: { draft: BookingDraft; total: number; code?: string }) {
+  const brands = useBrands();
   const appliance = applianceLabel(draft);
-  const brand = brandLabel(draft);
+  const brand = brandLabel(draft, brands);
   // A booking taken for two says two, or the confirmation quietly disagrees
   // with the price above it.
   const units = Math.max(1, draft.units ?? 1);

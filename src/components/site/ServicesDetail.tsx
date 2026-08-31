@@ -12,7 +12,7 @@ import { useServices } from "@/components/providers/ServicesProvider";
 import { bestSaving, brandsFor, priceFor, pricesDiffer } from "@/lib/catalogue-shared";
 import { ServiceSheet } from "./ServiceSheet";
 import { AddToCart } from "./AddToCart";
-import { BRANDS } from "@/lib/data";
+import { useBrands } from "@/components/providers/BrandsProvider";
 import { formatINR, formatRange } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { useSiteImage } from "@/components/providers/SiteImagesProvider";
@@ -65,6 +65,7 @@ const PRICING_ASSURANCES = [
 ];
 
 export function ServicesDetail() {
+  const brands = useBrands();
   const promiseShieldSrc = useSiteImage("promise-shield");
   const applianceLineupSrc = useSiteImage("appliance-lineup");
   const services = useServices();
@@ -369,13 +370,19 @@ export function ServicesDetail() {
                 <span className="text-[0.7rem] font-semibold uppercase tracking-[0.14em] text-muted">
                   Authorised for
                 </span>
-                {BRANDS.filter((b) => brandsFor(appliance).includes(b.id)).map((b) => (
+                {brands.filter((b) => brandsFor(appliance).includes(b.id)).map((b) => (
                   <span key={b.id} className="flex items-center gap-1.5">
                     {/* Sized to the wordmark, not to a fixed box: SAMSUNG and
                         BOSCH carry wide letter-spacing and were being clipped
                         by a width picked for the shortest of them. */}
                     <span className="inline-flex h-6 items-center rounded-md bg-white px-2 ring-1 ring-black/5">
-                      <BrandMark id={b.id} tone="brand" className={b.id === "lg" ? "text-base" : "text-[0.55rem]"} />
+                      <BrandMark
+                        id={b.id}
+                        name={b.name}
+                        accent={b.accent}
+                        tone="brand"
+                        className={b.id === "lg" ? "text-base" : "text-[0.55rem]"}
+                      />
                     </span>
                     {/* Only worth printing when the makes don't all start at
                         the same number — otherwise it's the same figure four

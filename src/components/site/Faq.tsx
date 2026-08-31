@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { BrandMark } from "@/components/ui/Icons";
-import { BRANDS } from "@/lib/data";
+import { useBrands } from "@/components/providers/BrandsProvider";
 import { TESTIMONIALS } from "@/lib/content";
 import { Kicker } from "./TextReveal";
 import { cn } from "@/lib/utils";
@@ -47,6 +47,7 @@ const PROMISES = [
 ];
 
 export function Faq() {
+  const brands = useBrands();
   const faqTechnicianSrc = useSiteImage("faq-technician");
   // Everything starts collapsed — an answer opens only when its row is clicked.
   const [open, setOpen] = useState<number | null>(null);
@@ -264,12 +265,12 @@ export function Faq() {
 
                           {f.brands && (
                             <div className="mt-5 flex flex-wrap gap-2.5">
-                              {BRANDS.map((b) => (
+                              {brands.map((b) => (
                                 <span
                                   key={b.id}
                                   className="grid h-12 min-w-[6.5rem] place-items-center rounded-xl bg-white px-4 shadow-premium-sm ring-1 ring-black/5"
                                 >
-                                  <BrandMark id={b.id} tone="brand" className="text-[0.8rem]" />
+                                  <BrandMark id={b.id} name={b.name} accent={b.accent} tone="brand" className="text-[0.8rem]" />
                                 </span>
                               ))}
                             </div>
