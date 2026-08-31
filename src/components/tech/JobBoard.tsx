@@ -12,6 +12,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { STATUS_META, type BookingStatus } from "@/lib/admin/data";
+import { todayKey } from "@/lib/booking-date";
 import type { Booking } from "@/lib/bookings";
 import { formatINR } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -33,14 +34,6 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "done", label: "Finished" },
 ];
 
-/** Local date as YYYY-MM-DD — what a booking's `date` is written in. */
-export function todayKey(): string {
-  const now = new Date();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${now.getFullYear()}-${month}-${day}`;
-}
-
 const CLOSED: BookingStatus[] = ["completed", "cancelled"];
 
 export function JobBoard({ jobs }: { jobs: Booking[] }) {
@@ -48,13 +41,17 @@ export function JobBoard({ jobs }: { jobs: Booking[] }) {
 
   const groups = useMemo(() => {
     const open = jobs.filter((j) => !CLOSED.includes(j.status));
-    const byDate = (a: Booking, b: Booking) => a.date.localeCompare(b.date);
+    // dateKey, never the label: "Sat, 8 Aug" sorts under S and "Today" under T,
+    // so comparing labels put every job in the wrong pile.
+    const byDate = (a: Booking, b: Booking) => a.dateKey.localeCompare(b.dateKey);
     return {
       // A visit whose day has passed and which nobody closed is still owed, so
       // it stays on today's list rather than disappearing into "upcoming".
-      today: open.filter((j) => !j.date || j.date <= today).sort(byDate),
-      upcoming: open.filter((j) => j.date > today).sort(byDate),
-      done: jobs.filter((j) => CLOSED.includes(j.status)).sort((a, b) => b.date.localeCompare(a.date)),
+      today: open.filter((j) => !j.dateKey || j.dateKey <= today).sort(byDate),
+      upcoming: open.filter((j) => j.dateKey > today).sort(byDate),
+      done: jobs
+        .filter((j) => CLOSED.includes(j.status))
+        .sort((a, b) => b.dateKey.localeCompare(a.dateKey)),
     };
   }, [jobs, today]);
 

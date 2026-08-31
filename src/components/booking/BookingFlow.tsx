@@ -15,6 +15,7 @@ import { AddToCart } from "@/components/site/AddToCart";
 import { ApplianceTile, BrandMark } from "@/components/ui/Icons";
 import { TIME_SLOTS, PAYMENT_METHODS, brandLabel, applianceLabel } from "@/lib/data";
 import { useBrands } from "@/components/providers/BrandsProvider";
+import { dateKeyOf } from "@/lib/booking-date";
 import type { AdminBrand } from "@/lib/brands-shared";
 import { useServices } from "@/components/providers/ServicesProvider";
 import type { CartItem } from "@/lib/cart";
@@ -452,6 +453,7 @@ export function BookingFlow({ customer }: { customer?: { name: string; email: st
           problem: items[0]?.problem ?? "",
           items,
           date: draft.date,
+          dateKey: draft.dateKey,
           slot: draft.slot,
           payment: paymentLabel,
           price: total,
@@ -1222,7 +1224,9 @@ function DateStep({ draft, setDraft }: StepProps) {
     for (let i = 0; i < 14; i++) {
       const d = new Date(now);
       d.setDate(now.getDate() + i);
-      const key = d.toISOString().slice(0, 10);
+      // Local, not `toISOString`: east of UTC that returns yesterday for every
+      // slot picked before half past five in the morning.
+      const key = dateKeyOf(d);
       out.push({
         key,
         day: d.toLocaleDateString("en-IN", { weekday: "short" }),
@@ -1245,7 +1249,7 @@ function DateStep({ draft, setDraft }: StepProps) {
           return (
             <button
               key={d.key}
-              onClick={() => setDraft((s) => ({ ...s, date: d.label }))}
+              onClick={() => setDraft((s) => ({ ...s, date: d.label, dateKey: d.key }))}
               aria-pressed={selected}
               className={cn(
                 "flex flex-col items-center gap-0.5 rounded-2xl border-2 p-3 transition-all hover:-translate-y-0.5",

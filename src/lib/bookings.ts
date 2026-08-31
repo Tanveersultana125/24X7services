@@ -2,6 +2,7 @@ import "server-only";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import type { BookingStatus } from "@/lib/admin/data";
+import { resolveDateKey } from "@/lib/booking-date";
 
 /**
  * Firestore data layer for customer bookings and customers.
@@ -62,7 +63,14 @@ export type Booking = {
   items: BookingItem[];
   city: string;
   address: BookingAddress;
+  /** The label the customer pressed — "Today", "Sat, 8 Aug". What to print. */
   date: string;
+  /**
+   * The same day as YYYY-MM-DD. What to sort, compare and group by; the label
+   * above can't do either. Bookings taken before this existed have it worked
+   * out from the label and `createdAt` when they are read.
+   */
+  dateKey: string;
   slot: string;
   payment: string;
   price: number;
@@ -92,6 +100,7 @@ export type NewBooking = {
   problem: string;
   items?: BookingItem[];
   date: string;
+  dateKey?: string;
   slot: string;
   payment: string;
   price: number;
@@ -154,6 +163,7 @@ export async function createBooking(input: NewBooking): Promise<{ id: string; co
     city: a.line2 || a.pincode,
     address: a,
     date: input.date,
+    dateKey: input.dateKey ?? "",
     slot: input.slot,
     payment: input.payment,
     price: input.price,
@@ -199,6 +209,7 @@ function mapBooking(id: string, data: FirebaseFirestore.DocumentData): Booking {
     city: data.city ?? "",
     address: data.address ?? { fullName: "", phone: "", line1: "", pincode: "" },
     date: data.date ?? "",
+    dateKey: resolveDateKey(data.date ?? "", data.dateKey, toMillis(data.createdAt)),
     slot: data.slot ?? "",
     payment: data.payment ?? "",
     price: data.price ?? 0,

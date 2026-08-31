@@ -60,7 +60,7 @@ export async function POST(request: Request) {
   }
 
   const {
-    brand, appliance, units, items, problem, date, slot, payment, price, address, emergency,
+    brand, appliance, units, items, problem, date, dateKey, slot, payment, price, address, emergency,
   } = body as Record<string, unknown>;
 
   const a = address as Partial<BookingAddress> | undefined;
@@ -93,6 +93,8 @@ export async function POST(request: Request) {
       items: lines,
       problem: typeof problem === "string" ? problem : "",
       date,
+      // The sortable day beside the label the customer pressed.
+      dateKey: typeof dateKey === "string" ? dateKey : "",
       slot,
       payment,
       price,

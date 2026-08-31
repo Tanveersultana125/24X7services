@@ -17,8 +17,8 @@ import { formatINR } from "@/lib/utils";
 const MONTH = new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" });
 
 /** "2026-07-18" → "July 2026". Parsed by hand: `new Date(s)` reads it as UTC. */
-function monthLabel(date: string): string {
-  const [y, m] = date.split("-").map(Number);
+function monthLabel(key: string): string {
+  const [y, m] = key.split("-").map(Number);
   if (!y || !m) return "Undated";
   return MONTH.format(new Date(y, m - 1, 1));
 }
@@ -29,8 +29,8 @@ export function Earnings({ jobs }: { jobs: Booking[] }) {
     const map = new Map<string, { label: string; jobs: Booking[]; total: number }>();
 
     for (const job of done) {
-      const key = job.date.slice(0, 7) || "0000-00";
-      const row = map.get(key) ?? { label: monthLabel(job.date), jobs: [], total: 0 };
+      const key = job.dateKey.slice(0, 7) || "0000-00";
+      const row = map.get(key) ?? { label: monthLabel(job.dateKey), jobs: [], total: 0 };
       row.jobs.push(job);
       row.total += job.price;
       map.set(key, row);
@@ -95,7 +95,7 @@ export function Earnings({ jobs }: { jobs: Booking[] }) {
                       {`${job.brand} ${job.appliance}`.trim() || "Service visit"}
                     </span>
                     <span className="mt-0.5 block truncate text-[0.72rem] text-muted">
-                      {job.date} · {job.city || job.problem}
+                      {job.date || "Undated"} · {job.city || job.problem}
                     </span>
                   </span>
                   <span className="shrink-0 text-[0.88rem] font-semibold tabular-nums">

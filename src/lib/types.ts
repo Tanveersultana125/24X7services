@@ -116,7 +116,10 @@ export interface BookingDraft extends BookingJob {
    * steps that build it never have to know how many came before.
    */
   more?: BookingJob[];
+  /** The label the customer pressed — "Today", "Sat, 8 Aug". */
   date?: string;
+  /** The same day as YYYY-MM-DD, so it can be sorted and compared. */
+  dateKey?: string;
   slot?: string;
   address?: {
     fullName: string;
