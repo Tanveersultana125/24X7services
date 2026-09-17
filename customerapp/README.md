@@ -19,7 +19,7 @@ customerapp/
 | 2 | Splash, location + serviceability, Home, Search, Services, Appliance | **Done** |
 | 3 | Sign-in, the booking flow, `createBooking`, payments, webhook, hold expiry | **Done** |
 | 4 | Assignment, tracking, progress, approval, OTPs, invoice, warranty, review | **Done** |
-| 5 | Bookings tabs, cancel/reschedule, profile, support | Not started |
+| 5 | Bookings tabs, cancel/reschedule, profile, support, legal | **Done** |
 | 6 | PWA, offline, Android build, App Check, accessibility, Lighthouse | Not started |
 
 Every route in the app exists as a stub from Phase 1 so `typedRoutes` can check
@@ -120,6 +120,22 @@ rejected transition rather than a booking stuck somewhere nothing can reach. The
 timeline entry is written in the same operation as the status change, so the two
 cannot disagree.
 
+**Cancelling and moving are the same two slot movements, done atomically.**
+A booking gives its old window back and takes a new one; done separately, a
+failure between them either double-books the customer or loses them the slot.
+Moving inside one day is the same document twice, so it is read once and both
+changes are applied to one array. What cancelling costs is computed by the
+server and shown before it is charged — `previewCancellation` and
+`cancelBooking` run the same function over the same policy, so the figure in
+the dialog is the figure applied.
+
+**Closing an account removes the person, not the invoices.** A customer may ask
+for their data to be removed and a business that has issued a GST invoice has
+to keep it. So the profile, addresses, saved appliances, notifications and
+support threads go; the bookings and invoices stay with the name replaced. The
+confirmation says so before they agree to it, because finding out afterwards
+that something remained is what breaks trust.
+
 **A bill is settled when nothing is owed, not when a flag says paid.**
 `payment.status` records that money came in once. Approving a repair afterwards
 raises the total, and those two facts stop being the same thing — so the invoice
@@ -181,6 +197,17 @@ Each of these is marked `DECISION NEEDED` at the place it matters.
 
 **Before launch, and blocking.**
 
+- `frontend/app/legal/*` — the three legal documents are a plain-English
+  statement of how the app actually behaves, written so a customer is not
+  misled. They are not a lawyer's draft. All three need review, and the version
+  approved becomes `termsVersion` in the business config, which is what every
+  consent record points at.
+- `backend/functions/src/booking/maskedNumber.ts` — no telephony provider is
+  configured, so a customer cannot call their expert and the callable says so
+  rather than handing back the support line pretending to be one. Pick a
+  provider (Exotel or Knowlarity, usually, in India), put the credentials in
+  `config/private`, and implement the allocation.
+
 - `frontend/components/TrackingMap.tsx` — `NEXT_PUBLIC_MAPS_KEY` is unset, so
   the map has never been run. The rest of the tracking screen works without it
   and the map degrades to a panel. Set a key restricted by HTTP referrer and by
@@ -220,6 +247,23 @@ Each of these is marked `DECISION NEEDED` at the place it matters.
   has to match the Play Console package before the first upload.
 
 **Business policy.**
+
+- `backend/functions/src/support/tickets.ts` — the first reply is a router, not
+  an assistant: it reads the category and answers with what the app already
+  knows, and never invents anything. Making it an actual assistant is a Claude
+  API call from `replyTo`, and needs an `ANTHROPIC_API_KEY` secret, the
+  `@anthropic-ai/sdk` dependency, and a decision about what the booking data in
+  the prompt may be used for. `claude-haiku-4-5` suits this shape of task;
+  `claude-opus-5` if answers must reason over booking history rather than
+  restate it.
+- `backend/functions/src/booking/reschedule.ts` — an assigned booking that moves
+  keeps its expert, who may not be free in the new window. There is no path back
+  to `confirmed` in the state machine, so assignment cannot re-run. Either that
+  transition is added, or operations pick these up by hand.
+- `backend/functions/src/account/account.ts` — how long kept invoices are
+  retained is a question for the CA. Indian GST rules are commonly read as six
+  years from the end of the financial year; nothing deletes them on any schedule
+  yet.
 
 - `backend/functions/src/booking/complete.ts` — the warranty's covers and
   excludes are one set of terms for every service. The warranty schema describes

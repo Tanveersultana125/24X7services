@@ -1,7 +1,8 @@
-import { ScreenStub } from '@/components/dev/ScreenStub'
+import type { Metadata } from 'next'
+import { ReviewsScreen } from './ReviewsScreen'
 
-export const metadata = { title: 'Your reviews' }
+export const metadata: Metadata = { title: 'Your reviews' }
 
 export default function Page() {
-  return <ScreenStub title={'Your reviews'} route={'/profile/reviews'} note={'Reviews you have left.'} />
+  return <ReviewsScreen />
 }

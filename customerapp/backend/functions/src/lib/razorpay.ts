@@ -105,6 +105,56 @@ export async function createOrder(request: OrderRequest): Promise<{ id: string }
 }
 
 // ---------------------------------------------------------------------------
+// Refunds
+// ---------------------------------------------------------------------------
+
+/**
+ * Put money back against the payment that took it.
+ *
+ * Refunds go to the original instrument and Razorpay decides the rest; there is
+ * no "refund to a different card" and nothing here tries to offer one. The
+ * amount is passed in paise, which is what Razorpay expects and what this
+ * codebase counts in anyway.
+ */
+export async function refundPayment(
+  paymentId: string,
+  amountPaise: number,
+  notes: Record<string, string>
+): Promise<{ id: string }> {
+  if (isEmulator()) {
+    return { id: `rfnd_emu${Date.now().toString(36)}` }
+  }
+
+  const auth = Buffer.from(`${keyId()}:${keySecret()}`).toString('base64')
+  const response = await fetch(
+    `https://api.razorpay.com/v1/payments/${paymentId}/refund`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${auth}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ amount: amountPaise, speed: 'normal', notes }),
+    }
+  )
+
+  if (!response.ok) {
+    logger.error('razorpay: refund failed', {
+      status: response.status,
+      body: await response.text().catch(() => '<unreadable>'),
+    })
+    throw new Error(`Razorpay refund failed with ${response.status}`)
+  }
+
+  const body: unknown = await response.json()
+  const id = (body as { id?: unknown }).id
+  if (typeof id !== 'string' || id.length === 0) {
+    throw new Error('Razorpay refund response had no id')
+  }
+  return { id }
+}
+
+// ---------------------------------------------------------------------------
 // Signatures
 // ---------------------------------------------------------------------------
 

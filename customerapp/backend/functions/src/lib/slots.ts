@@ -60,6 +60,19 @@ export function windowHasPassed(
   return minutesOf(window.start) - SLOT_LEAD_MINUTES <= istMinutesOfDay(now)
 }
 
+/**
+ * When a window opens, as an epoch. Used to work out how much notice a
+ * cancellation gave — the cancellation policy is written in hours before the
+ * slot, and that has to be computed against IST rather than the caller's clock.
+ */
+export function windowStartsAt(dateKey: string, start: string): number {
+  const [y, m, d] = dateKey.split('-').map(Number)
+  const [hh, mm] = start.split(':').map(Number)
+  return (
+    Date.UTC(y ?? 1970, (m ?? 1) - 1, d ?? 1, hh ?? 0, mm ?? 0) - IST_OFFSET_MS
+  )
+}
+
 /** The window a booking asked for, matched on both ends so a shifted grid misses. */
 export function findWindow(
   day: SlotDay,

@@ -1,7 +1,8 @@
-import { ScreenStub } from '@/components/dev/ScreenStub'
+import type { Metadata } from 'next'
+import { WarrantiesScreen } from './WarrantiesScreen'
 
-export const metadata = { title: 'Warranties' }
+export const metadata: Metadata = { title: 'Warranties' }
 
 export default function Page() {
-  return <ScreenStub title={'Warranties'} route={'/profile/warranties'} note={'Active and expired service warranties.'} />
+  return <WarrantiesScreen />
 }

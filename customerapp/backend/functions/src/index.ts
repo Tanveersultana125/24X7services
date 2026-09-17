@@ -12,6 +12,15 @@ import { getJobOtp } from './booking/jobOtp'
 import { respondToRepairRequest } from './booking/repairApproval'
 import { submitReview } from './booking/review'
 import { onBookingCompleted } from './booking/complete'
+import { previewCancellation, cancelBooking } from './booking/cancel'
+import { rescheduleBooking } from './booking/reschedule'
+import { getMaskedNumber } from './booking/maskedNumber'
+import {
+  createSupportTicket,
+  sendSupportMessage,
+  escalateTicket,
+} from './support/tickets'
+import { registerFcmToken, deleteAccount } from './account/account'
 import { createPaymentOrder, verifyPayment } from './payments/orders'
 import { razorpayWebhook } from './payments/webhook'
 import { onUserCreate } from './auth/onUserCreate'
@@ -26,7 +35,8 @@ import { onUserCreate } from './auth/onUserCreate'
  *            expireSlotHolds, onUserCreate
  *   Phase 4  getJobOtp, respondToRepairRequest, submitReview,
  *            assignTechnician, onBookingCompleted
- *   Phase 5  cancelBooking, rescheduleBooking, the support callables,
+ *   Phase 5  previewCancellation, cancelBooking, rescheduleBooking,
+ *            createSupportTicket, sendSupportMessage, escalateTicket,
  *            registerFcmToken, deleteAccount, getMaskedNumber
  *
  * The export name is the deployed function name, which is why each callable is
@@ -53,6 +63,17 @@ export {
   getJobOtp,
   respondToRepairRequest,
   submitReview,
+  // Changing or ending things
+  previewCancellation,
+  cancelBooking,
+  rescheduleBooking,
+  getMaskedNumber,
+  // Support and the account
+  createSupportTicket,
+  sendSupportMessage,
+  escalateTicket,
+  registerFcmToken,
+  deleteAccount,
 }
 
 // Not callables: an HTTP endpoint Razorpay posts to, a schedule, and three
@@ -86,4 +107,13 @@ assertCallableNames({
   getJobOtp,
   respondToRepairRequest,
   submitReview,
+  previewCancellation,
+  cancelBooking,
+  rescheduleBooking,
+  getMaskedNumber,
+  createSupportTicket,
+  sendSupportMessage,
+  escalateTicket,
+  registerFcmToken,
+  deleteAccount,
 })

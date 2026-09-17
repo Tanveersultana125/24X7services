@@ -1,7 +1,8 @@
-import { ScreenStub } from '@/components/dev/ScreenStub'
+import type { Metadata } from 'next'
+import { NotificationsScreen } from './NotificationsScreen'
 
-export const metadata = { title: 'Notifications' }
+export const metadata: Metadata = { title: 'Notifications' }
 
 export default function Page() {
-  return <ScreenStub title={'Notifications'} route={'/profile/notifications'} note={'Everything the app has told you.'} />
+  return <NotificationsScreen />
 }

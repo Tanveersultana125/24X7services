@@ -1,7 +1,8 @@
-import { ScreenStub } from '@/components/dev/ScreenStub'
+import type { Metadata } from 'next'
+import { PaymentsScreen } from './PaymentsScreen'
 
-export const metadata = { title: 'Payments' }
+export const metadata: Metadata = { title: 'Invoices' }
 
 export default function Page() {
-  return <ScreenStub title={'Payments'} route={'/profile/payments'} note={'Past payments and refunds.'} />
+  return <PaymentsScreen />
 }

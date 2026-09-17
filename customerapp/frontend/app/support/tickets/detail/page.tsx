@@ -1,7 +1,28 @@
-import { ScreenStub } from '@/components/dev/ScreenStub'
+import { Suspense } from 'react'
+import type { Metadata } from 'next'
+import { TicketDetailScreen } from './TicketDetailScreen'
+import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 
-export const metadata = { title: 'Ticket' }
+export const metadata: Metadata = { title: 'Conversation' }
 
+/**
+ * `useSearchParams` cannot be read during prerender, so the screen behind it
+ * renders on the client and needs a boundary to prerender up to.
+ */
 export default function Page() {
-  return <ScreenStub title={'Ticket'} route={'/support/tickets/detail'} note={'One conversation.'} />
+  return (
+    <Suspense
+      fallback={
+        <SkeletonGroup
+          label="Loading"
+          className="mx-auto flex w-full max-w-lg flex-col gap-4 px-4 pt-20 lg:max-w-2xl"
+        >
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-40 w-full" />
+        </SkeletonGroup>
+      }
+    >
+      <TicketDetailScreen />
+    </Suspense>
+  )
 }

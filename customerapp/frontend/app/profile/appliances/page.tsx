@@ -1,7 +1,8 @@
-import { ScreenStub } from '@/components/dev/ScreenStub'
+import type { Metadata } from 'next'
+import { AppliancesScreen } from './AppliancesScreen'
 
-export const metadata = { title: 'My appliances' }
+export const metadata: Metadata = { title: 'My appliances' }
 
 export default function Page() {
-  return <ScreenStub title={'My appliances'} route={'/profile/appliances'} note={'Appliances you have saved, and their service history.'} />
+  return <AppliancesScreen />
 }

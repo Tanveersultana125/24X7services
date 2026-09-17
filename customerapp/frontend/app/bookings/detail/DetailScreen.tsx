@@ -19,6 +19,7 @@ import {
   type BookingEvent,
 } from '@app/shared'
 
+import { BookingActions } from '@/components/BookingActions'
 import { BookingShell } from '@/components/BookingShell'
 import { StatusBadge } from '@/components/StatusBadge'
 import { StatusTimeline } from '@/components/StatusTimeline'
@@ -210,6 +211,8 @@ function Detail({
           />
         </section>
       ) : null}
+
+      <BookingActions booking={booking} />
 
       <section className="mt-7">
         <h2 className="mb-3 text-sm font-semibold text-muted">What has happened</h2>
