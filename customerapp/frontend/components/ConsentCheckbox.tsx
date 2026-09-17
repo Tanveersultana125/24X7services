@@ -33,8 +33,8 @@ export function ConsentCheckbox({
 
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
-      <div className="flex items-start gap-3">
-        <span className="relative flex size-11 shrink-0 items-center justify-center">
+      <div className="flex items-start">
+        <span className="relative -ml-2.5 flex size-11 shrink-0 items-center justify-center">
           <input
             id={id}
             type="checkbox"
@@ -51,25 +51,25 @@ export function ConsentCheckbox({
             className={cn(
               'flex size-5 items-center justify-center rounded border-2',
               'transition-colors duration-[var(--duration-fast)]',
-              'peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ink',
+              'peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand',
               checked
                 ? 'border-brand bg-brand text-bg'
                 : error
                   ? 'border-error bg-bg'
-                  : 'border-border bg-bg'
+                  : 'border-muted bg-bg'
             )}
           >
             {checked ? <Check className="size-3.5" strokeWidth={3} /> : null}
           </span>
         </span>
 
-        <label htmlFor={id} className="pt-2.5 text-sm leading-relaxed text-muted">
+        <label htmlFor={id} className="pt-2.5 pl-1 text-sm leading-relaxed text-muted">
           I agree to the{' '}
-          <Link href="/legal/terms" className="font-medium text-ink underline">
+          <Link href="/legal/terms" className="font-medium text-brand underline">
             Terms of Service
           </Link>{' '}
           and{' '}
-          <Link href="/legal/privacy" className="font-medium text-ink underline">
+          <Link href="/legal/privacy" className="font-medium text-brand underline">
             Privacy Policy
           </Link>
           .
@@ -77,7 +77,7 @@ export function ConsentCheckbox({
       </div>
 
       {error ? (
-        <p id={errorId} role="alert" className="pl-14 text-xs text-error">
+        <p id={errorId} role="alert" className="pl-10 text-xs text-error">
           {error}
         </p>
       ) : null}

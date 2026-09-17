@@ -6,7 +6,7 @@ import type { Route } from 'next'
 import { doc, getDoc } from 'firebase/firestore'
 import { COL } from '@app/shared'
 
-import { Header } from '@/components/Header'
+import { AuthShell, DevNote } from '@/components/AuthShell'
 import { Button } from '@/components/ui/Button'
 import { OtpInput } from '@/components/OtpInput'
 import {
@@ -103,84 +103,77 @@ export function OtpScreen() {
 
   if (!pending) {
     return (
-      <div className="min-h-dvh bg-bg">
-        <Header title="Enter the code" showBack backFallback="/login" />
-        <main id="content" className="mx-auto w-full max-w-lg px-4 lg:max-w-md">
-          <p className="mt-6 text-sm text-muted">
-            This sign-in has expired. Please enter your number again.
-          </p>
-          <Button
-            className="mt-4"
-            fullWidth
-            onClick={() => router.replace('/login')}
-          >
-            Back to sign in
-          </Button>
-        </main>
-      </div>
+      <AuthShell
+        title="This sign-in has expired"
+        subtitle="Codes are only good for a few minutes. Please enter your number again."
+        backFallback="/login"
+      >
+        <Button fullWidth size="lg" onClick={() => router.replace('/login')}>
+          Back to sign in
+        </Button>
+      </AuthShell>
     )
   }
 
   return (
-    <div className="min-h-dvh bg-bg">
-      <Header title="Enter the code" showBack backFallback="/login" />
-
-      <main id="content" className="mx-auto w-full max-w-lg px-4 pb-12 lg:max-w-md">
-        <p className="mt-4 text-sm leading-relaxed text-muted">
+    <AuthShell
+      title="Enter the code"
+      backFallback="/login"
+      subtitle={
+        <>
           We sent a 6-digit code to{' '}
-          <span className="font-medium text-ink">
+          <span className="font-semibold text-bg">
             {formatPhone(pending.phoneE164)}
           </span>
           .
-        </p>
+        </>
+      }
+    >
+      <OtpInput
+        value={code}
+        onChange={(value) => {
+          setCode(value)
+          setError(undefined)
+        }}
+        onComplete={(value) => void verify(value)}
+        error={error}
+        disabled={checking}
+        autoFocus
+      />
 
-        <OtpInput
-          className="mt-6"
-          value={code}
-          onChange={(value) => {
-            setCode(value)
-            setError(undefined)
-          }}
-          onComplete={(value) => void verify(value)}
-          error={error}
-          disabled={checking}
-          autoFocus
-        />
+      <Button
+        className="mt-6"
+        fullWidth
+        size="lg"
+        loading={checking}
+        disabled={code.length < 6}
+        onClick={() => void verify(code)}
+      >
+        Verify and continue
+      </Button>
 
-        <Button
-          className="mt-6"
-          fullWidth
-          size="lg"
-          loading={checking}
-          disabled={code.length < 6}
-          onClick={() => void verify(code)}
-        >
-          Verify and continue
-        </Button>
+      <div className="mt-4 text-center text-sm text-muted">
+        {secondsLeft > 0 ? (
+          <span>Resend in {secondsLeft}s</span>
+        ) : (
+          <button
+            type="button"
+            onClick={() => void resend()}
+            disabled={resending}
+            className="font-semibold text-brand underline disabled:text-muted"
+          >
+            {resending ? 'Sending…' : 'Resend code'}
+          </button>
+        )}
+      </div>
 
-        <div className="mt-4 text-center text-sm text-muted">
-          {secondsLeft > 0 ? (
-            <span>Resend in {secondsLeft}s</span>
-          ) : (
-            <button
-              type="button"
-              onClick={() => void resend()}
-              disabled={resending}
-              className="font-semibold text-ink underline disabled:text-muted"
-            >
-              {resending ? 'Sending…' : 'Resend code'}
-            </button>
-          )}
-        </div>
-
-        {OTP_IS_SIMULATED ? (
-          <p className="mt-6 rounded-card border border-border bg-surface px-4 py-3 text-xs leading-relaxed text-muted">
-            The emulator prints the code rather than sending it. Look in the
-            terminal running the emulators, or the Auth tab at localhost:4000.
-          </p>
-        ) : null}
-      </main>
-    </div>
+      {OTP_IS_SIMULATED ? (
+        <DevNote className="mt-6">
+          The emulator prints the code rather than sending it. Look in the
+          terminal running the emulators, or the Auth tab at localhost:4000.
+        </DevNote>
+      ) : null}
+    </AuthShell>
   )
 }
 

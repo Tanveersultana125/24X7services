@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { updateProfileInputSchema } from '@app/shared'
 
-import { Header } from '@/components/Header'
+import { AuthShell } from '@/components/AuthShell'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Field'
 import { useAuth, saveName } from '@/lib/auth'
@@ -68,17 +68,12 @@ export function NameScreen() {
   }
 
   return (
-    <div className="min-h-dvh bg-bg">
-      <Header showBack={false} />
-
-      <main id="content" className="mx-auto w-full max-w-lg px-4 pb-12 lg:max-w-md">
-        <h1 className="mt-4 text-2xl font-bold text-ink">What should we call you?</h1>
-        <p className="mt-1.5 text-sm leading-relaxed text-muted">
-          Your expert asks for this name at the door, and it appears on your
-          invoice.
-        </p>
-
-        <form onSubmit={submit} className="mt-6 flex flex-col gap-5">
+    <AuthShell
+      title="What should we call you?"
+      subtitle="Your expert asks for this name at the door, and it appears on your invoice."
+      showBack={false}
+    >
+      <form onSubmit={submit} className="flex flex-col gap-5">
           <Input
             label="Full name"
             required
@@ -108,11 +103,10 @@ export function NameScreen() {
             placeholder="you@example.com"
           />
 
-          <Button type="submit" fullWidth size="lg" loading={saving}>
-            Continue
-          </Button>
-        </form>
-      </main>
-    </div>
+        <Button type="submit" fullWidth size="lg" loading={saving}>
+          Continue
+        </Button>
+      </form>
+    </AuthShell>
   )
 }

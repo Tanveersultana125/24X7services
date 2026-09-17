@@ -6,12 +6,11 @@ import type { Route } from 'next'
 import { ShieldCheck } from 'lucide-react'
 import { phoneSchema } from '@app/shared'
 
-import { Header } from '@/components/Header'
+import { AuthShell, DevNote } from '@/components/AuthShell'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Field'
 import { ConsentCheckbox } from '@/components/ConsentCheckbox'
 import { TrustPoints } from '@/components/TrustPoints'
-import { Card } from '@/components/ui/Card'
 import {
   authErrorMessage,
   OTP_IS_SIMULATED,
@@ -76,19 +75,11 @@ export function LoginScreen() {
   }
 
   return (
-    <div className="min-h-dvh bg-bg">
-      <Header showBack backFallback="/home" />
-
-      <main id="content" className="mx-auto w-full max-w-lg px-4 pb-12 lg:max-w-md">
-        <h1 className="mt-4 text-2xl font-bold text-ink">
-          Your mobile number
-        </h1>
-        <p className="mt-1.5 text-sm leading-relaxed text-muted">
-          We send a one-time code to confirm it. The same number is how your
-          expert reaches you on the day.
-        </p>
-
-        <form onSubmit={sendCode} className="mt-6 flex flex-col gap-5">
+    <AuthShell
+      title="Your mobile number"
+      subtitle="We send a one-time code to confirm it. The same number is how your expert reaches you on the day."
+    >
+      <form onSubmit={sendCode} className="flex flex-col gap-5">
           <Input
             label="Mobile number"
             value={phone}
@@ -117,25 +108,22 @@ export function LoginScreen() {
           <Button type="submit" fullWidth size="lg" loading={sending}>
             Send code
           </Button>
-        </form>
+      </form>
 
-        {OTP_IS_SIMULATED ? (
-          <p className="mt-4 rounded-card border border-border bg-surface px-4 py-3 text-xs leading-relaxed text-muted">
-            Running against the emulator: no SMS is sent. The code is printed in
-            the emulator log, and the Auth tab at{' '}
-            <span className="font-medium text-ink">localhost:4000</span> shows
-            it too.
-          </p>
-        ) : null}
+      {OTP_IS_SIMULATED ? (
+        <DevNote className="mt-4">
+          No SMS is sent against the emulator. The code is printed in the
+          emulator log, and the Auth tab at localhost:4000 shows it too.
+        </DevNote>
+      ) : null}
 
-        <Card className="mt-8 p-4">
-          <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
-            <ShieldCheck className="size-4" aria-hidden="true" />
-            What you get
-          </p>
-          <TrustPoints />
-        </Card>
-      </main>
-    </div>
+      <section className="mt-9 border-t border-border pt-5">
+        <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
+          <ShieldCheck className="size-4 text-brand" aria-hidden="true" />
+          What you get
+        </h2>
+        <TrustPoints className="mt-3" compact />
+      </section>
+    </AuthShell>
   )
 }
