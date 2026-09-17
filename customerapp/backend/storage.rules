@@ -44,8 +44,9 @@ service firebase.storage {
       allow update, delete: if false;
     }
 
-    // Media captured before sign-in, staged here and referenced by the booking
-    // once it is created. The customer may still remove one at this point.
+    // Media captured before the booking exists — there is no booking id to file
+    // it under yet — staged here and referenced by the booking once it is
+    // created. The customer may still remove one at this point.
     match /users/{uid}/drafts/{fileName} {
       allow read, delete: if isOwner(uid);
       allow create: if isOwner(uid)

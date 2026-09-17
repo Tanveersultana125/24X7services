@@ -1,7 +1,31 @@
-import { ScreenStub } from '@/components/dev/ScreenStub'
+import { Suspense } from 'react'
+import type { Metadata } from 'next'
+import { NameScreen } from './NameScreen'
+import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 
-export const metadata = { title: 'Your name' }
+export const metadata: Metadata = { title: 'Your name' }
 
+/**
+ * `useSearchParams` cannot be read during prerender, so the screen behind it
+ * renders on the client and needs a boundary to prerender up to.
+ */
 export default function Page() {
-  return <ScreenStub title={'Your name'} route={'/login/name'} note={'Optional, and skippable.'} />
+  return (
+    <Suspense fallback={<PageSkeleton />}>
+      <NameScreen />
+    </Suspense>
+  )
+}
+
+function PageSkeleton() {
+  return (
+    <SkeletonGroup
+      label="Loading"
+      className="mx-auto flex w-full max-w-lg flex-col gap-4 px-4 pt-20 lg:max-w-md"
+    >
+      <Skeleton className="h-8 w-2/3 rounded-md" />
+      <Skeleton className="h-14 w-full" />
+      <Skeleton className="h-14 w-full" />
+    </SkeletonGroup>
+  )
 }

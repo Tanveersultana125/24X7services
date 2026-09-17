@@ -1,7 +1,8 @@
-import { ScreenStub } from '@/components/dev/ScreenStub'
+import type { Metadata } from 'next'
+import { IssueScreen } from './IssueScreen'
 
-export const metadata = { title: 'What is wrong' }
+export const metadata: Metadata = { title: 'What is wrong' }
 
 export default function Page() {
-  return <ScreenStub title={'What is wrong'} route={'/book/issue'} note={'The issues to look at.'} />
+  return <IssueScreen />
 }

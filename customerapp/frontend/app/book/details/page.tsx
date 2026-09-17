@@ -1,7 +1,8 @@
-import { ScreenStub } from '@/components/dev/ScreenStub'
+import type { Metadata } from 'next'
+import { DetailsScreen } from './DetailsScreen'
 
-export const metadata = { title: 'Appliance details' }
+export const metadata: Metadata = { title: 'Appliance details' }
 
 export default function Page() {
-  return <ScreenStub title={'Appliance details'} route={'/book/details'} note={'Type, model number and the model sticker photo.'} />
+  return <DetailsScreen />
 }

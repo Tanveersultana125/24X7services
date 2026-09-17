@@ -1,7 +1,8 @@
-import { ScreenStub } from '@/components/dev/ScreenStub'
+import type { Metadata } from 'next'
+import { SlotScreen } from './SlotScreen'
 
-export const metadata = { title: 'Date and time' }
+export const metadata: Metadata = { title: 'Pick a time' }
 
 export default function Page() {
-  return <ScreenStub title={'Date and time'} route={'/book/slot'} note={'Pick a two-hour window.'} />
+  return <SlotScreen />
 }

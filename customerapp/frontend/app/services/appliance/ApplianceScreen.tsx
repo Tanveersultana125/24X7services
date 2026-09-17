@@ -3,7 +3,6 @@
 import { useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
-import type { Route } from 'next'
 import {
   applianceIdSchema,
   type ApplianceId,
@@ -22,6 +21,7 @@ import { Card } from '@/components/ui/Card'
 import { ErrorState } from '@/components/ErrorState'
 import { ServiceListSkeleton } from '@/components/SkeletonLoader'
 import { MANUFACTURER_WARRANTY_NOTICE } from '@/config/brand'
+import { startDraft } from '@/lib/bookingDraft'
 import {
   fetchAppliance,
   fetchBrands,
@@ -75,10 +75,23 @@ export function ApplianceScreen() {
     data.data?.services.find((service) => service.serviceKey === 'repair') ??
     null
 
-  function startBooking(serviceId: string, issueId?: string): void {
-    const query = new URLSearchParams({ a: applianceId ?? '', s: serviceId })
-    if (issueId) query.set('i', issueId)
-    router.push(`/book/brand?${query.toString()}` as Route)
+  /**
+   * Starting a booking is starting a new draft, not adding to whatever was left
+   * half-filled before — a different appliance is a different job.
+   *
+   * The draft is seeded here rather than from query parameters on the first
+   * step, so that step never renders against a draft that has not been written
+   * yet and bounces the customer back out of the flow it just sent them into.
+   */
+  function startBooking(serviceKey: CatalogService['serviceKey'], issueId?: string): void {
+    if (!applianceId) return
+    startDraft({
+      applianceId,
+      serviceKey,
+      issueIds: issueId ? [issueId] : [],
+      techPreference: 'any',
+    })
+    router.push('/book/brand')
   }
 
   const unknown =
@@ -138,7 +151,7 @@ export function ApplianceScreen() {
                 <ServiceCard
                   key={service.id}
                   service={service}
-                  onSelect={() => startBooking(service.id)}
+                  onSelect={() => startBooking(service.serviceKey)}
                 />
               ))}
             </div>
@@ -156,7 +169,9 @@ export function ApplianceScreen() {
                   <li key={issue.id}>
                     {repairService ? (
                       <Chip
-                        onClick={() => startBooking(repairService.id, issue.id)}
+                        onClick={() =>
+                          startBooking(repairService.serviceKey, issue.id)
+                        }
                       >
                         {issue.label}
                       </Chip>

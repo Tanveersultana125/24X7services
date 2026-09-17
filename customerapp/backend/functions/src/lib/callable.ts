@@ -1,4 +1,5 @@
 import { onCall, HttpsError, type CallableRequest } from 'firebase-functions/v2/https'
+import type { SecretParam } from 'firebase-functions/lib/params/types'
 import { logger } from 'firebase-functions'
 import { z } from 'zod'
 import { REGION } from './options'
@@ -37,16 +38,36 @@ export interface Caller {
  */
 const GENERIC = 'Something went wrong. Please try again.'
 
+export interface CallableOptions {
+  /**
+   * Secrets this handler reads. A secret not declared here is not bound into
+   * the runtime, and `.value()` returns an empty string rather than failing —
+   * which, in a payment handler, is a signature that silently never matches.
+   */
+  secrets?: SecretParam[]
+}
+
 export function defineCallable<N extends CallableName>(
   name: N,
-  handler: (input: CallableInput<N>, caller: Caller) => Promise<CallableResult<N>>
+  handler: (input: CallableInput<N>, caller: Caller) => Promise<CallableResult<N>>,
+  options: CallableOptions = {}
 ) {
   const spec = CALLABLES[name]
 
   // The region is named here as well as globally. It is the one option whose
   // absence is invisible until a customer's call 404s, so it does not rely on
   // module evaluation order being what anyone expected.
-  return onCall({ region: REGION }, async (request: CallableRequest<unknown>) => {
+  //
+  // `secrets` is spread rather than passed as undefined: an explicit undefined
+  // reaches the deployed endpoint definition, and the CLI reads that field
+  // without checking it — which fails discovery for every function in the
+  // bundle, not just this one.
+  const callableOptions = {
+    region: REGION,
+    ...(options.secrets ? { secrets: options.secrets } : {}),
+  }
+
+  return onCall(callableOptions, async (request: CallableRequest<unknown>) => {
     const uid = request.auth?.uid ?? null
 
     if (spec.auth && uid === null) {

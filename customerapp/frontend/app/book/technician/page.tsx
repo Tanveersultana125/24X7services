@@ -1,7 +1,8 @@
-import { ScreenStub } from '@/components/dev/ScreenStub'
+import type { Metadata } from 'next'
+import { TechnicianScreen } from './TechnicianScreen'
 
-export const metadata = { title: 'Technician preference' }
+export const metadata: Metadata = { title: 'Choose an expert' }
 
 export default function Page() {
-  return <ScreenStub title={'Technician preference'} route={'/book/technician'} note={'Any expert, top rated, or a specific one.'} />
+  return <TechnicianScreen />
 }

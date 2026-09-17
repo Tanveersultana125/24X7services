@@ -1,7 +1,8 @@
-import { ScreenStub } from '@/components/dev/ScreenStub'
+import type { Metadata } from 'next'
+import { DiagnosisScreen } from './DiagnosisScreen'
 
-export const metadata = { title: 'Possible causes' }
+export const metadata: Metadata = { title: 'Possible causes' }
 
 export default function Page() {
-  return <ScreenStub title={'Possible causes'} route={'/book/diagnosis'} note={'Rule-based causes, verified on site.'} />
+  return <DiagnosisScreen />
 }

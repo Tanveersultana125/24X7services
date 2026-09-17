@@ -148,6 +148,15 @@
         { "fieldPath": "applianceId", "order": "ASCENDING" },
         { "fieldPath": "issueId", "order": "ASCENDING" }
       ]
+    },
+    {
+      "//": "Technician options: who is active and covers the booking's pincode.",
+      "collectionGroup": "technicians",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "active", "order": "ASCENDING" },
+        { "fieldPath": "pincodes", "arrayConfig": "CONTAINS" }
+      ]
     }
   ],
   "fieldOverrides": []

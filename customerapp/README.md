@@ -17,7 +17,7 @@ customerapp/
 |---|---|---|
 | 1 | Monorepo, shared schemas, rules + tests, seed, design system, `/dev/components` | **Done** |
 | 2 | Splash, location + serviceability, Home, Search, Services, Appliance | **Done** |
-| 3 | The booking flow, `createBooking`, payments, webhook, hold expiry | Not started |
+| 3 | Sign-in, the booking flow, `createBooking`, payments, webhook, hold expiry | **Done** |
 | 4 | Assignment, tracking, progress, approval, OTPs, invoice, warranty, review | Not started |
 | 5 | Bookings tabs, cancel/reschedule, profile, support | Not started |
 | 6 | PWA, offline, Android build, App Check, accessibility, Lighthouse | Not started |
@@ -99,6 +99,24 @@ never what it costs. `createBooking` prices it from the catalog inside a
 transaction, and the security rules refuse every client write to `bookings`,
 `invoices`, `warranties` and `tracking`, so there is no second path in.
 
+**A slot is held, then booked, and the hold is given back.** Paying online
+creates the booking in `pending_payment` and takes a hold on the window; paying
+after the service takes the place outright. `expireSlotHolds` runs every five
+minutes and releases holds nobody paid for, as `cancelled` rather than `failed`
+— nothing failed, somebody changed their mind. Without it an abandoned checkout
+keeps a place forever and the day quietly stops selling.
+
+**Payment is confirmed twice, and the second one is the one that counts.**
+`verifyPayment` runs when the customer's checkout returns, which is fast but not
+guaranteed; the webhook runs when Razorpay says the money was captured, which is
+slow but always happens. Both call the same idempotent function, so whichever
+arrives first does the work and the other finds it done.
+
+**Sign-in happens where the app first stores something.** Brand, appliance,
+problem and possible causes are open to anyone. The media step is the first
+thing kept on a customer's behalf, so that is the gate — the draft is persisted
+across it, including the trip out to the SMS app and back.
+
 **Static export, which rules things out.** No SSR, no server actions, no route
 handlers that read a request, no proxy, no redirects, no dynamic segments. Detail
 screens take a query param — `/bookings/detail?id=…`, not `/bookings/[id]`. All
@@ -122,6 +140,13 @@ rejects null — so a handler that sets an optional field to undefined fails
 validation on the client, after the server has done all the work. Handlers omit
 the key instead.
 
+**The booking draft is not in Redux.** `packages/shared` describes it as
+living there. It lives in the same external store as everything else the app
+keeps on the device — one object, written a field at a time, read through
+`useSyncExternalStore`. A second state library for a single slice would be two
+idioms where one does. `@reduxjs/toolkit` and `react-redux` are still in
+`frontend/package.json` and now unused; they come out, or something uses them.
+
 **localStorage is an external store, and is read as one.** The saved location
 and the recent searches go through `useSyncExternalStore`, not an effect that
 reads storage and calls setState. An effect renders once with the wrong answer
@@ -141,6 +166,22 @@ Each of these is marked `DECISION NEEDED` at the place it matters.
 
 **Before launch, and blocking.**
 
+- `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` and `RAZORPAY_WEBHOOK_SECRET` are
+  Cloud Functions secrets and are not set. Until they are, payments only work
+  against the emulator, which signs a stand-in response the emulated functions
+  accept. The webhook URL also has to be registered in the Razorpay dashboard
+  for `payment.captured`, or a payment that the customer's checkout fails to
+  report is never confirmed at all.
+- `backend/functions/src/auth/onUserCreate.ts` — a 1st-generation auth trigger,
+  which means us-central1: the one thing in this backend that is not in Mumbai.
+  It sees a uid and a phone number and writes to Firestore in Mumbai. The
+  alternative is a v2 blocking function, which needs Identity Platform enabled.
+  The answer is a data-residency statement under DPDP, so confirm it.
+- `frontend/lib/auth.ts` — phone sign-in uses reCAPTCHA, which cannot complete
+  inside the Android WebView. `@capacitor-firebase/authentication` is already a
+  dependency for this; wiring it is Phase 6, and `startPhoneSignIn` is the only
+  seam it replaces.
+
 - `frontend/app/location/LocationScreen.tsx` — there is no "detect my location"
   button. Turning a coordinate into a pincode needs a geocoding call, and a web
   service key cannot be restricted by referrer, so one compiled into the bundle
@@ -158,6 +199,16 @@ Each of these is marked `DECISION NEEDED` at the place it matters.
   has to match the Play Console package before the first upload.
 
 **Business policy.**
+
+- `backend/functions/src/lib/pricing.ts` — every area we service is in
+  Telangana and so is the seller, so every supply is intra-state and the tax is
+  CGST plus SGST. `serviceAreas` carries no state code. The day the business
+  crosses a border, one has to be added and compared against `config.stateCode`,
+  or every invoice from that day carries the wrong tax heads.
+- `frontend/app/book/details/DetailsScreen.tsx` — the catalog lets an appliance
+  declare several detail fields, but the draft carries a single
+  `applianceType`, so only the deciding one is asked. Either the draft grows a
+  `details` map, or the extra fields come out of the fixtures.
 
 - `backend/seed/seed.ts` — all twenty brand × appliance combinations are seeded
   as enabled. The business must disable the ones it does not service, or the
