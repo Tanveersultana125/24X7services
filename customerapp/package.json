@@ -18,11 +18,12 @@
     "typecheck": "npm -w @app/shared run typecheck && npm -w frontend run typecheck && npm -w functions run typecheck",
     "lint": "npm -w frontend run lint",
     "emulators": "npm -w functions run build && firebase emulators:start --project demo-customerapp --config backend/firebase.json --import backend/.emulator-data --export-on-exit backend/.emulator-data",
-    "seed": "npm -w functions run seed",
+    "seed": "firebase emulators:exec --only firestore --project demo-customerapp --config backend/firebase.json \"npm -w functions run seed\"",
     "simulate": "npm -w functions run simulate --",
-    "test:rules": "npm -w functions run test:rules",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-customerapp --config backend/firebase.json \"npm -w functions run test:rules\"",
     "deploy:functions": "npm -w functions run deploy",
-    "cap:android": "npm -w frontend run cap:android"
+    "cap:android": "npm -w frontend run cap:android",
+    "//seed": "Seeds a throwaway emulator. To seed the emulator you are actually running, use `npm -w functions run seed` in a second terminal while `npm run emulators` is up."
   },
   "devDependencies": {
     "typescript": "^5.9.2"
