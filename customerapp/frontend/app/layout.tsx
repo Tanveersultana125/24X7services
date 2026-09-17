@@ -3,7 +3,6 @@ import { brand } from '@/config/brand'
 import { AppChrome } from '@/components/AppChrome'
 import { ServiceWorker } from '@/components/ServiceWorker'
 import { ToastProvider } from '@/components/Toast'
-import { usingEmulators } from '@/lib/firebase'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -48,21 +47,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        {/* The first screen cannot render its content until Firestore answers,
-            so the handshake starts while the bundle is still parsing rather
-            than after it. Two origins, because auth and data are separate
-            hosts; neither is preloaded, only connected to.
-            
-            Skipped against the emulators, where those hosts are never reached
-            and the connections would be opened for nothing. */}
-        {usingEmulators ? null : (
-          <>
-            <link rel="preconnect" href="https://firestore.googleapis.com" />
-            <link rel="preconnect" href="https://identitytoolkit.googleapis.com" />
-          </>
-        )}
-      </head>
       <body className="min-h-dvh bg-bg text-ink antialiased">
         <ToastProvider>
           <AppChrome />

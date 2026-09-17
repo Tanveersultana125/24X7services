@@ -32,17 +32,50 @@ import {
 
 export const FUNCTIONS_REGION = 'asia-south1'
 
-const config = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-}
-
 export const usingEmulators =
   process.env.NEXT_PUBLIC_USE_EMULATORS === 'true'
+
+/**
+ * Stand-ins for the fields the SDK insists on having.
+ *
+ * Against the emulators none of these reaches Google and none of them means
+ * anything — but `getAuth()` throws `auth/invalid-api-key` on an empty string
+ * rather than on a wrong one, which takes down every screen in the app at
+ * hydration with an error that says nothing about emulators. The README
+ * promises that `NEXT_PUBLIC_USE_EMULATORS=true` is the only value a developer
+ * has to set; this is what keeps that promise.
+ *
+ * They apply only when the emulators are on. A real build with a missing key
+ * still fails, loudly, which is the right outcome — a placeholder silently
+ * standing in for a production credential is how an app ships pointed at
+ * nothing.
+ */
+const EMULATOR_PLACEHOLDERS = {
+  apiKey: 'demo-emulator-key',
+  appId: '1:0:web:demo',
+  messagingSenderId: '0',
+}
+
+const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+
+const config = {
+  apiKey:
+    process.env.NEXT_PUBLIC_FIREBASE_API_KEY ||
+    (usingEmulators ? EMULATOR_PLACEHOLDERS.apiKey : undefined),
+  authDomain:
+    process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ||
+    (usingEmulators ? `${projectId}.firebaseapp.com` : undefined),
+  projectId,
+  storageBucket:
+    process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ||
+    (usingEmulators ? `${projectId}.appspot.com` : undefined),
+  messagingSenderId:
+    process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ||
+    (usingEmulators ? EMULATOR_PLACEHOLDERS.messagingSenderId : undefined),
+  appId:
+    process.env.NEXT_PUBLIC_FIREBASE_APP_ID ||
+    (usingEmulators ? EMULATOR_PLACEHOLDERS.appId : undefined),
+}
 
 /** Emulator host, as reachable from wherever the app is running. */
 const EMULATOR_HOST = process.env.NEXT_PUBLIC_EMULATOR_HOST ?? '127.0.0.1'
