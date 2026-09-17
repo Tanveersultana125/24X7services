@@ -1,3 +1,4 @@
+import path from 'node:path'
 import type { NextConfig } from 'next'
 
 /**
@@ -12,6 +13,14 @@ import type { NextConfig } from 'next'
  */
 const nextConfig: NextConfig = {
   output: 'export',
+
+  turbopack: {
+    // There is a second lockfile one directory up, for the marketing site that
+    // shares this repo. Left to infer, Turbopack picks that one and resolves
+    // modules from the wrong tree — @app/shared among them. The workspace root
+    // is where this app's node_modules actually lives.
+    root: path.join(__dirname, '..'),
+  },
 
   // A WebView loads the bundle over file://, where a request for /home cannot
   // fall back to /home.html the way a web server would. Trailing slashes emit
