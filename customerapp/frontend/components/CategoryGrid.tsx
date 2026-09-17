@@ -71,7 +71,7 @@ export function CategoryGrid({ appliances, className }: CategoryGridProps) {
           className="group flex flex-col items-center gap-2"
           aria-label="See everything we service"
         >
-          <span className="flex aspect-square w-full items-center justify-center rounded-card border border-dashed border-border transition-colors duration-[var(--duration-fast)] group-hover:border-ink">
+          <span className="flex aspect-square w-full items-center justify-center rounded-card border border-dashed border-border transition-colors duration-[var(--duration-fast)] group-hover:border-brand">
             <ArrowRight className="size-5 text-muted" aria-hidden="true" />
           </span>
           <span className="text-center text-xs font-semibold leading-tight text-ink">

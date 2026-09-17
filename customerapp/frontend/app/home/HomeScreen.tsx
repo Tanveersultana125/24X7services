@@ -242,7 +242,7 @@ export function HomeScreen() {
                   action={
                     <Link
                       href={`/services/appliance?a=${row.appliance.id}` as Route}
-                      className="inline-flex shrink-0 items-center gap-0.5 text-sm font-semibold text-ink"
+                      className="inline-flex shrink-0 items-center gap-0.5 text-sm font-semibold text-brand"
                     >
                       See all
                       <ChevronRight className="size-4" aria-hidden="true" />

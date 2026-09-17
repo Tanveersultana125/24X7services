@@ -116,7 +116,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           required={required}
           className={cn(
             controlClasses,
-            invalid ? 'border-error' : 'border-border focus:border-ink',
+            invalid ? 'border-error' : 'border-border focus:border-brand',
             className
           )}
           {...props}
@@ -158,7 +158,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             className={cn(
               controlClasses,
               'resize-y',
-              invalid ? 'border-error' : 'border-border focus:border-ink',
+              invalid ? 'border-error' : 'border-border focus:border-brand',
               className
             )}
             {...props}

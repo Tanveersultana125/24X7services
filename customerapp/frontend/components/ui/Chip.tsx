@@ -35,8 +35,8 @@ export function Chip({
         'transition-colors duration-[var(--duration-fast)] ease-[var(--ease-out-soft)]',
         'disabled:cursor-not-allowed disabled:border-border disabled:text-muted',
         selected
-          ? 'border-ink bg-ink text-bg'
-          : 'border-border bg-bg text-ink hover:border-ink',
+          ? 'border-brand bg-brand text-bg'
+          : 'border-border bg-bg text-ink hover:border-brand',
         className
       )}
       {...props}

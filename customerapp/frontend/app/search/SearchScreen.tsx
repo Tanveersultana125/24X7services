@@ -257,7 +257,7 @@ function Suggestions({
               <li key={appliance.id}>
                 <Link
                   href={`/services/appliance?a=${appliance.id}` as Route}
-                  className="inline-flex min-h-11 items-center rounded-pill border border-border px-4 text-sm font-medium text-ink hover:border-ink"
+                  className="inline-flex min-h-11 items-center rounded-pill border border-border px-4 text-sm font-medium text-ink hover:border-brand"
                 >
                   {appliance.name}
                 </Link>

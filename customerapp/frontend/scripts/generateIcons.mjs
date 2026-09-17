@@ -25,7 +25,8 @@ import sharp from 'sharp'
 const here = dirname(fileURLToPath(import.meta.url))
 const publicDir = join(here, '..', 'public', 'icons')
 
-const INK = '#0a0a0a'
+// The launcher icon wears the brand, the same royal blue as the app header.
+const INK = '#2547d0'
 const PAPER = '#ffffff'
 
 /**

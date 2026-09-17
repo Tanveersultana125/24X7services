@@ -100,7 +100,7 @@ export function OfflineBanner({ className }: { className?: string }) {
       role="status"
       aria-live="polite"
       className={cn(
-        'flex items-center justify-center gap-2 bg-ink px-4 py-2 text-xs font-medium text-bg',
+        'flex items-center justify-center gap-2 bg-brand px-4 py-2 text-xs font-medium text-bg',
         className
       )}
     >

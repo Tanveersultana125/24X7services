@@ -50,7 +50,7 @@ export function BottomNavigation({ className }: { className?: string }) {
                 className={cn(
                   'flex h-[72px] flex-col items-center justify-center gap-1',
                   'text-xs font-medium transition-colors duration-[var(--duration-fast)]',
-                  active ? 'text-ink' : 'text-muted'
+                  active ? 'text-brand' : 'text-muted'
                 )}
               >
                 <Icon

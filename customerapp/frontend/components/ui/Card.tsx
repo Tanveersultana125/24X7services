@@ -45,7 +45,7 @@ export function CardLink({
       aria-label={ariaLabel}
       className={cn(
         base,
-        'block hover:border-ink',
+        'block hover:border-brand',
         raised && 'shadow-raised',
         className
       )}
@@ -83,10 +83,10 @@ export function CardButton({
         'block w-full text-left',
         disabled
           ? 'cursor-not-allowed opacity-60'
-          : 'hover:border-ink',
+          : 'hover:border-brand',
         // Two rings of border read as a thicker edge without the box shifting
         // by a pixel when it is picked.
-        selected && 'border-ink ring-1 ring-ink',
+        selected && 'border-brand ring-1 ring-brand',
         raised && 'shadow-raised',
         className
       )}

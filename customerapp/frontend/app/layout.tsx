@@ -37,7 +37,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   // The app has a bottom nav and sticky CTAs that need the safe area.
   viewportFit: 'cover',
-  themeColor: '#0a0a0a',
+  themeColor: '#2547d0',
 }
 
 export default function RootLayout({

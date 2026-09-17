@@ -266,7 +266,7 @@ function Secondary({
   return (
     <Link
       href={href}
-      className="flex min-h-12 items-center justify-center gap-2 rounded-card border border-border text-sm font-semibold text-ink hover:border-ink"
+      className="flex min-h-12 items-center justify-center gap-2 rounded-card border border-border text-sm font-semibold text-ink hover:border-brand"
     >
       <Icon className="size-4" aria-hidden="true" />
       {label}

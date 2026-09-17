@@ -1,1 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 200" width="220" height="200" role="img" aria-label="Geyser"><rect width="220" height="200" fill="#F5F5F5"/><g fill="none" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"><rect x="66" y="36" width="88" height="112" rx="44"/><circle cx="110" cy="128" r="9"/><line x1="86" y1="148" x2="86" y2="172"/><line x1="134" y1="148" x2="134" y2="172"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 200" width="220" height="200" role="img" aria-label="Water heater">
+  <circle cx="110" cy="104" r="86" fill="#FDF0DD"/>
+  <rect x="58" y="26" width="104" height="124" rx="46" fill="#FFFFFF" stroke="#D9821B" stroke-width="4"/>
+  <path d="M58 100a52 52 0 0 0 104 0v4a52 52 0 0 1-104 0z" fill="#FFE7C4"/>
+  <rect x="58" y="96" width="104" height="54" rx="26" fill="#FFE7C4" opacity="0.7"/>
+  <circle cx="110" cy="66" r="16" fill="#D9821B"/>
+  <path d="M110 58c5 6 8 9 8 13a8 8 0 0 1-16 0c0-4 3-7 8-13z" fill="#FFFFFF"/>
+  <rect x="100" y="150" width="20" height="26" rx="6" fill="#9A9384"/>
+  <path d="M110 176c12 6 18 12 18 18h-36c0-6 6-12 18-18z" fill="#59C6E8" opacity="0.55"/>
+  <circle cx="140" cy="122" r="6" fill="#0B9A63"/>
+</svg>

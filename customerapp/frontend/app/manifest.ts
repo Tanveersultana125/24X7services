@@ -36,7 +36,7 @@ export default function manifest(): MetadataRoute.Manifest {
     orientation: 'portrait',
     // The palette has exactly two surfaces, and these are them.
     background_color: '#ffffff',
-    theme_color: '#0a0a0a',
+    theme_color: '#2547d0',
     categories: ['business', 'utilities'],
     lang: 'en-IN',
     dir: 'ltr',

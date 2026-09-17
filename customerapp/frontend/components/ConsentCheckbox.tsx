@@ -53,7 +53,7 @@ export function ConsentCheckbox({
               'transition-colors duration-[var(--duration-fast)]',
               'peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ink',
               checked
-                ? 'border-ink bg-ink text-bg'
+                ? 'border-brand bg-brand text-bg'
                 : error
                   ? 'border-error bg-bg'
                   : 'border-border bg-bg'

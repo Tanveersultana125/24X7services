@@ -222,7 +222,7 @@ export function TicketDetailScreen() {
               onChange={(event) => setText(event.target.value.slice(0, 2000))}
               placeholder="Type a message"
               enterKeyHint="send"
-              className="min-h-12 flex-1 rounded-pill border border-border bg-bg px-4 text-base text-ink outline-none focus:border-ink"
+              className="min-h-12 flex-1 rounded-pill border border-border bg-bg px-4 text-base text-ink outline-none focus:border-brand"
             />
             <Button
               type="submit"

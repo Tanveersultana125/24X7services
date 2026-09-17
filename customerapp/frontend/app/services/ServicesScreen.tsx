@@ -107,7 +107,7 @@ export function ServicesScreen() {
             <li key={step.title}>
               <Card className="flex items-start gap-3 p-4">
                 <span
-                  className="flex size-7 shrink-0 items-center justify-center rounded-full bg-ink text-xs font-bold text-bg"
+                  className="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-bg"
                   aria-hidden="true"
                 >
                   {index + 1}

@@ -253,13 +253,13 @@ function ItemRow({
       className={cn(
         'flex w-full items-start gap-3 rounded-card border p-4 text-left',
         'transition-colors duration-[var(--duration-fast)]',
-        checked ? 'border-ink ring-1 ring-ink' : 'border-border hover:border-ink'
+        checked ? 'border-brand ring-1 ring-brand' : 'border-border hover:border-brand'
       )}
     >
       <span
         className={cn(
           'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded border-2',
-          checked ? 'border-ink bg-ink text-bg' : 'border-border'
+          checked ? 'border-brand bg-brand text-bg' : 'border-border'
         )}
         aria-hidden="true"
       >

@@ -23,7 +23,7 @@ export interface EmptyStateProps {
 
 const actionClasses =
   'mt-2 inline-flex min-h-11 items-center justify-center rounded-pill ' +
-  'bg-ink px-5 text-sm font-semibold text-bg'
+  'bg-brand px-5 text-sm font-semibold text-bg'
 
 export function EmptyState({
   icon: Icon,

@@ -121,7 +121,7 @@ export function PromotionalBanner({
       </div>
 
       {banners.length > 1 ? (
-        <div className="flex justify-center gap-1.5 pt-1">
+        <div className="-mb-3 flex justify-center gap-1.5">
           {banners.map((banner, index) => (
             <button
               key={banner.id}
@@ -138,7 +138,7 @@ export function PromotionalBanner({
               <span
                 className={cn(
                   'h-1.5 rounded-full transition-all duration-[var(--duration-base)]',
-                  index === active ? 'w-5 bg-ink' : 'w-1.5 bg-border'
+                  index === active ? 'w-5 bg-brand' : 'w-1.5 bg-border'
                 )}
               />
             </button>
@@ -161,10 +161,12 @@ export function PromotionalBanner({
  * not from a number written here. A fixed height fits the shortest banner
  * somebody seeds and cuts the longest one off above its own button.
  *
- * With an image it is that image behind a scrim; without one it is flat ink.
- * The scrim is not optional — the copy is seeded, the photograph behind it is
- * seeded separately, and white text over an unknown photograph is a contrast
- * failure waiting for the first pale image anyone uploads.
+ * With an image it is that image behind a scrim; without one it is a brand
+ * gradient. The scrim is not optional and it is not flat — the copy is seeded,
+ * the artwork behind it is seeded separately, and white text over an unknown
+ * image is a contrast failure waiting for the first pale one anyone uploads.
+ * It is weighted to the left, where the words are, so the right-hand side of
+ * the picture still arrives in full colour instead of under a grey sheet.
  */
 export function BannerCard({
   banner,
@@ -178,7 +180,7 @@ export function BannerCard({
   const body = (
     <div
       className={cn(
-        'relative flex h-full min-h-44 flex-col justify-between gap-4 overflow-hidden rounded-card bg-ink p-5 text-bg',
+        'relative flex h-full min-h-44 flex-col justify-between gap-4 overflow-hidden rounded-card bg-linear-to-br from-brand-deep to-brand p-5 text-bg',
         className
       )}
     >
@@ -192,26 +194,32 @@ export function BannerCard({
             priority={priority}
             className="object-cover"
           />
-          <span className="absolute inset-0 bg-ink/55" aria-hidden="true" />
+          <span
+            className="absolute inset-0 bg-linear-to-r from-ink/55 via-ink/20 to-transparent"
+            aria-hidden="true"
+          />
         </>
       ) : null}
 
-      <div className="relative">
+      {/* The artwork keeps to the right-hand third, so the words keep to the
+          left two. Without the cap a long seeded title runs straight across
+          whatever is drawn there, and neither is readable. */}
+      <div className="relative max-w-[68%]">
         {banner.badge ? (
-          <span className="mb-2.5 inline-flex items-center rounded-pill bg-bg/15 px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] uppercase text-bg">
+          <span className="mb-2.5 inline-flex items-center rounded-pill bg-bg/20 px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] uppercase text-bg">
             {banner.badge}
           </span>
         ) : null}
         <h3 className="text-xl font-bold leading-snug">{banner.title}</h3>
         {banner.subtitle ? (
-          <p className="mt-1.5 line-clamp-2 text-sm text-bg/70">
+          <p className="mt-1.5 line-clamp-2 text-sm text-bg/80">
             {banner.subtitle}
           </p>
         ) : null}
       </div>
 
       {banner.ctaLabel ? (
-        <span className="relative inline-flex w-fit items-center rounded-pill bg-bg px-4 py-2 text-sm font-semibold text-ink">
+        <span className="relative inline-flex w-fit items-center rounded-pill bg-bg px-4 py-2 text-sm font-semibold text-brand">
           {banner.ctaLabel}
         </span>
       ) : null}

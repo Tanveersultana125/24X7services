@@ -153,7 +153,7 @@ function StepProgress({ index }: { index: number }) {
     >
       <div
         className={cn(
-          'h-full bg-ink transition-[width] duration-[var(--duration-slow)]'
+          'h-full bg-brand transition-[width] duration-[var(--duration-slow)]'
         )}
         style={{ width: `${percent}%` }}
       />

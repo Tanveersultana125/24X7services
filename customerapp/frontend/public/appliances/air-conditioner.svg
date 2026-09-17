@@ -1,1 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 200" width="220" height="200" role="img" aria-label="Air Conditioner"><rect width="220" height="200" fill="#F5F5F5"/><g fill="none" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"><rect x="30" y="52" width="160" height="56" rx="10"/><line x1="46" y1="92" x2="174" y2="92"/><path d="M62 124c10 12 10 24 0 36"/><path d="M110 124c10 12 10 24 0 36"/><path d="M158 124c10 12 10 24 0 36"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 200" width="220" height="200" role="img" aria-label="Air conditioner">
+  <circle cx="110" cy="104" r="86" fill="#DFF3FB"/>
+  <rect x="34" y="46" width="152" height="52" rx="16" fill="#FFFFFF" stroke="#2547D0" stroke-width="4"/>
+  <rect x="34" y="80" width="152" height="18" rx="9" fill="#C9D8FF"/>
+  <rect x="48" y="60" width="92" height="8" rx="4" fill="#E3EAFF"/>
+  <circle cx="168" cy="64" r="5" fill="#0B9A63"/>
+  <g stroke="#59C6E8" stroke-width="7" stroke-linecap="round" fill="none">
+    <path d="M74 118c8 10 8 20 0 30"/>
+    <path d="M110 118c8 10 8 20 0 30"/>
+    <path d="M146 118c8 10 8 20 0 30"/>
+  </g>
+  <path d="M110 160l5 10-5 10-5-10z" fill="#2547D0" opacity="0.5"/>
+</svg>

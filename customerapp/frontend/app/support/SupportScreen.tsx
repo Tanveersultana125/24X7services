@@ -97,7 +97,7 @@ export function SupportScreen() {
 
       <Link
         href={'/support/tickets' as Route}
-        className="mt-3 flex min-h-12 items-center justify-center rounded-card border border-border text-sm font-semibold text-ink hover:border-ink"
+        className="mt-3 flex min-h-12 items-center justify-center rounded-card border border-border text-sm font-semibold text-ink hover:border-brand"
       >
         Your past conversations
       </Link>

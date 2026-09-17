@@ -1,1 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 200" width="220" height="200" role="img" aria-label="Washing Machine"><rect width="220" height="200" fill="#F5F5F5"/><g fill="none" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"><rect x="52" y="30" width="116" height="140" rx="10"/><circle cx="110" cy="112" r="34"/><circle cx="110" cy="112" r="22"/><circle cx="68" cy="48" r="5"/><line x1="86" y1="48" x2="152" y2="48"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 200" width="220" height="200" role="img" aria-label="Washing machine">
+  <circle cx="110" cy="104" r="86" fill="#E3EAFF"/>
+  <rect x="54" y="28" width="112" height="148" rx="14" fill="#FFFFFF" stroke="#2547D0" stroke-width="4"/>
+  <rect x="54" y="28" width="112" height="34" rx="14" fill="#2547D0"/>
+  <rect x="54" y="48" width="112" height="14" fill="#2547D0"/>
+  <circle cx="74" cy="45" r="6" fill="#FFD28A"/>
+  <rect x="92" y="40" width="58" height="10" rx="5" fill="#FFFFFF" opacity="0.65"/>
+  <circle cx="110" cy="118" r="40" fill="#C9D8FF" stroke="#2547D0" stroke-width="4"/>
+  <circle cx="110" cy="118" r="27" fill="#FFFFFF"/>
+  <path d="M84 122c9-8 17 6 26 0s17-8 26 0v12a26 26 0 0 1-52 0z" fill="#59C6E8"/>
+  <circle cx="99" cy="112" r="4" fill="#59C6E8" opacity="0.85"/>
+  <circle cx="122" cy="106" r="3" fill="#59C6E8" opacity="0.7"/>
+</svg>

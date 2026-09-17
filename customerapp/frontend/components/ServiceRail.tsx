@@ -92,7 +92,7 @@ export function ServiceRail({
               type="button"
               onClick={item.onBook}
               aria-label={`Book ${item.name}`}
-              className="inline-flex h-11 shrink-0 items-center rounded-pill border border-ink px-3.5 text-sm font-semibold text-ink transition-colors duration-[var(--duration-fast)] hover:bg-ink hover:text-bg"
+              className="inline-flex h-11 shrink-0 items-center rounded-pill border border-brand px-3.5 text-sm font-semibold text-brand transition-colors duration-[var(--duration-fast)] hover:bg-brand hover:text-bg"
             >
               Book
             </button>

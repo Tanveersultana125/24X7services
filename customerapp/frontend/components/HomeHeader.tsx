@@ -29,7 +29,7 @@ export function HomeHeader({
   onSearch: () => void
 }) {
   return (
-    <div className="sticky top-0 z-30 bg-ink pt-[var(--safe-top)] lg:hidden">
+    <div className="sticky top-0 z-30 bg-linear-to-b from-brand-deep to-brand pt-[var(--safe-top)] lg:hidden">
       <div className="mx-auto flex max-w-lg items-center gap-2 px-4 pt-1">
         <LocationSelector
           className="min-w-0 flex-1"

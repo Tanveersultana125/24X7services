@@ -41,13 +41,13 @@ export function StatusTimeline({
                 className={cn(
                   'flex size-6 shrink-0 items-center justify-center rounded-full border-2',
                   isCurrent
-                    ? 'border-ink bg-bg'
-                    : 'border-ink bg-ink text-bg'
+                    ? 'border-brand bg-bg'
+                    : 'border-brand bg-brand text-bg'
                 )}
                 aria-hidden="true"
               >
                 {isCurrent ? (
-                  <span className="size-2 rounded-full bg-ink" />
+                  <span className="size-2 rounded-full bg-brand" />
                 ) : (
                   <Check className="size-3.5" strokeWidth={3} />
                 )}

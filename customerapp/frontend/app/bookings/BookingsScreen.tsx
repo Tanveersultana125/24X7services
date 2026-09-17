@@ -90,8 +90,8 @@ export function BookingsScreen() {
                 'min-h-11 shrink-0 rounded-pill border px-4 text-sm font-medium',
                 'transition-colors duration-[var(--duration-fast)]',
                 selected
-                  ? 'border-ink bg-ink text-bg'
-                  : 'border-border bg-bg text-ink hover:border-ink'
+                  ? 'border-brand bg-brand text-bg'
+                  : 'border-border bg-bg text-ink hover:border-brand'
               )}
             >
               {option.label}

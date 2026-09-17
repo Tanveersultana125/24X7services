@@ -19,11 +19,13 @@ export interface ButtonProps
 }
 
 const variants: Record<Variant, string> = {
-  // Solid black on white is the only primary in the system.
+  // Solid brand blue is the only primary in the system.
   primary:
-    'bg-ink text-bg border border-ink hover:bg-ink/90 active:bg-ink/85 disabled:bg-muted disabled:border-muted',
+    'bg-brand text-bg border border-brand hover:bg-brand-deep active:bg-brand-deep disabled:bg-muted disabled:border-muted',
+  // The quieter of the two: brand edge and brand label, no fill. Used beside a
+  // primary, where two filled buttons would be a coin toss.
   secondary:
-    'bg-bg text-ink border border-ink hover:bg-surface active:bg-border disabled:text-muted disabled:border-border',
+    'bg-bg text-brand border border-brand hover:bg-brand-soft active:bg-brand-soft disabled:text-muted disabled:border-border',
   ghost:
     'bg-transparent text-ink border border-transparent hover:bg-surface active:bg-border disabled:text-muted',
   // Destructive confirmations only — cancelling a booking, deleting an account.

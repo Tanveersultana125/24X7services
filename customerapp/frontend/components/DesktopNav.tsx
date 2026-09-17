@@ -43,7 +43,7 @@ export function DesktopNav({
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-8 px-6">
         <Link
           href="/home"
-          className="text-xl font-extrabold tracking-tight text-ink"
+          className="text-xl font-extrabold tracking-tight text-brand"
         >
           {brand.wordmark}
         </Link>
@@ -59,7 +59,7 @@ export function DesktopNav({
                 className={cn(
                   'rounded-pill px-3 py-2 text-sm font-medium transition-colors',
                   active
-                    ? 'bg-surface text-ink'
+                    ? 'bg-brand-soft text-brand'
                     : 'text-muted hover:text-ink'
                 )}
               >
@@ -73,7 +73,7 @@ export function DesktopNav({
           {locationLabel ? (
             <Link
               href="/location"
-              className="max-w-xs truncate rounded-pill border border-border px-3 py-2 text-sm text-ink hover:border-ink"
+              className="max-w-xs truncate rounded-pill border border-border px-3 py-2 text-sm text-ink hover:border-brand"
             >
               <span className="text-muted">Service at</span>{' '}
               <span className="font-medium">{locationLabel}</span>

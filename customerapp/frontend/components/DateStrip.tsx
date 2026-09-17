@@ -96,8 +96,8 @@ export function DateStrip({
               !day.hasAvailability
                 ? 'cursor-not-allowed border-border bg-surface text-muted'
                 : selected
-                  ? 'border-ink bg-ink text-bg'
-                  : 'border-border bg-bg text-ink hover:border-ink'
+                  ? 'border-brand bg-brand text-bg'
+                  : 'border-border bg-bg text-ink hover:border-brand'
             )}
           >
             <span className="text-[11px] uppercase tracking-wide opacity-70">

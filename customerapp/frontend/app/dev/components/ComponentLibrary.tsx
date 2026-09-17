@@ -189,6 +189,9 @@ function Colour() {
     ['--color-surface', 'bg-surface'],
     ['--color-border', 'bg-border'],
     ['--color-muted', 'bg-muted'],
+    ['--color-brand', 'bg-brand'],
+    ['--color-brand-deep', 'bg-brand-deep'],
+    ['--color-brand-soft', 'bg-brand-soft'],
     ['--color-success', 'bg-success'],
     ['--color-warning', 'bg-warning'],
     ['--color-error', 'bg-error'],
@@ -197,7 +200,7 @@ function Colour() {
   return (
     <Section
       title="Colour"
-      note="Monochrome, plus three semantic hues that appear only on badges, dots and alerts."
+      note="Brand blue is the app talking — anything tappable, anything chosen. The three semantic hues are the job talking, and stay on badges, dots and alerts."
     >
       <Case label="Tokens">
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">

@@ -77,7 +77,7 @@ export function SearchBar({
           shell,
           onDark
             ? 'border-transparent bg-bg'
-            : 'border-border bg-surface hover:border-ink',
+            : 'border-border bg-surface hover:border-brand',
           className
         )}
       >
@@ -94,7 +94,7 @@ export function SearchBar({
         event.preventDefault()
         onSubmit?.(value ?? '')
       }}
-      className={cn(shell, 'border-border bg-bg focus-within:border-ink', className)}
+      className={cn(shell, 'border-border bg-bg focus-within:border-brand', className)}
     >
       <Search className="size-4 shrink-0 text-muted" aria-hidden="true" />
       <input
