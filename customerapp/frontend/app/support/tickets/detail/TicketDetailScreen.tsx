@@ -156,7 +156,7 @@ export function TicketDetailScreen() {
         backFallback="/support/tickets"
       />
 
-      <main className="mx-auto w-full max-w-lg flex-1 px-4 pb-4 lg:max-w-2xl">
+      <main id="content" className="mx-auto w-full max-w-lg flex-1 px-4 pb-4 lg:max-w-2xl">
         {status === 'loading' ? (
           <SkeletonGroup label="Loading" className="mt-6 flex flex-col gap-3">
             {Array.from({ length: 3 }).map((_, i) => (

@@ -36,6 +36,17 @@ const nextConfig: NextConfig = {
   // Every internal href is checked against the routes that actually exist. With
   // no server to 404 gracefully, a typo'd link in a WebView is a dead end.
   typedRoutes: true,
+
+  experimental: {
+    // The router prefetches a per-segment payload for every link in view, at
+    // `__next.<segment>.txt`. A static export does not emit those files, so on
+    // a static host every one of them is a 404 — nine of them on the services
+    // screen alone, and navigation silently falls back to a full load.
+    //
+    // Inlining puts those payloads in the HTML instead, so the router already
+    // has what it would have asked for.
+    prefetchInlining: true,
+  },
 }
 
 export default nextConfig

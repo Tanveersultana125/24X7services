@@ -41,6 +41,7 @@ export function AppShell({
       {mobileHeader}
 
       <main
+        id="content"
         className={cn(
           'mx-auto w-full max-w-lg px-4 lg:max-w-5xl lg:px-6',
           bottomNav

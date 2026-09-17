@@ -116,7 +116,7 @@ export function ChatScreen() {
     <div className="min-h-dvh bg-bg">
       <Header title="Tell us what happened" showBack backFallback="/support" />
 
-      <main className="mx-auto w-full max-w-lg px-4 pb-16 lg:max-w-2xl">
+      <main id="content" className="mx-auto w-full max-w-lg px-4 pb-16 lg:max-w-2xl">
         <fieldset className="mt-5">
           <legend className="text-sm font-semibold text-muted">
             What is this about?

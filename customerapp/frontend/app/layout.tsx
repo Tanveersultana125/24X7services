@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from 'next'
 import { brand } from '@/config/brand'
+import { AppChrome } from '@/components/AppChrome'
+import { ServiceWorker } from '@/components/ServiceWorker'
 import { ToastProvider } from '@/components/Toast'
+import { usingEmulators } from '@/lib/firebase'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -12,6 +15,13 @@ export const metadata: Metadata = {
     'Book appliance repair, service, installation and maintenance. Transparent pricing, verified technicians, and repairs only after your approval.',
   applicationName: brand.fullName,
   manifest: '/manifest.webmanifest',
+  icons: {
+    icon: [
+      { url: '/favicon.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+    ],
+    apple: '/icons/apple-touch-icon.png',
+  },
   appleWebApp: {
     capable: true,
     title: brand.name,
@@ -38,8 +48,27 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        {/* The first screen cannot render its content until Firestore answers,
+            so the handshake starts while the bundle is still parsing rather
+            than after it. Two origins, because auth and data are separate
+            hosts; neither is preloaded, only connected to.
+            
+            Skipped against the emulators, where those hosts are never reached
+            and the connections would be opened for nothing. */}
+        {usingEmulators ? null : (
+          <>
+            <link rel="preconnect" href="https://firestore.googleapis.com" />
+            <link rel="preconnect" href="https://identitytoolkit.googleapis.com" />
+          </>
+        )}
+      </head>
       <body className="min-h-dvh bg-bg text-ink antialiased">
-        <ToastProvider>{children}</ToastProvider>
+        <ToastProvider>
+          <AppChrome />
+          {children}
+        </ToastProvider>
+        <ServiceWorker />
       </body>
     </html>
   )

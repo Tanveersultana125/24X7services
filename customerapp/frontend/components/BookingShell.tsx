@@ -68,7 +68,7 @@ export function BookingShell({
         right={right}
       />
 
-      <main className="mx-auto w-full max-w-lg px-4 pb-16 lg:max-w-2xl">
+      <main id="content" className="mx-auto w-full max-w-lg px-4 pb-16 lg:max-w-2xl">
         {!ready || status === 'loading' ? (
           <SkeletonGroup label="Loading" className="mt-6 flex flex-col gap-4">
             <Skeleton className="h-28 w-full" />

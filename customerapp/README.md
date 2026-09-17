@@ -20,11 +20,11 @@ customerapp/
 | 3 | Sign-in, the booking flow, `createBooking`, payments, webhook, hold expiry | **Done** |
 | 4 | Assignment, tracking, progress, approval, OTPs, invoice, warranty, review | **Done** |
 | 5 | Bookings tabs, cancel/reschedule, profile, support, legal | **Done** |
-| 6 | PWA, offline, Android build, App Check, accessibility, Lighthouse | Not started |
+| 6 | PWA, offline, App Check, accessibility, Lighthouse | **Done** — Android build is set up but unbuilt, see below |
 
-Every route in the app exists as a stub from Phase 1 so `typedRoutes` can check
-each link from the start. A stub still standing at the end of Phase 6 is a
-screen that was missed.
+Every route in the app existed as a stub from Phase 1 so `typedRoutes` could
+check each link from the start. None is left; the stub component went with the
+last of them.
 
 ## Getting started
 
@@ -83,6 +83,7 @@ Reaching the emulators from elsewhere: an Android emulator sees the host at
 | `npm run typecheck` | All three packages |
 | `npm run lint` | ESLint over the frontend |
 | `npm run build` | Static export into `frontend/out` |
+| `npm -w frontend run icons` | Redraws every app icon from the wordmark |
 | `npm run cap:android` | Builds, syncs and opens Android Studio |
 | `npm run deploy:functions` | Builds shared, bundles functions, deploys |
 
@@ -171,6 +172,14 @@ rejects null — so a handler that sets an optional field to undefined fails
 validation on the client, after the server has done all the work. Handlers omit
 the key instead.
 
+**The service worker keeps the shell; Firestore keeps the data.** The worker
+caches the app shell and the build assets and nothing else — no booking, no
+invoice, no price. Firestore has its own on-device copy of that and knows when
+it is stale; a worker serving a six-hour-old booking status from a cache does
+not. It is fifty hand-written lines rather than a generated one, because a
+generated worker precaches the whole build and expires it on rules nobody here
+could explain.
+
 **The booking draft is not in Redux.** `packages/shared` describes it as
 living there. It lives in the same external store as everything else the app
 keeps on the device — one object, written a field at a time, read through
@@ -196,6 +205,19 @@ label always spelled out in text beside its dot.
 Each of these is marked `DECISION NEEDED` at the place it matters.
 
 **Before launch, and blocking.**
+
+- The Android app has never been built. `capacitor.config.ts` is written and
+  the scripts are in place, but `npx cap add android` needs Android Studio and
+  the SDK, and nothing here has run it. Until it does, `appId`, the splash
+  resources, and phone sign-in inside the WebView are all unverified.
+- `frontend/scripts/generateIcons.mjs` draws the icons from the text wordmark.
+  It is legible at 48px, which is more than many app icons manage, and it is
+  not a designed mark. Replace it before the Play Store listing.
+- App Check is off. `NEXT_PUBLIC_APPCHECK_SITE_KEY` turns on attestation in the
+  app and `APP_CHECK_ENFORCED=true` in `backend/functions/.env` makes the
+  backend refuse an unattested call. Setting only one of them locks a platform
+  out of its own backend, and the Android side additionally needs Play
+  Integrity through `@capacitor-firebase/app-check`.
 
 - `frontend/app/legal/*` — the three legal documents are a plain-English
   statement of how the app actually behaves, written so a customer is not
@@ -328,6 +350,35 @@ npm run simulate -- <bookingId>      # the expert, in another terminal
 
 Book something, pay for it, and the assignment trigger picks it up within a
 second or two. Take the booking id from the URL of the confirmation screen.
+
+## Measured
+
+Lighthouse 12, against `npm run build` served as static files, Chrome headless:
+
+| Route | Performance | Accessibility | Best practices | SEO |
+|---|---|---|---|---|
+| `/location/` | 100 | 100 | 100 | 100 |
+| `/services/` | 99 | 100 | 100 | 100 |
+| `/legal/terms/` | 100 | 100 | 100 | 100 |
+
+Desktop preset. On the mobile preset — 4× CPU throttling and slow 4G — the
+content screens land between 74 and 95 depending on the run, and `/services/` is
+the worst of them. The cause is structural rather than incidental: this is a
+static export, so the appliance grid cannot render until a client-side Firestore
+read returns, and the largest element above the fold is an image whose URL does
+not exist until then. Preconnecting and marking the first tiles `priority` help
+at the margin; the real fix is splitting the Firebase SDK out of the chunk every
+screen loads, which is a change worth measuring on its own.
+
+Two things the run found and that are fixed:
+
+- Every page was making up to nine failing requests. Next 16 prefetches a
+  per-segment payload at `__next.<segment>.txt`, and a static export does not
+  emit those files. `experimental.prefetchInlining` puts the payloads in the
+  HTML instead, and the 404s go to zero.
+- The largest element on the services screen was lazy-loaded, so the browser
+  did not ask for it until layout had run. `ApplianceCard` now takes a
+  `priority` flag, set on the tiles that are on screen before any scrolling.
 
 ## Testing
 

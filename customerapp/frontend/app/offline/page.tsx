@@ -1,7 +1,13 @@
-import { ScreenStub } from '@/components/dev/ScreenStub'
+import type { Metadata } from 'next'
+import { OfflineScreen } from './OfflineScreen'
 
-export const metadata = { title: 'Offline' }
+export const metadata: Metadata = {
+  title: 'Offline',
+  // The service worker serves this when a page cannot be reached; it should
+  // never be what a search result points at.
+  robots: { index: false, follow: false },
+}
 
 export default function Page() {
-  return <ScreenStub title={'Offline'} route={'/offline'} note={'Shown when the device has no connection and nothing is cached.'} />
+  return <OfflineScreen />
 }

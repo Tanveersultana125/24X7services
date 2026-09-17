@@ -28,7 +28,7 @@ export default function SplashPage() {
   }, [ready, location, router])
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-3 px-6 text-center">
+    <main id="content" className="flex min-h-dvh flex-col items-center justify-center gap-3 px-6 text-center">
       <p className="text-3xl font-extrabold tracking-tight">{brand.wordmark}</p>
       <p className="text-sm text-muted">{brand.tagline}</p>
       {/* Announced once, for anyone who hears the screen rather than sees it. */}

@@ -161,12 +161,14 @@ export function HomeScreen() {
             }
           >
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
-              {home.data.appliances.map((appliance) => {
+              {home.data.appliances.map((appliance, index) => {
                 const from = fromPrices?.get(appliance.id)
                 return (
                   <ApplianceCard
                     key={appliance.id}
                     appliance={appliance}
+                    // The tiles on screen before any scrolling.
+                    priority={index < 2}
                     fromLabel={
                       from === undefined
                         ? undefined

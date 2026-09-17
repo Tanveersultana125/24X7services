@@ -39,7 +39,7 @@ export function LegalPage({
     <div className="min-h-dvh bg-bg">
       <Header title={title} showBack backFallback="/profile/settings" />
 
-      <main className="mx-auto w-full max-w-lg px-4 pb-16 lg:max-w-2xl">
+      <main id="content" className="mx-auto w-full max-w-lg px-4 pb-16 lg:max-w-2xl">
         <p className="mt-4 text-xs text-muted">Last updated {updated}</p>
         <p className="mt-3 text-sm leading-relaxed text-ink">{intro}</p>
 

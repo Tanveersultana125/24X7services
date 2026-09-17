@@ -38,6 +38,17 @@ export interface Caller {
  */
 const GENERIC = 'Something went wrong. Please try again.'
 
+/**
+ * Whether an unattested call is refused outright.
+ *
+ * Read at module load because `enforceAppCheck` is a deployment option, not a
+ * runtime one — the CLI reads it during discovery and bakes it into the
+ * function. Set `APP_CHECK_ENFORCED=true` in `backend/functions/.env` once
+ * reCAPTCHA Enterprise is configured for the web and Play Integrity for
+ * Android; with only one of them done, the other platform stops working.
+ */
+const APP_CHECK_ENFORCED = process.env.APP_CHECK_ENFORCED === 'true'
+
 export interface CallableOptions {
   /**
    * Secrets this handler reads. A secret not declared here is not bound into
@@ -64,6 +75,10 @@ export function defineCallable<N extends CallableName>(
   // bundle, not just this one.
   const callableOptions = {
     region: REGION,
+    // Off until the site keys exist on both the web and the Android build —
+    // see APP_CHECK_ENFORCED below. Switching it on with only one of them
+    // configured locks that platform out of its own backend.
+    enforceAppCheck: APP_CHECK_ENFORCED,
     ...(options.secrets ? { secrets: options.secrets } : {}),
   }
 

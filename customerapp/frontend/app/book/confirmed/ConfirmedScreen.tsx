@@ -59,7 +59,7 @@ export function ConfirmedScreen() {
       {/* No back button: the flow behind this screen no longer exists. */}
       <Header showBack={false} />
 
-      <main className="mx-auto w-full max-w-lg px-4 pb-16 lg:max-w-2xl">
+      <main id="content" className="mx-auto w-full max-w-lg px-4 pb-16 lg:max-w-2xl">
         {booking.status === 'loading' ? (
           <SkeletonGroup label="Loading" className="mt-8 flex flex-col gap-4">
             <Skeleton className="h-24 w-full" />

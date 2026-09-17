@@ -71,7 +71,7 @@ export function NameScreen() {
     <div className="min-h-dvh bg-bg">
       <Header showBack={false} />
 
-      <main className="mx-auto w-full max-w-lg px-4 pb-12 lg:max-w-md">
+      <main id="content" className="mx-auto w-full max-w-lg px-4 pb-12 lg:max-w-md">
         <h1 className="mt-4 text-2xl font-bold text-ink">What should we call you?</h1>
         <p className="mt-1.5 text-sm leading-relaxed text-muted">
           Your expert asks for this name at the door, and it appears on your

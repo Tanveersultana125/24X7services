@@ -3,8 +3,10 @@
 import { getApp, getApps, initializeApp, type FirebaseApp } from 'firebase/app'
 import { getAuth, connectAuthEmulator, type Auth } from 'firebase/auth'
 import {
-  getFirestore,
+  initializeFirestore,
   connectFirestoreEmulator,
+  persistentLocalCache,
+  persistentMultipleTabManager,
   type Firestore,
 } from 'firebase/firestore'
 import {
@@ -45,7 +47,11 @@ export const usingEmulators =
 /** Emulator host, as reachable from wherever the app is running. */
 const EMULATOR_HOST = process.env.NEXT_PUBLIC_EMULATOR_HOST ?? '127.0.0.1'
 
+const APP_CHECK_SITE_KEY = process.env.NEXT_PUBLIC_APPCHECK_SITE_KEY
+const APP_CHECK_DEBUG_TOKEN = process.env.NEXT_PUBLIC_APPCHECK_DEBUG_TOKEN
+
 let app: FirebaseApp | undefined
+let appCheckStarted = false
 let authInstance: Auth | undefined
 let dbInstance: Firestore | undefined
 let storageInstance: FirebaseStorage | undefined
@@ -64,8 +70,57 @@ export function firebaseApp(): FirebaseApp {
   assertBrowser()
   if (!app) {
     app = getApps().length > 0 ? getApp() : initializeApp(config)
+    void startAppCheck(app)
   }
   return app
+}
+
+/**
+ * App Check, which is what makes the open callables answerable only by this app.
+ *
+ * Four of them — serviceability, the waitlist, search, diagnosis — take no
+ * sign-in, because a customer checks whether we cover their area before there
+ * is any reason to give us a phone number. App Check is the thing that stops
+ * those being scraped or used to flood the waitlist.
+ *
+ * It is off until a site key is configured, and it fails open rather than
+ * blocking the app: an attestation that cannot be obtained should degrade to an
+ * unattested request the backend can decide about, not to a white screen.
+ *
+ * Imported dynamically, and awaited by nothing. The whole reCAPTCHA Enterprise
+ * module would otherwise sit in the chunk every screen loads, to be used once
+ * on a project that has a site key — and attestation is not on the path to
+ * first paint, so nothing should wait for it.
+ *
+ * DECISION NEEDED: this is the web path (reCAPTCHA Enterprise). Inside the
+ * Android WebView it cannot attest — that needs Play Integrity through the
+ * native SDK, which means adding `@capacitor-firebase/app-check`. Until both
+ * are in place, leave `APP_CHECK_ENFORCED` unset on the functions or the
+ * Android build will be locked out of its own backend.
+ */
+async function startAppCheck(instance: FirebaseApp): Promise<void> {
+  if (appCheckStarted || !APP_CHECK_SITE_KEY) return
+  appCheckStarted = true
+
+  // Registers this browser as a known debug client with the console, so a
+  // developer machine can pass enforcement without a real attestation.
+  if (APP_CHECK_DEBUG_TOKEN) {
+    ;(
+      self as unknown as { FIREBASE_APPCHECK_DEBUG_TOKEN?: string }
+    ).FIREBASE_APPCHECK_DEBUG_TOKEN = APP_CHECK_DEBUG_TOKEN
+  }
+
+  try {
+    const { initializeAppCheck, ReCaptchaEnterpriseProvider } = await import(
+      'firebase/app-check'
+    )
+    initializeAppCheck(instance, {
+      provider: new ReCaptchaEnterpriseProvider(APP_CHECK_SITE_KEY),
+      isTokenAutoRefreshEnabled: true,
+    })
+  } catch {
+    // A failed attestation is not a reason a customer cannot book.
+  }
 }
 
 export function auth(): Auth {
@@ -80,9 +135,26 @@ export function auth(): Auth {
   return authInstance
 }
 
+/**
+ * Firestore, with its own on-device copy.
+ *
+ * This is what "works offline" actually means here. Every screen in the app
+ * reads through Firestore, so a booking the customer has already opened is
+ * readable in a lift, and a write made without signal is queued and sent when
+ * there is some. The service worker deliberately caches none of that — it keeps
+ * the shell, and this keeps the data, which is the half that knows when it is
+ * stale.
+ *
+ * Multi-tab is the right manager for a PWA: two tabs of the same app sharing
+ * one cache, rather than the second one silently failing to get a lease.
+ */
 export function db(): Firestore {
   if (!dbInstance) {
-    dbInstance = getFirestore(firebaseApp())
+    dbInstance = initializeFirestore(firebaseApp(), {
+      localCache: persistentLocalCache({
+        tabManager: persistentMultipleTabManager(),
+      }),
+    })
     if (usingEmulators) {
       connectFirestoreEmulator(dbInstance, EMULATOR_HOST, 8080)
     }

@@ -106,7 +106,7 @@ export function LocationScreen() {
           splash means the app replaced its own entry in the history. */}
       <Header title="Your location" showBack={location !== null} />
 
-      <main className="mx-auto w-full max-w-lg px-4 pb-16 lg:max-w-2xl">
+      <main id="content" className="mx-auto w-full max-w-lg px-4 pb-16 lg:max-w-2xl">
         <p className="mt-4 text-sm text-muted">
           We service parts of Hyderabad. Enter a pincode to check yours, or pick
           an area from the list.

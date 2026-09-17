@@ -104,7 +104,7 @@ export function BookingStep({
       />
       <StepProgress index={index} />
 
-      <main className="mx-auto w-full max-w-lg px-4 pb-6 lg:max-w-2xl">
+      <main id="content" className="mx-auto w-full max-w-lg px-4 pb-6 lg:max-w-2xl">
         {blocked ? (
           <SkeletonGroup label="Loading" className="mt-6 flex flex-col gap-3">
             {Array.from({ length: 4 }).map((_, i) => (

@@ -105,7 +105,7 @@ export function OtpScreen() {
     return (
       <div className="min-h-dvh bg-bg">
         <Header title="Enter the code" showBack backFallback="/login" />
-        <main className="mx-auto w-full max-w-lg px-4 lg:max-w-md">
+        <main id="content" className="mx-auto w-full max-w-lg px-4 lg:max-w-md">
           <p className="mt-6 text-sm text-muted">
             This sign-in has expired. Please enter your number again.
           </p>
@@ -125,7 +125,7 @@ export function OtpScreen() {
     <div className="min-h-dvh bg-bg">
       <Header title="Enter the code" showBack backFallback="/login" />
 
-      <main className="mx-auto w-full max-w-lg px-4 pb-12 lg:max-w-md">
+      <main id="content" className="mx-auto w-full max-w-lg px-4 pb-12 lg:max-w-md">
         <p className="mt-4 text-sm leading-relaxed text-muted">
           We sent a 6-digit code to{' '}
           <span className="font-medium text-ink">
