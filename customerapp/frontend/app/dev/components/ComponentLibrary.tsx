@@ -411,8 +411,8 @@ function Navigation() {
           <LocationSelector onClick={() => {}} loading />
           <LocationSelector
             onClick={() => {}}
-            label="Home"
-            area="Kondapur, Hyderabad"
+            area="Kondapur"
+            detail="Hyderabad 500084"
           />
         </div>
       </Case>

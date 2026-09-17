@@ -167,7 +167,10 @@ export function HomeScreen() {
     <AppShell
       mobileHeader={
         <HomeHeader
-          area={location ? locationLabel(location) : undefined}
+          area={location?.area}
+          detail={
+            location ? `${location.city} ${location.pincode}` : undefined
+          }
           onChangeLocation={() => router.push('/location')}
           onSearch={() => router.push('/search')}
         />
@@ -200,7 +203,7 @@ export function HomeScreen() {
       ) : data ? (
         <>
           {heroBanners.length > 0 ? (
-            <Section className="mt-4">
+            <Section className="mt-0 lg:mt-5">
               <PromotionalBanner banners={heroBanners} />
             </Section>
           ) : null}

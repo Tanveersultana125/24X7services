@@ -8,7 +8,7 @@ import type { Banner } from '@app/shared'
 import { cn } from '@/lib/cn'
 
 /**
- * The banner rail under the search bar: swipeable, with dots, and advancing on
+ * The banner rail at the top of Home: swipeable, with dots, and advancing on
  * its own.
  *
  * It is a scroll container rather than a transform carousel, so the platform
@@ -17,12 +17,18 @@ import { cn } from '@/lib/cn'
  * back — a rail that keeps moving while someone is reading it is worse than one
  * that never moved.
  *
- * One card at a time, filling the column. An earlier pass had them stop short
- * of the edge so the next one peeked through, on the theory that a visible
- * sliver is what makes people swipe. On a phone it just read as a card that had
- * been cut off, with a second one half-arriving beside it — the offer you are
- * meant to be reading loses the screen to the one you are not. The dots carry
- * "there is more" on their own.
+ * One card at a time, and on a phone it runs edge to edge with square corners,
+ * butted straight up against the header, so the coloured block at the top of
+ * the screen is one thing rather than a bar with a card parked beneath it. An
+ * earlier pass had rounded cards inset from the margin with a sliver of the
+ * next one showing, which read as a card that had been cut off — the offer you
+ * are meant to be reading losing the screen to the one you are not. From a
+ * laptop's width up it goes back to being a card, because a banner stretched
+ * across a desktop window is not a banner, it is a stripe.
+ *
+ * The dots sit inside the artwork on a phone for the same reason: below it they
+ * push the first heading down by the height of their own tap targets, and that
+ * gap reads as a mistake rather than as a control.
  */
 
 export interface PromotionalBannerProps {
@@ -93,14 +99,14 @@ export function PromotionalBanner({
     <section
       aria-roledescription="carousel"
       aria-label="Offers and announcements"
-      className={cn('flex flex-col', className)}
+      className={cn('relative -mx-4 lg:mx-0', className)}
       onPointerDown={stopAutoplay}
       onKeyDown={stopAutoplay}
       onFocus={stopAutoplay}
     >
       <div
         ref={railRef}
-        className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth"
+        className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto scroll-smooth lg:gap-3"
       >
         {banners.map((banner, index) => (
           <article
@@ -109,13 +115,17 @@ export function PromotionalBanner({
             aria-label={`${index + 1} of ${banners.length}`}
             className="w-full shrink-0 snap-start"
           >
-            <BannerCard banner={banner} priority={index === 0} />
+            <BannerCard
+              banner={banner}
+              priority={index === 0}
+              className="rounded-none lg:rounded-card"
+            />
           </article>
         ))}
       </div>
 
       {banners.length > 1 ? (
-        <div className="-mb-3 flex justify-center gap-1.5">
+        <div className="absolute right-2 bottom-0 flex gap-1.5 lg:static lg:-mb-3 lg:justify-center">
           {banners.map((banner, index) => (
             <button
               key={banner.id}
@@ -129,10 +139,15 @@ export function PromotionalBanner({
               // 44px of tappable height around a 6px dot.
               className="flex h-11 w-4 items-center justify-center"
             >
+              {/* White over the artwork; brand blue once the dots drop onto the
+                  page below it on a desktop. A blue dot on a green banner is
+                  not a dot. */}
               <span
                 className={cn(
                   'h-1.5 rounded-full transition-all duration-[var(--duration-base)]',
-                  index === active ? 'w-5 bg-brand' : 'w-1.5 bg-border'
+                  index === active
+                    ? 'w-5 bg-bg lg:bg-brand'
+                    : 'w-1.5 bg-bg/45 lg:bg-border'
                 )}
               />
             </button>
@@ -185,7 +200,7 @@ export function BannerCard({
             src={banner.image}
             alt=""
             fill
-            sizes="(min-width: 1024px) 640px, 90vw"
+            sizes="(min-width: 1024px) 640px, 100vw"
             priority={priority}
             className="object-cover"
           />
