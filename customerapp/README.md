@@ -18,7 +18,7 @@ customerapp/
 | 1 | Monorepo, shared schemas, rules + tests, seed, design system, `/dev/components` | **Done** |
 | 2 | Splash, location + serviceability, Home, Search, Services, Appliance | **Done** |
 | 3 | Sign-in, the booking flow, `createBooking`, payments, webhook, hold expiry | **Done** |
-| 4 | Assignment, tracking, progress, approval, OTPs, invoice, warranty, review | Not started |
+| 4 | Assignment, tracking, progress, approval, OTPs, invoice, warranty, review | **Done** |
 | 5 | Bookings tabs, cancel/reschedule, profile, support | Not started |
 | 6 | PWA, offline, Android build, App Check, accessibility, Lighthouse | Not started |
 
@@ -78,7 +78,7 @@ Reaching the emulators from elsewhere: an Android emulator sees the host at
 | `npm run emulators` | Builds the functions bundle, starts the suite, keeps state between runs |
 | `npm -w functions run seed` | Loads the catalog into a running emulator |
 | `npm run seed` | Seeds a throwaway emulator, for checking fixtures |
-| `npm run simulate -- <bookingId>` | Walks a booking through the whole job (Phase 4) |
+| `npm run simulate -- <bookingId>` | Walks a booking through the whole job; `--fast`, `--no-repair` |
 | `npm run test:rules` | Security rules, allow and deny, against the emulator |
 | `npm run typecheck` | All three packages |
 | `npm run lint` | ESLint over the frontend |
@@ -111,6 +111,21 @@ keeps a place forever and the day quietly stops selling.
 guaranteed; the webhook runs when Razorpay says the money was captured, which is
 slow but always happens. Both call the same idempotent function, so whichever
 arrives first does the work and the other finds it done.
+
+**One place changes a booking's status.** `BOOKING_STATUS_TRANSITIONS` in the
+shared package is the state machine; `applyTransition` is what makes it binding.
+The payment, the expiry sweep, the assignment trigger, the approval callable and
+the technician simulator all go through it, so an out-of-order write is a
+rejected transition rather than a booking stuck somewhere nothing can reach. The
+timeline entry is written in the same operation as the status change, so the two
+cannot disagree.
+
+**A bill is settled when nothing is owed, not when a flag says paid.**
+`payment.status` records that money came in once. Approving a repair afterwards
+raises the total, and those two facts stop being the same thing — so the invoice
+derives its settlement from the amounts, and `createPaymentOrder` gates on
+`price.due` rather than on the flag. Otherwise a customer ends up holding a bill
+the app refuses to take money for.
 
 **Sign-in happens where the app first stores something.** Brand, appliance,
 problem and possible causes are open to anyone. The media step is the first
@@ -166,6 +181,12 @@ Each of these is marked `DECISION NEEDED` at the place it matters.
 
 **Before launch, and blocking.**
 
+- `frontend/components/TrackingMap.tsx` — `NEXT_PUBLIC_MAPS_KEY` is unset, so
+  the map has never been run. The rest of the tracking screen works without it
+  and the map degrades to a panel. Set a key restricted by HTTP referrer and by
+  Android package name, and check it. This is the one Google API a client may
+  hold a key for; geocoding is not.
+
 - `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` and `RAZORPAY_WEBHOOK_SECRET` are
   Cloud Functions secrets and are not set. Until they are, payments only work
   against the emulator, which signs a stand-in response the emulated functions
@@ -200,6 +221,21 @@ Each of these is marked `DECISION NEEDED` at the place it matters.
 
 **Business policy.**
 
+- `backend/functions/src/booking/complete.ts` — the warranty's covers and
+  excludes are one set of terms for every service. The warranty schema describes
+  them as copied from the service and the catalog has nowhere to put them:
+  either `catalogServices` grows the two fields, or the business confirms one
+  set covers everything it does.
+- `backend/functions/src/booking/review.ts` — every seeded technician rating is
+  fictional, so real reviews are kept beside it as `reviewStats` rather than
+  averaged into it. The displayed rating should switch to the computed average
+  once there are enough real ones, and the business decides what enough is.
+- `backend/functions/src/booking/jobOtp.ts` — the Phase 1 note said job OTPs
+  would be stored hashed. They are not, and cannot be while the customer has to
+  read one back. What protects them is that `bookings/{id}/private` is denied to
+  every client in both directions. If that is not enough, the answer is a second
+  factor on the technician side.
+
 - `backend/functions/src/lib/pricing.ts` — every area we service is in
   Telangana and so is the seller, so every supply is intra-state and the tax is
   CGST plus SGST. `serviceAreas` carries no state code. The day the business
@@ -231,6 +267,23 @@ Each of these is marked `DECISION NEEDED` at the place it matters.
 - `frontend/public/appliances/*.svg` are line-art stand-ins. Appliance
   photography is the one place full colour belongs in this design, so these
   should be replaced with real photographs.
+
+## Watching a job happen
+
+There is no technician app in this repository, so the half of the product that
+happens after the booking has nothing to drive it. `npm run simulate` is that
+driver: it moves a booking through `applyTransition` against the same state
+machine the callables use, writes the same timeline entries and the same
+tracking document, and pauses at `awaiting_approval` until the customer answers
+in the app.
+
+```bash
+npm run dev                          # the app
+npm run simulate -- <bookingId>      # the expert, in another terminal
+```
+
+Book something, pay for it, and the assignment trigger picks it up within a
+second or two. Take the booking id from the URL of the confirmation screen.
 
 ## Testing
 

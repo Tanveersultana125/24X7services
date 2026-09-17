@@ -1,7 +1,29 @@
-import { ScreenStub } from '@/components/dev/ScreenStub'
+import { Suspense } from 'react'
+import type { Metadata } from 'next'
+import { ProgressScreen } from './ProgressScreen'
+import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 
-export const metadata = { title: 'Service in progress' }
+export const metadata: Metadata = { title: 'Job progress' }
 
+/**
+ * Every screen about one booking takes it as `?id=`, and `useSearchParams`
+ * cannot be read during prerender — so each renders on the client behind a
+ * boundary the export can prerender up to.
+ */
 export default function Page() {
-  return <ScreenStub title={'Service in progress'} route={'/bookings/progress'} note={'Inspection, diagnosis, repair, testing.'} />
+  return (
+    <Suspense
+      fallback={
+        <SkeletonGroup
+          label="Loading"
+          className="mx-auto flex w-full max-w-lg flex-col gap-4 px-4 pt-20 lg:max-w-2xl"
+        >
+          <Skeleton className="h-28 w-full" />
+          <Skeleton className="h-40 w-full" />
+        </SkeletonGroup>
+      }
+    >
+      <ProgressScreen />
+    </Suspense>
+  )
 }

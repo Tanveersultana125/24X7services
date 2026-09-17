@@ -32,8 +32,12 @@ export const createPaymentOrder = defineCallable(
     }
     const booking = parsed.data
 
-    if (booking.payment.status === 'paid' || booking.price.due <= 0) {
-      throw new HttpsError('failed-precondition', 'This booking is already paid.')
+    // What is owed decides this, not the payment flag. A booking whose visit
+    // fee was taken is `paid`, and approving a repair afterwards leaves it
+    // `paid` with a balance — refusing on the flag would leave the customer
+    // holding a bill the app will not accept money for.
+    if (booking.price.due <= 0) {
+      throw new HttpsError('failed-precondition', 'There is nothing left to pay.')
     }
     if (booking.status === 'cancelled' || booking.status === 'refunded') {
       throw new HttpsError('failed-precondition', 'This booking was cancelled.')

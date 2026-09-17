@@ -19,6 +19,7 @@ import {
 import { db } from '../lib/admin'
 import { defineCallable } from '../lib/callable'
 import { priceBooking } from '../lib/pricing'
+import { writeEvent } from '../lib/transition'
 import { findWindow, freeIn, windowHasPassed } from '../lib/slots'
 
 /**
@@ -230,14 +231,20 @@ export const createBooking = defineCallable(
         updatedAt: now,
       })
 
-      tx.set(bookingRef.collection(SUB.events).doc(), {
-        status: online ? 'pending_payment' : 'confirmed',
-        title: online ? 'Booking started' : 'Booking confirmed',
-        note: online
-          ? 'Your slot is held until the visit fee is paid.'
-          : 'You will pay after the service is done.',
-        at: now,
-      })
+      // A create rather than a transition, so there is no `from` status to
+      // check — but the timeline entry is written the same way as every other.
+      writeEvent(
+        tx,
+        bookingRef,
+        online ? 'pending_payment' : 'confirmed',
+        {
+          title: online ? 'Booking started' : 'Booking confirmed',
+          note: online
+            ? 'Your slot is held until the visit fee is paid.'
+            : 'You will pay after the service is done.',
+        },
+        now
+      )
 
       return {
         bookingId: bookingRef.id,

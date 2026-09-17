@@ -1,15 +1,10 @@
 import { onSchedule } from 'firebase-functions/v2/scheduler'
 import { logger } from 'firebase-functions'
-import {
-  bookingSchema,
-  COL,
-  slotDaySchema,
-  slotDocId,
-  SUB,
-} from '@app/shared'
+import { bookingSchema, COL, slotDaySchema, slotDocId } from '@app/shared'
 import { db } from '../lib/admin'
 import { REGION } from '../lib/options'
 import { findWindow } from '../lib/slots'
+import { applyTransition } from '../lib/transition'
 
 /**
  * Give back the slots nobody paid for.
@@ -113,26 +108,30 @@ async function releaseOne(bookingId: string, now: number): Promise<boolean> {
       }
     }
 
-    tx.update(bookingRef, {
-      status: 'cancelled',
-      'payment.status': 'failed',
-      cancellation: {
-        reason: 'The slot was not paid for in time and has been released.',
-        cancelledAt: now,
-        cancelledBy: 'system',
-        feeCharged: 0,
-        refundPaise: 0,
-        refundDays: 0,
+    applyTransition(
+      tx,
+      bookingRef,
+      'pending_payment',
+      'cancelled',
+      {
+        title: 'Slot released',
+        note: 'The visit fee was not paid in time, so the slot was given back.',
       },
-      updatedAt: now,
-    })
-
-    tx.set(bookingRef.collection(SUB.events).doc(), {
-      status: 'cancelled',
-      title: 'Slot released',
-      note: 'The visit fee was not paid in time, so the slot was given back.',
-      at: now,
-    })
+      {
+        extra: {
+          'payment.status': 'failed',
+          cancellation: {
+            reason: 'The slot was not paid for in time and has been released.',
+            cancelledAt: now,
+            cancelledBy: 'system',
+            feeCharged: 0,
+            refundPaise: 0,
+            refundDays: 0,
+          },
+        },
+        at: now,
+      }
+    )
 
     return true
   })

@@ -4,11 +4,11 @@ import {
   COL,
   slotDaySchema,
   slotDocId,
-  SUB,
   type PriceBreakdown,
 } from '@app/shared'
 import { db } from '../lib/admin'
 import { findWindow } from '../lib/slots'
+import { applyTransition, writeEvent } from '../lib/transition'
 
 /**
  * A booking is paid for. Called from two places that both have to be able to
@@ -18,7 +18,12 @@ import { findWindow } from '../lib/slots'
  * not guaranteed — they close the app, the page reloads, the network drops.
  * The webhook runs when Razorpay says the money was captured, which is slower
  * but always happens. Whichever lands first does the work; the other finds a
- * booking that is already confirmed and returns what it finds.
+ * booking that is already paid and returns what it finds.
+ *
+ * Two different payments arrive here. The visit fee, which turns a held slot
+ * into a confirmed booking, and the balance after a completed job, which
+ * changes no status at all — settling a bill is not a state transition, and
+ * moving a finished job back to `confirmed` would undo it.
  */
 
 export interface MarkPaidResult {
@@ -42,7 +47,10 @@ export async function markBookingPaid(
     }
     const booking = parsed.data
 
-    if (booking.payment.status === 'paid') {
+    // Nothing owed is the definition of settled — the payment flag says only
+    // that money came in once, which stops being the same thing the moment an
+    // approved repair raises the total.
+    if (booking.price.due <= 0) {
       return { changed: false, price: booking.price, status: 'paid' as const }
     }
 
@@ -58,6 +66,29 @@ export async function markBookingPaid(
       ...booking.price,
       paid: booking.price.total,
       due: 0,
+    }
+
+    const settlingTheBalance = booking.status !== 'pending_payment'
+
+    if (settlingTheBalance) {
+      // Nothing about the job changes; the customer has simply paid for it.
+      tx.update(bookingRef, {
+        price,
+        'payment.status': 'paid',
+        'payment.razorpayPaymentId': razorpayPaymentId,
+        updatedAt: now,
+      })
+      writeEvent(
+        tx,
+        bookingRef,
+        booking.status,
+        {
+          title: 'Payment received',
+          note: 'Your balance is settled. Thank you.',
+        },
+        now
+      )
+      return { changed: true, price, status: 'paid' as const }
     }
 
     // Turn the hold into a booking. The place was already counted against the
@@ -84,23 +115,27 @@ export async function markBookingPaid(
       }
     }
 
-    tx.update(bookingRef, {
-      status: 'confirmed',
-      price,
-      'payment.status': 'paid',
-      'payment.razorpayPaymentId': razorpayPaymentId,
-      // The slot is no longer held against the clock; it is booked. Deleted
-      // rather than zeroed, so the expiry sweep's query cannot match it.
-      holdExpiresAt: FieldValue.delete(),
-      updatedAt: now,
-    })
-
-    tx.set(bookingRef.collection(SUB.events).doc(), {
-      status: 'confirmed',
-      title: 'Booking confirmed',
-      note: 'Visit fee received. An expert will be assigned before your slot.',
-      at: now,
-    })
+    applyTransition(
+      tx,
+      bookingRef,
+      'pending_payment',
+      'confirmed',
+      {
+        title: 'Booking confirmed',
+        note: 'Visit fee received. An expert will be assigned before your slot.',
+      },
+      {
+        extra: {
+          price,
+          'payment.status': 'paid',
+          'payment.razorpayPaymentId': razorpayPaymentId,
+          // The slot is no longer held against the clock; it is booked. Deleted
+          // rather than zeroed, so the expiry sweep's query cannot match it.
+          holdExpiresAt: FieldValue.delete(),
+        },
+        at: now,
+      }
+    )
 
     return { changed: true, price, status: 'paid' as const }
   })
