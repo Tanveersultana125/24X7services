@@ -3,16 +3,19 @@
 import Link from 'next/link'
 import type { Route } from 'next'
 import { usePathname } from 'next/navigation'
-import { CalendarCheck, Headphones, Home, User } from 'lucide-react'
+import { CalendarCheck, Headphones, Home, User, Wrench } from 'lucide-react'
 import { cn } from '@/lib/cn'
 
 /**
- * The four places a customer goes. Mobile only — the desktop layout puts the
- * same destinations in DesktopNav across the top.
+ * The five places a customer goes. Mobile only — the desktop layout puts the
+ * same destinations in DesktopNav across the top, and the two lists have to
+ * agree: Services was in one and not the other, so browsing the catalog was a
+ * tab on a laptop and a scroll back up to Home on a phone.
  */
 
 const TABS = [
   { href: '/home', label: 'Home', icon: Home },
+  { href: '/services', label: 'Services', icon: Wrench },
   { href: '/bookings', label: 'Bookings', icon: CalendarCheck },
   { href: '/support', label: 'Support', icon: Headphones },
   { href: '/profile', label: 'Profile', icon: User },
@@ -48,8 +51,8 @@ export function BottomNavigation({ className }: { className?: string }) {
                 href={href}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'flex h-[72px] flex-col items-center justify-center gap-1',
-                  'text-xs font-medium transition-colors duration-[var(--duration-fast)]',
+                  'flex h-[72px] flex-col items-center justify-center gap-1 px-0.5',
+                  'text-[11px] font-medium transition-colors duration-[var(--duration-fast)]',
                   active ? 'text-brand' : 'text-muted'
                 )}
               >

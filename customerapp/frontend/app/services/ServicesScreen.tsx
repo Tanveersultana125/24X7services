@@ -67,7 +67,7 @@ export function ServicesScreen() {
   const fromPrices = all.data ? cheapestByAppliance(all.data.services) : null
 
   return (
-    <AppShell mobileHeader={<Header title="All services" showBack />}>
+    <AppShell mobileHeader={<Header title="All services" />}>
       <Section className="mt-5" title="What we service">
         {all.status === 'loading' ? (
           <ApplianceGridSkeleton />

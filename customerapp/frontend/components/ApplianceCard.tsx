@@ -5,8 +5,12 @@ import { CardLink } from '@/components/ui/Card'
 import { cn } from '@/lib/cn'
 
 /**
- * A tile in the Our Services grid. The photo is the one place full colour lives
- * in this app, so the card gives it the space and keeps everything else plain.
+ * A tile in the Our Services grid.
+ *
+ * The illustration is contained rather than cropped to fill. These are drawings
+ * with their own margins, not photographs — covering a 4:3 box with a squarer
+ * drawing takes a slice off the top and bottom, which is how the geyser lost
+ * its base and the microwave lost its feet.
  */
 
 export interface ApplianceCardProps {
@@ -51,7 +55,7 @@ export function ApplianceCard({
           // width barely changes. Anything wider is wasted bytes on mobile.
           sizes="(min-width: 1024px) 220px, 45vw"
           priority={priority}
-          className="object-cover"
+          className="object-contain p-4"
         />
       </div>
       <div className="p-3">
