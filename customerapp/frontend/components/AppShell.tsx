@@ -64,11 +64,14 @@ export function AppShell({
  */
 export function Section({
   title,
+  subtitle,
   action,
   className,
   children,
 }: {
   title?: string
+  /** A line under the heading saying what the section covers. */
+  subtitle?: string
   /** A "See all" link, aligned with the heading. */
   action?: React.ReactNode
   className?: string
@@ -78,7 +81,12 @@ export function Section({
     <section className={cn('mt-8 first:mt-6', className)}>
       {title ? (
         <div className="mb-3 flex items-baseline justify-between gap-3">
-          <h2 className="text-xl font-bold text-ink">{title}</h2>
+          <div className="min-w-0">
+            <h2 className="text-xl font-bold text-ink">{title}</h2>
+            {subtitle ? (
+              <p className="mt-0.5 text-sm text-muted">{subtitle}</p>
+            ) : null}
+          </div>
           {action}
         </div>
       ) : null}

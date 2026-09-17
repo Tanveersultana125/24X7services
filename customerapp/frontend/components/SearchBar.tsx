@@ -23,6 +23,8 @@ export interface SearchBarProps {
   readOnly?: boolean
   onOpen?: () => void
   autoFocus?: boolean
+  /** For the ink header on Home, where the default grey fill disappears. */
+  onDark?: boolean
   className?: string
 }
 
@@ -41,6 +43,7 @@ export function SearchBar({
   readOnly = false,
   onOpen,
   autoFocus = false,
+  onDark = false,
   className,
 }: SearchBarProps) {
   const [index, setIndex] = useState(0)
@@ -63,14 +66,20 @@ export function SearchBar({
   const placeholder = placeholders[index] ?? placeholders[0] ?? 'Search'
 
   const shell =
-    'flex min-h-12 w-full items-center gap-2.5 rounded-pill border border-border bg-surface px-4 text-left'
+    'flex min-h-12 w-full items-center gap-2.5 rounded-pill border px-4 text-left'
 
   if (readOnly) {
     return (
       <button
         type="button"
         onClick={onOpen}
-        className={cn(shell, 'hover:border-ink', className)}
+        className={cn(
+          shell,
+          onDark
+            ? 'border-transparent bg-bg'
+            : 'border-border bg-surface hover:border-ink',
+          className
+        )}
       >
         <Search className="size-4 shrink-0 text-muted" aria-hidden="true" />
         <span className="truncate text-sm text-muted">{placeholder}</span>
@@ -85,7 +94,7 @@ export function SearchBar({
         event.preventDefault()
         onSubmit?.(value ?? '')
       }}
-      className={cn(shell, 'bg-bg focus-within:border-ink', className)}
+      className={cn(shell, 'border-border bg-bg focus-within:border-ink', className)}
     >
       <Search className="size-4 shrink-0 text-muted" aria-hidden="true" />
       <input

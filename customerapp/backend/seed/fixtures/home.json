@@ -2,10 +2,12 @@
   "banners": [
     {
       "id": "banner_ac-season",
+      "badge": "In season",
       "title": "Summer-ready AC service",
       "subtitle": "Filter clean, gas check and a cooling test in under an hour.",
       "ctaLabel": "Book AC service",
       "ctaHref": "/services/appliance?a=air-conditioner",
+      "slot": "hero",
       "order": 1,
       "active": true
     },
@@ -15,6 +17,7 @@
       "subtitle": "The expert inspects, quotes, and waits for your yes.",
       "ctaLabel": "How it works",
       "ctaHref": "/services",
+      "slot": "hero",
       "order": 2,
       "active": true
     },
@@ -24,7 +27,30 @@
       "subtitle": "With a GST invoice in the app the moment the job is done.",
       "ctaLabel": "See all services",
       "ctaHref": "/services",
+      "slot": "hero",
       "order": 3,
+      "active": true
+    },
+    {
+      "id": "banner_fridge",
+      "badge": "Most booked",
+      "title": "Fridge not cooling?",
+      "subtitle": "A diagnosis on the spot, and a price before anything is opened.",
+      "ctaLabel": "Book a fridge visit",
+      "ctaHref": "/services/appliance?a=refrigerator",
+      "slot": "inline",
+      "order": 4,
+      "active": true
+    },
+    {
+      "id": "banner_support",
+      "badge": "Any hour",
+      "title": "Something stopped working at 11pm?",
+      "subtitle": "Support answers at any hour, and the earliest slot we have is the first one you see.",
+      "ctaLabel": "Talk to us",
+      "ctaHref": "/support",
+      "slot": "inline",
+      "order": 5,
       "active": true
     }
   ],

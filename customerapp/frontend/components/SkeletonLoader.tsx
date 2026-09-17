@@ -131,14 +131,28 @@ export function ProfileSkeleton() {
 
 export function HomeSkeleton() {
   return (
-    <SkeletonGroup label="Loading home" className="flex flex-col gap-6 p-4">
-      <Skeleton className="h-12 w-full rounded-pill" />
-      <Skeleton className="h-40 w-full" />
+    <SkeletonGroup label="Loading home" className="flex flex-col gap-8 pt-5">
+      <Skeleton className="h-44 w-full" />
       <div>
         <Skeleton className="mb-3 h-6 w-40 rounded-md" />
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-36" />
+        <div className="grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 lg:grid-cols-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i}>
+              <Skeleton className="aspect-square w-full" />
+              <Skeleton className="mx-auto mt-2 h-3 w-4/5 rounded-md" />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div>
+        <Skeleton className="mb-3 h-6 w-48 rounded-md" />
+        <div className="flex gap-3 overflow-hidden">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="w-40 shrink-0">
+              <Skeleton className="aspect-square w-full" />
+              <Skeleton className="mt-2.5 h-4 w-full rounded-md" />
+              <Skeleton className="mt-2 h-9 w-full rounded-md" />
+            </div>
           ))}
         </div>
       </div>

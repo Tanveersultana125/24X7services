@@ -20,6 +20,8 @@ export interface LocationSelectorProps {
   onClick: () => void
   /** Set while the pincode is being checked against serviceAreas. */
   loading?: boolean
+  /** For the ink header on Home: white text instead of ink. */
+  onDark?: boolean
   className?: string
 }
 
@@ -28,6 +30,7 @@ export function LocationSelector({
   area,
   onClick,
   loading = false,
+  onDark = false,
   className,
 }: LocationSelectorProps) {
   const chosen = Boolean(area)
@@ -38,7 +41,7 @@ export function LocationSelector({
       onClick={onClick}
       className={cn(
         'flex min-h-11 max-w-full items-center gap-1.5 rounded-pill px-1 text-left',
-        'hover:bg-surface',
+        onDark ? 'hover:bg-bg/10' : 'hover:bg-surface',
         className
       )}
       aria-label={
@@ -47,12 +50,25 @@ export function LocationSelector({
           : 'Set your location'
       }
     >
-      <MapPin className="size-4 shrink-0 text-ink" aria-hidden="true" />
+      <MapPin
+        className={cn('size-4 shrink-0', onDark ? 'text-bg' : 'text-ink')}
+        aria-hidden="true"
+      />
       <span className="min-w-0">
-        <span className="block text-[11px] leading-none text-muted">
+        <span
+          className={cn(
+            'block text-[11px] leading-none',
+            onDark ? 'text-bg/70' : 'text-muted'
+          )}
+        >
           Service at
         </span>
-        <span className="mt-0.5 block truncate text-sm font-semibold text-ink">
+        <span
+          className={cn(
+            'mt-0.5 block truncate text-sm font-semibold',
+            onDark ? 'text-bg' : 'text-ink'
+          )}
+        >
           {loading
             ? 'Checking…'
             : chosen
@@ -60,7 +76,10 @@ export function LocationSelector({
               : 'Set location'}
         </span>
       </span>
-      <ChevronDown className="size-4 shrink-0 text-muted" aria-hidden="true" />
+      <ChevronDown
+        className={cn('size-4 shrink-0', onDark ? 'text-bg/70' : 'text-muted')}
+        aria-hidden="true"
+      />
     </button>
   )
 }

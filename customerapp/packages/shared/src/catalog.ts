@@ -70,6 +70,14 @@ export const catalogServiceSchema = z.object({
   active: z.boolean(),
   /** Overrides `config/business.defaultWarrantyDays` when present. */
   warrantyDays: z.number().int().min(0).optional(),
+  /**
+   * How long the visit usually takes, in minutes.
+   *
+   * It lets a rail card separate a twenty-minute installation from a two-hour
+   * deep clean before anyone opens a slot picker. Typical on-site time, not a
+   * promise — no screen may word it as one.
+   */
+  durationMinutes: z.number().int().min(1).optional(),
 })
 export type CatalogService = z.infer<typeof catalogServiceSchema>
 
@@ -131,11 +139,25 @@ export type DiagnosisRule = z.infer<typeof diagnosisRuleSchema>
 // Home page content
 // ---------------------------------------------------------------------------
 
+/**
+ * Where a banner is allowed to appear.
+ *
+ * `hero` rides the carousel under the search bar; `inline` is a single card
+ * dropped between two sections further down. Which one a banner is, is seed
+ * data rather than something Home decides, so the running order of the page
+ * can change without a release.
+ */
+export const bannerSlotSchema = z.enum(['hero', 'inline'])
+export type BannerSlot = z.infer<typeof bannerSlotSchema>
+
 export const bannerSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
   subtitle: z.string().optional(),
   image: z.string().optional(),
+  /** A small pill in the corner of the card: "New", "Trending". */
+  badge: z.string().optional(),
+  slot: bannerSlotSchema.default('hero'),
   ctaLabel: z.string().optional(),
   /** Internal route only; external links are not allowed from a banner. */
   ctaHref: z.string().startsWith('/').optional(),

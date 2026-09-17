@@ -4,29 +4,35 @@ import { useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { Route } from 'next'
-import { Bell, ChevronRight, MapPinOff } from 'lucide-react'
+import { ChevronRight, MapPinOff } from 'lucide-react'
 import type {
+  ApplianceId,
   Banner,
   CatalogAppliance,
   CatalogBrand,
   CatalogService,
   PopularService,
+  ServiceKey,
 } from '@app/shared'
 
 import { AppShell, Section } from '@/components/AppShell'
-import { HeaderAction } from '@/components/Header'
-import { LocationSelector } from '@/components/LocationSelector'
+import { HomeHeader } from '@/components/HomeHeader'
 import { SearchBar } from '@/components/SearchBar'
-import { PromotionalBanner } from '@/components/PromotionalBanner'
-import { ApplianceCard } from '@/components/ApplianceCard'
+import { PromotionalBanner, BannerCard } from '@/components/PromotionalBanner'
+import { CategoryGrid } from '@/components/CategoryGrid'
+import {
+  ServiceRail,
+  durationNote,
+  type ServiceRailItem,
+} from '@/components/ServiceRail'
 import { BrandDisclaimer } from '@/components/BrandCard'
 import { TrustPoints } from '@/components/TrustPoints'
 import { useLocation } from '@/lib/useLocation'
-import { Card, CardLink } from '@/components/ui/Card'
+import { Card } from '@/components/ui/Card'
 import { ErrorState } from '@/components/ErrorState'
 import { HomeSkeleton } from '@/components/SkeletonLoader'
+import { startDraft } from '@/lib/bookingDraft'
 import {
-  cheapestByAppliance,
   fetchAllServices,
   fetchAppliances,
   fetchBanners,
@@ -34,7 +40,6 @@ import {
   fetchPopularServices,
 } from '@/lib/catalog'
 import { callFn } from '@/lib/callables'
-import { formatPaise } from '@/lib/format'
 import { LOCATION_STALE_MS, locationLabel } from '@/lib/location'
 import { useAsync } from '@/lib/useAsync'
 
@@ -44,6 +49,15 @@ import { useAsync } from '@/lib/useAsync'
  * Everything on it comes from the catalog. No appliance, service, brand or
  * price is written into this file — a new appliance is a seed entry, and it
  * appears here without anyone editing a screen.
+ *
+ * The page is a stack of short sideways rows rather than a few tall blocks:
+ * the banners, the grid of everything we service, the things people book most,
+ * and then one row per appliance. A customer who already knows what is broken
+ * reaches a booking in two taps from anywhere on it, and one who does not can
+ * scroll the whole range in about four screens. Where the rows would otherwise
+ * run together, a banner from the `inline` slot breaks them up — which banners
+ * those are, and how many, is seed data, so the shape of this page changes
+ * without a release.
  *
  * The one thing Home decides for itself is whether the saved location still
  * holds. Areas get switched on and off, and a customer whose pincode was
@@ -57,6 +71,9 @@ interface HomeData {
   services: CatalogService[]
   brands: CatalogBrand[]
 }
+
+/** How many appliance rows run before an inline banner is dropped between. */
+const ROWS_BETWEEN_BANNERS = 2
 
 export function HomeScreen() {
   const router = useRouter()
@@ -86,28 +103,74 @@ export function HomeScreen() {
     if (ready && !location) router.replace('/location')
   }, [ready, location, router])
 
-  const fromPrices = home.data ? cheapestByAppliance(home.data.services) : null
+  /**
+   * Starting a booking is starting a new draft, not adding to whatever was left
+   * half-filled before — a different appliance is a different job.
+   *
+   * Seeded here rather than passed as query parameters into the first step, so
+   * that step never renders against a draft that has not been written yet.
+   */
+  const startBooking = useCallback(
+    (applianceId: ApplianceId, serviceKey: ServiceKey) => {
+      startDraft({
+        applianceId,
+        serviceKey,
+        issueIds: [],
+        techPreference: 'any',
+      })
+      router.push('/book/brand')
+    },
+    [router]
+  )
+
+  const data = home.data
+  const imageFor = new Map(
+    data?.appliances.map((appliance) => [appliance.id, appliance.image]) ?? []
+  )
+
+  const heroBanners = data?.banners.filter((b) => b.slot === 'hero') ?? []
+  const inlineBanners = data?.banners.filter((b) => b.slot === 'inline') ?? []
+
+  const popularItems: ServiceRailItem[] =
+    data?.popular.map((popular) => {
+      const listed = data.services.find(
+        (service) =>
+          service.applianceId === popular.applianceId &&
+          service.serviceKey === popular.serviceKey
+      )
+      return {
+        id: popular.id,
+        name: popular.name,
+        image: popular.image ?? imageFor.get(popular.applianceId),
+        href: `/services/appliance?a=${popular.applianceId}` as Route,
+        note: durationNote(listed?.durationMinutes),
+        priceLabel: 'Visit from',
+        price: popular.fromPrice,
+        onBook: () => startBooking(popular.applianceId, popular.serviceKey),
+      }
+    }) ?? []
+
+  // One row per appliance, in catalog order, skipping any appliance whose
+  // services are all inactive — a heading over an empty row reads as a page
+  // that failed to load rather than a catalog with nothing to say yet.
+  const rows =
+    data?.appliances
+      .map((appliance) => ({
+        appliance,
+        services: data.services
+          .filter((service) => service.applianceId === appliance.id)
+          .sort((a, b) => a.order - b.order),
+      }))
+      .filter((row) => row.services.length > 0) ?? []
 
   return (
     <AppShell
       mobileHeader={
-        <div className="sticky top-0 z-30 border-b border-border bg-bg pt-[var(--safe-top)] lg:hidden">
-          <div className="mx-auto flex max-w-lg items-center gap-2 px-4 pt-1">
-            {/* `label` stays empty until there is an address book to name a
-                saved address from — that arrives with the profile in Phase 5. */}
-            <LocationSelector
-              className="min-w-0 flex-1"
-              area={location ? locationLabel(location) : undefined}
-              onClick={() => router.push('/location')}
-            />
-            <HeaderAction href="/profile/notifications" label="Notifications">
-              <Bell className="size-5" aria-hidden="true" />
-            </HeaderAction>
-          </div>
-          <div className="mx-auto max-w-lg px-4 pb-3">
-            <SearchBar readOnly onOpen={() => router.push('/search')} />
-          </div>
-        </div>
+        <HomeHeader
+          area={location ? locationLabel(location) : undefined}
+          onChangeLocation={() => router.push('/location')}
+          onSearch={() => router.push('/search')}
+        />
       }
     >
       {/* The desktop bar carries the location, but not the search field. */}
@@ -134,56 +197,81 @@ export function HomeScreen() {
           onRetry={home.reload}
           retrying={home.refreshing}
         />
-      ) : home.data ? (
+      ) : data ? (
         <>
-          {home.data.banners.length > 0 ? (
-            <Section className="mt-5">
-              <PromotionalBanner banners={home.data.banners} />
+          {heroBanners.length > 0 ? (
+            <Section className="mt-4">
+              <PromotionalBanner banners={heroBanners} />
             </Section>
           ) : null}
 
-          {home.data.popular.length > 0 ? (
-            <Section title="Popular right now">
-              <PopularRail services={home.data.popular} />
-            </Section>
-          ) : null}
-
-          <Section
-            title="What we service"
-            action={
-              <Link
-                href="/services"
-                className="inline-flex items-center gap-0.5 text-sm font-medium text-ink"
-              >
-                See all
-                <ChevronRight className="size-4" aria-hidden="true" />
-              </Link>
-            }
-          >
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
-              {home.data.appliances.map((appliance, index) => {
-                const from = fromPrices?.get(appliance.id)
-                return (
-                  <ApplianceCard
-                    key={appliance.id}
-                    appliance={appliance}
-                    // The tiles on screen before any scrolling.
-                    priority={index < 2}
-                    fromLabel={
-                      from === undefined
-                        ? undefined
-                        : `Visit from ${formatPaise(from)}`
-                    }
-                  />
-                )
-              })}
-            </div>
+          <Section title="What we service" className="mt-6">
+            <CategoryGrid appliances={data.appliances} />
           </Section>
 
-          {home.data.brands.length > 0 ? (
+          {popularItems.length > 0 ? (
+            <Section
+              title="Most booked"
+              subtitle="What people call us about most"
+            >
+              <ServiceRail items={popularItems} />
+            </Section>
+          ) : null}
+
+          {rows.map((row, index) => {
+            // Dropped after every second row, and only while there are banners
+            // left to drop: repeating the same card down the page would be
+            // worse than the run of rows it is there to break up.
+            const bannerIndex =
+              index > 0 && index % ROWS_BETWEEN_BANNERS === 0
+                ? index / ROWS_BETWEEN_BANNERS - 1
+                : -1
+            const banner = inlineBanners[bannerIndex]
+
+            return (
+              <div key={row.appliance.id}>
+                {banner ? (
+                  <Section className="mt-8">
+                    <BannerCard banner={banner} />
+                  </Section>
+                ) : null}
+
+                <Section
+                  title={row.appliance.name}
+                  subtitle={summariseServices(row.services)}
+                  action={
+                    <Link
+                      href={`/services/appliance?a=${row.appliance.id}` as Route}
+                      className="inline-flex shrink-0 items-center gap-0.5 text-sm font-semibold text-ink"
+                    >
+                      See all
+                      <ChevronRight className="size-4" aria-hidden="true" />
+                    </Link>
+                  }
+                >
+                  <ServiceRail
+                    items={row.services.map((service) => ({
+                      id: service.id,
+                      name: service.name,
+                      image: imageFor.get(service.applianceId),
+                      href:
+                        `/services/appliance?a=${service.applianceId}` as Route,
+                      note: durationNote(service.durationMinutes),
+                      priceLabel: 'Visit fee',
+                      price: service.visitFee,
+                      onBook: () =>
+                        startBooking(service.applianceId, service.serviceKey),
+                    }))}
+                  />
+                </Section>
+              </div>
+            )
+          })}
+
+          {data.brands.length > 0 ? (
             <Section title="Brands we service">
               <ul className="flex flex-wrap gap-2">
-                {home.data.brands.map((brand) => (
+                {data.brands.map((brand) => (
                   <li
                     key={brand.id}
                     className="rounded-card border border-border px-4 py-3 text-sm font-bold tracking-[0.08em] text-ink"
@@ -211,6 +299,35 @@ export function HomeScreen() {
 }
 
 // ---------------------------------------------------------------------------
+
+/** Past this many, the line stops listing and says "and more". */
+const SUMMARY_LIMIT = 3
+
+/**
+ * "Repair, service and installation" — the line under an appliance heading.
+ *
+ * Built from the service keys themselves rather than from a table of labels in
+ * this file, so an appliance that gains a gas refill says so without anyone
+ * remembering to come back here and write a word for it.
+ *
+ * It stops at three. A heading followed by two lines naming every single thing
+ * in the row underneath is not a subtitle, it is the row read out loud.
+ */
+function summariseServices(services: readonly CatalogService[]): string {
+  const words = [
+    ...new Set(services.map((service) => service.serviceKey.replace(/-/g, ' '))),
+  ]
+  if (words.length === 0) return ''
+
+  const sentence =
+    words.length > SUMMARY_LIMIT
+      ? `${words.slice(0, SUMMARY_LIMIT - 1).join(', ')} and more`
+      : words.length === 1
+        ? String(words[0])
+        : `${words.slice(0, -1).join(', ')} and ${words[words.length - 1]}`
+
+  return sentence.charAt(0).toUpperCase() + sentence.slice(1)
+}
 
 /**
  * Re-ask whether we still cover the saved pincode, once a day, in the
@@ -284,33 +401,6 @@ function UnserviceableNotice({
         </button>
       </div>
     </div>
-  )
-}
-
-/** The rail of the four or five things people book most. */
-function PopularRail({ services }: { services: readonly PopularService[] }) {
-  return (
-    <ul className="no-scrollbar -mx-4 flex snap-x gap-3 overflow-x-auto px-4 lg:mx-0 lg:px-0">
-      {services.map((service) => (
-        <li key={service.id} className="w-44 shrink-0 snap-start">
-          <CardLink
-            href={`/services/appliance?a=${service.applianceId}` as Route}
-            className="flex h-full flex-col justify-between p-4"
-            ariaLabel={`${service.name}, from ${formatPaise(service.fromPrice)}`}
-          >
-            <span className="text-sm font-semibold leading-snug text-ink">
-              {service.name}
-            </span>
-            <span className="mt-3 text-xs text-muted">
-              from{' '}
-              <span className="text-sm font-bold text-ink">
-                {formatPaise(service.fromPrice)}
-              </span>
-            </span>
-          </CardLink>
-        </li>
-      ))}
-    </ul>
   )
 }
 

@@ -1,19 +1,26 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import type { Route } from 'next'
 import type { Banner } from '@app/shared'
 import { cn } from '@/lib/cn'
 
 /**
- * The banner rail on Home: swipeable, with dots, and advancing on its own.
+ * The banner rail under the search bar: swipeable, with dots, and advancing on
+ * its own.
  *
  * It is a scroll container rather than a transform carousel, so the platform
  * provides the swipe, the momentum and the snap, and a keyboard user gets arrow
  * keys for free. Autoplay stops the moment anyone touches it and does not come
  * back — a rail that keeps moving while someone is reading it is worse than one
  * that never moved.
+ *
+ * The cards stop short of the right edge so the next one shows by a thumb's
+ * width. Dots say a rail is swipeable to someone who reads them; a sliver of
+ * the next card says it to everybody else, and it is the reason people swipe
+ * these at all rather than assuming the first offer is the only one.
  */
 
 export interface PromotionalBannerProps {
@@ -34,8 +41,11 @@ export function PromotionalBanner({
   const scrollTo = useCallback((index: number) => {
     const rail = railRef.current
     const slide = rail?.children[index]
-    if (!(slide instanceof HTMLElement)) return
-    rail?.scrollTo({ left: slide.offsetLeft, behavior: 'smooth' })
+    if (!rail || !(slide instanceof HTMLElement)) return
+    // The rail carries its own padding so the cards can bleed to the screen
+    // edge; the snap position is that padding in from the slide's own offset.
+    const inset = Number.parseFloat(getComputedStyle(rail).paddingLeft) || 0
+    rail.scrollTo({ left: slide.offsetLeft - inset, behavior: 'smooth' })
   }, [])
 
   // Track which slide is in view rather than assuming, since the customer can
@@ -84,29 +94,34 @@ export function PromotionalBanner({
     <section
       aria-roledescription="carousel"
       aria-label="Offers and announcements"
-      className={cn('flex flex-col gap-2', className)}
+      className={cn('flex flex-col', className)}
       onPointerDown={stopAutoplay}
       onKeyDown={stopAutoplay}
       onFocus={stopAutoplay}
     >
       <div
         ref={railRef}
-        className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth"
+        className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto scroll-smooth px-4 lg:mx-0 lg:px-0"
       >
         {banners.map((banner, index) => (
           <article
             key={banner.id}
             aria-roledescription="slide"
             aria-label={`${index + 1} of ${banners.length}`}
-            className="w-full shrink-0 snap-start"
+            className={cn(
+              'shrink-0 snap-start',
+              // A sliver of the next card on a phone; on a desktop the rail is
+              // wide enough to show most of a second one outright.
+              banners.length > 1 ? 'w-[88%] lg:w-[58%]' : 'w-full'
+            )}
           >
-            <BannerCard banner={banner} />
+            <BannerCard banner={banner} priority={index === 0} />
           </article>
         ))}
       </div>
 
       {banners.length > 1 ? (
-        <div className="flex justify-center gap-1.5">
+        <div className="flex justify-center gap-1.5 pt-1">
           {banners.map((banner, index) => (
             <button
               key={banner.id}
@@ -123,7 +138,7 @@ export function PromotionalBanner({
               <span
                 className={cn(
                   'h-1.5 rounded-full transition-all duration-[var(--duration-base)]',
-                  index === active ? 'w-4 bg-ink' : 'w-1.5 bg-border'
+                  index === active ? 'w-5 bg-ink' : 'w-1.5 bg-border'
                 )}
               />
             </button>
@@ -134,17 +149,69 @@ export function PromotionalBanner({
   )
 }
 
-function BannerCard({ banner }: { banner: Banner }) {
+/**
+ * One banner, as a card.
+ *
+ * Exported because the same card does a second job further down the page: a
+ * banner seeded into the `inline` slot is dropped between two sections on its
+ * own, which is what breaks a long run of near-identical service rails into
+ * something with a shape.
+ *
+ * Its height comes from its content and from whatever the rail stretches it to,
+ * not from a number written here. A fixed height fits the shortest banner
+ * somebody seeds and cuts the longest one off above its own button.
+ *
+ * With an image it is that image behind a scrim; without one it is flat ink.
+ * The scrim is not optional — the copy is seeded, the photograph behind it is
+ * seeded separately, and white text over an unknown photograph is a contrast
+ * failure waiting for the first pale image anyone uploads.
+ */
+export function BannerCard({
+  banner,
+  priority = false,
+  className,
+}: {
+  banner: Banner
+  priority?: boolean
+  className?: string
+}) {
   const body = (
-    <div className="flex h-full flex-col justify-between gap-4 rounded-card border border-border bg-ink p-5 text-bg">
-      <div>
+    <div
+      className={cn(
+        'relative flex h-full min-h-44 flex-col justify-between gap-4 overflow-hidden rounded-card bg-ink p-5 text-bg',
+        className
+      )}
+    >
+      {banner.image ? (
+        <>
+          <Image
+            src={banner.image}
+            alt=""
+            fill
+            sizes="(min-width: 1024px) 640px, 90vw"
+            priority={priority}
+            className="object-cover"
+          />
+          <span className="absolute inset-0 bg-ink/55" aria-hidden="true" />
+        </>
+      ) : null}
+
+      <div className="relative">
+        {banner.badge ? (
+          <span className="mb-2.5 inline-flex items-center rounded-pill bg-bg/15 px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] uppercase text-bg">
+            {banner.badge}
+          </span>
+        ) : null}
         <h3 className="text-xl font-bold leading-snug">{banner.title}</h3>
         {banner.subtitle ? (
-          <p className="mt-1.5 text-sm text-bg/70">{banner.subtitle}</p>
+          <p className="mt-1.5 line-clamp-2 text-sm text-bg/70">
+            {banner.subtitle}
+          </p>
         ) : null}
       </div>
+
       {banner.ctaLabel ? (
-        <span className="inline-flex w-fit items-center rounded-pill bg-bg px-4 py-2 text-sm font-semibold text-ink">
+        <span className="relative inline-flex w-fit items-center rounded-pill bg-bg px-4 py-2 text-sm font-semibold text-ink">
           {banner.ctaLabel}
         </span>
       ) : null}
