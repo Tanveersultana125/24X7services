@@ -17,10 +17,12 @@ import { cn } from '@/lib/cn'
  * back — a rail that keeps moving while someone is reading it is worse than one
  * that never moved.
  *
- * The cards stop short of the right edge so the next one shows by a thumb's
- * width. Dots say a rail is swipeable to someone who reads them; a sliver of
- * the next card says it to everybody else, and it is the reason people swipe
- * these at all rather than assuming the first offer is the only one.
+ * One card at a time, filling the column. An earlier pass had them stop short
+ * of the edge so the next one peeked through, on the theory that a visible
+ * sliver is what makes people swipe. On a phone it just read as a card that had
+ * been cut off, with a second one half-arriving beside it — the offer you are
+ * meant to be reading loses the screen to the one you are not. The dots carry
+ * "there is more" on their own.
  */
 
 export interface PromotionalBannerProps {
@@ -42,10 +44,7 @@ export function PromotionalBanner({
     const rail = railRef.current
     const slide = rail?.children[index]
     if (!rail || !(slide instanceof HTMLElement)) return
-    // The rail carries its own padding so the cards can bleed to the screen
-    // edge; the snap position is that padding in from the slide's own offset.
-    const inset = Number.parseFloat(getComputedStyle(rail).paddingLeft) || 0
-    rail.scrollTo({ left: slide.offsetLeft - inset, behavior: 'smooth' })
+    rail.scrollTo({ left: slide.offsetLeft, behavior: 'smooth' })
   }, [])
 
   // Track which slide is in view rather than assuming, since the customer can
@@ -101,19 +100,14 @@ export function PromotionalBanner({
     >
       <div
         ref={railRef}
-        className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto scroll-smooth px-4 lg:mx-0 lg:px-0"
+        className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth"
       >
         {banners.map((banner, index) => (
           <article
             key={banner.id}
             aria-roledescription="slide"
             aria-label={`${index + 1} of ${banners.length}`}
-            className={cn(
-              'shrink-0 snap-start',
-              // A sliver of the next card on a phone; on a desktop the rail is
-              // wide enough to show most of a second one outright.
-              banners.length > 1 ? 'w-[88%] lg:w-[58%]' : 'w-full'
-            )}
+            className="w-full shrink-0 snap-start"
           >
             <BannerCard banner={banner} priority={index === 0} />
           </article>
