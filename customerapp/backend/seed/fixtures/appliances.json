@@ -2,7 +2,7 @@
   {
     "id": "washing-machine",
     "name": "Washing Machine",
-    "image": "/appliances/washing-machine.jpg",
+    "image": "/appliances/washing-machine.svg",
     "order": 1,
     "active": true,
     "detailFields": [
@@ -25,7 +25,7 @@
   {
     "id": "air-conditioner",
     "name": "Air Conditioner",
-    "image": "/appliances/air-conditioner.jpg",
+    "image": "/appliances/air-conditioner.svg",
     "order": 2,
     "active": true,
     "detailFields": [
@@ -48,7 +48,7 @@
   {
     "id": "refrigerator",
     "name": "Refrigerator",
-    "image": "/appliances/refrigerator.jpg",
+    "image": "/appliances/refrigerator.svg",
     "order": 3,
     "active": true,
     "detailFields": [
@@ -64,7 +64,7 @@
   {
     "id": "geyser",
     "name": "Geyser",
-    "image": "/appliances/geyser.jpg",
+    "image": "/appliances/geyser.svg",
     "order": 4,
     "active": true,
     "detailFields": [
@@ -87,7 +87,7 @@
   {
     "id": "microwave",
     "name": "Microwave",
-    "image": "/appliances/microwave.jpg",
+    "image": "/appliances/microwave.svg",
     "order": 5,
     "active": true,
     "detailFields": [

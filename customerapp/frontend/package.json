@@ -7,7 +7,7 @@
     "dev": "next dev -p 3300",
     "build": "next build",
     "start": "npx serve out -l 3300",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint .",
     "cap:sync": "npm run build && npx cap sync android",
     "cap:android": "npm run cap:sync && npx cap open android"
@@ -44,5 +44,6 @@
     "eslint-config-next": "16.2.10",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.2"
-  }
+  },
+  "//typecheck": "typedRoutes derives its Route union from the app directory into .next/types, and tsc cannot see a route added since the last build. Running typegen first is what stops a clean checkout failing on links that are perfectly valid."
 }

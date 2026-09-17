@@ -1,0 +1,209 @@
+@import 'tailwindcss';
+
+/* ===========================================================================
+   Design tokens
+   ---------------------------------------------------------------------------
+   The palette is monochrome on purpose. Colour in this app means one thing —
+   the state of a job — so the only hues in the system are the three semantic
+   ones, and they appear on badges, dots and alerts, never on a surface or a
+   button. Appliance photography is the one place full colour belongs.
+   =========================================================================== */
+
+@theme {
+  /* --- Colour ------------------------------------------------------------ */
+  --color-ink: #0a0a0a;
+  --color-bg: #ffffff;
+  --color-surface: #f5f5f5;
+  --color-border: #e5e5e5;
+  --color-muted: #6b7280;
+
+  /* Semantic. Small surfaces only: a badge, a status dot, an alert border. */
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-error: #dc2626;
+
+  /* Tinted backings for those three, light enough to carry ink-coloured text
+     at AA. Used by StatusBadge and the alert variants, nowhere else. */
+  --color-success-soft: #f0fdf4;
+  --color-warning-soft: #fffbeb;
+  --color-error-soft: #fef2f2;
+
+  /* --- Type -------------------------------------------------------------- */
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    sans-serif;
+
+  /* A seven-step scale. Anything not on it is a mistake, not a decision. */
+  --text-xs: 0.75rem; /* 12 — legal, captions */
+  --text-xs--line-height: 1.125rem;
+  --text-sm: 0.875rem; /* 14 — secondary, labels */
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem; /* 16 — body, inputs */
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem; /* 18 — card titles */
+  --text-lg--line-height: 1.625rem;
+  --text-xl: 1.375rem; /* 22 — section headings */
+  --text-xl--line-height: 1.875rem;
+  --text-2xl: 1.75rem; /* 28 — screen titles */
+  --text-2xl--line-height: 2.125rem;
+  --text-3xl: 2.125rem; /* 34 — the one hero line per screen */
+  --text-3xl--line-height: 2.5rem;
+
+  /* --- Shape ------------------------------------------------------------- */
+  --radius-card: 0.75rem; /* 12 */
+  --radius-pill: 999px;
+
+  /* One elevation level. A second one only ever gets used inconsistently. */
+  --shadow-raised: 0 1px 2px rgba(10, 10, 10, 0.04),
+    0 8px 24px -12px rgba(10, 10, 10, 0.12);
+
+  /* --- Motion ------------------------------------------------------------ */
+  --ease-out-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 250ms;
+}
+
+/* ===========================================================================
+   Fonts
+   ---------------------------------------------------------------------------
+   Manrope is bundled rather than fetched, so the WebView renders it offline and
+   no request leaves the device for a font. The variable file covers 200-800 in
+   one download; the two subsets are split by unicode-range so a device only
+   pulls latin-ext when a page actually uses it — which the rupee sign does.
+   =========================================================================== */
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/manrope-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/manrope-latin-ext.woff2') format('woff2');
+  /* U+20AD-20C0 carries ₹, which every price on every screen needs. */
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7,
+    U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+    U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ===========================================================================
+   Base
+   =========================================================================== */
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* The safe-area inset the bottom nav and sticky CTAs sit above. */
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-top: env(safe-area-inset-top, 0px);
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    -webkit-font-smoothing: antialiased;
+    /* A WebView will happily rubber-band the whole document under a fixed
+       bottom nav. */
+    overscroll-behavior-y: none;
+  }
+
+  /* Focus has to stay visible: the desktop layouts are keyboard-navigable and
+     the outline is the only thing marking position in a monochrome UI. */
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Tapping a button in a WebView otherwise flashes a grey box over it. */
+  button,
+  a,
+  [role='button'] {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Anything interactive clears the 44px minimum without each component having
+     to remember. Components that are visually smaller pad out to it instead. */
+  button,
+  [role='button'],
+  a[data-tappable],
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+  }
+
+  input,
+  textarea,
+  select {
+    /* iOS zooms the viewport on focus for anything under 16px. */
+    font-size: var(--text-base);
+  }
+
+  ::placeholder {
+    color: var(--color-muted);
+  }
+}
+
+/* ===========================================================================
+   Utilities
+   =========================================================================== */
+
+@utility tap-target {
+  /* For icon buttons that must stay 44px without growing their own box. */
+  position: relative;
+}
+
+@utility tap-target-after {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+
+/* A horizontal scroller — the date strip, the banner rail — without the bar. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ===========================================================================
+   Motion
+   =========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
