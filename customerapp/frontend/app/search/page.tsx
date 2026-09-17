@@ -1,7 +1,8 @@
-import { ScreenStub } from '@/components/dev/ScreenStub'
+import type { Metadata } from 'next'
+import { SearchScreen } from './SearchScreen'
 
-export const metadata = { title: 'Search' }
+export const metadata: Metadata = { title: 'Search' }
 
 export default function Page() {
-  return <ScreenStub title={'Search'} route={'/search'} note={'Appliances, services and issues matched from the catalog.'} />
+  return <SearchScreen />
 }

@@ -16,7 +16,7 @@ customerapp/
 | Phase | Scope | State |
 |---|---|---|
 | 1 | Monorepo, shared schemas, rules + tests, seed, design system, `/dev/components` | **Done** |
-| 2 | Splash, location + serviceability, Home, Search, Services, Appliance | Not started |
+| 2 | Splash, location + serviceability, Home, Search, Services, Appliance | **Done** |
 | 3 | The booking flow, `createBooking`, payments, webhook, hold expiry | Not started |
 | 4 | Assignment, tracking, progress, approval, OTPs, invoice, warranty, review | Not started |
 | 5 | Bookings tabs, cancel/reschedule, profile, support | Not started |
@@ -50,6 +50,10 @@ npm -w functions run seed
 
 `npm run seed` on its own starts a throwaway emulator, seeds it and shuts it
 down — useful for checking the fixtures, useless for development.
+
+The seed writes to the emulator unless `SEED_ALLOW_PRODUCTION=1` says otherwise.
+It is that way round because `FIRESTORE_EMULATOR_HOST` is only set for processes
+the emulator spawns, so a second terminal never sees it.
 
 ### Environment
 
@@ -104,6 +108,27 @@ data is fetched client-side from Firebase.
 sides import, including the booking status graph and which transitions it allows.
 A renamed field is a compile error on both sides rather than a runtime surprise.
 
+**The region is stated on every callable, not just globally.** Imports evaluate
+before the importing module's body, so `setGlobalOptions` in `index.ts` runs
+after each handler has already built its `onCall` and the handlers deploy to
+us-central1 while the app calls asia-south1. That 404s, and a 404 from a
+callable reads as a dropped network request rather than a misconfiguration.
+Options live in `functions/src/lib/options.ts`, which `defineCallable` imports,
+and `defineCallable` names the region again on every `onCall`.
+
+**Callables return absent, never null.** The callable encoder turns an
+`undefined` field into a JSON `null`, and the shared schemas' `.optional()`
+rejects null — so a handler that sets an optional field to undefined fails
+validation on the client, after the server has done all the work. Handlers omit
+the key instead.
+
+**localStorage is an external store, and is read as one.** The saved location
+and the recent searches go through `useSyncExternalStore`, not an effect that
+reads storage and calls setState. An effect renders once with the wrong answer
+and again with the right one, and every screen has to handle the gap; the
+snapshot carries `ready` so the one screen that genuinely needs to tell "nothing
+saved" from "not read yet" — the splash — can.
+
 **Colour means state.** The palette is black and white; the only hues are
 success, warning and error, and they appear on badges, dots and alerts and
 nowhere else. Because there is no accent colour to spend, selection and current
@@ -115,6 +140,16 @@ label always spelled out in text beside its dot.
 Each of these is marked `DECISION NEEDED` at the place it matters.
 
 **Before launch, and blocking.**
+
+- `frontend/app/location/LocationScreen.tsx` — there is no "detect my location"
+  button. Turning a coordinate into a pincode needs a geocoding call, and a web
+  service key cannot be restricted by referrer, so one compiled into the bundle
+  gets lifted and billed to us. If detection is wanted it belongs behind a
+  callable, which is an addition to the shared registry.
+- `backend/functions/src/index.ts` — all four Phase 2 callables are open to
+  callers who have not signed in, which is deliberate: a customer checks whether
+  we cover their area before there is any reason to give us a phone number. App
+  Check (Phase 6) is what keeps them from being called from outside the app.
 
 - `backend/seed/fixtures/businessConfig.json` — legal name, GSTIN, registered
   address, SAC code, GST rate and state code are placeholders. All six are

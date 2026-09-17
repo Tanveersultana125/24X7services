@@ -88,6 +88,17 @@ describe('catalog', () => {
       await setDoc(doc(db, 'technicianPublic/tech_1'), { name: 'Arjun', rating: 4.8 })
       await setDoc(doc(db, 'technicians/tech_1'), { phone: '+919000000101' })
       await setDoc(doc(db, 'slots/500084_2026-09-20'), { windows: [] })
+      await setDoc(doc(db, 'serviceAreas/500084'), {
+        pincode: '500084',
+        city: 'Hyderabad',
+        area: 'Kondapur',
+        active: true,
+      })
+      await setDoc(doc(db, 'searchIndex/appliance_washing-machine'), {
+        kind: 'appliance',
+        label: 'Washing Machine',
+        tokens: ['washing', 'machine'],
+      })
     })
   })
 
@@ -96,6 +107,12 @@ describe('catalog', () => {
     await assertSucceeds(getDoc(doc(guest(), 'catalogAppliances/washing-machine')))
     await assertSucceeds(getDoc(doc(guest(), 'config/business')))
     await assertSucceeds(getDoc(doc(guest(), 'technicianPublic/tech_1')))
+    // The location screen lists the areas we cover, and the search screen
+    // matches against the index, both before anyone has signed in.
+    await assertSucceeds(getDoc(doc(guest(), 'serviceAreas/500084')))
+    await assertSucceeds(
+      getDoc(doc(guest(), 'searchIndex/appliance_washing-machine'))
+    )
   })
 
   it('refuses writes to the catalog from any client', async () => {
@@ -103,6 +120,19 @@ describe('catalog', () => {
       setDoc(doc(alice(), 'catalogAppliances/washing-machine'), { name: 'Free' })
     )
     await assertFails(setDoc(doc(alice(), 'config/business'), { gstRate: 0 }))
+    // Switching on an area we do not staff, or planting a search row that
+    // points somewhere of the writer's choosing.
+    await assertFails(
+      setDoc(doc(alice(), 'serviceAreas/999999'), {
+        pincode: '999999',
+        city: 'Anywhere',
+        area: 'Anywhere',
+        active: true,
+      })
+    )
+    await assertFails(
+      setDoc(doc(alice(), 'searchIndex/x'), { label: 'Free repair', tokens: [] })
+    )
   })
 
   it('keeps private config, technician records and slot counts off the client', async () => {
@@ -443,6 +473,9 @@ describe('notifications', () => {
 describe('collections the client never touches', () => {
   it('denies waitlist, counters and webhook bookkeeping', async () => {
     await assertFails(setDoc(doc(alice(), 'waitlist/w1'), { pincode: '500084' }))
+    // The waitlist is a list of people's phone numbers against the areas they
+    // live in. joinWaitlist writes it; nothing reads it back.
+    await assertFails(getDoc(doc(alice(), 'waitlist/500084_+919876543210')))
     await assertFails(getDoc(doc(alice(), 'counters/booking')))
     await assertFails(setDoc(doc(alice(), 'counters/booking'), { next: 1 }))
     await assertFails(getDoc(doc(alice(), 'processedWebhookEvents/evt1')))

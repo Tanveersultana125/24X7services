@@ -4,8 +4,11 @@ node_modules/
 # build output
 .next/
 out/
-dist/
-lib/
+packages/*/dist/
+# The functions bundle, and only that. A bare `lib/` matches every directory
+# called lib at any depth, which quietly kept frontend/lib — firebase.ts,
+# format.ts, the whole data layer — out of the repository.
+backend/functions/lib/
 *.tsbuildinfo
 next-env.d.ts
 

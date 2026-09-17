@@ -1,13 +1,12 @@
-import { setGlobalOptions } from 'firebase-functions/v2'
+import { assertCallableNames } from './lib/callable'
+import { checkServiceability } from './catalog/serviceability'
+import { joinWaitlist } from './catalog/waitlist'
+import { searchCatalog } from './catalog/search'
+import { getDiagnosis } from './catalog/diagnosis'
 
 /**
  * The deployment surface. Every callable, trigger, scheduled job and webhook is
  * re-exported from here.
- *
- * Phase 1 establishes the shape: the region, the admin app, and the callable
- * wrapper that enforces auth, validates against the shared schemas and maps
- * errors to something safe to show a customer. The handlers themselves arrive
- * with the phase that needs them —
  *
  *   Phase 2  checkServiceability, joinWaitlist, searchCatalog, getDiagnosis
  *   Phase 3  getAvailableSlots, getTechnicianOptions, createBooking,
@@ -17,14 +16,26 @@ import { setGlobalOptions } from 'firebase-functions/v2'
  *            triggers, the invoice and warranty generation
  *   Phase 5  cancelBooking, rescheduleBooking, the support callables,
  *            registerFcmToken, deleteAccount, getMaskedNumber
+ *
+ * The export name is the deployed function name, which is why each one is named
+ * after its entry in the shared registry and checked against it below.
  */
 
-setGlobalOptions({
-  // Mumbai, for latency and because customer data stays in India under DPDP.
-  region: 'asia-south1',
-  maxInstances: 20,
-})
+// The region and the instance cap are set in lib/options, which every handler
+// pulls in through defineCallable — see the note there on why they cannot be
+// set from this file.
 
-// Nothing is deployed yet. An empty index still has to compile and bundle, so
-// that `npm run emulators` works from Phase 1 rather than Phase 3.
-export {}
+export { checkServiceability, joinWaitlist, searchCatalog, getDiagnosis }
+
+// All four are callable without signing in — a customer checks whether we cover
+// their area before they have any reason to give us a phone number.
+//
+// DECISION NEEDED: that is also four unauthenticated entry points. App Check
+// (Phase 6) is what stops them being called from outside the app; until it is
+// enforced, treat the waitlist counts as indicative rather than real demand.
+assertCallableNames({
+  checkServiceability,
+  joinWaitlist,
+  searchCatalog,
+  getDiagnosis,
+})

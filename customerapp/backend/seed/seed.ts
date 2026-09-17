@@ -7,9 +7,9 @@
  * Run it with `npm run seed` from the repo root. It is idempotent — every write
  * is a set() on a known id, so running it twice leaves the same data.
  *
- * Against the emulator it needs no credentials. Against a real project it uses
- * GOOGLE_APPLICATION_CREDENTIALS, and refuses unless SEED_ALLOW_PRODUCTION is
- * set, because it overwrites the live catalog.
+ * It targets the emulator unless SEED_ALLOW_PRODUCTION=1 is set, because it
+ * overwrites whatever catalog it is pointed at. Against the emulator it needs
+ * no credentials; against a real project it uses GOOGLE_APPLICATION_CREDENTIALS.
  */
 
 import { readFileSync } from 'node:fs'
@@ -53,16 +53,29 @@ import { z } from 'zod'
 const PROJECT_ID =
   process.env.GCLOUD_PROJECT ?? process.env.FIREBASE_PROJECT ?? 'demo-customerapp'
 
-const usingEmulator = Boolean(process.env.FIRESTORE_EMULATOR_HOST)
+/**
+ * The emulator is the default target, and reaching a real project takes saying
+ * so out loud.
+ *
+ * It cannot be the other way round. `FIRESTORE_EMULATOR_HOST` is only set for
+ * processes the emulator itself spawns, so a seed run from a second terminal —
+ * which is the documented way to load the emulator you are developing
+ * against — never sees it. Requiring it there meant the documented command
+ * could not work, and the way around it was to export the variable by hand,
+ * which is a habit that eventually gets used in a shell pointed at production.
+ */
+const usingEmulator = process.env.SEED_ALLOW_PRODUCTION !== '1'
 
-if (!usingEmulator && !process.env.SEED_ALLOW_PRODUCTION) {
-  console.error(
-    'FIRESTORE_EMULATOR_HOST is not set, so this would write to the real ' +
-      `project "${PROJECT_ID}" and overwrite its catalog.\n` +
-      'Start the emulators first, or set SEED_ALLOW_PRODUCTION=1 if that is ' +
-      'genuinely what you want.'
+/** Matches the firestore port in backend/firebase.json. */
+const DEFAULT_EMULATOR_HOST = '127.0.0.1:8080'
+
+if (usingEmulator) {
+  process.env.FIRESTORE_EMULATOR_HOST ??= DEFAULT_EMULATOR_HOST
+} else {
+  console.warn(
+    `SEED_ALLOW_PRODUCTION=1: writing to the real project "${PROJECT_ID}" ` +
+      'and overwriting its catalog.'
   )
-  process.exit(1)
 }
 
 // Against an emulator the SDK needs no credential at all, and handing it a
@@ -335,8 +348,29 @@ const DEMO_UID = 'demo-user-1'
 // Run
 // ---------------------------------------------------------------------------
 
+/**
+ * Fail now, with the reason, rather than inside the admin SDK's retry loop —
+ * which reports a connection refused as a deadline sixty seconds later.
+ */
+async function assertEmulatorReachable(): Promise<void> {
+  const host = process.env.FIRESTORE_EMULATOR_HOST
+  if (!usingEmulator || !host) return
+  try {
+    await fetch(`http://${host}/`)
+  } catch {
+    console.error(
+      `No Firestore emulator is listening on ${host}.
+` +
+        'Start it with `npm run emulators` in another terminal, or set ' +
+        'FIRESTORE_EMULATOR_HOST if yours is somewhere else.'
+    )
+    process.exit(1)
+  }
+}
+
 async function main(): Promise<void> {
   crossCheck()
+  await assertEmulatorReachable()
 
   const b = new Batcher(db)
 

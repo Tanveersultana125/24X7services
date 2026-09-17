@@ -1,7 +1,8 @@
-import { ScreenStub } from '@/components/dev/ScreenStub'
+import type { Metadata } from 'next'
+import { LocationScreen } from './LocationScreen'
 
-export const metadata = { title: 'Location' }
+export const metadata: Metadata = { title: 'Location' }
 
 export default function Page() {
-  return <ScreenStub title={'Location'} route={'/location'} note={'Pick your location and check that we service the pincode.'} />
+  return <LocationScreen />
 }
