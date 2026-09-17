@@ -39,7 +39,7 @@ Two terminals:
 
 ```bash
 npm run emulators                # Auth, Firestore, Functions, Storage, UI on :4000
-npm run dev                      # the app on http://localhost:3300
+npm run dev                      # the app on http://localhost:3310
 ```
 
 Then seed the emulator you just started:
