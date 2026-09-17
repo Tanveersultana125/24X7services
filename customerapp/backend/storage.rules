@@ -1,0 +1,88 @@
+rules_version = '2';
+
+// Customers upload three things: photos of a fault, a photo of a model sticker,
+// and an attachment on a support message. Everything else under a user's prefix
+// is written by the functions and only read back here.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function isImage() {
+      return request.resource.contentType.matches('image/(jpeg|png|webp|heic|heif)');
+    }
+
+    function isVideo() {
+      return request.resource.contentType.matches('video/(mp4|quicktime|webm)');
+    }
+
+    // The client compresses photos to roughly 300KB before upload. The ceiling
+    // here is deliberately looser so an unusual but honest file still lands,
+    // while a full-resolution phone photo does not.
+    function withinPhotoSize() {
+      return request.resource.size <= 2 * 1024 * 1024;
+    }
+
+    function withinVideoSize() {
+      return request.resource.size <= 25 * 1024 * 1024;
+    }
+
+    // -----------------------------------------------------------------------
+    // Issue media attached to a booking
+    // -----------------------------------------------------------------------
+
+    match /users/{uid}/bookings/{bookingId}/{fileName} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid)
+        && ((isImage() && withinPhotoSize()) || (isVideo() && withinVideoSize()));
+      // Media is evidence of what the appliance looked like when the job was
+      // booked, so it is not editable after the fact. Deletion before the
+      // booking exists is handled on the draft prefix below.
+      allow update, delete: if false;
+    }
+
+    // Media captured before sign-in, staged here and referenced by the booking
+    // once it is created. The customer may still remove one at this point.
+    match /users/{uid}/drafts/{fileName} {
+      allow read, delete: if isOwner(uid);
+      allow create: if isOwner(uid)
+        && ((isImage() && withinPhotoSize()) || (isVideo() && withinVideoSize()));
+      allow update: if false;
+    }
+
+    // -----------------------------------------------------------------------
+    // Model sticker photos on saved appliances
+    // -----------------------------------------------------------------------
+
+    match /users/{uid}/appliances/{fileName} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid) && isImage() && withinPhotoSize();
+    }
+
+    // -----------------------------------------------------------------------
+    // Support attachments
+    // -----------------------------------------------------------------------
+
+    match /users/{uid}/support/{ticketId}/{fileName} {
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid) && isImage() && withinPhotoSize();
+      allow update, delete: if false;
+    }
+
+    // -----------------------------------------------------------------------
+    // Generated invoices — written by the completion trigger, read by the owner
+    // -----------------------------------------------------------------------
+
+    match /users/{uid}/invoices/{fileName} {
+      allow read: if isOwner(uid);
+      allow write: if false;
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

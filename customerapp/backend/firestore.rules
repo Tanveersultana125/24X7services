@@ -1,0 +1,256 @@
+rules_version = '2';
+
+// The shape of this file follows one rule: a client may read what belongs to it
+// and write almost nothing. Every price, status and slot count is decided by a
+// callable, so the only client writes allowed here are the profile, addresses
+// and saved appliances — data the customer owns outright and nothing charges
+// against. Everything not named below is denied by the final catch-all.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -----------------------------------------------------------------------
+    // Helpers
+    // -----------------------------------------------------------------------
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // Field-set checks. `required` must all be present; nothing outside
+    // `required + optional` may appear, so a client cannot smuggle in a field
+    // the rules do not validate.
+    function onlyFields(required, optional) {
+      return incoming().keys().hasAll(required)
+        && incoming().keys().hasOnly(required.concat(optional));
+    }
+
+    function isString(v, maxLen) {
+      return v is string && v.size() > 0 && v.size() <= maxLen;
+    }
+
+    function isPincode(v) {
+      return v is string && v.matches('[1-9][0-9]{5}');
+    }
+
+    // -----------------------------------------------------------------------
+    // Catalog — public read, written only by the seed and by admins
+    // -----------------------------------------------------------------------
+
+    match /catalogAppliances/{id}    { allow read: if true; allow write: if false; }
+    match /catalogServices/{id}      { allow read: if true; allow write: if false; }
+    match /catalogBrands/{id}        { allow read: if true; allow write: if false; }
+    match /brandApplianceMatrix/{id} { allow read: if true; allow write: if false; }
+    match /catalogIssues/{id}        { allow read: if true; allow write: if false; }
+    match /diagnosisRules/{id}       { allow read: if true; allow write: if false; }
+    match /banners/{id}              { allow read: if true; allow write: if false; }
+    match /popularServices/{id}      { allow read: if true; allow write: if false; }
+    match /serviceAreas/{pincode}    { allow read: if true; allow write: if false; }
+    match /searchIndex/{id}          { allow read: if true; allow write: if false; }
+
+    // The public half of the config. Provider keys and anything with a margin
+    // in it live in config/private, which no rule below grants.
+    match /config/business { allow read: if true; allow write: if false; }
+
+    // The customer-facing view of a technician: name, rating, jobs, photo.
+    // `technicians` itself holds phone numbers and payout details and is never
+    // client-readable.
+    match /technicianPublic/{id} { allow read: if true; allow write: if false; }
+    match /technicians/{id}      { allow read, write: if false; }
+
+    // Slot capacity is a number a client could otherwise mine for load
+    // patterns, and availability is served through getAvailableSlots anyway.
+    match /slots/{id} { allow read, write: if false; }
+
+    // -----------------------------------------------------------------------
+    // Users — the one place a client writes
+    // -----------------------------------------------------------------------
+
+    match /users/{uid} {
+      allow get, list: if isOwner(uid);
+
+      // `phone` comes from the auth token and `consent` is stamped at sign-in,
+      // so neither is writable here. fcmTokens is managed by registerFcmToken.
+      allow create, update: if isOwner(uid)
+        && onlyFields([], ['name', 'email', 'defaultAddressId', 'createdAt', 'updatedAt'])
+        && (!('name' in incoming()) || isString(incoming().name, 80))
+        && (!('email' in incoming()) || isString(incoming().email, 160))
+        && (!('defaultAddressId' in incoming()) || isString(incoming().defaultAddressId, 200));
+
+      allow delete: if false; // deleteAccount() handles this
+
+      match /addresses/{addressId} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && onlyFields(
+               ['label', 'flat', 'area', 'city', 'pincode'],
+               ['customLabel', 'landmark', 'geo', 'createdAt', 'updatedAt']
+             )
+          && incoming().label in ['home', 'office', 'other']
+          && isString(incoming().flat, 120)
+          && isString(incoming().area, 160)
+          && isString(incoming().city, 80)
+          && isPincode(incoming().pincode);
+      }
+
+      match /appliances/{applianceId} {
+        allow read, delete: if isOwner(uid);
+        // lastServicedAt is stamped by the completion trigger, not by the app.
+        allow create, update: if isOwner(uid)
+          && onlyFields(
+               ['applianceId', 'brandId'],
+               ['type', 'modelNumber', 'modelPhotoPath', 'nickname',
+                'lastServicedAt', 'createdAt', 'updatedAt']
+             )
+          && incoming().applianceId in
+               ['refrigerator', 'washing-machine', 'air-conditioner', 'microwave', 'geyser']
+          && incoming().brandId in ['lg', 'samsung', 'bosch', 'ifb']
+          && (!('modelNumber' in incoming()) || incoming().modelNumber.size() <= 60)
+          && (!('lastServicedAt' in incoming())
+              || incoming().lastServicedAt == resource.data.get('lastServicedAt', null));
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // Bookings — read-only to the customer, written only by callables
+    // -----------------------------------------------------------------------
+
+    match /bookings/{bookingId} {
+      allow get: if signedIn() && resource.data.uid == request.auth.uid;
+      // Split from get because request.query only exists on a list; reading
+      // .limit during a get raises, and a raising rule denies.
+      // On a list Firestore allows the query only when the query itself proves
+      // every result will satisfy the rule, so where('uid','==',uid) passes and
+      // an unscoped read of the collection is rejected outright.
+      allow list: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.query.limit <= 100;
+      allow write: if false;
+
+      match /events/{eventId} {
+        allow read: if signedIn()
+          && get(/databases/$(database)/documents/bookings/$(bookingId)).data.uid == request.auth.uid;
+        allow write: if false;
+      }
+
+      match /repairRequests/{requestId} {
+        allow read: if signedIn()
+          && get(/databases/$(database)/documents/bookings/$(bookingId)).data.uid == request.auth.uid;
+        // Approve/decline goes through respondToRepairRequest, which recomputes
+        // the price. A direct write here would let a client approve at no cost.
+        allow write: if false;
+      }
+
+      // Job OTPs. Revealed to the owner only through getJobOtp, and stored
+      // hashed even there.
+      match /private/{docId} {
+        allow read, write: if false;
+      }
+    }
+
+    match /tracking/{bookingId} {
+      allow read: if signedIn()
+        && get(/databases/$(database)/documents/bookings/$(bookingId)).data.uid == request.auth.uid;
+      allow write: if false;
+    }
+
+    match /invoices/{invoiceId} {
+      allow get: if signedIn() && resource.data.uid == request.auth.uid;
+      // Split from get because request.query only exists on a list; reading
+      // .limit during a get raises, and a raising rule denies.
+      // On a list Firestore allows the query only when the query itself proves
+      // every result will satisfy the rule, so where('uid','==',uid) passes and
+      // an unscoped read of the collection is rejected outright.
+      allow list: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.query.limit <= 100;
+      allow write: if false;
+    }
+
+    match /warranties/{warrantyId} {
+      allow get: if signedIn() && resource.data.uid == request.auth.uid;
+      // Split from get because request.query only exists on a list; reading
+      // .limit during a get raises, and a raising rule denies.
+      // On a list Firestore allows the query only when the query itself proves
+      // every result will satisfy the rule, so where('uid','==',uid) passes and
+      // an unscoped read of the collection is rejected outright.
+      allow list: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.query.limit <= 100;
+      allow write: if false;
+    }
+
+    match /reviews/{reviewId} {
+      allow get: if signedIn() && resource.data.uid == request.auth.uid;
+      // Split from get because request.query only exists on a list; reading
+      // .limit during a get raises, and a raising rule denies.
+      // On a list Firestore allows the query only when the query itself proves
+      // every result will satisfy the rule, so where('uid','==',uid) passes and
+      // an unscoped read of the collection is rejected outright.
+      allow list: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.query.limit <= 100;
+      allow write: if false; // submitReview enforces "completed, and only once"
+    }
+
+    // -----------------------------------------------------------------------
+    // Support
+    // -----------------------------------------------------------------------
+
+    match /supportTickets/{ticketId} {
+      allow get: if signedIn() && resource.data.uid == request.auth.uid;
+      // Split from get because request.query only exists on a list; reading
+      // .limit during a get raises, and a raising rule denies.
+      // On a list Firestore allows the query only when the query itself proves
+      // every result will satisfy the rule, so where('uid','==',uid) passes and
+      // an unscoped read of the collection is rejected outright.
+      allow list: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.query.limit <= 100;
+      allow write: if false;
+
+      // Messages are created by sendSupportMessage so the assistant can reply
+      // in the same transaction and lastMessageAt stays truthful.
+      match /messages/{messageId} {
+        allow read: if signedIn()
+          && get(/databases/$(database)/documents/supportTickets/$(ticketId)).data.uid == request.auth.uid;
+        allow write: if false;
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // Notifications — owner reads, and may only mark one as read
+    // -----------------------------------------------------------------------
+
+    match /notifications/{uid}/items/{itemId} {
+      allow read: if isOwner(uid);
+      allow update: if isOwner(uid)
+        && incoming().diff(resource.data).affectedKeys().hasOnly(['readAt']);
+      allow create, delete: if false;
+    }
+
+    // -----------------------------------------------------------------------
+    // Written by functions only, never read by a client
+    // -----------------------------------------------------------------------
+
+    match /waitlist/{id}               { allow read, write: if false; } // joinWaitlist
+    match /counters/{id}               { allow read, write: if false; }
+    match /processedWebhookEvents/{id} { allow read, write: if false; }
+
+    // -----------------------------------------------------------------------
+    // Anything not named above
+    // -----------------------------------------------------------------------
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
