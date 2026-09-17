@@ -1,0 +1,103 @@
+[
+  {
+    "id": "washing-machine",
+    "name": "Washing Machine",
+    "image": "/appliances/washing-machine.jpg",
+    "order": 1,
+    "active": true,
+    "detailFields": [
+      {
+        "key": "type",
+        "label": "Machine type",
+        "kind": "select",
+        "options": ["front-load", "top-load", "semi-automatic"],
+        "required": true
+      },
+      {
+        "key": "capacity",
+        "label": "Capacity",
+        "kind": "select",
+        "options": ["Up to 6 kg", "6.5 - 7.5 kg", "8 kg and above"],
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "air-conditioner",
+    "name": "Air Conditioner",
+    "image": "/appliances/air-conditioner.jpg",
+    "order": 2,
+    "active": true,
+    "detailFields": [
+      {
+        "key": "type",
+        "label": "AC type",
+        "kind": "select",
+        "options": ["split", "window", "cassette"],
+        "required": true
+      },
+      {
+        "key": "capacity",
+        "label": "Tonnage",
+        "kind": "select",
+        "options": ["1 ton", "1.5 ton", "2 ton and above"],
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "refrigerator",
+    "name": "Refrigerator",
+    "image": "/appliances/refrigerator.jpg",
+    "order": 3,
+    "active": true,
+    "detailFields": [
+      {
+        "key": "type",
+        "label": "Fridge type",
+        "kind": "select",
+        "options": ["single-door", "double-door", "side-by-side"],
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "geyser",
+    "name": "Geyser",
+    "image": "/appliances/geyser.jpg",
+    "order": 4,
+    "active": true,
+    "detailFields": [
+      {
+        "key": "type",
+        "label": "Geyser type",
+        "kind": "select",
+        "options": ["storage", "instant"],
+        "required": true
+      },
+      {
+        "key": "capacity",
+        "label": "Capacity",
+        "kind": "select",
+        "options": ["Up to 6 L", "10 - 15 L", "25 L and above"],
+        "required": false
+      }
+    ]
+  },
+  {
+    "id": "microwave",
+    "name": "Microwave",
+    "image": "/appliances/microwave.jpg",
+    "order": 5,
+    "active": true,
+    "detailFields": [
+      {
+        "key": "type",
+        "label": "Microwave type",
+        "kind": "select",
+        "options": ["solo", "grill", "convection"],
+        "required": true
+      }
+    ]
+  }
+]

@@ -1,0 +1,237 @@
+[
+  {
+    "id": "washing-machine_repair",
+    "applianceId": "washing-machine",
+    "serviceKey": "repair",
+    "name": "Washing Machine Repair",
+    "description": "Not draining, not spinning, leaking or throwing an error code. The expert inspects it and quotes the repair before touching anything.",
+    "visitFee": 29900,
+    "startingPrice": 29900,
+    "order": 1,
+    "active": true
+  },
+  {
+    "id": "washing-machine_service",
+    "applianceId": "washing-machine",
+    "serviceKey": "service",
+    "name": "Washing Machine Service",
+    "description": "Full check-up, drum and filter clean, drain line flush and a test wash.",
+    "visitFee": 49900,
+    "startingPrice": 49900,
+    "order": 2,
+    "active": true
+  },
+  {
+    "id": "washing-machine_installation",
+    "applianceId": "washing-machine",
+    "serviceKey": "installation",
+    "name": "Washing Machine Installation",
+    "description": "Levelling, inlet and drain connection, transit bolt removal and a first test cycle.",
+    "visitFee": 39900,
+    "startingPrice": 39900,
+    "order": 3,
+    "active": true
+  },
+  {
+    "id": "washing-machine_uninstallation",
+    "applianceId": "washing-machine",
+    "serviceKey": "uninstallation",
+    "name": "Washing Machine Uninstallation",
+    "description": "Safe disconnection and packing for a move, including transit bolt refitting.",
+    "visitFee": 29900,
+    "startingPrice": 29900,
+    "order": 4,
+    "active": true
+  },
+
+  {
+    "id": "air-conditioner_service",
+    "applianceId": "air-conditioner",
+    "serviceKey": "service",
+    "name": "AC Service",
+    "description": "Filter and coil clean, drain line clear, gas pressure check and a cooling test.",
+    "visitFee": 39900,
+    "startingPrice": 39900,
+    "order": 1,
+    "active": true
+  },
+  {
+    "id": "air-conditioner_repair",
+    "applianceId": "air-conditioner",
+    "serviceKey": "repair",
+    "name": "AC Repair",
+    "description": "Not cooling, leaking water, tripping or making noise. Inspection first, quote before repair.",
+    "visitFee": 29900,
+    "startingPrice": 29900,
+    "order": 2,
+    "active": true
+  },
+  {
+    "id": "air-conditioner_deep-clean",
+    "applianceId": "air-conditioner",
+    "serviceKey": "deep-clean",
+    "name": "AC Deep Clean (Jet)",
+    "description": "Indoor unit dismantled and jet-washed, blower and coil cleaned, outdoor unit rinsed.",
+    "visitFee": 69900,
+    "startingPrice": 69900,
+    "order": 3,
+    "active": true
+  },
+  {
+    "id": "air-conditioner_gas-refill",
+    "applianceId": "air-conditioner",
+    "serviceKey": "gas-refill",
+    "name": "AC Gas Refill",
+    "description": "Leak test, repair of the leak point, vacuum and a full gas charge.",
+    "visitFee": 29900,
+    "startingPrice": 219900,
+    "order": 4,
+    "active": true
+  },
+  {
+    "id": "air-conditioner_installation",
+    "applianceId": "air-conditioner",
+    "serviceKey": "installation",
+    "name": "AC Installation",
+    "description": "Indoor and outdoor mounting, piping, drain routing, vacuum and a cooling test.",
+    "visitFee": 149900,
+    "startingPrice": 149900,
+    "order": 5,
+    "active": true
+  },
+  {
+    "id": "air-conditioner_uninstallation",
+    "applianceId": "air-conditioner",
+    "serviceKey": "uninstallation",
+    "name": "AC Uninstallation",
+    "description": "Gas recovered into the outdoor unit, units dismounted and packed for a move.",
+    "visitFee": 79900,
+    "startingPrice": 79900,
+    "order": 6,
+    "active": true
+  },
+
+  {
+    "id": "refrigerator_repair",
+    "applianceId": "refrigerator",
+    "serviceKey": "repair",
+    "name": "Refrigerator Repair",
+    "description": "Not cooling, freezing over, leaking or running constantly. Diagnosed on site before any work.",
+    "visitFee": 29900,
+    "startingPrice": 29900,
+    "order": 1,
+    "active": true
+  },
+  {
+    "id": "refrigerator_service",
+    "applianceId": "refrigerator",
+    "serviceKey": "service",
+    "name": "Refrigerator Service",
+    "description": "Defrost, coil and drain clean, door seal check and a temperature test.",
+    "visitFee": 44900,
+    "startingPrice": 44900,
+    "order": 2,
+    "active": true
+  },
+  {
+    "id": "refrigerator_gas-refill",
+    "applianceId": "refrigerator",
+    "serviceKey": "gas-refill",
+    "name": "Refrigerator Gas Refill",
+    "description": "Leak trace, repair, vacuum and a fresh gas charge with a cooling test.",
+    "visitFee": 29900,
+    "startingPrice": 189900,
+    "order": 3,
+    "active": true
+  },
+  {
+    "id": "refrigerator_installation",
+    "applianceId": "refrigerator",
+    "serviceKey": "installation",
+    "name": "Refrigerator Installation",
+    "description": "Placement, levelling, door alignment and first-start checks.",
+    "visitFee": 29900,
+    "startingPrice": 29900,
+    "order": 4,
+    "active": true
+  },
+
+  {
+    "id": "geyser_service",
+    "applianceId": "geyser",
+    "serviceKey": "service",
+    "name": "Geyser Service",
+    "description": "Descaling, element and thermostat check, valve test and a full flush.",
+    "visitFee": 34900,
+    "startingPrice": 34900,
+    "order": 1,
+    "active": true
+  },
+  {
+    "id": "geyser_repair",
+    "applianceId": "geyser",
+    "serviceKey": "repair",
+    "name": "Geyser Repair",
+    "description": "No hot water, leaking, tripping or heating slowly. Quoted after inspection.",
+    "visitFee": 29900,
+    "startingPrice": 29900,
+    "order": 2,
+    "active": true
+  },
+  {
+    "id": "geyser_installation",
+    "applianceId": "geyser",
+    "serviceKey": "installation",
+    "name": "Geyser Installation",
+    "description": "Wall mounting, inlet and outlet plumbing, safety valve fitting and a heating test.",
+    "visitFee": 59900,
+    "startingPrice": 59900,
+    "order": 3,
+    "active": true
+  },
+  {
+    "id": "geyser_uninstallation",
+    "applianceId": "geyser",
+    "serviceKey": "uninstallation",
+    "name": "Geyser Uninstallation",
+    "description": "Drain, disconnect and dismount, ready for a move.",
+    "visitFee": 29900,
+    "startingPrice": 29900,
+    "order": 4,
+    "active": true
+  },
+
+  {
+    "id": "microwave_repair",
+    "applianceId": "microwave",
+    "serviceKey": "repair",
+    "name": "Microwave Repair",
+    "description": "Not heating, sparking, turntable stuck or panel unresponsive. Inspected before repair.",
+    "visitFee": 29900,
+    "startingPrice": 29900,
+    "order": 1,
+    "active": true
+  },
+  {
+    "id": "microwave_service",
+    "applianceId": "microwave",
+    "serviceKey": "service",
+    "name": "Microwave Service",
+    "description": "Interior and cavity clean, magnetron and door interlock check, heating test.",
+    "visitFee": 34900,
+    "startingPrice": 34900,
+    "order": 2,
+    "active": true
+  },
+  {
+    "id": "microwave_installation",
+    "applianceId": "microwave",
+    "serviceKey": "installation",
+    "name": "Microwave Installation",
+    "description": "Placement or wall mounting, power check and a first heating test.",
+    "visitFee": 29900,
+    "startingPrice": 29900,
+    "order": 3,
+    "active": true
+  }
+]

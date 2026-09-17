@@ -1,0 +1,39 @@
+[
+  { "id": "washing-machine_not-draining", "applianceId": "washing-machine", "label": "Not draining water", "order": 1, "allowMultiple": true },
+  { "id": "washing-machine_not-spinning", "applianceId": "washing-machine", "label": "Drum not spinning", "order": 2, "allowMultiple": true },
+  { "id": "washing-machine_leaking", "applianceId": "washing-machine", "label": "Leaking water", "order": 3, "allowMultiple": true },
+  { "id": "washing-machine_noisy", "applianceId": "washing-machine", "label": "Loud noise or shaking", "order": 4, "allowMultiple": true },
+  { "id": "washing-machine_not-starting", "applianceId": "washing-machine", "label": "Not switching on", "order": 5, "allowMultiple": true },
+  { "id": "washing-machine_error-code", "applianceId": "washing-machine", "label": "Showing an error code", "order": 6, "allowMultiple": true },
+  { "id": "washing-machine_door-stuck", "applianceId": "washing-machine", "label": "Door will not open", "order": 7, "allowMultiple": true },
+
+  { "id": "air-conditioner_not-cooling", "applianceId": "air-conditioner", "label": "Not cooling enough", "order": 1, "allowMultiple": true },
+  { "id": "air-conditioner_leaking", "applianceId": "air-conditioner", "label": "Water dripping indoors", "order": 2, "allowMultiple": true },
+  { "id": "air-conditioner_bad-smell", "applianceId": "air-conditioner", "label": "Bad smell from the unit", "order": 3, "allowMultiple": true },
+  { "id": "air-conditioner_noisy", "applianceId": "air-conditioner", "label": "Noisy or rattling", "order": 4, "allowMultiple": true },
+  { "id": "air-conditioner_not-starting", "applianceId": "air-conditioner", "label": "Not switching on", "order": 5, "allowMultiple": true },
+  { "id": "air-conditioner_icing", "applianceId": "air-conditioner", "label": "Ice on the coil or pipe", "order": 6, "allowMultiple": true },
+  { "id": "air-conditioner_tripping", "applianceId": "air-conditioner", "label": "Tripping the MCB", "order": 7, "allowMultiple": true },
+
+  { "id": "refrigerator_not-cooling", "applianceId": "refrigerator", "label": "Not cooling", "order": 1, "allowMultiple": true },
+  { "id": "refrigerator_excess-ice", "applianceId": "refrigerator", "label": "Too much ice in the freezer", "order": 2, "allowMultiple": true },
+  { "id": "refrigerator_leaking", "applianceId": "refrigerator", "label": "Water collecting inside or below", "order": 3, "allowMultiple": true },
+  { "id": "refrigerator_noisy", "applianceId": "refrigerator", "label": "Loud or constant noise", "order": 4, "allowMultiple": true },
+  { "id": "refrigerator_door-seal", "applianceId": "refrigerator", "label": "Door not sealing", "order": 5, "allowMultiple": true },
+  { "id": "refrigerator_always-running", "applianceId": "refrigerator", "label": "Compressor never stops", "order": 6, "allowMultiple": true },
+  { "id": "refrigerator_light-out", "applianceId": "refrigerator", "label": "Light or display not working", "order": 7, "allowMultiple": true },
+
+  { "id": "geyser_no-hot-water", "applianceId": "geyser", "label": "No hot water", "order": 1, "allowMultiple": true },
+  { "id": "geyser_slow-heating", "applianceId": "geyser", "label": "Heating too slowly", "order": 2, "allowMultiple": true },
+  { "id": "geyser_leaking", "applianceId": "geyser", "label": "Leaking water", "order": 3, "allowMultiple": true },
+  { "id": "geyser_tripping", "applianceId": "geyser", "label": "Tripping the MCB", "order": 4, "allowMultiple": true },
+  { "id": "geyser_low-pressure", "applianceId": "geyser", "label": "Low water pressure", "order": 5, "allowMultiple": true },
+  { "id": "geyser_noisy", "applianceId": "geyser", "label": "Rumbling or knocking sound", "order": 6, "allowMultiple": true },
+
+  { "id": "microwave_not-heating", "applianceId": "microwave", "label": "Runs but does not heat", "order": 1, "allowMultiple": true },
+  { "id": "microwave_sparking", "applianceId": "microwave", "label": "Sparking inside", "order": 2, "allowMultiple": true },
+  { "id": "microwave_turntable", "applianceId": "microwave", "label": "Turntable not rotating", "order": 3, "allowMultiple": true },
+  { "id": "microwave_panel", "applianceId": "microwave", "label": "Buttons or display not responding", "order": 4, "allowMultiple": true },
+  { "id": "microwave_door", "applianceId": "microwave", "label": "Door not closing properly", "order": 5, "allowMultiple": true },
+  { "id": "microwave_noisy", "applianceId": "microwave", "label": "Loud humming or buzzing", "order": 6, "allowMultiple": true }
+]

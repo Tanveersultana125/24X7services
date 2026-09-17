@@ -1,0 +1,28 @@
+{
+  "//DECISION NEEDED": "legalName, gstin, address, sacCode, gstRate and stateCode are placeholders. All six must be confirmed with the CA before launch — they are printed on every GST invoice the app issues.",
+  "legalName": "24X7 Home Services Private Limited",
+  "gstin": "36AAAAA0000A1Z5",
+  "address": "Plot 12, Road No. 2, Banjara Hills, Hyderabad, Telangana 500034",
+  "sacCode": "998714",
+  "gstRate": 18,
+  "stateCode": "36",
+  "allowPayAfterService": true,
+  "cancellationPolicy": {
+    "freeUntilHours": 4,
+    "feePaise": 9900,
+    "refundDays": 5
+  },
+  "rescheduleLimit": 2,
+  "defaultWarrantyDays": 30,
+  "supportPhone": "+918000247247",
+  "mediaLimits": {
+    "maxPhotos": 5,
+    "maxPhotoBytes": 307200,
+    "maxPhotoDimension": 1600,
+    "maxVideos": 1,
+    "maxVideoBytes": 26214400,
+    "maxVideoSeconds": 30
+  },
+  "slotHoldMinutes": 15,
+  "termsVersion": "2026-09-01"
+}

@@ -1,0 +1,405 @@
+[
+  {
+    "id": "washing-machine_not-draining",
+    "applianceId": "washing-machine",
+    "issueId": "washing-machine_not-draining",
+    "possibleCauses": [
+      "Blocked drain filter or lint trap",
+      "Kinked or clogged drain hose",
+      "Worn or jammed drain pump",
+      "Drain pipe set higher than the machine allows"
+    ],
+    "tips": [
+      "Run the machine on empty after clearing the filter to see if it drains.",
+      "Keep the drain hose free of sharp bends."
+    ]
+  },
+  {
+    "id": "washing-machine_not-spinning",
+    "applianceId": "washing-machine",
+    "issueId": "washing-machine_not-spinning",
+    "possibleCauses": [
+      "Load unbalanced on one side of the drum",
+      "Worn or slipped drive belt",
+      "Faulty door lock stopping the spin cycle",
+      "Motor or control board fault"
+    ],
+    "tips": ["Redistribute the load evenly and try a spin-only cycle."]
+  },
+  {
+    "id": "washing-machine_leaking",
+    "applianceId": "washing-machine",
+    "issueId": "washing-machine_leaking",
+    "possibleCauses": [
+      "Loose or cracked inlet hose",
+      "Worn door gasket",
+      "Blocked detergent drawer overflowing",
+      "Cracked outer tub or damaged pump seal"
+    ],
+    "tips": ["Turn the inlet tap off until the visit to limit water damage."]
+  },
+  {
+    "id": "washing-machine_noisy",
+    "applianceId": "washing-machine",
+    "issueId": "washing-machine_noisy",
+    "possibleCauses": [
+      "Transit bolts still fitted after a move",
+      "Machine not levelled on the floor",
+      "Worn drum bearings",
+      "A coin or clip caught between drum and tub"
+    ],
+    "tips": ["Check the machine does not rock when pushed at a corner."]
+  },
+  {
+    "id": "washing-machine_not-starting",
+    "applianceId": "washing-machine",
+    "issueId": "washing-machine_not-starting",
+    "possibleCauses": [
+      "No power at the socket or a tripped MCB",
+      "Door not latched fully",
+      "Faulty door lock switch",
+      "Control board or power supply fault"
+    ],
+    "tips": ["Try another appliance on the same socket to rule out the supply."]
+  },
+  {
+    "id": "washing-machine_error-code",
+    "applianceId": "washing-machine",
+    "issueId": "washing-machine_error-code",
+    "possibleCauses": [
+      "Water inlet or drain fault reported by a sensor",
+      "Door lock not registering",
+      "Temperature or level sensor out of range",
+      "Control board fault"
+    ],
+    "tips": ["Note the exact code — it narrows the fault considerably."]
+  },
+  {
+    "id": "washing-machine_door-stuck",
+    "applianceId": "washing-machine",
+    "issueId": "washing-machine_door-stuck",
+    "possibleCauses": [
+      "Water still standing in the drum",
+      "Door lock jammed mid-cycle",
+      "Handle or latch mechanism broken",
+      "Power interrupted before the cycle ended"
+    ],
+    "tips": ["Switch off at the wall for a minute, then power back on."]
+  },
+
+  {
+    "id": "air-conditioner_not-cooling",
+    "applianceId": "air-conditioner",
+    "issueId": "air-conditioner_not-cooling",
+    "possibleCauses": [
+      "Clogged air filter restricting airflow",
+      "Low refrigerant from a slow leak",
+      "Dirty condenser coil on the outdoor unit",
+      "Failing compressor or capacitor"
+    ],
+    "tips": ["Rinse the filters and let them dry fully before refitting."]
+  },
+  {
+    "id": "air-conditioner_leaking",
+    "applianceId": "air-conditioner",
+    "issueId": "air-conditioner_leaking",
+    "possibleCauses": [
+      "Blocked drain line or drain pan",
+      "Indoor unit not tilted correctly",
+      "Frozen coil melting faster than it drains",
+      "Loose or detached drain pipe"
+    ],
+    "tips": ["Switch the unit off to stop the drip until the visit."]
+  },
+  {
+    "id": "air-conditioner_bad-smell",
+    "applianceId": "air-conditioner",
+    "issueId": "air-conditioner_bad-smell",
+    "possibleCauses": [
+      "Mould in the blower wheel or coil",
+      "Standing water in the drain pan",
+      "Dust burning off the heating element",
+      "Dead insect or debris inside the unit"
+    ],
+    "tips": ["A deep clean usually clears this where a normal service will not."]
+  },
+  {
+    "id": "air-conditioner_noisy",
+    "applianceId": "air-conditioner",
+    "issueId": "air-conditioner_noisy",
+    "possibleCauses": [
+      "Loose panel or mounting bracket",
+      "Debris in the outdoor fan",
+      "Worn fan motor bearing",
+      "Compressor vibration"
+    ],
+    "tips": ["Note whether the noise is from the indoor or the outdoor unit."]
+  },
+  {
+    "id": "air-conditioner_not-starting",
+    "applianceId": "air-conditioner",
+    "issueId": "air-conditioner_not-starting",
+    "possibleCauses": [
+      "Remote batteries dead or remote unpaired",
+      "Tripped MCB or stabiliser cut-off",
+      "Faulty PCB on the indoor unit",
+      "Failed capacitor on the outdoor unit"
+    ],
+    "tips": ["Try the manual power button on the indoor unit."]
+  },
+  {
+    "id": "air-conditioner_icing",
+    "applianceId": "air-conditioner",
+    "issueId": "air-conditioner_icing",
+    "possibleCauses": [
+      "Low refrigerant charge",
+      "Restricted airflow from a dirty filter",
+      "Faulty temperature sensor",
+      "Blower running too slowly"
+    ],
+    "tips": ["Run the fan without cooling for an hour to let the ice melt."]
+  },
+  {
+    "id": "air-conditioner_tripping",
+    "applianceId": "air-conditioner",
+    "issueId": "air-conditioner_tripping",
+    "possibleCauses": [
+      "Short in the compressor or fan winding",
+      "Moisture in the electrical section",
+      "Undersized MCB for the load",
+      "Damaged power cable"
+    ],
+    "tips": ["Leave the MCB off until an expert has looked at it."]
+  },
+
+  {
+    "id": "refrigerator_not-cooling",
+    "applianceId": "refrigerator",
+    "issueId": "refrigerator_not-cooling",
+    "possibleCauses": [
+      "Thermostat set too low or faulty",
+      "Dust-clogged condenser coil at the back",
+      "Failed condenser fan",
+      "Refrigerant leak or compressor fault"
+    ],
+    "tips": ["Leave a 10cm gap behind the fridge for airflow."]
+  },
+  {
+    "id": "refrigerator_excess-ice",
+    "applianceId": "refrigerator",
+    "issueId": "refrigerator_excess-ice",
+    "possibleCauses": [
+      "Faulty defrost timer or heater",
+      "Door seal letting warm air in",
+      "Blocked defrost drain",
+      "Thermostat reading incorrectly"
+    ],
+    "tips": ["Manual defrosting helps briefly but the cause will return."]
+  },
+  {
+    "id": "refrigerator_leaking",
+    "applianceId": "refrigerator",
+    "issueId": "refrigerator_leaking",
+    "possibleCauses": [
+      "Blocked defrost drain tube",
+      "Cracked or overflowing drip tray",
+      "Door left ajar causing condensation",
+      "Water line or filter leak on a dispenser model"
+    ],
+    "tips": ["Dry the floor under it so you can tell if the leak is ongoing."]
+  },
+  {
+    "id": "refrigerator_noisy",
+    "applianceId": "refrigerator",
+    "issueId": "refrigerator_noisy",
+    "possibleCauses": [
+      "Fridge not level on the floor",
+      "Worn condenser or evaporator fan",
+      "Compressor mounting rubber perished",
+      "Ice touching the evaporator fan blade"
+    ],
+    "tips": ["Note when the noise happens — constant or only in cycles."]
+  },
+  {
+    "id": "refrigerator_door-seal",
+    "applianceId": "refrigerator",
+    "issueId": "refrigerator_door-seal",
+    "possibleCauses": [
+      "Perished or torn gasket",
+      "Door hinge dropped out of alignment",
+      "Fridge tilted forward",
+      "Shelf or drawer fouling the door"
+    ],
+    "tips": ["A note of paper should grip when closed in the door."]
+  },
+  {
+    "id": "refrigerator_always-running",
+    "applianceId": "refrigerator",
+    "issueId": "refrigerator_always-running",
+    "possibleCauses": [
+      "Poor door seal letting warm air in",
+      "Condenser coil thick with dust",
+      "Thermostat stuck closed",
+      "Low refrigerant charge"
+    ],
+    "tips": ["Check nothing is holding a door slightly open."]
+  },
+  {
+    "id": "refrigerator_light-out",
+    "applianceId": "refrigerator",
+    "issueId": "refrigerator_light-out",
+    "possibleCauses": [
+      "Blown bulb or failed LED strip",
+      "Door switch stuck",
+      "Display board fault",
+      "Loose internal wiring"
+    ],
+    "tips": ["If cooling is normal, this is usually a small part swap."]
+  },
+
+  {
+    "id": "geyser_no-hot-water",
+    "applianceId": "geyser",
+    "issueId": "geyser_no-hot-water",
+    "possibleCauses": [
+      "Burnt-out heating element",
+      "Failed thermostat",
+      "Tripped thermal cut-out",
+      "No power reaching the unit"
+    ],
+    "tips": ["Check the indicator lamp — no lamp usually means no supply."]
+  },
+  {
+    "id": "geyser_slow-heating",
+    "applianceId": "geyser",
+    "issueId": "geyser_slow-heating",
+    "possibleCauses": [
+      "Heavy scale on the heating element",
+      "Thermostat set too low",
+      "Element partially failed",
+      "Tank capacity too small for the demand"
+    ],
+    "tips": ["Hard water areas need descaling roughly once a year."]
+  },
+  {
+    "id": "geyser_leaking",
+    "applianceId": "geyser",
+    "issueId": "geyser_leaking",
+    "possibleCauses": [
+      "Faulty pressure relief valve",
+      "Corroded tank",
+      "Loose inlet or outlet connection",
+      "Perished element gasket"
+    ],
+    "tips": ["Turn the geyser off at the MCB and shut the inlet valve."]
+  },
+  {
+    "id": "geyser_tripping",
+    "applianceId": "geyser",
+    "issueId": "geyser_tripping",
+    "possibleCauses": [
+      "Element shorted to the tank",
+      "Water ingress in the wiring",
+      "Faulty thermostat",
+      "Earth leakage in the supply"
+    ],
+    "tips": ["Do not reset repeatedly — a tripping geyser is a shock risk."]
+  },
+  {
+    "id": "geyser_low-pressure",
+    "applianceId": "geyser",
+    "issueId": "geyser_low-pressure",
+    "possibleCauses": [
+      "Scale blocking the outlet",
+      "Partially closed inlet valve",
+      "Clogged shower or tap aerator",
+      "Low overhead tank level"
+    ],
+    "tips": ["Compare the cold tap pressure at the same outlet."]
+  },
+  {
+    "id": "geyser_noisy",
+    "applianceId": "geyser",
+    "issueId": "geyser_noisy",
+    "possibleCauses": [
+      "Scale on the element boiling unevenly",
+      "Sediment settled in the tank",
+      "Loose mounting bracket",
+      "Water hammer in the pipework"
+    ],
+    "tips": ["A flush and descale clears most rumbling."]
+  },
+
+  {
+    "id": "microwave_not-heating",
+    "applianceId": "microwave",
+    "issueId": "microwave_not-heating",
+    "possibleCauses": [
+      "Failed magnetron",
+      "Blown high-voltage fuse or diode",
+      "Faulty door interlock switch",
+      "Control board fault"
+    ],
+    "tips": ["If the turntable and light still work, it is usually the magnetron side."]
+  },
+  {
+    "id": "microwave_sparking",
+    "applianceId": "microwave",
+    "issueId": "microwave_sparking",
+    "possibleCauses": [
+      "Metal or foil left inside",
+      "Damaged waveguide cover",
+      "Chipped interior paint exposing metal",
+      "Failing magnetron"
+    ],
+    "tips": ["Stop using it until it is checked — sparking can start a fire."]
+  },
+  {
+    "id": "microwave_turntable",
+    "applianceId": "microwave",
+    "issueId": "microwave_turntable",
+    "possibleCauses": [
+      "Turntable coupler not seated",
+      "Failed turntable motor",
+      "Debris in the roller ring",
+      "Control board not driving the motor"
+    ],
+    "tips": ["Lift the plate out and refit it on the coupler."]
+  },
+  {
+    "id": "microwave_panel",
+    "applianceId": "microwave",
+    "issueId": "microwave_panel",
+    "possibleCauses": [
+      "Membrane keypad worn through",
+      "Control board fault",
+      "Child lock engaged",
+      "Loose ribbon connector"
+    ],
+    "tips": ["Look for a lock icon on the display before booking."]
+  },
+  {
+    "id": "microwave_door",
+    "applianceId": "microwave",
+    "issueId": "microwave_door",
+    "possibleCauses": [
+      "Bent or broken door latch",
+      "Worn hinge",
+      "Failed interlock switch",
+      "Debris on the door seal"
+    ],
+    "tips": ["A door that will not latch stops the microwave from running at all."]
+  },
+  {
+    "id": "microwave_noisy",
+    "applianceId": "microwave",
+    "issueId": "microwave_noisy",
+    "possibleCauses": [
+      "Cooling fan obstructed",
+      "Failing magnetron under load",
+      "Worn turntable motor",
+      "Loose internal panel"
+    ],
+    "tips": ["Note whether the noise only starts when it is heating."]
+  }
+]

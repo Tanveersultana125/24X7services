@@ -1,0 +1,18 @@
+[
+  { "pincode": "500001", "city": "Hyderabad", "area": "Afzal Gunj", "active": true },
+  { "pincode": "500003", "city": "Hyderabad", "area": "Secunderabad", "active": true },
+  { "pincode": "500016", "city": "Hyderabad", "area": "Begumpet", "active": true },
+  { "pincode": "500018", "city": "Hyderabad", "area": "Sanathnagar", "active": true },
+  { "pincode": "500028", "city": "Hyderabad", "area": "Mehdipatnam", "active": true },
+  { "pincode": "500032", "city": "Hyderabad", "area": "Gachibowli", "active": true },
+  { "pincode": "500033", "city": "Hyderabad", "area": "Jubilee Hills", "active": true },
+  { "pincode": "500034", "city": "Hyderabad", "area": "Banjara Hills", "active": true },
+  { "pincode": "500035", "city": "Hyderabad", "area": "Hyderguda", "active": true },
+  { "pincode": "500049", "city": "Hyderabad", "area": "Nizampet", "active": true },
+  { "pincode": "500072", "city": "Hyderabad", "area": "Kukatpally", "active": true },
+  { "pincode": "500081", "city": "Hyderabad", "area": "Madhapur", "active": true },
+  { "pincode": "500084", "city": "Hyderabad", "area": "Kondapur", "active": true },
+  { "pincode": "500085", "city": "Hyderabad", "area": "KPHB Colony", "active": true },
+  { "pincode": "500090", "city": "Hyderabad", "area": "Bachupally", "active": true },
+  { "pincode": "501301", "city": "Hyderabad", "area": "Shamshabad", "active": false }
+]

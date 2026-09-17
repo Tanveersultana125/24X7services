@@ -1,0 +1,69 @@
+{
+  "banners": [
+    {
+      "id": "banner_ac-season",
+      "title": "Summer-ready AC service",
+      "subtitle": "Filter clean, gas check and a cooling test in under an hour.",
+      "ctaLabel": "Book AC service",
+      "ctaHref": "/services/appliance?a=air-conditioner",
+      "order": 1,
+      "active": true
+    },
+    {
+      "id": "banner_no-surprise",
+      "title": "You approve the repair before it starts",
+      "subtitle": "The expert inspects, quotes, and waits for your yes.",
+      "ctaLabel": "How it works",
+      "ctaHref": "/services",
+      "order": 2,
+      "active": true
+    },
+    {
+      "id": "banner_warranty",
+      "title": "Every repair carries a service warranty",
+      "subtitle": "With a GST invoice in the app the moment the job is done.",
+      "ctaLabel": "See all services",
+      "ctaHref": "/services",
+      "order": 3,
+      "active": true
+    }
+  ],
+  "popularServices": [
+    {
+      "id": "popular_ac-service",
+      "applianceId": "air-conditioner",
+      "serviceKey": "service",
+      "name": "AC Service",
+      "fromPrice": 39900,
+      "order": 1,
+      "active": true
+    },
+    {
+      "id": "popular_refrigerator-repair",
+      "applianceId": "refrigerator",
+      "serviceKey": "repair",
+      "name": "Refrigerator Repair",
+      "fromPrice": 29900,
+      "order": 2,
+      "active": true
+    },
+    {
+      "id": "popular_washing-machine-repair",
+      "applianceId": "washing-machine",
+      "serviceKey": "repair",
+      "name": "Washing Machine Repair",
+      "fromPrice": 29900,
+      "order": 3,
+      "active": true
+    },
+    {
+      "id": "popular_geyser-service",
+      "applianceId": "geyser",
+      "serviceKey": "service",
+      "name": "Geyser Service",
+      "fromPrice": 34900,
+      "order": 4,
+      "active": true
+    }
+  ]
+}

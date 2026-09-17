@@ -7,10 +7,10 @@
   "scripts": {
     "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=cjs --outfile=lib/index.js --external:firebase-admin --external:firebase-functions --external:pdfkit --sourcemap",
     "watch": "npm run build -- --watch",
-    "typecheck": "tsc --noEmit",
-    "seed": "tsx seed/seed.ts",
-    "simulate": "tsx scripts/simulateTechnician.ts",
-    "test:rules": "vitest run --config test/vitest.config.ts",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p ../tsconfig.tools.json",
+    "seed": "tsx ../seed/seed.ts",
+    "simulate": "tsx ../scripts/simulateTechnician.ts",
+    "test:rules": "vitest run --config ../test/vitest.config.ts",
     "deploy": "npm run build && firebase deploy --only functions --config ../firebase.json"
   },
   "engines": {

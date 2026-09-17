@@ -1,0 +1,62 @@
+[
+  {
+    "id": "tech_arjun",
+    "name": "Arjun Kumar",
+    "rating": 4.8,
+    "jobsCount": 320,
+    "specializations": ["samsung", "lg"],
+    "appliances": ["washing-machine", "refrigerator", "air-conditioner"],
+    "pincodes": ["500032", "500033", "500034", "500081", "500084"],
+    "phone": "+919000000101",
+    "employeeCode": "AP-T-0101",
+    "active": true
+  },
+  {
+    "id": "tech_farhan",
+    "name": "Farhan Ali",
+    "rating": 4.7,
+    "jobsCount": 268,
+    "specializations": ["bosch", "ifb"],
+    "appliances": ["washing-machine", "microwave", "geyser"],
+    "pincodes": ["500016", "500018", "500072", "500085"],
+    "phone": "+919000000102",
+    "employeeCode": "AP-T-0102",
+    "active": true
+  },
+  {
+    "id": "tech_ramesh",
+    "name": "Ramesh Naidu",
+    "rating": 4.9,
+    "jobsCount": 412,
+    "specializations": ["lg", "samsung", "bosch"],
+    "appliances": ["air-conditioner", "refrigerator"],
+    "pincodes": ["500001", "500003", "500028", "500035"],
+    "phone": "+919000000103",
+    "employeeCode": "AP-T-0103",
+    "active": true
+  },
+  {
+    "id": "tech_sunita",
+    "name": "Sunita Rao",
+    "rating": 4.8,
+    "jobsCount": 197,
+    "specializations": ["ifb", "bosch"],
+    "appliances": ["washing-machine", "microwave"],
+    "pincodes": ["500049", "500072", "500085", "500090"],
+    "phone": "+919000000104",
+    "employeeCode": "AP-T-0104",
+    "active": true
+  },
+  {
+    "id": "tech_vikram",
+    "name": "Vikram Shetty",
+    "rating": 4.6,
+    "jobsCount": 154,
+    "specializations": ["samsung", "lg", "ifb"],
+    "appliances": ["geyser", "air-conditioner", "microwave"],
+    "pincodes": ["500033", "500034", "500081", "500084", "500032"],
+    "phone": "+919000000105",
+    "employeeCode": "AP-T-0105",
+    "active": true
+  }
+]
