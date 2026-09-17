@@ -150,14 +150,35 @@ export type DiagnosisRule = z.infer<typeof diagnosisRuleSchema>
 export const bannerSlotSchema = z.enum(['hero', 'inline'])
 export type BannerSlot = z.infer<typeof bannerSlotSchema>
 
+/**
+ * Which of the five house gradients a banner is painted in.
+ *
+ * The colour is data rather than something baked into the artwork, so a banner
+ * card can fill its own background at any size and the picture on it is only
+ * ever a subject on a transparent ground. Having the two arrive as one flat
+ * image is what forced the layout to guess where the subject was, and a guess
+ * that is right on one phone puts a shield through the middle of a headline on
+ * the next.
+ */
+export const bannerToneSchema = z.enum([
+  'blue',
+  'amber',
+  'green',
+  'teal',
+  'violet',
+])
+export type BannerTone = z.infer<typeof bannerToneSchema>
+
 export const bannerSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
   subtitle: z.string().optional(),
+  /** A subject on a transparent ground — never a full-bleed background. */
   image: z.string().optional(),
   /** A small pill in the corner of the card: "New", "Trending". */
   badge: z.string().optional(),
   slot: bannerSlotSchema.default('hero'),
+  tone: bannerToneSchema.default('blue'),
   ctaLabel: z.string().optional(),
   /** Internal route only; external links are not allowed from a banner. */
   ctaHref: z.string().startsWith('/').optional(),

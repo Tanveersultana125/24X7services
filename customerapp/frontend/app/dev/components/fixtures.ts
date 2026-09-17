@@ -65,6 +65,7 @@ export const banners: Banner[] = [
     id: 'b1',
     badge: 'In season',
     slot: 'hero',
+    tone: 'blue',
     title: 'Summer-ready AC service',
     subtitle: 'Filter clean, gas check and a cooling test in under an hour.',
     ctaLabel: 'Book AC service',
@@ -75,6 +76,7 @@ export const banners: Banner[] = [
   {
     id: 'b2',
     slot: 'hero',
+    tone: 'amber',
     title: 'You approve the repair before it starts',
     subtitle: 'The expert inspects, quotes, and waits for your yes.',
     ctaLabel: 'How it works',
@@ -85,6 +87,7 @@ export const banners: Banner[] = [
   {
     id: 'b3',
     slot: 'inline',
+    tone: 'green',
     title: 'Every repair carries a service warranty',
     subtitle: 'With a GST invoice in the app the moment the job is done.',
     order: 3,

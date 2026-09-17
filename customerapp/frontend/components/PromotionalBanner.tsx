@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Route } from 'next'
-import type { Banner } from '@app/shared'
+import type { Banner, BannerTone } from '@app/shared'
 import { HOME_HEADER_CLEARANCE } from '@/components/HomeHeader'
 import { cn } from '@/lib/cn'
 
@@ -166,6 +166,26 @@ export function PromotionalBanner({
 }
 
 /**
+ * The five house gradients a banner can be painted in.
+ *
+ * Content colour, not interface colour: brand blue means "this is tappable"
+ * everywhere else in the app, and these mean nothing at all beyond telling one
+ * offer apart from the next as it slides past. They live here rather than in
+ * the token block for exactly that reason, and nothing outside a banner may
+ * reach for them.
+ *
+ * Every one of them starts dark enough at the top left to carry white text at
+ * well over AA, which is what lets the card go without a scrim.
+ */
+const TONES: Record<BannerTone, string> = {
+  blue: 'from-brand-deep via-brand to-[#4AA8DC]',
+  amber: 'from-[#3B1A05] via-[#8C4F10] to-[#E0952E]',
+  green: 'from-[#08402F] via-[#0B7A50] to-[#2FB483]',
+  teal: 'from-[#11293E] via-[#1E6E8C] to-[#5FC9E8]',
+  violet: 'from-[#0E0E22] via-[#2B2A6E] to-[#5A4ED0]',
+}
+
+/**
  * One banner, as a card.
  *
  * Exported because the same card does a second job further down the page: a
@@ -173,17 +193,24 @@ export function PromotionalBanner({
  * own, which is what breaks a long run of near-identical service rails into
  * something with a shape.
  *
+ * The words and the picture are two columns of a row, not two layers of a
+ * stack. They used to be layered: a full-bleed image with the subject painted
+ * into one corner of it, and the text capped at a width chosen to miss that
+ * corner. Which corner the subject lands in after `object-cover` depends on the
+ * card's aspect ratio, and the card is nearly square on a phone and a long
+ * strip on a desktop — so the width that cleared it on one screen put a shield
+ * through the middle of a headline on the next. As a row they cannot overlap at
+ * any size, because neither one is allowed into the other's column.
+ *
+ * That also retires the scrim. It was there because white text over a seeded
+ * photograph is a contrast failure waiting for the first pale image; now the
+ * ground under the text is one of five gradients this file controls, and the
+ * seeded artwork is a subject on transparency that never goes behind a word.
+ *
  * Its height comes from its content and from whatever the rail stretches it to,
  * with a floor under it. A fixed height fits the shortest banner somebody seeds
  * and cuts the longest one off above its own button; no floor at all leaves a
  * one-line banner as a strip too thin to carry a picture.
- *
- * With an image it is that image behind a scrim; without one it is a brand
- * gradient. The scrim is not optional and it is not flat — the copy is seeded,
- * the artwork behind it is seeded separately, and white text over an unknown
- * image is a contrast failure waiting for the first pale one anyone uploads.
- * It is weighted to the left, where the words are, so the right-hand side of
- * the picture still arrives in full colour instead of under a grey sheet.
  */
 export function BannerCard({
   banner,
@@ -197,53 +224,45 @@ export function BannerCard({
   const body = (
     <div
       className={cn(
-        'relative flex h-full min-h-52 flex-col justify-between gap-4 overflow-hidden rounded-card bg-linear-to-br from-brand-deep to-brand p-5 text-bg sm:min-h-56',
+        'flex h-full min-h-52 gap-4 overflow-hidden rounded-card bg-linear-to-br p-5 text-bg sm:min-h-56',
+        TONES[banner.tone],
         className
       )}
     >
+      <div className="flex min-w-0 flex-1 flex-col justify-between gap-4">
+        <div>
+          {banner.badge ? (
+            <span className="mb-2.5 inline-flex items-center rounded-pill bg-bg/20 px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] uppercase text-bg">
+              {banner.badge}
+            </span>
+          ) : null}
+          <h3 className="text-xl font-bold leading-snug">{banner.title}</h3>
+          {banner.subtitle ? (
+            <p className="mt-1.5 line-clamp-3 text-sm text-bg/80">
+              {banner.subtitle}
+            </p>
+          ) : null}
+        </div>
+
+        {banner.ctaLabel ? (
+          <span className="inline-flex w-fit items-center rounded-pill bg-bg px-4 py-2 text-sm font-semibold text-brand">
+            {banner.ctaLabel}
+          </span>
+        ) : null}
+      </div>
+
       {banner.image ? (
-        <>
+        <div className="relative w-[34%] shrink-0">
           <Image
             src={banner.image}
             alt=""
             fill
-            sizes="(min-width: 1024px) 640px, 100vw"
+            // Never wider than a third of a phone's screen.
+            sizes="140px"
             priority={priority}
-            // Pinned to its right edge. The card is nearly square on a
-            // phone and a long strip on a desktop, and a centred crop of the
-            // same picture cannot survive both — anchoring it means the
-            // artwork is always the part that gets kept and the empty left of
-            // the gradient is always the part that goes.
-            className="object-cover object-right"
+            className="object-contain object-right"
           />
-          <span
-            className="absolute inset-0 bg-linear-to-r from-ink/55 via-ink/20 to-transparent"
-            aria-hidden="true"
-          />
-        </>
-      ) : null}
-
-      {/* The artwork keeps to the right-hand third, so the words keep to the
-          left two. Without the cap a long seeded title runs straight across
-          whatever is drawn there, and neither is readable. */}
-      <div className="relative max-w-[68%]">
-        {banner.badge ? (
-          <span className="mb-2.5 inline-flex items-center rounded-pill bg-bg/20 px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] uppercase text-bg">
-            {banner.badge}
-          </span>
-        ) : null}
-        <h3 className="text-xl font-bold leading-snug">{banner.title}</h3>
-        {banner.subtitle ? (
-          <p className="mt-1.5 line-clamp-2 text-sm text-bg/80">
-            {banner.subtitle}
-          </p>
-        ) : null}
-      </div>
-
-      {banner.ctaLabel ? (
-        <span className="relative inline-flex w-fit items-center rounded-pill bg-bg px-4 py-2 text-sm font-semibold text-brand">
-          {banner.ctaLabel}
-        </span>
+        </div>
       ) : null}
     </div>
   )

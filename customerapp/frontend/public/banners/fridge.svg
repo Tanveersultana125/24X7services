@@ -1,15 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 400" width="700" height="400" role="img" aria-label="">
-  <defs><linearGradient id="g4" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0" stop-color="#11293E"/><stop offset="0.55" stop-color="#1E6E8C"/><stop offset="1" stop-color="#5FC9E8"/>
-  </linearGradient></defs>
-  <rect width="700" height="400" fill="url(#g4)"/>
-  <circle cx="610" cy="310" r="140" fill="#FFFFFF" opacity="0.08"/>
-  <rect x="512" y="80" width="124" height="240" rx="18" fill="#FBFAF6"/>
-  <rect x="512" y="80" width="124" height="84" rx="18" fill="#D8ECF6"/>
-  <rect x="512" y="150" width="124" height="14" fill="#D8ECF6"/>
-  <line x1="512" y1="164" x2="636" y2="164" stroke="#1E6E8C" stroke-width="5"/>
-  <rect x="612" y="108" width="9" height="38" rx="4.5" fill="#1E6E8C"/>
-  <rect x="612" y="186" width="9" height="50" rx="4.5" fill="#1E6E8C"/>
-  <circle cx="552" cy="216" r="16" fill="#D64545"/>
-  <rect x="532" y="262" width="64" height="14" rx="7" fill="#C9D8FF"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" width="200" height="220" fill="none" role="img" aria-label="">
+  <rect x="42" y="12" width="116" height="196" rx="18" fill="#FBFAF6"/>
+  <path d="M42 30a18 18 0 0 1 18-18h80a18 18 0 0 1 18 18v42H42z" fill="#D8ECF6"/>
+  <line x1="42" y1="74" x2="158" y2="74" stroke="#1E6E8C" stroke-width="6"/>
+  <rect x="130" y="36" width="10" height="30" rx="5" fill="#1E6E8C"/>
+  <rect x="130" y="92" width="10" height="42" rx="5" fill="#1E6E8C"/>
+  <circle cx="74" cy="120" r="16" fill="#D64545"/>
+  <rect x="58" y="160" width="62" height="14" rx="7" fill="#C9D8FF"/>
 </svg>
