@@ -152,8 +152,9 @@ export function PromotionalBanner({
  * something with a shape.
  *
  * Its height comes from its content and from whatever the rail stretches it to,
- * not from a number written here. A fixed height fits the shortest banner
- * somebody seeds and cuts the longest one off above its own button.
+ * with a floor under it. A fixed height fits the shortest banner somebody seeds
+ * and cuts the longest one off above its own button; no floor at all leaves a
+ * one-line banner as a strip too thin to carry a picture.
  *
  * With an image it is that image behind a scrim; without one it is a brand
  * gradient. The scrim is not optional and it is not flat — the copy is seeded,
@@ -174,7 +175,7 @@ export function BannerCard({
   const body = (
     <div
       className={cn(
-        'relative flex h-full min-h-44 flex-col justify-between gap-4 overflow-hidden rounded-card bg-linear-to-br from-brand-deep to-brand p-5 text-bg',
+        'relative flex h-full min-h-52 flex-col justify-between gap-4 overflow-hidden rounded-card bg-linear-to-br from-brand-deep to-brand p-5 text-bg sm:min-h-56',
         className
       )}
     >
