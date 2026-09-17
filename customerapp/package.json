@@ -1,0 +1,30 @@
+{
+  "name": "customerapp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Customer app for 24X7 home appliance service — Next.js static export + Capacitor, Firebase backend",
+  "workspaces": [
+    "packages/*",
+    "frontend",
+    "backend/functions"
+  ],
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "//dev": "Frontend dev server talks to the emulators. Start `npm run emulators` in another terminal first, or NEXT_PUBLIC_USE_EMULATORS=false will point it at a real project.",
+    "dev": "npm -w frontend run dev",
+    "build": "npm -w @app/shared run build && npm -w frontend run build",
+    "typecheck": "npm -w @app/shared run typecheck && npm -w frontend run typecheck && npm -w functions run typecheck",
+    "lint": "npm -w frontend run lint",
+    "emulators": "npm -w functions run build && firebase emulators:start --project demo-customerapp --config backend/firebase.json --import backend/.emulator-data --export-on-exit backend/.emulator-data",
+    "seed": "npm -w functions run seed",
+    "simulate": "npm -w functions run simulate --",
+    "test:rules": "npm -w functions run test:rules",
+    "deploy:functions": "npm -w functions run deploy",
+    "cap:android": "npm -w frontend run cap:android"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "name": "functions",
+  "version": "0.1.0",
+  "private": true,
+  "main": "lib/index.js",
+  "//build": "esbuild bundles @app/shared into the output. Firebase packs only the functions directory on deploy, so a workspace symlink would not survive the upload; bundling makes lib/index.js self-contained. firebase-admin and firebase-functions stay external because the runtime provides them.",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --format=cjs --outfile=lib/index.js --external:firebase-admin --external:firebase-functions --external:pdfkit --sourcemap",
+    "watch": "npm run build -- --watch",
+    "typecheck": "tsc --noEmit",
+    "seed": "tsx seed/seed.ts",
+    "simulate": "tsx scripts/simulateTechnician.ts",
+    "test:rules": "vitest run --config test/vitest.config.ts",
+    "deploy": "npm run build && firebase deploy --only functions --config ../firebase.json"
+  },
+  "engines": {
+    "node": "20"
+  },
+  "dependencies": {
+    "@app/shared": "*",
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^6.5.0",
+    "pdfkit": "^0.17.2",
+    "razorpay": "^2.9.6",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.0",
+    "@types/node": "^22.15.0",
+    "@types/pdfkit": "^0.17.3",
+    "esbuild": "^0.25.10",
+    "firebase-tools": "^14.19.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

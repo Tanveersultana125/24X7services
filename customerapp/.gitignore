@@ -1,0 +1,35 @@
+# dependencies
+node_modules/
+
+# build output
+.next/
+out/
+dist/
+lib/
+*.tsbuildinfo
+next-env.d.ts
+
+# The root .gitignore ignores .env* unanchored, which would swallow these too.
+# They carry no secrets and the README points new contributors straight at them.
+!**/.env.example
+
+# firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+pubsub-debug.log
+database-debug.log
+
+# emulator state, written by --export-on-exit
+.emulator-data/
+
+# capacitor / android
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+android/app/google-services.json
+
+# testing
+coverage/
