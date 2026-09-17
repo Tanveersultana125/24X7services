@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { Route } from 'next'
 import type { Banner } from '@app/shared'
+import { HOME_HEADER_CLEARANCE } from '@/components/HomeHeader'
 import { cn } from '@/lib/cn'
 
 /**
@@ -17,14 +18,15 @@ import { cn } from '@/lib/cn'
  * back — a rail that keeps moving while someone is reading it is worse than one
  * that never moved.
  *
- * One card at a time, and on a phone it runs edge to edge with square corners,
- * butted straight up against the header, so the coloured block at the top of
- * the screen is one thing rather than a bar with a card parked beneath it. An
- * earlier pass had rounded cards inset from the margin with a sliver of the
- * next one showing, which read as a card that had been cut off — the offer you
- * are meant to be reading losing the screen to the one you are not. From a
- * laptop's width up it goes back to being a card, because a banner stretched
- * across a desktop window is not a banner, it is a stripe.
+ * One card at a time. On a phone it runs edge to edge with square corners and
+ * starts at the very top of the screen, with the header floating over its upper
+ * third — so the coloured block at the top of Home is painted by one element
+ * and there is no join to see. Butting a coloured header up against it was the
+ * previous attempt, and a join between two elements is only invisible while
+ * their colours agree, which lasts exactly until the next banner is seeded a
+ * different shade. From a laptop's width up it goes back to being an ordinary
+ * card, because a banner stretched across a desktop window is not a banner, it
+ * is a stripe.
  *
  * The dots sit inside the artwork on a phone for the same reason: below it they
  * push the first heading down by the height of their own tap targets, and that
@@ -118,7 +120,12 @@ export function PromotionalBanner({
             <BannerCard
               banner={banner}
               priority={index === 0}
-              className="rounded-none lg:rounded-card"
+              className={cn(
+                'rounded-none lg:rounded-card',
+                // Room at the top for the header that floats on this.
+                HOME_HEADER_CLEARANCE,
+                'min-h-[22rem] lg:min-h-56 lg:pt-5'
+              )}
             />
           </article>
         ))}
@@ -202,7 +209,12 @@ export function BannerCard({
             fill
             sizes="(min-width: 1024px) 640px, 100vw"
             priority={priority}
-            className="object-cover"
+            // Pinned to its right edge. The card is nearly square on a
+            // phone and a long strip on a desktop, and a centred crop of the
+            // same picture cannot survive both — anchoring it means the
+            // artwork is always the part that gets kept and the empty left of
+            // the gradient is always the part that goes.
+            className="object-cover object-right"
           />
           <span
             className="absolute inset-0 bg-linear-to-r from-ink/55 via-ink/20 to-transparent"

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { Route } from 'next'
@@ -16,7 +16,11 @@ import type {
 } from '@app/shared'
 
 import { AppShell, Section } from '@/components/AppShell'
-import { HomeHeader } from '@/components/HomeHeader'
+import {
+  HomeHeader,
+  HOME_HEADER_CLEARANCE,
+  HOME_HEADER_HEIGHT,
+} from '@/components/HomeHeader'
 import { SearchBar } from '@/components/SearchBar'
 import { PromotionalBanner, BannerCard } from '@/components/PromotionalBanner'
 import { CategoryGrid } from '@/components/CategoryGrid'
@@ -42,6 +46,7 @@ import {
 import { callFn } from '@/lib/callables'
 import { LOCATION_STALE_MS, locationLabel } from '@/lib/location'
 import { useAsync } from '@/lib/useAsync'
+import { cn } from '@/lib/cn'
 
 /**
  * Home.
@@ -94,6 +99,11 @@ export function HomeScreen() {
   }, [])
 
   const home = useAsync(load)
+
+  // The header paints nothing while the hero is behind it. Once the hero has
+  // gone past, there is white page under it and it has to become a bar.
+  const heroRef = useRef<HTMLDivElement>(null)
+  const pastHero = useScrolledPast(heroRef, HOME_HEADER_HEIGHT)
 
   useStaleLocationCheck(location, setLocation)
 
@@ -167,6 +177,7 @@ export function HomeScreen() {
     <AppShell
       mobileHeader={
         <HomeHeader
+          solid={pastHero}
           area={location?.area}
           detail={
             location ? `${location.city} ${location.pincode}` : undefined
@@ -183,6 +194,17 @@ export function HomeScreen() {
           onOpen={() => router.push('/search')}
           className="max-w-xl"
         />
+      </div>
+
+      {/* Always something here, on every path. The header floats on this and
+          is transparent until it scrolls past it, so a screen that reaches the
+          error state with nothing behind the header is white on white. */}
+      <div ref={heroRef}>
+        {data && heroBanners.length > 0 ? (
+          <PromotionalBanner className="lg:mt-5" banners={heroBanners} />
+        ) : (
+          <HeroBackdrop full={home.status === 'loading'} />
+        )}
       </div>
 
       {location && !location.serviceable ? (
@@ -202,12 +224,6 @@ export function HomeScreen() {
         />
       ) : data ? (
         <>
-          {heroBanners.length > 0 ? (
-            <Section className="mt-0 lg:mt-5">
-              <PromotionalBanner banners={heroBanners} />
-            </Section>
-          ) : null}
-
           <Section title="What we service" className="mt-6">
             <CategoryGrid appliances={data.appliances} />
           </Section>
@@ -302,6 +318,57 @@ export function HomeScreen() {
 }
 
 // ---------------------------------------------------------------------------
+
+/**
+ * What the header floats on when there is no banner to float on: while the
+ * catalog is still arriving, when it failed, and when nobody has seeded a hero
+ * banner at all.
+ *
+ * `full` matches the banner's height so the swap from loading to loaded does
+ * not jump the page. Once the answer is in and there is genuinely no banner, it
+ * shrinks to just the height the header needs — a 350px empty blue block is not
+ * a design, it is a hole.
+ */
+function HeroBackdrop({ full }: { full: boolean }) {
+  return (
+    <div
+      aria-hidden="true"
+      className={cn(
+        '-mx-4 bg-linear-to-br from-brand-deep to-brand lg:hidden',
+        full ? 'h-[22rem]' : HOME_HEADER_CLEARANCE
+      )}
+    />
+  )
+}
+
+/**
+ * Whether the element has scrolled up past a band `offset` pixels deep at the
+ * top of the viewport.
+ *
+ * An observer rather than a scroll handler: this fires twice in a session, when
+ * the hero leaves and when it comes back, instead of on every frame of every
+ * scroll to compute the same boolean.
+ */
+function useScrolledPast(
+  ref: React.RefObject<HTMLElement | null>,
+  offset: number
+): boolean {
+  const [past, setPast] = useState(false)
+
+  useEffect(() => {
+    const element = ref.current
+    if (!element) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setPast(entry !== undefined && !entry.isIntersecting),
+      { rootMargin: `-${offset}px 0px 0px 0px` }
+    )
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [ref, offset])
+
+  return past
+}
 
 /** Past this many, the line stops listing and says "and more". */
 const SUMMARY_LIMIT = 3

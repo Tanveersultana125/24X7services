@@ -132,7 +132,8 @@ export function ProfileSkeleton() {
 export function HomeSkeleton() {
   return (
     <SkeletonGroup label="Loading home" className="flex flex-col gap-8 pt-5">
-      <Skeleton className="h-44 w-full" />
+      {/* No banner block: Home paints the hero itself on every path, because
+          the header floats on it and needs something behind it. */}
       <div>
         <Skeleton className="mb-3 h-6 w-40 rounded-md" />
         <div className="grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 lg:grid-cols-6">

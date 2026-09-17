@@ -3,14 +3,14 @@
     <stop offset="0" stop-color="#3B1A05"/><stop offset="0.5" stop-color="#8C4F10"/><stop offset="1" stop-color="#E0952E"/>
   </linearGradient></defs>
   <rect width="700" height="400" fill="url(#g2)"/>
-  <circle cx="600" cy="200" r="160" fill="#FFFFFF" opacity="0.1"/>
-  <rect x="500" y="98" width="140" height="176" rx="16" fill="#FBFAF6"/>
+  <circle cx="636" cy="240" r="150" fill="#FFFFFF" opacity="0.1"/>
+  <rect x="562" y="170" width="116" height="140" rx="14" fill="#FBFAF6"/>
   <g fill="#F0C48A">
-    <rect x="522" y="128" width="96" height="11" rx="5.5"/>
-    <rect x="522" y="154" width="72" height="11" rx="5.5"/>
-    <rect x="522" y="180" width="84" height="11" rx="5.5"/>
+    <rect x="580" y="194" width="80" height="10" rx="5"/>
+    <rect x="580" y="216" width="60" height="10" rx="5"/>
+    <rect x="580" y="238" width="70" height="10" rx="5"/>
   </g>
-  <rect x="522" y="214" width="96" height="13" rx="6.5" fill="#E6E2D8"/>
-  <circle cx="622" cy="262" r="30" fill="#0B9A63"/>
-  <path d="M610 262l9 10 17-20" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <rect x="580" y="266" width="80" height="11" rx="5.5" fill="#E6E2D8"/>
+  <circle cx="672" cy="298" r="26" fill="#0B9A63"/>
+  <path d="M661 298l8 9 15-18" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>
