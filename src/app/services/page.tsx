@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { SiteNav } from "@/components/site/SiteNav";
 import { PageHeader } from "@/components/site/PageHeader";
-import { ServicesIndex } from "@/components/site/ServicesIndex";
+import { ServiceCatalogue } from "@/components/site/ServiceCatalogue";
 import { getServiceIndex, getServiceIndexCopy } from "@/lib/service-index";
-import { ServicesPricing, ServicesPromise } from "@/components/site/ServicesDetail";
+import { ServicesPromise } from "@/components/site/ServicesPromise";
 import { Contact } from "@/components/site/Contact";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
@@ -36,12 +36,12 @@ export default async function ServicesPage() {
           bgPos="right center"
           bgDark
         />
-        {/* Prices first: what a repair costs is the question people arrive
-            with, and it used to sit three sections down. The eight-service
-            index follows it. */}
-        <ServicesPricing />
+        {/* The catalogue is the page. What a repair costs is the question
+            people arrive with, and it is now on the same row as the fault and
+            the button that baskets it, rather than three sections apart. The
+            promise follows, because it is read after a price, not before. */}
+        <ServiceCatalogue index={services} copy={copy} />
         <ServicesPromise />
-        <ServicesIndex services={services} copy={copy} />
         <Contact />
       </main>
       <SiteFooter />

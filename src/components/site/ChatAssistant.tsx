@@ -206,7 +206,10 @@ export function ChatAssistant() {
         transition={{ delay: 1, type: "spring", stiffness: 200, damping: 16 }}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-5 z-[70] grid size-14 place-items-center rounded-full bg-gradient-to-br from-royal-bright to-royal text-white shadow-royal sm:bottom-6 sm:right-6"
+        /* --dock-h is published by whatever is docked to the foot of the
+           page — the basket bar on /services. Without stepping over it the
+           two share the same corner and this covers the other. */
+        className="fixed bottom-[calc(max(1.25rem,env(safe-area-inset-bottom))_+_var(--dock-h,0px))] right-5 z-[70] grid size-14 place-items-center rounded-full bg-gradient-to-br from-royal-bright to-royal text-white shadow-royal transition-[bottom] duration-300 sm:right-6"
       >
         <span className="absolute inset-0 animate-pulse-ring rounded-full ring-2 ring-royal-bright/50" />
         <AnimatePresence mode="wait" initial={false}>
