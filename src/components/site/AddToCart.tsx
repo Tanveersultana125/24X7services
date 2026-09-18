@@ -57,7 +57,9 @@ export function AddToCart({
   // wherever the button sits, or a card could paint "added" back to "add".
   const shape = {
     outline: cn(
-      "rounded-full border px-3.5 py-1.5 text-xs",
+      // py-2.5 on a phone: at py-1.5 the pill stood 30px tall, and it is the
+      // one control on the plan card that a thumb has to find.
+      "rounded-full border px-3.5 py-2.5 text-xs sm:py-1.5",
       inBasket
         ? "border-emerald bg-emerald/10 text-emerald hover:border-danger hover:bg-danger/10 hover:text-danger"
         : "border-royal-bright text-royal-bright hover:bg-royal-bright hover:text-white",

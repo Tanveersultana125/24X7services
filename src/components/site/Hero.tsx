@@ -61,14 +61,19 @@ export function Hero() {
             </h1>
           </motion.div>
 
-          {/* Supporting copy — still beside the technician, under the headline */}
+          {/* Supporting copy. On a phone it drops below the collage and takes
+              the full width: beside the photo the column was ~200px, and
+              justifying 25 characters a line opened rivers of white through
+              the paragraph — hyphenation only closes them where the browser
+              has a dictionary loaded, which is not a thing to rely on. From lg
+              it goes back beside the picture, where the column is wide. */}
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5, ease }}
-            /* justified on phones so the narrow column has a clean right edge;
-               hyphenation keeps the word gaps from opening up */
-            className={`col-start-1 row-start-2 max-w-md hyphens-auto self-start text-justify text-[0.875rem] leading-relaxed text-muted sm:text-pretty sm:text-left sm:text-base lg:mt-8 lg:text-lg ${copyCols}`}
+            className={`col-span-12 col-start-1 row-start-3 max-w-md self-start text-pretty text-[0.9rem] leading-relaxed text-muted sm:text-base lg:row-start-2 lg:mt-8 lg:text-lg ${
+              heroTechnicianSrc ? "lg:col-span-6" : "lg:col-span-9"
+            }`}
           >
             Certified doorstep repair, installation and maintenance for Samsung, LG,
             IFB &amp; Bosch — genuine parts, a 90-day warranty, and a technician you can
@@ -77,7 +82,7 @@ export function Hero() {
 
           {/* CTAs and proof — full width below the technician */}
           <div
-            className={`col-span-12 col-start-1 row-start-3 lg:self-start ${
+            className={`col-span-12 col-start-1 row-start-4 lg:row-start-3 lg:self-start ${
               heroTechnicianSrc ? "lg:col-span-6" : "lg:col-span-9"
             }`}
           >

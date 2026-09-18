@@ -158,7 +158,8 @@ export function PageHeader({
           className={"flex items-center gap-1.5 text-sm " + (onDark ? "text-white/60" : "text-muted")}
           aria-label="Breadcrumb"
         >
-          <Link href="/" className={"transition-colors " + (onDark ? "hover:text-white" : "hover:text-ink")}>Home</Link>
+          {/* -my-2 so the crumb is a 36px target without the row growing */}
+          <Link href="/" className={"-my-2 py-2 transition-colors " + (onDark ? "hover:text-white" : "hover:text-ink")}>Home</Link>
           <ChevronRight className={"size-3.5 " + (onDark ? "text-white/40" : "text-muted-2")} />
           <span className={onDark ? "text-white" : "text-ink"}>{crumb}</span>
         </motion.nav>

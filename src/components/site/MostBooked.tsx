@@ -196,7 +196,7 @@ export function MostBooked({
             onClick={() => slide(-1)}
             disabled={atStart}
             className={cn(
-              "absolute left-0 top-[38%] z-10 grid size-8 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:top-[42%] sm:size-10",
+              "absolute left-0 top-[38%] z-10 hidden size-8 -translate-y-1/2 place-items-center sm:grid rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:top-[42%] sm:size-10",
               atStart && "pointer-events-none opacity-30"
             )}
           >
@@ -208,16 +208,19 @@ export function MostBooked({
             onClick={() => slide(1)}
             disabled={atEnd}
             className={cn(
-              "absolute right-0 top-[38%] z-10 grid size-8 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:top-[42%] sm:size-10",
+              "absolute right-0 top-[38%] z-10 hidden size-8 -translate-y-1/2 place-items-center sm:grid rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:top-[42%] sm:size-10",
               atEnd && "pointer-events-none opacity-30"
             )}
           >
             <ChevronRight className="size-4" />
           </button>
 
-          {/* The margins are the arrows' lane at every size — they sit beside
-              the card, never over the artwork, and clip the neighbours. */}
-          <div className="mx-9 overflow-hidden sm:mx-12">
+          {/* From sm the margins are the arrows' lane — they sit beside the
+              card, never over the artwork, and clip the neighbours. A phone
+              has no arrows to make room for and only 390px to give away, so
+              the strip runs the full width of the section there and the next
+              card peeks past the edge to say it can be swiped. */}
+          <div className="overflow-hidden sm:mx-12">
           <div
             ref={scroller}
             onScroll={update}
@@ -248,7 +251,7 @@ export function MostBooked({
                  Subtracting a gap with w-[calc(...)] looked equivalent but
                  Tailwind never emitted those rules, leaving cards at their
                  content width and a sliver of the next one showing. */
-              className="w-full shrink-0 grow-0 snap-start pr-5 sm:w-1/2 lg:w-1/3"
+              className="w-[90%] shrink-0 grow-0 snap-start pr-4 sm:w-1/2 sm:pr-5 lg:w-1/3"
             >
               {/* The card is a link end to end, and a button inside an anchor
                   is neither valid nor clickable on its own — so Add is a

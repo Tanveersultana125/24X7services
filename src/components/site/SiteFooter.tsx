@@ -113,12 +113,16 @@ export function SiteFooter() {
               // Nudge the right mobile column (odd index) slightly right; no change from sm up.
               <div key={title} className={cn(i % 2 === 1 && "pl-16 sm:pl-0")}>
                 <h4 className="text-xs font-bold uppercase tracking-[0.18em] text-foreground">{title}</h4>
-                <ul className="mt-5 space-y-3">
+                {/* The gap between the rows used to be the list's, which left
+                    each link a 17px-tall target with dead space above and
+                    below it. Moving that space inside the anchor keeps the
+                    same rhythm and makes the whole row tappable. */}
+                <ul className="mt-4 space-y-0.5">
                   {links.map((l) => (
                     <li key={l.label}>
                       <Link
                         href={l.href}
-                        className="text-sm text-muted transition-colors hover:text-foreground"
+                        className="block py-2.5 text-sm text-muted transition-colors hover:text-foreground"
                       >
                         {l.label}
                       </Link>

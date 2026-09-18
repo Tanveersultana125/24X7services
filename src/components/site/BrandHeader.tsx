@@ -55,9 +55,10 @@ export function BrandHeader({
           className="flex items-center gap-1.5 text-sm text-muted"
           aria-label="Breadcrumb"
         >
-          <Link href="/" className="transition-colors hover:text-ink">Home</Link>
+          {/* -my-2 so each crumb is a 36px target without the row growing */}
+          <Link href="/" className="-my-2 py-2 transition-colors hover:text-ink">Home</Link>
           <ChevronRight className="size-3.5 text-muted-2" />
-          <Link href="/brands" className="transition-colors hover:text-ink">Brands</Link>
+          <Link href="/brands" className="-my-2 py-2 transition-colors hover:text-ink">Brands</Link>
           <ChevronRight className="size-3.5 text-muted-2" />
           <span className="text-ink">{brand.name}</span>
         </motion.nav>

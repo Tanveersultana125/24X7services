@@ -242,8 +242,11 @@ export function ServicesPricing() {
                 </div>
               )}
 
-              {/* promise note */}
-              <div className="relative">
+              {/* Promise note. It restates the paragraph at the top of this
+                  panel, which reads as a pull quote in the three-column
+                  desktop layout and as the same sentence twice in a row once
+                  the columns stack — so a phone gets the paragraph only. */}
+              <div className="relative hidden lg:block">
                 <div className="relative z-10 overflow-hidden rounded-[1.5rem] border border-card-edge bg-card p-6 shadow-premium-md">
                   <span className="grid size-11 place-items-center rounded-xl bg-royal-bright/10 text-royal-bright">
                     <Receipt className="size-5" strokeWidth={1.8} />
@@ -268,7 +271,15 @@ export function ServicesPricing() {
           </div>
 
           {/* ---------- appliance tabs ---------- */}
-          <div className="mt-8 grid grid-cols-2 gap-2.5 sm:flex sm:flex-wrap">
+          {/* Two columns on a phone left ~95px for the label, so "Washing
+              Machine" and "Microwave & Oven" both ended in an ellipsis — the
+              word that tells them apart was the one being cut. They run as a
+              swipeable row instead, each chip as wide as its own name.
+              Lenis owns touch scrolling, hence data-lenis-prevent. */}
+          <div
+            data-lenis-prevent
+            className="no-scrollbar -mx-6 mt-8 flex gap-2.5 overflow-x-auto px-6 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0"
+          >
             {services.map((a) => (
               <button
                 key={a.id}
@@ -282,7 +293,7 @@ export function ServicesPricing() {
                     : undefined
                 }
                 className={cn(
-                  "flex min-w-0 items-center gap-2 rounded-full border px-3 py-2 text-[0.78rem] font-medium transition-all sm:gap-2.5 sm:px-4 sm:py-2.5 sm:text-sm",
+                  "flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-[0.78rem] font-medium transition-all sm:gap-2.5 sm:px-4 sm:py-2.5 sm:text-sm",
                   active === a.id
                     ? "border-transparent text-white"
                     : "border-card-edge bg-card text-ink shadow-premium-sm hover:-translate-y-0.5"
@@ -294,7 +305,7 @@ export function ServicesPricing() {
                   onAccent={active === a.id}
                   className="size-9 shrink-0 rounded-xl sm:size-11 sm:rounded-2xl"
                 />
-                <span className="truncate">{a.name}</span>
+                <span className="whitespace-nowrap">{a.name}</span>
               </button>
             ))}
           </div>
@@ -324,7 +335,9 @@ export function ServicesPricing() {
                       is a tap away rather than crammed into the card. */}
                   <button
                     onClick={() => setSheet(appliance.id)}
-                    className="mt-2 inline-flex items-center gap-1 text-[0.78rem] font-semibold text-royal-bright hover:underline sm:text-sm"
+                    /* -mb-1.5 keeps the card's spacing while the button
+                       grows from a 19px target to a 34px one */
+                    className="mt-0.5 -mb-1.5 inline-flex items-center gap-1 py-2 text-[0.78rem] font-semibold text-royal-bright hover:underline sm:text-sm"
                   >
                     View details
                     {bestSaving(appliance.tiers) > 0 && (
@@ -441,7 +454,11 @@ export function ServicesPricing() {
                         {formatRange(p.price[0], p.price[1])}
                       </span>
 
-                      <span className="grid size-7 shrink-0 place-items-center rounded-full border border-border text-muted transition-all group-hover:border-royal-bright group-hover:bg-royal-bright group-hover:text-white sm:size-8">
+                      {/* Decoration: the whole row is the link, and on a
+                          phone this chevron and its gap were taking 36px off
+                          a label column that only had ~115px — which is what
+                          pushed "Compressor" up against its own price. */}
+                      <span className="hidden size-7 shrink-0 place-items-center rounded-full border border-border text-muted transition-all group-hover:border-royal-bright group-hover:bg-royal-bright group-hover:text-white sm:grid sm:size-8">
                         <ChevronRight className="size-4" />
                       </span>
                     </Link>

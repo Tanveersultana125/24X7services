@@ -119,7 +119,8 @@ export function Plans() {
               <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 sm:mt-8">
                 <a
                   href={`/book?amc=${p.id}`}
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-ink transition-colors group-hover:text-royal-bright"
+                  /* -my-2: a 36px target, with the row the height it was */
+                  className="-my-2 inline-flex items-center gap-1.5 py-2 text-sm font-medium text-ink transition-colors group-hover:text-royal-bright"
                 >
                   Choose {p.name}
                   <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

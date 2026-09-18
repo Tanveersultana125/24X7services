@@ -73,7 +73,9 @@ export function Process() {
                   {s.n}
                 </span>
                 <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/60 to-transparent dark:from-white/[0.06]" />
-                <h3 className="relative text-xl font-semibold tracking-tight sm:text-2xl">{s.title}</h3>
+                {/* The step number sits in the top-right corner of the card;
+                    without a gutter the longer titles ran straight under it. */}
+                <h3 className="relative pr-14 text-xl font-semibold tracking-tight sm:pr-16 sm:text-2xl">{s.title}</h3>
                 <p className="relative mt-3 max-w-lg text-pretty leading-relaxed text-muted">{s.body}</p>
                 {/* accent rule */}
                 <span className="relative mt-5 block h-1 w-10 rounded-full transition-all duration-500 group-hover:w-16" style={{ background: s.tint }} />

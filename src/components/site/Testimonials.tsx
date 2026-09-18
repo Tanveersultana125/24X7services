@@ -136,19 +136,19 @@ export function Testimonials({ reviews }: { reviews?: ReviewCard[] }) {
           <button
             onClick={() => nudge(-1)}
             aria-label="Previous reviews"
-            className="absolute left-0 top-1/2 z-10 grid size-8 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:size-10"
+            className="absolute left-0 top-1/2 z-10 hidden size-8 -translate-y-1/2 place-items-center sm:grid rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:size-10"
           >
             <ArrowLeft className="size-4" />
           </button>
           <button
             onClick={() => nudge(1)}
             aria-label="More reviews"
-            className="absolute right-0 top-1/2 z-10 grid size-8 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:size-10"
+            className="absolute right-0 top-1/2 z-10 hidden size-8 -translate-y-1/2 place-items-center sm:grid rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:size-10"
           >
             <ArrowRight className="size-4" />
           </button>
 
-          <div className="mx-9 overflow-hidden sm:mx-12">
+          <div className="overflow-hidden sm:mx-12">
         <div
           ref={trackRef}
           onScroll={onScroll}
@@ -164,7 +164,7 @@ export function Testimonials({ reviews }: { reviews?: ReviewCard[] }) {
             <div
               key={`${r.name}-${idx}`}
               data-card
-              className="w-full shrink-0 snap-start pr-5 sm:w-1/2 lg:w-1/3"
+              className="w-[90%] shrink-0 snap-start pr-4 sm:w-1/2 sm:pr-5 lg:w-1/3"
             >
             <article
               role="button"

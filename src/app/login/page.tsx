@@ -54,7 +54,8 @@ export default async function LoginPage({
       {/* Right — form */}
       <main className="relative flex flex-col">
         <div className="flex items-center justify-between px-6 py-5 sm:px-10">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-ink">
+          {/* -my-2: a 36px target, with the header row the height it was */}
+          <Link href="/" className="-my-2 inline-flex items-center gap-2 py-2 text-sm text-muted transition-colors hover:text-ink">
             <ArrowLeft className="size-4" /> Home
           </Link>
           <ThemeToggle />

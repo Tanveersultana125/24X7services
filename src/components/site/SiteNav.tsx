@@ -35,7 +35,10 @@ export function SiteNav() {
         initial={{ y: -30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-4"
+        /* The layout ships viewportFit: cover, so on a notched phone the
+           page starts behind the status bar — a flat pt-4 put the pill under
+           it. max() keeps the same 1rem on every screen that has no inset. */
+        className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-[max(1rem,env(safe-area-inset-top))]"
       >
         {/* min-w-0 + a tighter left inset on phones: the pill has to stay inside
             the viewport even when the logo and every action are on screen */}
@@ -108,7 +111,11 @@ export function SiteNav() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[60] bg-background lg:hidden"
+            /* The drawer covers the notch and the home indicator too, and on
+               a short phone its own contents are taller than the screen — so
+               it scrolls, and pads itself past both insets. */
+            className="fixed inset-0 z-[60] overflow-y-auto overscroll-contain bg-background pt-[env(safe-area-inset-top)] pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:hidden"
+            data-lenis-prevent
           >
             <div className="flex items-center justify-between px-6 py-5">
               {/* the drawer's logo has to go home and close the drawer — as a

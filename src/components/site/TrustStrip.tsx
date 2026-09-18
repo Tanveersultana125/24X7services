@@ -10,19 +10,19 @@ const PILLARS = [
   {
     icon: ShieldCheck,
     tint: "#2547d0",
-    title: "Trustworthiness",
+    title: "Trust\u00ADworthiness",
     desc: "Brand-authorised technicians, 100% genuine spare parts, and a 90-day warranty on every single repair.",
   },
   {
     icon: BadgeCheck,
     tint: "#0b9a63",
-    title: "Professionalism",
+    title: "Profession\u00ADalism",
     desc: "Trained, background-verified pros who arrive on time, in uniform, and treat your home with real care.",
   },
   {
     icon: Star,
     tint: "#d9821b",
-    title: "Customer Satisfaction",
+    title: "Customer Satis\u00ADfaction",
     desc: "Rated 4.9/5 across 128k+ services — with live technician tracking and transparent, upfront pricing.",
   },
 ];
@@ -82,8 +82,12 @@ export function TrustStrip() {
                   title until there's room for the serif to be itself. */}
               {/* "Trustworthiness" is one 15-letter word in a ~76px column —
                   it can't wrap on a space, so it ran under the card's edge and
-                  was clipped. Hyphenation gives it somewhere to break; the
-                  anywhere-break is the fallback for browsers that won't. */}
+                  was clipped. `hyphens-auto` only breaks it where the browser
+                  has an en dictionary loaded, and where it hasn't the
+                  anywhere-break split the word with no hyphen at all
+                  ("Trustworthin / ess"). The soft hyphens in the titles above
+                  mark the break themselves, so every browser draws the same
+                  hyphen in the same place. */}
               <h3 className="mt-3 hyphens-auto text-[0.78rem] font-semibold leading-tight tracking-[-0.01em] [overflow-wrap:anywhere] sm:mt-6 sm:font-display sm:text-2xl sm:tracking-[-0.02em] sm:[overflow-wrap:normal]">
                 {p.title}
               </h3>

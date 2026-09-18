@@ -212,7 +212,7 @@ function RotatingStat() {
       </div>
 
       {/* dots */}
-      <div className="mt-5 flex justify-center gap-2">
+      <div className="mt-5 flex justify-center gap-3">
         {STATS.map((st, i) => (
           <button
             key={st.label}
@@ -220,8 +220,11 @@ function RotatingStat() {
             onClick={() => show(i)}
             aria-label={`Show ${st.label}`}
             aria-current={i === index}
-            /* generous hit area around a 6px dot, without changing how it looks */
-            className="relative h-1.5 rounded-full transition-all duration-300 before:absolute before:-inset-x-1 before:-inset-y-3 before:content-['']"
+            /* A hit area around a 6px dot, without changing how it looks. It
+               grows to the gap and no further: the dots sit 12px apart, so an
+               inset wider than 6px each side would put one dot's target under
+               its neighbour and a tap near the middle would land on either. */
+            className="relative h-1.5 rounded-full transition-all duration-300 before:absolute before:-inset-x-1.5 before:-inset-y-4 before:content-['']"
             style={{
               width: i === index ? "1.5rem" : "0.375rem",
               background: i === index ? st.color : "var(--border)",

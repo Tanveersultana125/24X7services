@@ -193,7 +193,14 @@ export function Faq() {
                   <Mail className="size-4" strokeWidth={1.7} />
                 </span>
                 <span className="mt-3 block text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-royal-bright">Email</span>
-                <span className="mt-1.5 block break-all text-[0.8rem] font-semibold tracking-tight">care@24x7services.in</span>
+                {/* In a half-width tile the address is ~5px wider than the
+                    room it has, and break-all took that as licence to split it
+                    anywhere — it was landing as "care@24x7services.i / n". The
+                    break opportunity after the @ is the one a reader expects,
+                    so it is marked explicitly and break-all is gone. */}
+                <span className="mt-1.5 block text-[0.8rem] font-semibold tracking-tight [overflow-wrap:break-word]">
+                  care@<wbr />24x7services.in
+                </span>
               </a>
             </div>
 

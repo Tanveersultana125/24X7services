@@ -70,7 +70,7 @@ export function Spotlight({
             onClick={() => slide(-1)}
             disabled={atStart}
             className={cn(
-              "absolute left-0 top-1/2 z-10 grid size-8 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:size-10",
+              "absolute left-0 top-1/2 z-10 hidden size-8 -translate-y-1/2 place-items-center sm:grid rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:size-10",
               atStart && "pointer-events-none opacity-30"
             )}
           >
@@ -82,16 +82,18 @@ export function Spotlight({
             onClick={() => slide(1)}
             disabled={atEnd}
             className={cn(
-              "absolute right-0 top-1/2 z-10 grid size-8 -translate-y-1/2 place-items-center rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:size-10",
+              "absolute right-0 top-1/2 z-10 hidden size-8 -translate-y-1/2 place-items-center sm:grid rounded-full border border-border bg-surface shadow-premium-lg transition-all hover:scale-110 hover:bg-surface-2 sm:size-10",
               atEnd && "pointer-events-none opacity-30"
             )}
           >
             <ChevronRight className="size-4" />
           </button>
 
-          {/* The margins are the arrows' lane at every size — they sit beside
-              the banner, never over the artwork, and clip the neighbours. */}
-          <div className="mx-9 overflow-hidden sm:mx-12">
+          {/* From sm the margins are the arrows' lane — beside the banner,
+              never over the artwork. A phone has no arrows and only 390px to
+              give away, so the strip runs the full width of the section and
+              the next banner peeks past the edge to say it can be swiped. */}
+          <div className="overflow-hidden sm:mx-12">
           <div
             ref={scroller}
             onScroll={update}
@@ -104,7 +106,7 @@ export function Spotlight({
             {spots.map((s) => (
               /* sizer carries the gap as padding, so plain fractions give
                  exactly 1 / 2 whole banners per row */
-              <div key={s.title} data-spot className="w-full shrink-0 snap-start pr-5 sm:w-1/2">
+              <div key={s.title} data-spot className="w-[90%] shrink-0 snap-start pr-4 sm:w-1/2 sm:pr-5">
               <Link
                 href={s.href}
                 className="group relative block h-60 w-full overflow-hidden rounded-[1.5rem] sm:h-72"
@@ -121,7 +123,7 @@ export function Spotlight({
                   className="absolute inset-0"
                   style={{ background: `linear-gradient(95deg, ${s.tint}f2 0%, ${s.tint}cc 38%, ${s.tint}33 68%, transparent 100%)` }}
                 />
-                <div className="relative flex h-full flex-col justify-between p-7 text-white sm:p-8">
+                <div className="relative flex h-full flex-col justify-between p-5 text-white sm:p-8">
                   <div>
                     <h3 className="font-display text-2xl leading-tight tracking-[-0.01em] sm:text-3xl">{s.title}</h3>
                     <p className="mt-2 max-w-[16rem] text-sm text-white/85">{s.sub}</p>

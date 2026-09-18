@@ -105,16 +105,18 @@ export function BrandsDetail() {
                   {/* Its own page first, booking from there — someone looking
                       for their make wants to see what we do for it before
                       they are asked to book. */}
+                  {/* -my-2 on both: the row keeps its height, each action
+                      becomes a 36px target instead of a 20px one. */}
                   <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2">
                     <Link
                       href={`/brands/${b.id}`}
-                      className="inline-flex items-center gap-1.5 text-sm font-medium text-ink transition-colors group-hover:text-royal-bright"
+                      className="-my-2 inline-flex items-center gap-1.5 py-2 text-sm font-medium text-ink transition-colors group-hover:text-royal-bright"
                     >
                       {b.name} services <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </Link>
                     <Link
                       href={`/book?brand=${b.id}`}
-                      className="text-sm font-medium text-muted transition-colors hover:text-ink"
+                      className="-my-2 inline-block py-2 text-sm font-medium text-muted transition-colors hover:text-ink"
                     >
                       Book now
                     </Link>
