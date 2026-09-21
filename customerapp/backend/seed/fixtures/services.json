@@ -81,7 +81,8 @@
     "startingPrice": 69900,
     "durationMinutes": 135,
     "order": 3,
-    "active": true
+    "active": true,
+    "video": "/services/ac-deep-clean.mp4"
   },
   {
     "id": "air-conditioner_gas-refill",
@@ -129,7 +130,8 @@
     "startingPrice": 29900,
     "durationMinutes": 75,
     "order": 1,
-    "active": true
+    "active": true,
+    "video": "/services/refrigerator-repair.mp4"
   },
   {
     "id": "refrigerator_service",

@@ -36,3 +36,6 @@ android/app/google-services.json
 
 # testing
 coverage/
+
+# Frames make_service_clips.py slices on its way to an mp4.
+frontend/.clip-frames/
