@@ -81,8 +81,13 @@ export function WalletScreen() {
 }
 
 /**
- * What someone who has not signed in sees: the same card with no number in it,
- * the one button that fixes that, and every question answered.
+ * What someone who has not signed in sees: the whole screen, with a dash
+ * wherever a figure would be and the one button that fills them in.
+ *
+ * The blocks are all here rather than hidden. A screen that drops two thirds
+ * of itself until you sign in does not read as "sign in to see your figures",
+ * it reads as a different, emptier product — and the shape of it is the part
+ * that tells someone what credits even are before they have any.
  *
  * `next` is this screen's own path, written out rather than read off the
  * location: this screen takes no query parameters, so there is nothing about
@@ -90,20 +95,21 @@ export function WalletScreen() {
  */
 function SignedOut() {
   return (
-    <>
-      <div className="mt-5">
-        <BalanceCard balance={null} />
+    <CreditsBody
+      balance={null}
+      given={null}
+      used={null}
+      entries={[]}
+      emptyNote="Sign in and everything we have credited you shows up here."
+      action={
         <Link
           href={'/login?next=%2Fprofile%2Fwallet' as Route}
           className="mt-3 flex h-12 w-full items-center justify-center rounded-pill bg-brand text-base font-semibold text-bg"
         >
           Sign in to see your credits
         </Link>
-      </div>
-
-      <Band />
-      <Faq />
-    </>
+      }
+    />
   )
 }
 
@@ -143,26 +149,62 @@ function Credits({ uid }: { uid: string }) {
     .reduce((total, entry) => total + entry.amount, 0)
 
   return (
+    <CreditsBody
+      balance={wallet.balance}
+      given={wallet.lifetimeIssued}
+      used={used}
+      entries={entries}
+      emptyNote="No credits yet. When we owe you something, it turns up here."
+    />
+  )
+}
+
+/**
+ * The screen itself, signed in or not.
+ *
+ * One component for both states rather than two that drift: a figure is either
+ * a number or a dash, and the only thing the signed-out state adds is a button
+ * under the card. Everything else — the blocks, their order, the bands between
+ * them — is decided once.
+ */
+function CreditsBody({
+  balance,
+  given,
+  used,
+  entries,
+  emptyNote,
+  action,
+}: {
+  /** Null while nobody is signed in, which is a dash and not a zero. */
+  balance: number | null
+  given: number | null
+  used: number | null
+  entries: readonly WalletEntry[]
+  emptyNote: string
+  action?: React.ReactNode
+}) {
+  return (
     <>
       <div className="mt-5">
-        <BalanceCard balance={wallet.balance} />
+        <BalanceCard balance={balance} />
+        {action}
 
         <div className="mt-3 grid grid-cols-2 gap-3">
           <StatTile
             icon={HandCoins}
             label="Given to you"
-            value={formatPaise(wallet.lifetimeIssued)}
+            value={given === null ? '—' : formatPaise(given)}
           />
           <StatTile
             icon={ReceiptIndianRupee}
             label="Used on bills"
-            value={formatPaise(used)}
+            value={used === null ? '—' : formatPaise(used)}
           />
         </div>
       </div>
 
       <Band />
-      <Activity entries={entries} />
+      <Activity entries={entries} emptyNote={emptyNote} />
       <Band />
       <Faq />
     </>
@@ -261,7 +303,13 @@ type FilterId = (typeof FILTERS)[number]['id']
  * the first time a customer is credited, and a control that moves under the
  * finger is worse than one with nothing behind it.
  */
-function Activity({ entries }: { entries: readonly WalletEntry[] }) {
+function Activity({
+  entries,
+  emptyNote,
+}: {
+  entries: readonly WalletEntry[]
+  emptyNote: string
+}) {
   const [filter, setFilter] = useState<FilterId>('all')
 
   const shown = entries.filter((entry) =>
@@ -302,9 +350,7 @@ function Activity({ entries }: { entries: readonly WalletEntry[] }) {
 
       {shown.length === 0 ? (
         <p className="py-12 text-center text-sm text-muted">
-          {entries.length === 0
-            ? 'No credits yet. When we owe you something, it turns up here.'
-            : 'Nothing under this filter.'}
+          {entries.length === 0 ? emptyNote : 'Nothing under this filter.'}
         </p>
       ) : (
         <ul className="mt-2 divide-y divide-border">
