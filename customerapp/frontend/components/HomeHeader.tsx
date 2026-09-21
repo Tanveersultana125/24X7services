@@ -1,6 +1,6 @@
 'use client'
 
-import { Bell, ReceiptIndianRupee } from 'lucide-react'
+import { Bell, WalletMinimal } from 'lucide-react'
 import Link from 'next/link'
 import type { Route } from 'next'
 import { LocationSelector } from '@/components/LocationSelector'
@@ -67,15 +67,15 @@ export function HomeHeader({
           onClick={onChangeLocation}
         />
         <div className="flex shrink-0 gap-2">
-          {/* Bills, not a wallet. The tile is where every app of this shape
-              puts its wallet, and this app has nowhere to put one — the cards
-              live at Razorpay and never reach us — so what it opens is the
-              list of invoices we have issued, which is the part of the money a
-              customer here actually comes looking for. */}
+          {/* The wallet glyph every app of this shape puts in this corner,
+              opening the only money this app holds: the invoices we have
+              issued. There is no balance and no saved card behind it — the
+              cards live at Razorpay and never reach us — so if a wallet is
+              ever built, it goes here and this label changes with it. */}
           <HeaderTile
             href="/profile/payments"
             label="Invoices"
-            icon={ReceiptIndianRupee}
+            icon={WalletMinimal}
           />
           <HeaderTile
             href="/profile/notifications"
