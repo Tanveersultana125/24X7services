@@ -17,19 +17,18 @@ import { cn } from '@/lib/cn'
  * back — a rail that keeps moving while someone is reading it is worse than one
  * that never moved.
  *
- * One card at a time, and a card everywhere: inset from the edge of the screen,
- * rounded on all four corners, sitting inside Home's blue hero rather than
- * being it. It used to run edge to edge with square corners from the very top
- * of the screen, so that the coloured block at the top of Home was painted by
- * the banner itself and there was no join to see. That worked, and it cost the
- * offer its edges — a banner with no border on any side is the page, and a
- * customer scrolls past the page. The join is not a problem any more because
- * the block behind this is the app's own gradient, not a colour chosen per
- * banner.
+ * One at a time, and edge to edge on a phone: no gutter down either side, no
+ * rounded corners, sitting flush under the search field at the bottom of
+ * Home's blue block. It was an inset card for a while. An offer with a margin
+ * around it is an offer the eye reads as an advert to be skipped, and the
+ * margin is the first thing it catches; full width, the offer is simply the
+ * top of the app. From a laptop's width up it goes back to being an ordinary
+ * card, because a banner stretched across a desktop window is not a banner, it
+ * is a stripe.
  *
- * The dots stay inside the artwork rather than under it: below the card they
- * push everything down by the height of their own tap targets, and that gap
- * reads as a mistake rather than as a control.
+ * The dots stay inside the artwork rather than under it: below it they push
+ * everything down by the height of their own tap targets, and that gap reads
+ * as a mistake rather than as a control.
  */
 
 export interface PromotionalBannerProps {
@@ -100,14 +99,14 @@ export function PromotionalBanner({
     <section
       aria-roledescription="carousel"
       aria-label="Offers and announcements"
-      className={cn('relative', className)}
+      className={cn('relative -mx-4 lg:mx-0', className)}
       onPointerDown={stopAutoplay}
       onKeyDown={stopAutoplay}
       onFocus={stopAutoplay}
     >
       <div
         ref={railRef}
-        className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth"
+        className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto scroll-smooth lg:gap-3"
       >
         {banners.map((banner, index) => (
           <article
@@ -119,7 +118,7 @@ export function PromotionalBanner({
             <BannerCard
               banner={banner}
               priority={index === 0}
-              className="shadow-raised lg:shadow-none"
+              className="rounded-none lg:rounded-card"
             />
           </article>
         ))}

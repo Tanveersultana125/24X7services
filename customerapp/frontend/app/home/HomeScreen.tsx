@@ -55,11 +55,11 @@ import { cn } from '@/lib/cn'
  * price is written into this file — a new appliance is a seed entry, and it
  * appears here without anyone editing a screen.
  *
- * The top of it is one blue block: the location, the search field and the
- * offer cards all sit on the same piece of colour, rounded off at the bottom,
- * and the white page starts under it with the grid of everything we service.
- * The block says where you are and what this place sells; everything below it
- * is the shop.
+ * The top of it is one blue block running the full width of the screen: the
+ * location, the search field, and then the offer, edge to edge under them. The
+ * white page starts where that block stops, with the grid of everything we
+ * service. The block says where you are and what this place sells; everything
+ * below it is the shop.
  *
  * Under that the page is a stack of short sideways rows rather than a few tall
  * blocks: the things people book most, and then one row per appliance. A
@@ -210,7 +210,7 @@ export function HomeScreen() {
           {data && heroBanners.length > 0 ? (
             <PromotionalBanner banners={heroBanners} />
           ) : (
-            <HeroPlaceholder show={home.status === 'loading'} />
+            <HeroPlaceholder loading={home.status === 'loading'} />
           )}
 
           {/* On the blue rather than under it. Someone whose pincode has been
@@ -349,23 +349,16 @@ export function HomeScreen() {
  * header floats on it and is transparent until it scrolls away, so a path that
  * leaves this unpainted is white text on a white page.
  *
- * It is the app's own colour rather than a banner's, which is the whole point
- * of the arrangement. The banner under the header used to have to be the
- * background, so the background was whatever shade that banner happened to be
- * seeded in. Now it is flat `brand-deep`, the exact fill the header takes once
- * it has to paint itself, and the offers are cards sitting on it. Flat rather
- * than a gradient because the cards are the gradients: a blue-toned offer on a
- * blue-toned wash had no edge to find, and the one thing a card has to do is
- * look like a card.
+ * It paints `brand-deep` behind the header and nothing else: the offer under
+ * the search field runs the full width of the screen with square corners, so
+ * the bottom of this block is the bottom of the offer. No gutter down either
+ * side of it, no rounded corners, nothing lapping it from below. An offer
+ * inset as a card on a coloured field was the previous attempt, twice, and
+ * both times the thing the eye caught was the margin around it rather than the
+ * offer inside it.
  *
- * Nothing laps it. The first white card of the page was pulled up over this
- * block's lower edge for a while, on the theory that an overlap says the page
- * carries on below the fold. What it actually says, at the size a phone draws
- * it, is that two boxes have collided: the block's rounded corners come out
- * either side of the card like ears, and every remedy for that — squaring the
- * block off, deepening the colour, lapping further — trades one wrong-looking
- * join for another. The block ends, the page begins. Nobody has ever failed to
- * scroll for want of an overlap.
+ * Every banner tone starts dark at its top left, so the seam where the offer
+ * meets this fill is one dark band meeting another rather than a line.
  *
  * None of it applies from a laptop's width up, where the desktop bar carries
  * the location and a banner stretched across the window is a stripe, not a
@@ -375,9 +368,9 @@ function HomeHero({ children }: { children: React.ReactNode }) {
   return (
     <div
       className={cn(
-        '-mx-4 rounded-b-hero bg-brand-deep px-4 pb-6',
+        '-mx-4 bg-brand-deep px-4',
         HOME_HEADER_CLEARANCE,
-        'lg:mx-0 lg:rounded-none lg:bg-transparent lg:px-0 lg:pt-5 lg:pb-0'
+        'lg:mx-0 lg:bg-transparent lg:px-0 lg:pt-5'
       )}
     >
       {children}
@@ -386,21 +379,26 @@ function HomeHero({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * A banner-shaped hole in the hero while the catalog is still coming, so the
- * card below does not jump up the screen when the real one lands. Tinted out of
- * the blue rather than shimmering grey: this sits on colour, and the grey
- * skeleton the rest of the app uses reads here as a picture that failed.
+ * What sits where the offer would, when there is no offer to sit there.
  *
- * Nothing at all once the answer is in and there is genuinely no banner — the
- * hero then shrinks to the header and its own padding, which is a header, not
- * a hole.
+ * While the catalog is coming: a banner-shaped hole at the banner's own width
+ * and height, so the page does not jump when the real one lands. Tinted out of
+ * the blue rather than shimmering grey, because this sits on colour and the
+ * grey skeleton the rest of the app uses reads here as a picture that failed.
+ *
+ * Once the answer is in and nobody has seeded a banner at all: a short foot of
+ * blue. The hero carries no bottom padding of its own — the offer is meant to
+ * reach its bottom edge — so without this the search field would sit on the
+ * block's very edge.
  */
-function HeroPlaceholder({ show }: { show: boolean }) {
-  if (!show) return null
+function HeroPlaceholder({ loading }: { loading: boolean }) {
   return (
     <div
       aria-hidden="true"
-      className="min-h-52 rounded-card bg-bg/10 sm:min-h-56 lg:hidden"
+      className={cn(
+        'lg:hidden',
+        loading ? '-mx-4 min-h-52 bg-bg/10 sm:min-h-56' : 'h-6'
+      )}
     />
   )
 }
@@ -515,7 +513,7 @@ function UnserviceableNotice({
   return (
     <div
       role="status"
-      className="mt-4 flex items-start gap-3 rounded-card border border-border bg-warning-soft p-4"
+      className="mt-4 mb-6 flex items-start gap-3 rounded-card border border-border bg-warning-soft p-4"
     >
       <MapPinOff className="mt-0.5 size-5 shrink-0 text-warning" aria-hidden="true" />
       <div className="min-w-0 flex-1">

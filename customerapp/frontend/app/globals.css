@@ -68,9 +68,6 @@
   /* --- Shape ------------------------------------------------------------- */
   --radius-card: 0.75rem; /* 12 */
   --radius-pill: 999px;
-  /* Only the blue block at the top of Home wears this, and only along its
-     bottom edge. A card's 12 looks like a nick on a shape that wide. */
-  --radius-hero: 1.75rem; /* 28 */
 
   /* One elevation level. A second one only ever gets used inconsistently. */
   --shadow-raised: 0 1px 2px rgba(10, 10, 10, 0.04),
