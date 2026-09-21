@@ -93,17 +93,20 @@ export function WalletScreen() {
  * What someone who has not signed in sees: the whole screen, with a dash
  * wherever a figure would be and the one button that fills them in.
  *
- * The blocks are all here rather than hidden. A screen that drops two thirds
- * of itself until you sign in does not read as "sign in to see your figures",
- * it reads as a different, emptier product — and the shape of it is the part
- * that tells someone what credits even are before they have any.
+ * The blocks are all here rather than hidden, and the figures read zero
+ * rather than a dash. A screen that drops two thirds of itself until you sign
+ * in does not read as "sign in to see your figures", it reads as a different,
+ * emptier product; and a row of dashes where the money goes reads as a screen
+ * that failed to load rather than one waiting to be signed into. Zero is the
+ * truthful number for an account nobody has named yet, and the button above
+ * says whose zero it is not.
  */
 function SignedOut() {
   return (
     <CreditsBody
-      balance={null}
-      given={null}
-      used={null}
+      balance={0}
+      given={0}
+      used={0}
       entries={[]}
       emptyNote="Sign in and everything we have credited you shows up here."
       signedIn={false}
@@ -183,10 +186,9 @@ function CreditsBody({
   emptyNote,
   action,
 }: {
-  /** Null while nobody is signed in, which is a dash and not a zero. */
-  balance: number | null
-  given: number | null
-  used: number | null
+  balance: number
+  given: number
+  used: number
   entries: readonly WalletEntry[]
   signedIn: boolean
   emptyNote: string
@@ -219,14 +221,14 @@ function CreditsBody({
   return (
     <>
       <div className="mt-5">
-        <BalanceCard balance={balance} />
+        <BalanceCard balance={balance} signedIn={signedIn} />
         {action}
 
         <div className="mt-3 grid grid-cols-2 gap-3">
           <StatTile
             icon={HandCoins}
             label="Given to you"
-            value={given === null ? '—' : formatPaise(given)}
+            value={formatPaise(given)}
             hint="See what we credited"
             selected={filter === 'issued'}
             onSelect={signedIn ? () => show('issued') : undefined}
@@ -234,7 +236,7 @@ function CreditsBody({
           <StatTile
             icon={ReceiptIndianRupee}
             label="Used on bills"
-            value={used === null ? '—' : formatPaise(used)}
+            value={formatPaise(used)}
             hint="See what you spent"
             selected={filter === 'used'}
             onSelect={signedIn ? () => show('used') : undefined}
@@ -279,7 +281,13 @@ function Band() {
  * radial gradient rather than an image: it survives any card size, costs no
  * request, and is the one flourish on the screen.
  */
-function BalanceCard({ balance }: { balance: number | null }) {
+function BalanceCard({
+  balance,
+  signedIn,
+}: {
+  balance: number
+  signedIn: boolean
+}) {
   return (
     <div className="relative overflow-hidden rounded-card bg-linear-to-br from-brand-deep to-brand p-5 text-bg">
       <div
@@ -297,13 +305,11 @@ function BalanceCard({ balance }: { balance: number | null }) {
       <p className="relative mt-10 text-xs font-semibold tracking-[0.08em] uppercase text-bg/70">
         Balance
       </p>
-      <p className="relative mt-0.5 text-3xl font-bold">
-        {balance === null ? '—' : formatPaise(balance)}
-      </p>
+      <p className="relative mt-0.5 text-3xl font-bold">{formatPaise(balance)}</p>
 
       <p className="relative mt-3 max-w-[22rem] text-sm text-bg/80">
-        {balance === null
-          ? 'Credits are tied to your number. Sign in and yours show up here.'
+        {!signedIn
+          ? 'Credits are tied to your number. Sign in to see yours.'
           : balance > 0
             ? 'We take this off your next bill. Nothing to redeem.'
             : 'Credits we owe you show up here and come off your next bill.'}
