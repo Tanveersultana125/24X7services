@@ -48,7 +48,15 @@ export function ServicesScreen() {
   const fromPrices = all.data ? cheapestByAppliance(all.data.services) : null
 
   return (
-    <AppShell mobileHeader={<Header title="All services" />}>
+    // Services is a tab, and tabs do not usually carry a back arrow. This one
+    // does, because most people do not arrive at it through the tab bar: they
+    // tap "All services" at the end of Home's grid, and without an arrow the
+    // only way back to where they were is to work out that Home is a tab.
+    <AppShell
+      mobileHeader={
+        <Header title="All services" showBack backFallback="/home" />
+      }
+    >
       <Section
         className="mt-5"
         title="What we service"
