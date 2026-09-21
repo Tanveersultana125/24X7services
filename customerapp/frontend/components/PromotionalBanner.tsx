@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { Route } from 'next'
 import type { Banner, BannerTone } from '@app/shared'
+import { HOME_HEADER_CLEARANCE } from '@/components/HomeHeader'
 import { cn } from '@/lib/cn'
 
 /**
@@ -17,14 +18,17 @@ import { cn } from '@/lib/cn'
  * back — a rail that keeps moving while someone is reading it is worse than one
  * that never moved.
  *
- * One at a time, and edge to edge on a phone: no gutter down either side, no
- * rounded corners, sitting flush under the search field at the bottom of
- * Home's blue block. It was an inset card for a while. An offer with a margin
- * around it is an offer the eye reads as an advert to be skipped, and the
- * margin is the first thing it catches; full width, the offer is simply the
- * top of the app. From a laptop's width up it goes back to being an ordinary
- * card, because a banner stretched across a desktop window is not a banner, it
- * is a stripe.
+ * One at a time. On a phone it runs edge to edge with square corners and
+ * starts at the very top of the screen, with the header floating over its
+ * upper third — so the whole coloured block at the top of Home is painted by
+ * this one element and there is no seam anywhere in it. That is the shape
+ * every app of this kind uses, and the reason they all use it is that the
+ * alternatives show their joins: an offer inset as a card wears its margin
+ * more loudly than its message, and an offer butted up under a coloured header
+ * draws a line across the screen exactly where the two colours stop agreeing.
+ *
+ * From a laptop's width up it goes back to being an ordinary card, because a
+ * banner stretched across a desktop window is not a banner, it is a stripe.
  *
  * The dots stay inside the artwork rather than under it: below it they push
  * everything down by the height of their own tap targets, and that gap reads
@@ -118,7 +122,12 @@ export function PromotionalBanner({
             <BannerCard
               banner={banner}
               priority={index === 0}
-              className="rounded-none lg:rounded-card"
+              className={cn(
+                'rounded-none lg:rounded-card',
+                // Room at the top for the header that floats on this.
+                HOME_HEADER_CLEARANCE,
+                'min-h-[22rem] lg:min-h-56 lg:pt-5'
+              )}
             />
           </article>
         ))}

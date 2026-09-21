@@ -9,26 +9,21 @@ import { cn } from '@/lib/cn'
 /**
  * The top of Home: where the customer is, and what they are looking for.
  *
- * It paints nothing. On a phone it floats over Home's hero — a brand-coloured
- * block that Home renders on every path, whether the catalog arrived or not —
- * and that block starts at `brand-deep`, the same colour this header fills
- * with once it has to. So there is no join to see at the top of the screen and
- * no moment where the fill jumps a shade as the page scrolls.
+ * It paints nothing. On a phone it floats over the banner, which runs from the
+ * very top of the screen up behind it, so the whole coloured block at the top
+ * is one element rather than a bar with a card under it. That is the only
+ * arrangement with no seam in it: give the header its own fill and the line
+ * where that fill stops is visible the moment a banner is seeded in a shade
+ * the header is not.
  *
- * It floated over the banner artwork itself until the offers became inset
- * cards. That was the only arrangement that kept the join invisible while the
- * block was painted by a banner whose colour is seed data — five gradients, any
- * of which could be under the search field. Now the block is the app's own
- * colour and the banner is a card sitting on it, which is what Urban Company,
- * Swiggy and every other app of this shape do, and what a customer reads as
- * "this is an offer" rather than "this is the page".
- *
- * It is still only legible while something dark is behind it, so the moment the
- * hero scrolls past, `solid` turns the header into a filled bar and the white
- * text never lands on the white page underneath.
+ * Which means it is only legible while something dark is behind it. Two things
+ * keep that true: Home always renders a hero — the banner when there is one, a
+ * plain brand block when there is not — and the moment that hero scrolls past,
+ * `solid` turns the header into a filled bar so the white text never lands on
+ * the white page underneath.
  *
  * Fixed rather than sticky, because sticky takes up its own row and would push
- * the hero down out from under it.
+ * the banner down out from under it.
  */
 export function HomeHeader({
   area,
@@ -51,10 +46,10 @@ export function HomeHeader({
       className={cn(
         'fixed inset-x-0 top-0 z-30 pt-[var(--safe-top)] lg:hidden',
         'transition-colors duration-[var(--duration-base)] ease-[var(--ease-out-soft)]',
-        // Nothing until the hero has gone: the hero's own top stop is this
-        // exact colour, so painting it here as well would only risk the two
-        // drifting apart.
-        solid ? 'bg-brand-deep' : 'bg-transparent'
+        // Over the artwork, a fade that is strongest at the very top and gone
+        // by the search field — enough to hold the white text on a light patch
+        // of somebody's banner, not enough to draw an edge anywhere.
+        solid ? 'bg-brand-deep' : 'bg-linear-to-b from-ink/30 to-transparent'
       )}
     >
       <div className="mx-auto flex max-w-lg items-start gap-2 px-4 pt-2">
@@ -85,9 +80,9 @@ export function HomeHeader({
 /**
  * The height the header occupies, as a Tailwind padding utility.
  *
- * The hero starts at the top of the screen and the header floats on it, so
- * whatever the hero holds has to begin below this or it ends up underneath the
- * search field. Exported so the one number lives next to the markup that sets
+ * The banner starts at the top of the screen and the header floats on it, so
+ * the banner's own words have to begin below this or they end up underneath
+ * the search field. Exported so the one number lives next to the markup that sets
  * it rather than being guessed at from the other side of the app.
  */
 export const HOME_HEADER_CLEARANCE = 'pt-[calc(var(--safe-top)+8.5rem)]'
