@@ -55,11 +55,11 @@ import { cn } from '@/lib/cn'
  * price is written into this file — a new appliance is a seed entry, and it
  * appears here without anyone editing a screen.
  *
- * The top of it is one blue block: the location, the search field and the
- * offer cards all sit on the same piece of colour, rounded off at the bottom,
- * and the white page starts under it with the grid of everything we service.
- * The block says where you are and what this place sells; everything below it
- * is the shop.
+ * The top of it is one unbroken block of colour running the full width of the
+ * screen, from the status bar down: the location and the search field float on
+ * it, and it is the offer itself that paints it. The white page starts where
+ * that block stops, with the grid of everything we service. The block says
+ * where you are and what this place sells; everything below it is the shop.
  *
  * Under that the page is a stack of short sideways rows rather than a few tall
  * blocks: the things people book most, and then one row per appliance. A
@@ -202,28 +202,23 @@ export function HomeScreen() {
         />
       </div>
 
-      {/* Always painted, on every path. The header floats on this and is
-          transparent until it scrolls past it, so a screen that reaches the
+      {/* Always something here, on every path. The header floats on this and
+          is transparent until it scrolls past it, so a screen that reaches the
           error state with nothing behind the header is white on white. */}
       <div ref={heroRef}>
-        <HomeHero>
-          {data && heroBanners.length > 0 ? (
-            <PromotionalBanner banners={heroBanners} />
-          ) : (
-            <HeroPlaceholder show={home.status === 'loading'} />
-          )}
-
-          {/* On the blue rather than under it. Someone whose pincode has been
-              dropped should read this before they read an offer, and up here
-              it is the only pale thing on a field of colour. */}
-          {location && !location.serviceable ? (
-            <UnserviceableNotice
-              area={locationLabel(location)}
-              onChange={() => router.push('/location')}
-            />
-          ) : null}
-        </HomeHero>
+        {data && heroBanners.length > 0 ? (
+          <PromotionalBanner banners={heroBanners} />
+        ) : (
+          <HeroBackdrop full={home.status === 'loading'} />
+        )}
       </div>
+
+      {location && !location.serviceable ? (
+        <UnserviceableNotice
+          area={locationLabel(location)}
+          onChange={() => router.push('/location')}
+        />
+      ) : null}
 
       {/* The first card under the hero, and the one that renders in all three
           states: the grid, the retry, or the grid's own skeleton.
@@ -344,63 +339,28 @@ export function HomeScreen() {
 // ---------------------------------------------------------------------------
 
 /**
- * The blue block at the top of the screen, and the one thing on Home painted on
- * every path — loading, loaded, failed, and with no banner seeded at all. The
- * header floats on it and is transparent until it scrolls away, so a path that
- * leaves this unpainted is white text on a white page.
+ * What the header floats on when there is no banner to float on: while the
+ * catalog is still arriving, when it failed, and when nobody has seeded a hero
+ * banner at all.
  *
- * It is the app's own colour rather than a banner's, which is the whole point
- * of the arrangement. The banner under the header used to have to be the
- * background, so the background was whatever shade that banner happened to be
- * seeded in. Now it is flat `brand-deep`, the exact fill the header takes once
- * it has to paint itself, and the offers are cards sitting on it. Flat rather
- * than a gradient because the cards are the gradients: a blue-toned offer on a
- * blue-toned wash had no edge to find, and the one thing a card has to do is
- * look like a card.
+ * The offer paints the top of this screen itself — it starts at the status bar
+ * and the header sits on its upper third — so on those three paths there is no
+ * offer and therefore nothing behind the location and the search field. This
+ * is that nothing, in the app's own colour.
  *
- * Nothing laps it. The first white card of the page was pulled up over this
- * block's lower edge for a while, on the theory that an overlap says the page
- * carries on below the fold. What it actually says, at the size a phone draws
- * it, is that two boxes have collided: the block's rounded corners come out
- * either side of the card like ears, and every remedy for that — squaring the
- * block off, deepening the colour, lapping further — trades one wrong-looking
- * join for another. The block ends, the page begins. Nobody has ever failed to
- * scroll for want of an overlap.
- *
- * None of it applies from a laptop's width up, where the desktop bar carries
- * the location and a banner stretched across the window is a stripe, not a
- * banner.
+ * `full` matches the banner's height so the swap from loading to loaded does
+ * not jump the page. Once the answer is in and there is genuinely no banner it
+ * shrinks to just the height the header needs: a 350px empty blue block is not
+ * a design, it is a hole.
  */
-function HomeHero({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      className={cn(
-        '-mx-4 rounded-b-hero bg-brand-deep px-4 pb-6',
-        HOME_HEADER_CLEARANCE,
-        'lg:mx-0 lg:rounded-none lg:bg-transparent lg:px-0 lg:pt-5 lg:pb-0'
-      )}
-    >
-      {children}
-    </div>
-  )
-}
-
-/**
- * A banner-shaped hole in the hero while the catalog is still coming, so the
- * card below does not jump up the screen when the real one lands. Tinted out of
- * the blue rather than shimmering grey: this sits on colour, and the grey
- * skeleton the rest of the app uses reads here as a picture that failed.
- *
- * Nothing at all once the answer is in and there is genuinely no banner — the
- * hero then shrinks to the header and its own padding, which is a header, not
- * a hole.
- */
-function HeroPlaceholder({ show }: { show: boolean }) {
-  if (!show) return null
+function HeroBackdrop({ full }: { full: boolean }) {
   return (
     <div
       aria-hidden="true"
-      className="min-h-52 rounded-card bg-bg/10 sm:min-h-56 lg:hidden"
+      className={cn(
+        '-mx-4 bg-brand-deep lg:hidden',
+        full ? 'h-[22rem]' : HOME_HEADER_CLEARANCE
+      )}
     />
   )
 }
@@ -515,7 +475,7 @@ function UnserviceableNotice({
   return (
     <div
       role="status"
-      className="mt-4 flex items-start gap-3 rounded-card border border-border bg-warning-soft p-4"
+      className="mt-5 flex items-start gap-3 rounded-card border border-border bg-warning-soft p-4"
     >
       <MapPinOff className="mt-0.5 size-5 shrink-0 text-warning" aria-hidden="true" />
       <div className="min-w-0 flex-1">
