@@ -1,6 +1,8 @@
 'use client'
 
 import { useCallback, useState } from 'react'
+import Link from 'next/link'
+import type { Route } from 'next'
 import {
   ChevronDown,
   Gift,
@@ -14,9 +16,10 @@ import {
   type WalletEntry,
 } from '@app/shared'
 
-import { ProfileShell } from '@/components/ProfileShell'
+import { Header } from '@/components/Header'
 import { ErrorState } from '@/components/ErrorState'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
+import { useAuth } from '@/lib/auth'
 import { fetchLedger, fetchWallet } from '@/lib/wallet'
 import { formatDateTime } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
@@ -41,6 +44,13 @@ import { cn } from '@/lib/cn'
  * The balance and the statement are fetched together. They are two reads of
  * the same fact, and a screen that showed one without the other would be a
  * screen showing a number with no reason behind it.
+ *
+ * It is the one screen under /profile that does not bounce a signed-out
+ * visitor to the login form. The way in is a tile on Home, and Home is open to
+ * anyone — so the tap that should answer "what are these credits?" was
+ * answering with a phone number field instead. Signed out, the balance is
+ * replaced by a way in and the questions below it are shown in full: they are
+ * the part someone who has not signed in actually came to read.
  */
 
 interface CreditsData {
@@ -49,10 +59,64 @@ interface CreditsData {
 }
 
 export function WalletScreen() {
+  const { user, ready } = useAuth()
+
   return (
-    <ProfileShell title="Credits">
-      {(user) => <Credits uid={user.uid} />}
-    </ProfileShell>
+    <div className="min-h-dvh bg-bg">
+      <Header title="Credits" showBack backFallback="/profile" />
+      <main
+        id="content"
+        className="mx-auto w-full max-w-lg px-4 pb-16 lg:max-w-2xl"
+      >
+        {!ready ? (
+          <CreditsSkeleton />
+        ) : user ? (
+          <Credits uid={user.uid} />
+        ) : (
+          <SignedOut />
+        )}
+      </main>
+    </div>
+  )
+}
+
+/**
+ * What someone who has not signed in sees: the same card with no number in it,
+ * the one button that fixes that, and every question answered.
+ *
+ * `next` is this screen's own path, written out rather than read off the
+ * location: this screen takes no query parameters, so there is nothing about
+ * the current URL worth preserving, and a constant cannot come back wrong.
+ */
+function SignedOut() {
+  return (
+    <>
+      <div className="mt-5">
+        <BalanceCard balance={null} />
+        <Link
+          href={'/login?next=%2Fprofile%2Fwallet' as Route}
+          className="mt-3 flex h-12 w-full items-center justify-center rounded-pill bg-brand text-base font-semibold text-bg"
+        >
+          Sign in to see your credits
+        </Link>
+      </div>
+
+      <Band />
+      <Faq />
+    </>
+  )
+}
+
+function CreditsSkeleton() {
+  return (
+    <SkeletonGroup label="Loading credits" className="mt-5 flex flex-col gap-4">
+      <Skeleton className="h-48" />
+      <div className="grid grid-cols-2 gap-3">
+        <Skeleton className="h-24" />
+        <Skeleton className="h-24" />
+      </div>
+      <Skeleton className="h-32" />
+    </SkeletonGroup>
   )
 }
 
@@ -67,18 +131,7 @@ function Credits({ uid }: { uid: string }) {
 
   const credits = useAsync(load)
 
-  if (credits.status === 'loading') {
-    return (
-      <SkeletonGroup label="Loading credits" className="mt-5 flex flex-col gap-4">
-        <Skeleton className="h-48" />
-        <div className="grid grid-cols-2 gap-3">
-          <Skeleton className="h-24" />
-          <Skeleton className="h-24" />
-        </div>
-        <Skeleton className="h-32" />
-      </SkeletonGroup>
-    )
-  }
+  if (credits.status === 'loading') return <CreditsSkeleton />
 
   if (credits.status === 'error' || !credits.data) {
     return <ErrorState onRetry={credits.reload} retrying={credits.refreshing} />
@@ -139,7 +192,7 @@ function Band() {
  * radial gradient rather than an image: it survives any card size, costs no
  * request, and is the one flourish on the screen.
  */
-function BalanceCard({ balance }: { balance: number }) {
+function BalanceCard({ balance }: { balance: number | null }) {
   return (
     <div className="relative overflow-hidden rounded-card bg-linear-to-br from-brand-deep to-brand p-5 text-bg">
       <div
@@ -157,12 +210,16 @@ function BalanceCard({ balance }: { balance: number }) {
       <p className="relative mt-10 text-xs font-semibold tracking-[0.08em] uppercase text-bg/70">
         Balance
       </p>
-      <p className="relative mt-0.5 text-3xl font-bold">{formatPaise(balance)}</p>
+      <p className="relative mt-0.5 text-3xl font-bold">
+        {balance === null ? '—' : formatPaise(balance)}
+      </p>
 
       <p className="relative mt-3 max-w-[22rem] text-sm text-bg/80">
-        {balance > 0
-          ? 'We take this off your next bill. Nothing to redeem.'
-          : 'Credits we owe you show up here and come off your next bill.'}
+        {balance === null
+          ? 'Credits are tied to your number. Sign in and yours show up here.'
+          : balance > 0
+            ? 'We take this off your next bill. Nothing to redeem.'
+            : 'Credits we owe you show up here and come off your next bill.'}
       </p>
     </div>
   )
