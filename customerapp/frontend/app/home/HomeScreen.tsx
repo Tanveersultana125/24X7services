@@ -233,7 +233,7 @@ export function HomeScreen() {
           The catalog is checked before the status, so a reload that fails with
           a catalog already on screen leaves the page standing rather than
           punching an error through the middle of it. */}
-      <Card raised className="relative -mt-10 p-4 lg:mt-8 lg:p-5">
+      <Card raised className="relative -mt-12 p-4 lg:mt-8 lg:p-5">
         {data ? (
           <>
             <h2 className="mb-3 text-xl font-bold text-ink">What we service</h2>
@@ -351,11 +351,19 @@ export function HomeScreen() {
  * header floats on it and is transparent until it scrolls away, so a path that
  * leaves this unpainted is white text on a white page.
  *
- * It is the app's own gradient rather than a banner's, which is the whole point
+ * It is the app's own colour rather than a banner's, which is the whole point
  * of the arrangement. The banner under the header used to have to be the
  * background, so the background was whatever shade that banner happened to be
- * seeded in. Now the colour is fixed, the header's fill matches its top stop
- * exactly, and the offers are cards sitting on it.
+ * seeded in. Now it is flat `brand-deep`, the exact fill the header takes once
+ * it has to paint itself, and the offers are cards sitting on it. Flat rather
+ * than a gradient because the cards are the gradients: a blue-toned offer on a
+ * blue-toned wash had no edge to find, and the one thing a card has to do is
+ * look like a card.
+ *
+ * Square at the bottom. It was rounded for a while, and a rounded block behind
+ * an inset card leaves the two bottom corners poking out either side of that
+ * card like ears — which reads as two boxes colliding, not as one lapping the
+ * other. A straight edge under a card is just ground.
  *
  * The bottom padding is what the first white card of the page laps into. Keep
  * the two numbers in step — this one and that card's negative top margin — or
@@ -369,9 +377,9 @@ function HomeHero({ children }: { children: React.ReactNode }) {
   return (
     <div
       className={cn(
-        '-mx-4 rounded-b-hero bg-linear-to-b from-brand-deep to-brand px-4 pb-14',
+        '-mx-4 bg-brand-deep px-4 pb-20',
         HOME_HEADER_CLEARANCE,
-        'lg:mx-0 lg:rounded-none lg:bg-none lg:px-0 lg:pt-5 lg:pb-0'
+        'lg:mx-0 lg:bg-transparent lg:px-0 lg:pt-5 lg:pb-0'
       )}
     >
       {children}

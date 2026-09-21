@@ -218,7 +218,7 @@ export function BannerCard({
   const body = (
     <div
       className={cn(
-        'flex h-full min-h-52 gap-4 overflow-hidden rounded-card bg-linear-to-br p-5 text-bg sm:min-h-56',
+        'flex h-full min-h-52 gap-5 overflow-hidden rounded-card bg-linear-to-br p-5 text-bg sm:min-h-56',
         TONES[banner.tone],
         className
       )}
@@ -246,7 +246,10 @@ export function BannerCard({
       </div>
 
       {banner.image ? (
-        <div className="relative w-[34%] shrink-0">
+        // Under a third, and a full gutter clear of the words. The artwork is
+        // drawn to the edges of its own box, so whatever this column is set to
+        // is exactly how close the picture comes to the end of a line of text.
+        <div className="relative w-[30%] shrink-0">
           <Image
             src={banner.image}
             alt=""
