@@ -56,11 +56,10 @@ import { cn } from '@/lib/cn'
  * appears here without anyone editing a screen.
  *
  * The top of it is one blue block: the location, the search field and the
- * offer cards all sit on the same piece of colour, and the grid of everything
- * we service is a white card that rides up over its lower edge. That shape is
- * the one every app of this kind has settled on, and it earns its keep — the
- * block says where you are and what this place sells, and a card lapping its
- * edge says the page carries on below the fold without an arrow to say so.
+ * offer cards all sit on the same piece of colour, rounded off at the bottom,
+ * and the white page starts under it with the grid of everything we service.
+ * The block says where you are and what this place sells; everything below it
+ * is the shop.
  *
  * Under that the page is a stack of short sideways rows rather than a few tall
  * blocks: the things people book most, and then one row per appliance. A
@@ -226,14 +225,13 @@ export function HomeScreen() {
         </HomeHero>
       </div>
 
-      {/* The card that laps the hero. It renders in all three states so the
-          blue block always has something sitting on its edge — an overhang
-          with nothing under it is not a design, it is a gap.
+      {/* The first card under the hero, and the one that renders in all three
+          states: the grid, the retry, or the grid's own skeleton.
 
           The catalog is checked before the status, so a reload that fails with
           a catalog already on screen leaves the page standing rather than
           punching an error through the middle of it. */}
-      <Card raised className="relative -mt-12 p-4 lg:mt-8 lg:p-5">
+      <Card raised className="mt-5 p-4 lg:mt-8 lg:p-5">
         {data ? (
           <>
             <h2 className="mb-3 text-xl font-bold text-ink">What we service</h2>
@@ -360,14 +358,14 @@ export function HomeScreen() {
  * blue-toned wash had no edge to find, and the one thing a card has to do is
  * look like a card.
  *
- * Square at the bottom. It was rounded for a while, and a rounded block behind
- * an inset card leaves the two bottom corners poking out either side of that
- * card like ears — which reads as two boxes colliding, not as one lapping the
- * other. A straight edge under a card is just ground.
- *
- * The bottom padding is what the first white card of the page laps into. Keep
- * the two numbers in step — this one and that card's negative top margin — or
- * the card either floats clear of the blue or swallows it.
+ * Nothing laps it. The first white card of the page was pulled up over this
+ * block's lower edge for a while, on the theory that an overlap says the page
+ * carries on below the fold. What it actually says, at the size a phone draws
+ * it, is that two boxes have collided: the block's rounded corners come out
+ * either side of the card like ears, and every remedy for that — squaring the
+ * block off, deepening the colour, lapping further — trades one wrong-looking
+ * join for another. The block ends, the page begins. Nobody has ever failed to
+ * scroll for want of an overlap.
  *
  * None of it applies from a laptop's width up, where the desktop bar carries
  * the location and a banner stretched across the window is a stripe, not a
@@ -377,9 +375,9 @@ function HomeHero({ children }: { children: React.ReactNode }) {
   return (
     <div
       className={cn(
-        '-mx-4 bg-brand-deep px-4 pb-20',
+        '-mx-4 rounded-b-hero bg-brand-deep px-4 pb-6',
         HOME_HEADER_CLEARANCE,
-        'lg:mx-0 lg:bg-transparent lg:px-0 lg:pt-5 lg:pb-0'
+        'lg:mx-0 lg:rounded-none lg:bg-transparent lg:px-0 lg:pt-5 lg:pb-0'
       )}
     >
       {children}
