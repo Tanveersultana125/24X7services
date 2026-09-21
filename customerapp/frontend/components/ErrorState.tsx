@@ -2,6 +2,7 @@
 
 import { CloudOff, RefreshCw, TriangleAlert, WifiOff } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
+import { EmulatorHint } from '@/components/EmulatorHint'
 import { cn } from '@/lib/cn'
 
 /**
@@ -9,6 +10,11 @@ import { cn } from '@/lib/cn'
  * plain words, offers Try Again, and never shows a raw error — a Firestore
  * permission string on screen tells the customer nothing and tells everyone
  * else too much.
+ *
+ * Under the emulators, and only there, it also says which emulator is not
+ * running. In development that is the cause most of the time, and it is the
+ * one cause the app cannot tell apart from a handler that threw — see
+ * EmulatorHint.
  */
 
 type Kind = 'generic' | 'offline' | 'notFound'
@@ -85,6 +91,8 @@ export function ErrorState({
           Try again
         </Button>
       ) : null}
+
+      <EmulatorHint className="mt-4" />
     </div>
   )
 }

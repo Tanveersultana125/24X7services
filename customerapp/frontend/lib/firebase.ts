@@ -78,7 +78,8 @@ const config = {
 }
 
 /** Emulator host, as reachable from wherever the app is running. */
-const EMULATOR_HOST = process.env.NEXT_PUBLIC_EMULATOR_HOST ?? '127.0.0.1'
+export const EMULATOR_HOST =
+  process.env.NEXT_PUBLIC_EMULATOR_HOST ?? '127.0.0.1'
 
 const APP_CHECK_SITE_KEY = process.env.NEXT_PUBLIC_APPCHECK_SITE_KEY
 const APP_CHECK_DEBUG_TOKEN = process.env.NEXT_PUBLIC_APPCHECK_DEBUG_TOKEN
