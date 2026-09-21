@@ -67,9 +67,48 @@ function clearRecaptcha(): void {
   verifier = null
 }
 
+/**
+ * The ten digits that identify an Indian mobile, out of whatever arrived.
+ *
+ * What arrives is rarely ten digits. People type the trunk zero out of habit,
+ * paste the number with its country code, and a browser autofilling `tel`
+ * hands over `+91 98765 43210` complete with spaces. The field used to strip
+ * the non-digits and keep the first ten of what was left, which turned
+ * `+919876543210` into `9191219830` — a different, perfectly valid-looking
+ * number, and the code went to a stranger's phone with nothing on screen to
+ * suggest anything had happened. `09876543210` fared differently and no
+ * better: it became `0987654321`, which fails the schema, so a real number was
+ * rejected as invalid.
+ *
+ * So the prefixes are peeled rather than counted past. The country code only
+ * comes off when at least twelve digits are present, and the trunk zero only
+ * at eleven — otherwise a number that genuinely begins 91 would lose its first
+ * two digits. Looped, because `0091 98765 43210` carries both.
+ *
+ * What is left is capped at ten from the front, so typing an eleventh digit is
+ * ignored rather than silently shifting the whole number along by one.
+ */
+export function toNationalDigits(raw: string): string {
+  let digits = raw.replace(/\D/g, '')
+
+  for (;;) {
+    if (digits.length >= 12 && digits.startsWith('91')) {
+      digits = digits.slice(2)
+      continue
+    }
+    if (digits.length >= 11 && digits.startsWith('0')) {
+      digits = digits.slice(1)
+      continue
+    }
+    break
+  }
+
+  return digits.slice(0, 10)
+}
+
 /** `9876543210` as typed, `+919876543210` as Firebase wants it. */
-export function toE164(tenDigits: string): string {
-  return `+91${tenDigits.replace(/\D/g, '').slice(-10)}`
+export function toE164(raw: string): string {
+  return `+91${toNationalDigits(raw)}`
 }
 
 export interface PendingVerification {

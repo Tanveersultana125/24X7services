@@ -16,6 +16,7 @@ import {
   OTP_IS_SIMULATED,
   startPhoneSignIn,
   toE164,
+  toNationalDigits,
   useAuth,
 } from '@/lib/auth'
 import { safeNext, setPendingSignIn } from '@/lib/pendingSignIn'
@@ -84,8 +85,22 @@ export function LoginScreen() {
             label="Mobile number"
             value={phone}
             onChange={(event) => {
-              setPhone(event.target.value.replace(/\D/g, '').slice(0, 10))
+              // Peels a pasted country code or a typed trunk zero — see
+              // toNationalDigits. Keeping the first ten of the raw digits is
+              // what used to send the code to a different number entirely.
+              setPhone(toNationalDigits(event.target.value))
               setPhoneError(undefined)
+            }}
+            // Checked on the way out of the field as well as on submit: a
+            // number one digit short is worth saying so about before the
+            // customer has pressed anything.
+            onBlur={() => {
+              if (phone.length === 0) return
+              setPhoneError(
+                phoneSchema.safeParse(toE164(phone)).success
+                  ? undefined
+                  : 'Enter a valid 10-digit Indian mobile number'
+              )
             }}
             error={phoneError}
             inputMode="tel"
