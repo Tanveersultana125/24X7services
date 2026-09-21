@@ -71,6 +71,17 @@ export const catalogServiceSchema = z.object({
   /** Overrides `config/business.defaultWarrantyDays` when present. */
   warrantyDays: z.number().int().min(0).optional(),
   /**
+   * A short clip of the work, shown above the service on its card.
+   *
+   * Optional, and expected to stay optional: most services will never have
+   * one, and a card is written to look right without it. Seeded as a path
+   * under `public/` like every other asset here. Keep them short, silent and
+   * loopable — they autoplay muted, which is the only way a browser will play
+   * one unasked, and a clip that needs sound to make sense is a clip nobody
+   * will understand.
+   */
+  video: z.string().min(1).optional(),
+  /**
    * How long the visit usually takes, in minutes.
    *
    * It lets a rail card separate a twenty-minute installation from a two-hour

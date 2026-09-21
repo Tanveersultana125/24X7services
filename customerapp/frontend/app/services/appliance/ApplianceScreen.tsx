@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import Image from 'next/image'
+import { ChevronRight, ShieldCheck } from 'lucide-react'
 import {
   applianceIdSchema,
   type ApplianceId,
+  type BusinessConfig,
   type CatalogAppliance,
   type CatalogBrand,
   type CatalogIssue,
@@ -29,11 +30,13 @@ import { startDraft } from '@/lib/bookingDraft'
 import {
   fetchAppliance,
   fetchBrands,
+  fetchBusinessConfig,
   fetchIssuesFor,
   fetchServicesFor,
 } from '@/lib/catalog'
 import { formatPaise } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
+import { cn } from '@/lib/cn'
 
 /**
  * One appliance: what we do to it, what usually goes wrong with it, and which
@@ -65,6 +68,7 @@ import { useAsync } from '@/lib/useAsync'
 
 interface ApplianceData {
   appliance: CatalogAppliance | null
+  config: BusinessConfig | null
   services: CatalogService[]
   issues: CatalogIssue[]
   brands: CatalogBrand[]
@@ -87,15 +91,24 @@ export function ApplianceScreen() {
 
   const load = useCallback(async (): Promise<ApplianceData> => {
     if (!applianceId) {
-      return { appliance: null, services: [], issues: [], brands: [] }
+      return {
+        appliance: null,
+        config: null,
+        services: [],
+        issues: [],
+        brands: [],
+      }
     }
-    const [appliance, services, issues, brands] = await Promise.all([
+    const [appliance, config, services, issues, brands] = await Promise.all([
       fetchAppliance(applianceId),
+      // Only for the warranty line. A failed read leaves the strip out rather
+      // than the page, which is the right trade for one sentence.
+      fetchBusinessConfig(),
       fetchServicesFor(applianceId),
       fetchIssuesFor(applianceId),
       fetchBrands(),
     ])
-    return { appliance, services, issues, brands }
+    return { appliance, config, services, issues, brands }
   }, [applianceId])
 
   const data = useAsync(load)
@@ -116,6 +129,17 @@ export function ApplianceScreen() {
   const cheapestFee = services.length
     ? Math.min(...services.map((service) => service.visitFee))
     : null
+
+  // The longest cover on offer here, service overrides included. "Up to",
+  // because it is the best of them and not what every service carries.
+  const warrantyDays = services.length
+    ? Math.max(
+        ...services.map(
+          (service) =>
+            service.warrantyDays ?? data.data?.config?.defaultWarrantyDays ?? 0
+        )
+      )
+    : 0
 
   /**
    * Scroll to the service named in the URL, once it is on the page.
@@ -193,43 +217,59 @@ export function ApplianceScreen() {
         </div>
       ) : (
         <>
-          <section className="mt-5">
-            <Card className="overflow-hidden" raised>
-              <div className="flex items-center gap-4 bg-brand-soft p-4">
-                <div className="relative size-20 shrink-0 overflow-hidden rounded-card bg-bg sm:size-24">
-                  <Image
-                    src={appliance.image}
-                    alt=""
-                    fill
-                    sizes="96px"
-                    // Contained, for the reason the grid tile is: these are
-                    // drawings with their own margins, and filling a square
-                    // with one takes the appliance's feet off.
-                    className="object-contain p-2"
-                    priority
-                  />
-                </div>
-                <div className="min-w-0">
-                  <h1 className="text-xl font-bold text-ink sm:text-2xl">
-                    {appliance.name}
-                  </h1>
-                  <p className="mt-1 text-sm text-muted">
-                    Repair, service and installation at your doorstep.
-                  </p>
-                  {cheapestFee !== null ? (
-                    <p className="mt-2 text-sm text-muted">
-                      Visit from{' '}
-                      <span className="font-bold text-ink">
-                        {formatPaise(cheapestFee)}
-                      </span>
-                    </p>
-                  ) : null}
-                </div>
-              </div>
-              <div className="p-4">
-                <TrustPoints compact />
-              </div>
-            </Card>
+          {/* The top of the page is the appliance's name and the two facts
+              worth knowing before reading a price list: what the cheapest
+              visit costs, and how long the work is covered for. It used to be
+              a tinted card with the drawing in it and the promises stacked
+              underneath, which spent the first screen on reassurance nobody
+              had asked for yet — the promises are still here, further down,
+              where a customer is actually weighing one service against
+              another. */}
+          <section className="mt-6">
+            <h1 className="text-2xl font-bold leading-tight text-ink">
+              {appliance.name}
+            </h1>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted">
+              Repair, service and installation at your doorstep.
+            </p>
+
+            {cheapestFee !== null ? (
+              <p className="mt-3 text-sm text-muted">
+                Visit from{' '}
+                <span className="text-base font-bold text-ink">
+                  {formatPaise(cheapestFee)}
+                </span>
+                {services.length > 1 ? (
+                  <>
+                    {' · '}
+                    {services.length} services
+                  </>
+                ) : null}
+              </p>
+            ) : null}
+
+            {/* A row rather than a badge: it is a claim about money, and the
+                condition on it is at the foot of the page, so it has to be
+                something you can follow rather than something you can only
+                read. */}
+            {warrantyDays > 0 ? (
+              <a
+                href="#warranty"
+                className="mt-4 flex items-center gap-3 rounded-card bg-surface px-4 py-3 text-sm text-ink hover:bg-border"
+              >
+                <ShieldCheck
+                  className="size-5 shrink-0 text-brand"
+                  aria-hidden="true"
+                />
+                <span className="min-w-0 flex-1">
+                  Up to {warrantyDays} days service warranty
+                </span>
+                <ChevronRight
+                  className="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                />
+              </a>
+            ) : null}
           </section>
 
           {/* The jump row. Worth its space once there are enough services that
@@ -256,7 +296,7 @@ export function ApplianceScreen() {
           ) : null}
 
           <Section
-            title="Choose a service"
+            title="Select your service"
             subtitle="The visit fee is what you pay to book. Everything after it is quoted first."
           >
             <div className="flex flex-col gap-3">
@@ -305,6 +345,12 @@ export function ApplianceScreen() {
             </Section>
           ) : null}
 
+          <Section title="Why book with us">
+            <Card className="p-4">
+              <TrustPoints />
+            </Card>
+          </Section>
+
           <Section title="How it works" subtitle={HOW_IT_WORKS_SUBTITLE}>
             <HowItWorks />
           </Section>
@@ -325,11 +371,14 @@ export function ApplianceScreen() {
             </Section>
           ) : null}
 
-          <Section>
-            {/* Said here, before a slot is chosen, rather than after the job. */}
-            <Card className="p-4 text-sm leading-relaxed text-muted">
-              {MANUFACTURER_WARRANTY_NOTICE}
-            </Card>
+          <Section className={cn('mt-8', JUMP_OFFSET)}>
+            {/* Said here, before a slot is chosen, rather than after the job.
+                The warranty row at the top of the page points at this. */}
+            <div id="warranty">
+              <Card className="p-4 text-sm leading-relaxed text-muted">
+                {MANUFACTURER_WARRANTY_NOTICE}
+              </Card>
+            </div>
           </Section>
 
           {headline ? (

@@ -1,5 +1,6 @@
 'use client'
 
+import { useSyncExternalStore } from 'react'
 import Image from 'next/image'
 import type { CatalogService } from '@app/shared'
 import { formatPaise } from '@/lib/format'
@@ -10,6 +11,13 @@ import { cn } from '@/lib/cn'
 /**
  * A service on the appliance page: what it is, what the visit costs, how long
  * it takes, and a button that starts the booking.
+ *
+ * A service that has been seeded a clip shows it across the top of the card.
+ * Muted, looping and inline, because that is the only shape a browser will
+ * play unasked — and not played at all for a customer who has asked their
+ * system for less motion, who gets the appliance drawing as a still instead.
+ * Most services will never have one; the card is written to look right either
+ * way and the clip is never the thing carrying the meaning.
  *
  * The price is stated as a fact rather than a range, because the visit fee is
  * the only number the customer is committing to at this point — anything
@@ -43,15 +51,32 @@ export function ServiceCard({
   className,
 }: ServiceCardProps) {
   const duration = durationNote(service.durationMinutes)
+  const reducedMotion = usePrefersReducedMotion()
 
   return (
     <CardButton
       onClick={() => onSelect(service)}
       selected={selected}
       ariaLabel={`Book ${service.name}, visit fee ${formatPaise(service.visitFee)}`}
-      className={cn('group p-4', className)}
+      className={cn('group overflow-hidden', className)}
     >
-      <div className="flex gap-4">
+      {service.video ? (
+        <video
+          // The drawing stands in before a frame has decoded, and stands in
+          // for good on a connection that never gets one.
+          poster={image}
+          src={reducedMotion ? undefined : service.video}
+          autoPlay={!reducedMotion}
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          aria-hidden="true"
+          className="aspect-video w-full bg-surface object-cover"
+        />
+      ) : null}
+
+      <div className="flex gap-4 p-4">
         <div className="min-w-0 flex-1">
           <h3 className="text-base font-semibold text-ink">{service.name}</h3>
 
@@ -112,6 +137,32 @@ export function ServiceCard({
         </div>
       </div>
     </CardButton>
+  )
+}
+
+/**
+ * Whether the customer has asked their system for less movement.
+ *
+ * An external store rather than state in an effect, the same shape auth and
+ * location use here: the media query already lives outside React and already
+ * pushes changes, so subscribing to it is the whole job. It is also a setting
+ * someone can change while the app is open, and the server snapshot has to be
+ * a definite value — false, so the prerender matches the common case and only
+ * a customer who asked for less motion sees anything swap.
+ */
+const MOTION_QUERY = '(prefers-reduced-motion: reduce)'
+
+function subscribeReducedMotion(onChange: () => void): () => void {
+  const query = window.matchMedia(MOTION_QUERY)
+  query.addEventListener('change', onChange)
+  return () => query.removeEventListener('change', onChange)
+}
+
+function usePrefersReducedMotion(): boolean {
+  return useSyncExternalStore(
+    subscribeReducedMotion,
+    () => window.matchMedia(MOTION_QUERY).matches,
+    () => false
   )
 }
 
