@@ -142,34 +142,52 @@ export function ProfileSkeleton() {
   )
 }
 
+/**
+ * The contents of Home's first card while the catalog is on its way — the
+ * heading and the tiles under it, at the grid's own column counts, so the card
+ * is the height it will be and the page does not shift when the answer lands.
+ *
+ * Separate from HomeSkeleton because it goes inside the card that laps the
+ * hero, and that card renders in every state.
+ */
+export function CategoryGridSkeleton({ count = 6 }: { count?: number }) {
+  return (
+    <SkeletonGroup label="Loading services">
+      <Skeleton className="mb-3 h-6 w-40 rounded-md" />
+      <div className="grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 lg:grid-cols-6">
+        {Array.from({ length: count }).map((_, i) => (
+          <div key={i}>
+            <Skeleton className="aspect-square w-full" />
+            <Skeleton className="mx-auto mt-2 h-3 w-4/5 rounded-md" />
+          </div>
+        ))}
+      </div>
+    </SkeletonGroup>
+  )
+}
+
+/**
+ * Everything on Home below the first card: the service rails. The hero and the
+ * grid are not in here — Home paints the hero itself on every path, and the
+ * grid stands in for itself inside the card with CategoryGridSkeleton.
+ */
 export function HomeSkeleton() {
   return (
-    <SkeletonGroup label="Loading home" className="flex flex-col gap-8 pt-5">
-      {/* No banner block: Home paints the hero itself on every path, because
-          the header floats on it and needs something behind it. */}
-      <div>
-        <Skeleton className="mb-3 h-6 w-40 rounded-md" />
-        <div className="grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 lg:grid-cols-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i}>
-              <Skeleton className="aspect-square w-full" />
-              <Skeleton className="mx-auto mt-2 h-3 w-4/5 rounded-md" />
-            </div>
-          ))}
+    <SkeletonGroup label="Loading home" className="flex flex-col gap-8 pt-8">
+      {Array.from({ length: 2 }).map((_, row) => (
+        <div key={row}>
+          <Skeleton className="mb-3 h-6 w-48 rounded-md" />
+          <div className="flex gap-3 overflow-hidden">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="w-40 shrink-0">
+                <Skeleton className="aspect-square w-full" />
+                <Skeleton className="mt-2.5 h-4 w-full rounded-md" />
+                <Skeleton className="mt-2 h-9 w-full rounded-md" />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-      <div>
-        <Skeleton className="mb-3 h-6 w-48 rounded-md" />
-        <div className="flex gap-3 overflow-hidden">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="w-40 shrink-0">
-              <Skeleton className="aspect-square w-full" />
-              <Skeleton className="mt-2.5 h-4 w-full rounded-md" />
-              <Skeleton className="mt-2 h-9 w-full rounded-md" />
-            </div>
-          ))}
-        </div>
-      </div>
+      ))}
     </SkeletonGroup>
   )
 }

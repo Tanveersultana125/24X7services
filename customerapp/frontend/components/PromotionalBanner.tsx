@@ -5,7 +5,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { Route } from 'next'
 import type { Banner, BannerTone } from '@app/shared'
-import { HOME_HEADER_CLEARANCE } from '@/components/HomeHeader'
 import { cn } from '@/lib/cn'
 
 /**
@@ -18,19 +17,19 @@ import { cn } from '@/lib/cn'
  * back — a rail that keeps moving while someone is reading it is worse than one
  * that never moved.
  *
- * One card at a time. On a phone it runs edge to edge with square corners and
- * starts at the very top of the screen, with the header floating over its upper
- * third — so the coloured block at the top of Home is painted by one element
- * and there is no join to see. Butting a coloured header up against it was the
- * previous attempt, and a join between two elements is only invisible while
- * their colours agree, which lasts exactly until the next banner is seeded a
- * different shade. From a laptop's width up it goes back to being an ordinary
- * card, because a banner stretched across a desktop window is not a banner, it
- * is a stripe.
+ * One card at a time, and a card everywhere: inset from the edge of the screen,
+ * rounded on all four corners, sitting inside Home's blue hero rather than
+ * being it. It used to run edge to edge with square corners from the very top
+ * of the screen, so that the coloured block at the top of Home was painted by
+ * the banner itself and there was no join to see. That worked, and it cost the
+ * offer its edges — a banner with no border on any side is the page, and a
+ * customer scrolls past the page. The join is not a problem any more because
+ * the block behind this is the app's own gradient, not a colour chosen per
+ * banner.
  *
- * The dots sit inside the artwork on a phone for the same reason: below it they
- * push the first heading down by the height of their own tap targets, and that
- * gap reads as a mistake rather than as a control.
+ * The dots stay inside the artwork rather than under it: below the card they
+ * push everything down by the height of their own tap targets, and that gap
+ * reads as a mistake rather than as a control.
  */
 
 export interface PromotionalBannerProps {
@@ -101,14 +100,14 @@ export function PromotionalBanner({
     <section
       aria-roledescription="carousel"
       aria-label="Offers and announcements"
-      className={cn('relative -mx-4 lg:mx-0', className)}
+      className={cn('relative', className)}
       onPointerDown={stopAutoplay}
       onKeyDown={stopAutoplay}
       onFocus={stopAutoplay}
     >
       <div
         ref={railRef}
-        className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto scroll-smooth lg:gap-3"
+        className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth"
       >
         {banners.map((banner, index) => (
           <article
@@ -120,12 +119,7 @@ export function PromotionalBanner({
             <BannerCard
               banner={banner}
               priority={index === 0}
-              className={cn(
-                'rounded-none lg:rounded-card',
-                // Room at the top for the header that floats on this.
-                HOME_HEADER_CLEARANCE,
-                'min-h-[22rem] lg:min-h-56 lg:pt-5'
-              )}
+              className="shadow-raised lg:shadow-none"
             />
           </article>
         ))}
