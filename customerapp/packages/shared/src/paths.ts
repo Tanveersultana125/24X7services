@@ -23,6 +23,8 @@ export const COL = {
   bookings: 'bookings',
   tracking: 'tracking',
   invoices: 'invoices',
+  /** One per customer, keyed by uid, with the ledger underneath it. */
+  wallets: 'wallets',
   warranties: 'warranties',
   reviews: 'reviews',
   supportTickets: 'supportTickets',
@@ -40,6 +42,7 @@ export const SUB = {
   private: 'private',
   messages: 'messages',
   items: 'items',
+  ledger: 'ledger',
 } as const
 
 export const DOC = {

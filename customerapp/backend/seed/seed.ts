@@ -517,6 +517,41 @@ async function seedDemoUser(b: Batcher): Promise<void> {
     nickname: 'Kitchen fridge',
   })
 
+  // Credits, so the wallet screen has a balance and a statement to draw in the
+  // emulator. Written straight in rather than through issueCredit(), which is
+  // a transaction per movement and would make the seed a great deal slower for
+  // three rows nobody will reconcile — `balanceAfter` is therefore kept in
+  // step by hand here, and is the one place in the app where it is.
+  const hour = 60 * 60 * 1000
+  b.set(`${COL.wallets}/${DEMO_UID}`, {
+    balance: 35000,
+    lifetimeIssued: 55000,
+    updatedAt: Date.now() - 2 * day,
+  })
+  b.set(`${COL.wallets}/${DEMO_UID}/${SUB.ledger}/seed_late_visit`, {
+    kind: 'issued',
+    amount: 20000,
+    balanceAfter: 20000,
+    reason: 'late_visit',
+    note: 'Sorry we were late to your washing machine visit',
+    createdAt: Date.now() - 30 * day,
+  })
+  b.set(`${COL.wallets}/${DEMO_UID}/${SUB.ledger}/seed_spent_ac`, {
+    kind: 'spent',
+    amount: 20000,
+    balanceAfter: 0,
+    note: 'Used on your AC service',
+    createdAt: Date.now() - 12 * day,
+  })
+  b.set(`${COL.wallets}/${DEMO_UID}/${SUB.ledger}/seed_cancellation`, {
+    kind: 'issued',
+    amount: 35000,
+    balanceAfter: 35000,
+    reason: 'cancellation_refund',
+    note: 'Refund for the visit we could not make',
+    createdAt: Date.now() - 2 * day - hour,
+  })
+
   // DECISION NEEDED: past bookings are seeded only so My Appliances and Service
   // History have something to render. They are written directly here rather
   // than through createBooking, so their prices are illustrative.

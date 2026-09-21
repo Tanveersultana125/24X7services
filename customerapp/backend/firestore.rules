@@ -162,6 +162,27 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // -----------------------------------------------------------------------
+    // Credits — the customer reads their own balance and never touches it
+    // -----------------------------------------------------------------------
+
+    // Keyed by uid, so ownership is the document id and there is no `uid`
+    // field to compare against. Nothing anywhere grants a write: credits are
+    // money we owe, and a balance a client can set is not a balance.
+    match /wallets/{uid} {
+      allow get: if isOwner(uid);
+      allow write: if false;
+
+      // The reason for every paisa of that balance. Read-only for the same
+      // reason, and capped like every other list so a statement cannot be
+      // asked for in one unbounded page.
+      match /ledger/{entryId} {
+        allow get: if isOwner(uid);
+        allow list: if isOwner(uid) && request.query.limit <= 100;
+        allow write: if false;
+      }
+    }
+
     match /invoices/{invoiceId} {
       allow get: if signedIn() && resource.data.uid == request.auth.uid;
       // Split from get because request.query only exists on a list; reading

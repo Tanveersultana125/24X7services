@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   Star,
   User,
+  WalletMinimal,
   WashingMachine,
 } from 'lucide-react'
 import { COL, userProfileSchema, type UserProfile } from '@app/shared'
@@ -66,6 +67,12 @@ const ROWS = [
     label: 'Warranties',
     detail: 'What is still covered',
     icon: ShieldCheck,
+  },
+  {
+    href: '/profile/wallet',
+    label: 'Credits',
+    detail: 'What we owe you, and why',
+    icon: WalletMinimal,
   },
   {
     href: '/profile/payments',

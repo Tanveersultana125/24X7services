@@ -62,14 +62,13 @@ export function HomeHeader({
           onClick={onChangeLocation}
         />
         <div className="flex shrink-0 gap-2">
-          {/* The wallet glyph every app of this shape puts in this corner,
-              opening the only money this app holds: the invoices we have
-              issued. There is no balance and no saved card behind it — the
-              cards live at Razorpay and never reach us — so if a wallet is
-              ever built, it goes here and this label changes with it. */}
+          {/* The wallet glyph every app of this shape puts in this corner.
+              What it opens is credits — money we owe, issued by us — and not a
+              wallet in the sense of somewhere to put your own money in, which
+              this app does not have and should not grow. */}
           <HeaderTile
-            href="/profile/payments"
-            label="Invoices"
+            href="/profile/wallet"
+            label="Credits"
             icon={WalletMinimal}
           />
           <HeaderTile
