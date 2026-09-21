@@ -41,7 +41,7 @@ export function CategoryGrid({ appliances, className }: CategoryGridProps) {
       {appliances.map((appliance, index) => (
         <li key={appliance.id}>
           <Link
-            href={`/services/appliance?a=${appliance.id}` as Route}
+            href={`/services/appliance/?a=${appliance.id}` as Route}
             className="group flex flex-col items-center gap-2"
           >
             <span className="relative block aspect-square w-full overflow-hidden rounded-card bg-surface transition-colors duration-[var(--duration-fast)] group-hover:bg-border">

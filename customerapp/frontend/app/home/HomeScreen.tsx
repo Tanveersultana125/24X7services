@@ -152,7 +152,7 @@ export function HomeScreen() {
         id: popular.id,
         name: popular.name,
         image: popular.image ?? imageFor.get(popular.applianceId),
-        href: `/services/appliance?a=${popular.applianceId}` as Route,
+        href: `/services/appliance/?a=${popular.applianceId}` as Route,
         note: durationNote(listed?.durationMinutes),
         priceLabel: 'Visit from',
         price: popular.fromPrice,
@@ -260,7 +260,7 @@ export function HomeScreen() {
                   subtitle={summariseServices(row.services)}
                   action={
                     <Link
-                      href={`/services/appliance?a=${row.appliance.id}` as Route}
+                      href={`/services/appliance/?a=${row.appliance.id}` as Route}
                       className="inline-flex shrink-0 items-center gap-0.5 text-sm font-semibold text-brand"
                     >
                       See all
@@ -274,7 +274,7 @@ export function HomeScreen() {
                       name: service.name,
                       image: imageFor.get(service.applianceId),
                       href:
-                        `/services/appliance?a=${service.applianceId}` as Route,
+                        `/services/appliance/?a=${service.applianceId}` as Route,
                       note: durationNote(service.durationMinutes),
                       priceLabel: 'Visit fee',
                       price: service.visitFee,

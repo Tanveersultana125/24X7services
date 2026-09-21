@@ -134,7 +134,10 @@ export function ApplianceScreen() {
                 alt=""
                 fill
                 sizes="96px"
-                className="object-cover"
+                // Contained, for the reason the grid tile is: these are
+                // drawings with their own margins, and filling a square with
+                // one takes the appliance's feet off.
+                className="object-contain p-2"
               />
             </div>
             <div className="min-w-0">

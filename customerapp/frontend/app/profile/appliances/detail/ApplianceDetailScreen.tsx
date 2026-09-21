@@ -197,7 +197,7 @@ function ApplianceDetail({
 
       <Link
         href={
-          `/services/appliance?a=${appliance.applianceId}` as Route
+          `/services/appliance/?a=${appliance.applianceId}` as Route
         }
         className="mt-6 flex min-h-12 items-center justify-center rounded-pill border border-ink px-5 text-sm font-semibold text-ink"
       >

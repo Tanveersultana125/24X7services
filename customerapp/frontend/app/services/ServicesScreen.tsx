@@ -68,7 +68,11 @@ export function ServicesScreen() {
 
   return (
     <AppShell mobileHeader={<Header title="All services" />}>
-      <Section className="mt-5" title="What we service">
+      <Section
+        className="mt-5"
+        title="What we service"
+        subtitle="Tap an appliance for its repairs, service and installation, with the visit fee shown before you book."
+      >
         {all.status === 'loading' ? (
           <ApplianceGridSkeleton />
         ) : all.status === 'error' ? (
@@ -81,7 +85,7 @@ export function ServicesScreen() {
           />
         ) : (
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
-            {all.data?.appliances.map((appliance, index) => {
+            {all.data?.appliances.map((appliance, index, appliances) => {
               const from = fromPrices?.get(appliance.id)
               return (
                 <ApplianceCard
@@ -89,11 +93,12 @@ export function ServicesScreen() {
                   appliance={appliance}
                   // The tiles on screen before any scrolling.
                   priority={index < 2}
-                  fromLabel={
-                    from === undefined
-                      ? undefined
-                      : `Visit from ${formatPaise(from)}`
+                  // The last one, when it would otherwise sit alone in a row.
+                  wide={
+                    appliances.length % 2 === 1 &&
+                    index === appliances.length - 1
                   }
+                  from={from === undefined ? undefined : formatPaise(from)}
                 />
               )
             })}
@@ -101,29 +106,38 @@ export function ServicesScreen() {
         )}
       </Section>
 
-      <Section title="How it works">
-        <ol className="flex flex-col gap-3">
-          {STEPS.map((step, index) => (
-            <li key={step.title}>
-              <Card className="flex items-start gap-3 p-4">
+      <Section title="How it works" subtitle="Four steps, in the order they happen">
+        {/* One card with a rail down it, rather than four cards in a stack:
+            these are stages of a single job, and four separate boxes made them
+            look like four things a customer had to choose between. */}
+        <Card className="p-4 sm:p-5">
+          <ol className="flex flex-col">
+            {STEPS.map((step, index) => (
+              <li
+                key={step.title}
+                className="relative flex gap-3 pb-5 last:pb-0"
+              >
+                {index < STEPS.length - 1 ? (
+                  <span
+                    // Centred on the 28px circle above it, not beside it.
+                    className="absolute bottom-1 left-3.5 top-8 w-px -translate-x-1/2 bg-border"
+                    aria-hidden="true"
+                  />
+                ) : null}
                 <span
-                  className="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-bg"
+                  className="relative flex size-7 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-bg"
                   aria-hidden="true"
                 >
                   {index + 1}
                 </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-semibold text-ink">
-                    {step.title}
-                  </span>
-                  <span className="mt-0.5 block text-sm text-muted">
-                    {step.detail}
-                  </span>
-                </span>
-              </Card>
-            </li>
-          ))}
-        </ol>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-ink">{step.title}</p>
+                  <p className="mt-0.5 text-sm text-muted">{step.detail}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </Card>
       </Section>
 
       <Section title="What you get either way">

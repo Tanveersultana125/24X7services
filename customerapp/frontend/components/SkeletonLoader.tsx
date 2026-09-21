@@ -67,7 +67,20 @@ export function ApplianceGridSkeleton({ count = 6 }: { count?: number }) {
       className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5"
     >
       {Array.from({ length: count }).map((_, i) => (
-        <Skeleton key={i} className="h-36" />
+        // Built out of the tile's own parts rather than one grey box: the tile
+        // is a 4:3 illustration over a two-line caption, and a block of the
+        // wrong height means the grid jumps when the catalog lands.
+        <div
+          key={i}
+          aria-hidden="true"
+          className="overflow-hidden rounded-card border border-border"
+        >
+          <Skeleton className="aspect-4/3 rounded-none" />
+          <div className="p-3">
+            <Skeleton className="h-4 w-3/4 rounded-md" />
+            <Skeleton className="mt-1.5 h-3 w-1/2 rounded-md" />
+          </div>
+        </div>
       ))}
     </SkeletonGroup>
   )

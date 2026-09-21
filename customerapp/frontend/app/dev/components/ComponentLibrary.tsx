@@ -459,7 +459,7 @@ function Discovery() {
 
       <Case label="ApplianceCard">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <ApplianceCard appliance={fx.appliance} fromLabel="from ₹299" />
+          <ApplianceCard appliance={fx.appliance} from="₹299" />
           <ApplianceCard
             appliance={{
               ...fx.appliance,
@@ -467,7 +467,7 @@ function Discovery() {
               name: 'Air Conditioner',
               image: '/appliances/air-conditioner.jpg',
             }}
-            fromLabel="from ₹399"
+            from="₹399"
           />
         </div>
       </Case>
