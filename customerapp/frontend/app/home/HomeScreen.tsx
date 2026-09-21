@@ -233,7 +233,6 @@ export function HomeScreen() {
             <CategoryGrid
               appliances={data.appliances}
               services={data.services}
-              onBook={startBooking}
             />
           </>
         ) : home.status === 'error' ? (

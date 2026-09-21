@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import {
@@ -53,6 +53,14 @@ import { useAsync } from '@/lib/useAsync'
  * export has no server to resolve `/services/[id]`, and `generateStaticParams`
  * would bake today's catalog into the build — a new appliance would need a new
  * release rather than a seed entry.
+ *
+ * A second parameter, `s`, names the service to open at. It is how the sheet
+ * on Home hands over: a customer who tapped "Deep clean" lands on the deep
+ * clean, not at the top of a page they now have to search. A fragment would
+ * have been the obvious way to do that and does not work here — the anchor
+ * does not exist when the URL is followed, because the catalog has not
+ * arrived yet, so the browser scrolls nowhere and the customer sees the top
+ * of the page anyway.
  */
 
 interface ApplianceData {
@@ -74,6 +82,7 @@ export function ApplianceScreen() {
   const router = useRouter()
   const params = useSearchParams()
   const parsed = applianceIdSchema.safeParse(params.get('a'))
+  const openAt = params.get('s')
   const applianceId: ApplianceId | null = parsed.success ? parsed.data : null
 
   const load = useCallback(async (): Promise<ApplianceData> => {
@@ -98,11 +107,40 @@ export function ApplianceScreen() {
   const repairService =
     services.find((service) => service.serviceKey === 'repair') ?? null
 
-  // What the bottom bar books, and what the price at the top is "from".
-  const headline = repairService ?? services[0] ?? null
+  // What the bottom bar books, and what the price at the top is "from". When
+  // the customer arrived on one service in particular, that is the one the bar
+  // offers — anything else asks them to pick again what they just picked.
+  const requested =
+    services.find((service) => service.serviceKey === openAt) ?? null
+  const headline = requested ?? repairService ?? services[0] ?? null
   const cheapestFee = services.length
     ? Math.min(...services.map((service) => service.visitFee))
     : null
+
+  /**
+   * Scroll to the service named in the URL, once it is on the page.
+   *
+   * After the catalog lands, not before: at navigation time the list does not
+   * exist, which is why a fragment could not do this. Once only — `done` is a
+   * ref rather than state so a re-render cannot fire it again and drag the
+   * page back from wherever the customer has since scrolled.
+   *
+   * `scroll-mt` on the row keeps the sticky header off it, so the service
+   * lands below the bar rather than under it.
+   */
+  const scrolled = useRef(false)
+  useEffect(() => {
+    if (scrolled.current || !requested) return
+    const row = document.getElementById(`service-${requested.id}`)
+    if (!row) return
+
+    scrolled.current = true
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    row.scrollIntoView({
+      behavior: reduced ? 'auto' : 'smooth',
+      block: 'start',
+    })
+  }, [requested])
 
   /**
    * Starting a booking is starting a new draft, not adding to whatever was left

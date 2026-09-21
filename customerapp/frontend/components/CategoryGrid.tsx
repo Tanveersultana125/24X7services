@@ -10,7 +10,6 @@ import {
   type ApplianceId,
   type CatalogAppliance,
   type CatalogService,
-  type ServiceKey,
 } from '@app/shared'
 
 import { BottomSheet } from '@/components/BottomSheet'
@@ -30,8 +29,14 @@ import { cn } from '@/lib/cn'
  * on "Washing machine" is asking is "what do you do for it", and that has a
  * three-line answer — a whole page navigation to deliver three lines costs the
  * customer their place on Home and makes going back the price of looking.
- * From the sheet a booking is one more tap, so the grid is now two taps from a
- * draft instead of a page load and a scroll.
+ *
+ * Tapping a service in that sheet does leave, for the appliance page, opened
+ * at that service. It used to start a booking draft outright, which was one
+ * tap quicker and asked the customer to commit off a tile carrying a name, a
+ * price and nothing else — no description, no warranty, no note about what
+ * the visit fee covers. The sheet answers "what do you do for it"; the page
+ * answers "what does this one involve", and that question has to be
+ * answerable before a draft exists.
  *
  * No prices on the tiles. The grid is an index: it says what we touch, and the
  * sheet says what each thing costs. A "from" price on a tile is the cheapest
@@ -48,15 +53,12 @@ export interface CategoryGridProps {
   appliances: readonly CatalogAppliance[]
   /** Every active service, of every appliance. The sheet filters its own. */
   services: readonly CatalogService[]
-  /** Starts a draft and sends the customer into the booking flow. */
-  onBook: (applianceId: ApplianceId, serviceKey: ServiceKey) => void
   className?: string
 }
 
 export function CategoryGrid({
   appliances,
   services,
-  onBook,
   className,
 }: CategoryGridProps) {
   const [openId, setOpenId] = useState<ApplianceId | null>(null)
@@ -178,12 +180,11 @@ export function CategoryGrid({
             const duration = durationNote(service.durationMinutes)
             return (
               <li key={service.id}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOpenId(null)
-                    onBook(service.applianceId, service.serviceKey)
-                  }}
+                <Link
+                  href={
+                    `/services/appliance/?a=${service.applianceId}&s=${service.serviceKey}` as Route
+                  }
+                  onClick={() => setOpenId(null)}
                   className="group flex w-full min-w-0 flex-col items-center gap-2"
                 >
                   <span className="relative block aspect-square w-full overflow-hidden rounded-card bg-surface transition-colors duration-[var(--duration-fast)] group-hover:bg-border">
@@ -216,7 +217,7 @@ export function CategoryGrid({
                       {formatPaise(service.visitFee)}
                     </span>
                   </span>
-                </button>
+                </Link>
               </li>
             )
           })}
