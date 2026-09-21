@@ -159,60 +159,90 @@ export function CategoryGrid({
           ) : null
         }
       >
-        {/* Rows with a thumbnail, not a grid of full-size pictures. Every
-            service of an appliance shares that appliance's one photograph, so
-            four of them at tile size is the same image four times under four
-            captions — which reads as a loading bug. At thumbnail size it does
-            what a thumbnail is for: it anchors the row and says which
-            appliance you are still looking at. ServiceRail draws its cards the
-            same way, from the same image, for the same reason.
+        {/* A grid of tiles, the shape every app of this kind uses for a
+            picker like this, and the shape that was asked for.
 
-            The day a service is seeded its own artwork, this is the one place
-            that has to change. */}
-        <ul className="divide-y divide-border">
-          {openServices.map((service) => (
-            <li key={service.id}>
-              <button
-                type="button"
-                onClick={() => {
-                  setOpenId(null)
-                  onBook(service.applianceId, service.serviceKey)
-                }}
-                className="flex w-full items-center gap-3 py-3 text-left"
-              >
-                {open ? (
-                  <span className="relative block size-12 shrink-0 overflow-hidden rounded-card bg-surface">
-                    <Image
-                      src={open.image}
-                      alt=""
-                      fill
-                      sizes="48px"
-                      className="object-contain p-1.5"
-                    />
-                  </span>
-                ) : null}
+            Every service of an appliance shares that appliance's one
+            photograph, so the pictures here repeat. That is the cost of the
+            shape and it is paid deliberately: what tells the tiles apart is
+            the label under each one, which is why the label is stripped down
+            to the part that differs. The sheet's own title already says which
+            appliance this is, so a tile that repeated it would spend three
+            lines saying "Washing Machine" to distinguish itself from "Washing
+            Machine".
 
-                <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-semibold text-ink">
-                    {service.name}
-                  </span>
-                  <span className="mt-0.5 block text-xs text-muted">
-                    {[durationNote(service.durationMinutes), 'Visit fee']
-                      .filter(Boolean)
-                      .join(' · ')}{' '}
-                    {formatPaise(service.visitFee)}
-                  </span>
-                </span>
+            The day a service is seeded its own artwork, nothing here changes
+            except that the pictures stop repeating. */}
+        <ul className="grid grid-cols-3 gap-x-3 gap-y-4 sm:grid-cols-4">
+          {openServices.map((service) => {
+            const duration = durationNote(service.durationMinutes)
+            return (
+              <li key={service.id}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenId(null)
+                    onBook(service.applianceId, service.serviceKey)
+                  }}
+                  className="group flex w-full min-w-0 flex-col items-center gap-2"
+                >
+                  <span className="relative block aspect-square w-full overflow-hidden rounded-card bg-surface transition-colors duration-[var(--duration-fast)] group-hover:bg-border">
+                    {open ? (
+                      <Image
+                        src={open.image}
+                        alt=""
+                        fill
+                        sizes="(min-width: 640px) 110px, 30vw"
+                        className="object-contain p-3"
+                      />
+                    ) : null}
 
-                <ChevronRight
-                  className="size-4 shrink-0 text-muted"
-                  aria-hidden="true"
-                />
-              </button>
-            </li>
-          ))}
+                    {/* How long it takes, on the picture rather than under
+                        it. Below the label it would push every tile in the
+                        row down by a line, including the ones with no
+                        duration seeded. */}
+                    {duration ? (
+                      <span className="absolute inset-x-1 bottom-1 truncate rounded-sm bg-bg/95 px-1 py-0.5 text-center text-[10px] font-semibold text-success">
+                        {duration.replace('About ', '')}
+                      </span>
+                    ) : null}
+                  </span>
+
+                  <span className="min-w-0 text-center">
+                    <span className="block text-xs font-semibold leading-tight text-ink">
+                      {shortServiceName(service.name, open?.name)}
+                    </span>
+                    <span className="mt-0.5 block text-[11px] leading-tight text-muted">
+                      {formatPaise(service.visitFee)}
+                    </span>
+                  </span>
+                </button>
+              </li>
+            )
+          })}
         </ul>
       </BottomSheet>
     </>
   )
+}
+
+/**
+ * "Washing Machine Repair", inside a sheet already titled "Washing Machine",
+ * is the word Repair wearing a hat.
+ *
+ * The catalog names a service in full because it is read on its own
+ * elsewhere — a rail card, a booking, an invoice. Here the appliance is the
+ * heading two lines above, so the prefix is dropped and a tile label that
+ * would have wrapped to three lines fits on one. A name that does not start
+ * with the appliance is left exactly as seeded; guessing further would mean
+ * inventing a rule the catalog never agreed to.
+ */
+function shortServiceName(name: string, appliance: string | undefined): string {
+  if (!appliance) return name
+  const prefix = `${appliance.toLowerCase()} `
+  if (!name.toLowerCase().startsWith(prefix)) return name
+
+  const rest = name.slice(appliance.length).trim()
+  if (rest.length === 0) return name
+  return rest.charAt(0).toUpperCase() + rest.slice(1)
 }
