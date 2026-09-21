@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import Link from 'next/link'
 import type { Route } from 'next'
 import {
@@ -58,6 +58,15 @@ interface CreditsData {
   entries: WalletEntry[]
 }
 
+/**
+ * Where every way in from this screen points.
+ *
+ * `next` is this screen's own path, written out rather than read off the
+ * location: this screen takes no query parameters, so there is nothing about
+ * the current URL worth preserving, and a constant cannot come back wrong.
+ */
+const SIGN_IN = '/login?next=%2Fprofile%2Fwallet' as Route
+
 export function WalletScreen() {
   const { user, ready } = useAuth()
 
@@ -88,10 +97,6 @@ export function WalletScreen() {
  * of itself until you sign in does not read as "sign in to see your figures",
  * it reads as a different, emptier product — and the shape of it is the part
  * that tells someone what credits even are before they have any.
- *
- * `next` is this screen's own path, written out rather than read off the
- * location: this screen takes no query parameters, so there is nothing about
- * the current URL worth preserving, and a constant cannot come back wrong.
  */
 function SignedOut() {
   return (
@@ -101,9 +106,10 @@ function SignedOut() {
       used={null}
       entries={[]}
       emptyNote="Sign in and everything we have credited you shows up here."
+      signedIn={false}
       action={
         <Link
-          href={'/login?next=%2Fprofile%2Fwallet' as Route}
+          href={SIGN_IN}
           className="mt-3 flex h-12 w-full items-center justify-center rounded-pill bg-brand text-base font-semibold text-bg"
         >
           Sign in to see your credits
@@ -154,6 +160,7 @@ function Credits({ uid }: { uid: string }) {
       given={wallet.lifetimeIssued}
       used={used}
       entries={entries}
+      signedIn
       emptyNote="No credits yet. When we owe you something, it turns up here."
     />
   )
@@ -172,6 +179,7 @@ function CreditsBody({
   given,
   used,
   entries,
+  signedIn,
   emptyNote,
   action,
 }: {
@@ -180,9 +188,34 @@ function CreditsBody({
   given: number | null
   used: number | null
   entries: readonly WalletEntry[]
+  signedIn: boolean
   emptyNote: string
   action?: React.ReactNode
 }) {
+  // The filter lives up here because two controls set it: the pills above the
+  // list, and the two figures above those. A figure that cannot be pressed to
+  // see what it is made of is a number with the receipts locked in the
+  // next room.
+  const [filter, setFilter] = useState<FilterId>('all')
+  const activity = useRef<HTMLElement>(null)
+
+  function show(next: FilterId): void {
+    // Pressing the figure that is already showing puts everything back, so the
+    // same tap undoes itself rather than being a dead press.
+    const applied = next === filter ? 'all' : next
+    setFilter(applied)
+
+    // The list is a screen further down on a phone, so filtering it without
+    // moving there looks like the tap did nothing at all.
+    const reduced =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    activity.current?.scrollIntoView({
+      behavior: reduced ? 'auto' : 'smooth',
+      block: 'start',
+    })
+  }
+
   return (
     <>
       <div className="mt-5">
@@ -194,17 +227,29 @@ function CreditsBody({
             icon={HandCoins}
             label="Given to you"
             value={given === null ? '—' : formatPaise(given)}
+            hint="See what we credited"
+            selected={filter === 'issued'}
+            onSelect={signedIn ? () => show('issued') : undefined}
           />
           <StatTile
             icon={ReceiptIndianRupee}
             label="Used on bills"
             value={used === null ? '—' : formatPaise(used)}
+            hint="See what you spent"
+            selected={filter === 'used'}
+            onSelect={signedIn ? () => show('used') : undefined}
           />
         </div>
       </div>
 
       <Band />
-      <Activity entries={entries} emptyNote={emptyNote} />
+      <Activity
+        ref={activity}
+        entries={entries}
+        filter={filter}
+        onFilter={setFilter}
+        emptyNote={emptyNote}
+      />
       <Band />
       <Faq />
     </>
@@ -267,21 +312,70 @@ function BalanceCard({ balance }: { balance: number | null }) {
   )
 }
 
+/**
+ * One of the two figures under the balance.
+ *
+ * It is a button wherever there is a statement to show: pressing it filters
+ * the list below to the lines that add up to it, which is the only question a
+ * figure like this raises. Signed out there is no statement and no account, so
+ * it becomes the same link as the button above it rather than a control that
+ * looks live and is not.
+ */
 function StatTile({
   icon: Icon,
   label,
   value,
+  hint,
+  selected,
+  onSelect,
 }: {
   icon: typeof HandCoins
   label: string
   value: string
+  /** Read out in place of the bare label, so the press is not a surprise. */
+  hint: string
+  selected: boolean
+  /** Absent when there is nothing to filter — see above. */
+  onSelect?: () => void
 }) {
-  return (
-    <div className="rounded-card border border-border p-4">
-      <Icon className="size-5 text-muted" aria-hidden="true" />
+  const body = (
+    <>
+      <Icon
+        className={cn('size-5', selected ? 'text-brand' : 'text-muted')}
+        aria-hidden="true"
+      />
       <p className="mt-3 text-sm text-muted">{label}</p>
       <p className="mt-0.5 text-lg font-bold text-ink tabular-nums">{value}</p>
-    </div>
+    </>
+  )
+
+  const base =
+    'block w-full rounded-card border p-4 text-left ' +
+    'transition-colors duration-[var(--duration-fast)]'
+
+  if (!onSelect) {
+    return (
+      <Link href={SIGN_IN} className={cn(base, 'border-border')} aria-label={hint}>
+        {body}
+      </Link>
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      aria-pressed={selected}
+      aria-label={`${label}. ${hint}`}
+      className={cn(
+        base,
+        selected
+          ? 'border-brand bg-brand-soft'
+          : 'border-border hover:border-brand'
+      )}
+    >
+      {body}
+    </button>
   )
 }
 
@@ -304,14 +398,19 @@ type FilterId = (typeof FILTERS)[number]['id']
  * finger is worse than one with nothing behind it.
  */
 function Activity({
+  ref,
   entries,
+  filter,
+  onFilter,
   emptyNote,
 }: {
+  /** So the figures above can bring their own filtered list into view. */
+  ref: React.Ref<HTMLElement>
   entries: readonly WalletEntry[]
+  filter: FilterId
+  onFilter: (next: FilterId) => void
   emptyNote: string
 }) {
-  const [filter, setFilter] = useState<FilterId>('all')
-
   const shown = entries.filter((entry) =>
     filter === 'all'
       ? true
@@ -321,7 +420,7 @@ function Activity({
   )
 
   return (
-    <section>
+    <section ref={ref} className="scroll-mt-16">
       <h2 className="text-xl font-bold text-ink">Credits activity</h2>
 
       <div role="tablist" aria-label="Filter activity" className="mt-3 flex gap-2">
@@ -333,7 +432,7 @@ function Activity({
               type="button"
               role="tab"
               aria-selected={active}
-              onClick={() => setFilter(option.id)}
+              onClick={() => onFilter(option.id)}
               className={cn(
                 'rounded-pill border px-4 text-sm font-semibold',
                 'transition-colors duration-[var(--duration-fast)]',
