@@ -474,7 +474,11 @@ function Discovery() {
 
       <Case label="ServiceCard — unselected and selected">
         <div className="flex flex-col gap-3">
-          <ServiceCard service={fx.service} onSelect={() => {}} />
+          <ServiceCard
+            service={fx.service}
+            image={fx.appliance.image}
+            onSelect={() => {}}
+          />
           <ServiceCard service={fx.service} onSelect={() => {}} selected />
         </div>
       </Case>

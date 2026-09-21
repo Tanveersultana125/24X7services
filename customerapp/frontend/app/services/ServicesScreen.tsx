@@ -7,6 +7,7 @@ import { AppShell, Section } from '@/components/AppShell'
 import { Header } from '@/components/Header'
 import { ApplianceCard } from '@/components/ApplianceCard'
 import { TrustPoints } from '@/components/TrustPoints'
+import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
 import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
@@ -25,34 +26,14 @@ import { PackageOpen } from 'lucide-react'
  *
  * The "how it works" block is here rather than on Home because this is the
  * screen a customer reaches when they are deciding whether to trust the
- * process, not when they already know what they want. The order of those four
- * steps is the actual order of the job, including the one that matters: nobody
- * repairs anything before the customer has said yes to a price.
+ * process, not when they already know what they want. It is the same block the
+ * appliance page carries, from the same component, so the two never drift.
  */
 
 interface ServicesData {
   appliances: CatalogAppliance[]
   services: CatalogService[]
 }
-
-const STEPS = [
-  {
-    title: 'Pick the appliance and what is wrong',
-    detail: 'Brand, model details and the symptoms you have noticed.',
-  },
-  {
-    title: 'Choose a day and a two-hour window',
-    detail: 'You pay only the visit fee to confirm the slot.',
-  },
-  {
-    title: 'The expert inspects and quotes',
-    detail: 'A written estimate for the repair, itemised, before any work.',
-  },
-  {
-    title: 'You approve, and only then does work start',
-    detail: 'Finished with a GST invoice and a service warranty in the app.',
-  },
-] as const
 
 export function ServicesScreen() {
   const load = useCallback(async (): Promise<ServicesData> => {
@@ -106,38 +87,8 @@ export function ServicesScreen() {
         )}
       </Section>
 
-      <Section title="How it works" subtitle="Four steps, in the order they happen">
-        {/* One card with a rail down it, rather than four cards in a stack:
-            these are stages of a single job, and four separate boxes made them
-            look like four things a customer had to choose between. */}
-        <Card className="p-4 sm:p-5">
-          <ol className="flex flex-col">
-            {STEPS.map((step, index) => (
-              <li
-                key={step.title}
-                className="relative flex gap-3 pb-5 last:pb-0"
-              >
-                {index < STEPS.length - 1 ? (
-                  <span
-                    // Centred on the 28px circle above it, not beside it.
-                    className="absolute bottom-1 left-3.5 top-8 w-px -translate-x-1/2 bg-border"
-                    aria-hidden="true"
-                  />
-                ) : null}
-                <span
-                  className="relative flex size-7 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-bg"
-                  aria-hidden="true"
-                >
-                  {index + 1}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-ink">{step.title}</p>
-                  <p className="mt-0.5 text-sm text-muted">{step.detail}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </Card>
+      <Section title="How it works" subtitle={HOW_IT_WORKS_SUBTITLE}>
+        <HowItWorks />
       </Section>
 
       <Section title="What you get either way">

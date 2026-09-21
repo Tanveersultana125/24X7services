@@ -1,20 +1,35 @@
 'use client'
 
-import { ChevronRight } from 'lucide-react'
+import Image from 'next/image'
 import type { CatalogService } from '@app/shared'
 import { formatPaise } from '@/lib/format'
 import { CardButton } from '@/components/ui/Card'
+import { durationNote } from '@/components/ServiceRail'
 import { cn } from '@/lib/cn'
 
 /**
- * A service on the appliance page. It states the visit fee as a fact rather
- * than a range, because that is the only number the customer is committing to
- * at this point — anything beyond it needs their approval first, and the card
- * says so.
+ * A service on the appliance page: what it is, what the visit costs, how long
+ * it takes, and a button that starts the booking.
+ *
+ * The price is stated as a fact rather than a range, because the visit fee is
+ * the only number the customer is committing to at this point — anything
+ * beyond it needs their approval first, and the card says so in as many words.
+ *
+ * The "Book" pill is drawn as a button but is not one. The whole card is the
+ * control, and a real button inside it would be a second target nested in the
+ * first: two things to tab to, one of which a screen reader cannot describe
+ * without repeating the other. Drawn this way, the affordance is where a
+ * customer expects it and there is still only one thing to press.
  */
 
 export interface ServiceCardProps {
   service: CatalogService
+  /**
+   * The appliance illustration. There is no photograph per service — a picture
+   * of "repair" would be a stock image of a spanner — so all the services for
+   * one appliance carry that appliance's drawing, the way the tile did.
+   */
+  image?: string
   onSelect: (service: CatalogService) => void
   selected?: boolean
   className?: string
@@ -22,52 +37,89 @@ export interface ServiceCardProps {
 
 export function ServiceCard({
   service,
+  image,
   onSelect,
   selected = false,
   className,
 }: ServiceCardProps) {
+  const duration = durationNote(service.durationMinutes)
+
   return (
     <CardButton
       onClick={() => onSelect(service)}
       selected={selected}
-      ariaLabel={`${service.name}, visit fee ${formatPaise(service.visitFee)}`}
-      className={cn('p-4', className)}
+      ariaLabel={`Book ${service.name}, visit fee ${formatPaise(service.visitFee)}`}
+      className={cn('group p-4', className)}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex gap-4">
         <div className="min-w-0 flex-1">
           <h3 className="text-base font-semibold text-ink">{service.name}</h3>
-          <p className="mt-1 text-sm leading-relaxed text-muted">
+
+          {/* Price, then the two facts a customer weighs it against. */}
+          <p className="mt-1.5 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs text-muted">
+            <span className="text-base font-bold text-ink">
+              {formatPaise(service.visitFee)}
+            </span>
+            <span>visit fee</span>
+            {duration ? (
+              <>
+                <Dot />
+                <span>{duration}</span>
+              </>
+            ) : null}
+            {service.warrantyDays ? (
+              <>
+                <Dot />
+                <span>{service.warrantyDays}-day warranty</span>
+              </>
+            ) : null}
+          </p>
+
+          <p className="mt-2 text-sm leading-relaxed text-muted">
             {service.description}
           </p>
 
-          <dl className="mt-3 flex flex-wrap items-baseline gap-x-4 gap-y-1">
-            <div className="flex items-baseline gap-1.5">
-              <dt className="text-xs text-muted">Visit fee</dt>
-              <dd className="text-base font-bold text-ink">
-                {formatPaise(service.visitFee)}
-              </dd>
-            </div>
-            {service.startingPrice > service.visitFee ? (
-              <div className="flex items-baseline gap-1.5">
-                <dt className="text-xs text-muted">Repairs from</dt>
-                <dd className="text-sm font-semibold text-ink">
-                  {formatPaise(service.startingPrice)}
-                </dd>
-              </div>
-            ) : null}
-          </dl>
-
-          <p className="mt-2 text-xs text-muted">
-            Any repair beyond this is quoted on site and starts only after you
-            approve it.
+          <p className="mt-2 text-xs leading-relaxed text-muted">
+            {service.startingPrice > service.visitFee
+              ? `Repairs usually start at ${formatPaise(service.startingPrice)}, quoted on site and begun only after you approve.`
+              : 'Any repair beyond this is quoted on site and starts only after you approve it.'}
           </p>
         </div>
 
-        <ChevronRight
-          className="mt-1 size-5 shrink-0 text-muted"
-          aria-hidden="true"
-        />
+        <div className="flex w-20 shrink-0 flex-col gap-2 sm:w-24">
+          {image ? (
+            <span className="relative block aspect-square overflow-hidden rounded-card bg-surface">
+              <Image
+                src={image}
+                alt=""
+                fill
+                sizes="96px"
+                className="object-contain p-2"
+              />
+            </span>
+          ) : null}
+          <span
+            className={cn(
+              'inline-flex h-9 items-center justify-center rounded-pill px-3',
+              'text-sm font-semibold transition-colors duration-[var(--duration-fast)]',
+              'border border-brand text-brand',
+              'group-hover:bg-brand group-hover:text-bg'
+            )}
+            aria-hidden="true"
+          >
+            Book
+          </span>
+        </div>
       </div>
     </CardButton>
+  )
+}
+
+/** The separator between two facts on one line. */
+function Dot() {
+  return (
+    <span aria-hidden="true" className="text-border">
+      ·
+    </span>
   )
 }

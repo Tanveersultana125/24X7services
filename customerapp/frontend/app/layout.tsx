@@ -46,7 +46,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    // `scroll-smooth` is what makes the appliance page's service row glide to
+    // the section it points at instead of teleporting. The reduced-motion
+    // block in globals.css turns it back off for anyone who asked for that.
+    <html lang="en" className="scroll-smooth">
       <body className="min-h-dvh bg-bg text-ink antialiased">
         <ToastProvider>
           <AppChrome />
