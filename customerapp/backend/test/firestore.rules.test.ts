@@ -366,6 +366,89 @@ describe('bookings', () => {
 
 // ---------------------------------------------------------------------------
 
+describe('the balance and its ledger', () => {
+  beforeEach(async () => {
+    await asAdmin(async (db) => {
+      await setDoc(doc(db, `wallets/${ALICE}`), {
+        balance: 35000,
+        lifetimeIssued: 55000,
+        lifetimeToppedUp: 0,
+        updatedAt: 1,
+      })
+      await setDoc(doc(db, `wallets/${ALICE}/ledger/e1`), {
+        kind: 'issued',
+        amount: 35000,
+        balanceAfter: 35000,
+        note: 'Refund for the visit we could not make',
+        createdAt: 1,
+      })
+      await setDoc(doc(db, 'topupOrders/order_1'), {
+        uid: ALICE,
+        amount: 100000,
+        createdAt: 1,
+      })
+    })
+  })
+
+  it('lets the owner read their balance and statement', async () => {
+    await assertSucceeds(getDoc(doc(alice(), `wallets/${ALICE}`)))
+    await assertSucceeds(getDoc(doc(alice(), `wallets/${ALICE}/ledger/e1`)))
+    await assertSucceeds(
+      getDocs(query(collection(alice(), `wallets/${ALICE}/ledger`), limit(50)))
+    )
+  })
+
+  it('keeps one customer out of the balance of another', async () => {
+    await assertFails(getDoc(doc(bob(), `wallets/${ALICE}`)))
+    await assertFails(getDoc(doc(bob(), `wallets/${ALICE}/ledger/e1`)))
+  })
+
+  it('refuses an unbounded read of a statement', async () => {
+    await assertFails(
+      getDocs(query(collection(alice(), `wallets/${ALICE}/ledger`), limit(500)))
+    )
+  })
+
+  // The whole point. A balance a client can write is not a balance, and a
+  // ledger a client can append to is not a reason for one.
+  it('lets nobody write a balance or a ledger entry, not even its owner', async () => {
+    await assertFails(
+      setDoc(doc(alice(), `wallets/${ALICE}`), { balance: 9999999 })
+    )
+    await assertFails(
+      updateDoc(doc(alice(), `wallets/${ALICE}`), { balance: 9999999 })
+    )
+    await assertFails(deleteDoc(doc(alice(), `wallets/${ALICE}`)))
+    await assertFails(
+      setDoc(doc(alice(), `wallets/${ALICE}/ledger/e2`), {
+        kind: 'topup',
+        amount: 9999999,
+        balanceAfter: 9999999,
+        note: 'free money',
+        createdAt: 1,
+      })
+    )
+  })
+
+  // The amount a top-up credits is read off this document by the webhook, so
+  // a customer who could write it could name their own number.
+  it('hides a top-up order from everybody, including the customer who raised it', async () => {
+    await assertFails(getDoc(doc(alice(), 'topupOrders/order_1')))
+    await assertFails(
+      setDoc(doc(alice(), 'topupOrders/order_2'), {
+        uid: ALICE,
+        amount: 9999999,
+        createdAt: 1,
+      })
+    )
+    await assertFails(
+      updateDoc(doc(alice(), 'topupOrders/order_1'), { amount: 9999999 })
+    )
+  })
+})
+
+// ---------------------------------------------------------------------------
+
 describe('invoices, warranties and reviews', () => {
   beforeEach(async () => {
     await asAdmin(async (db) => {

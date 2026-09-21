@@ -62,13 +62,13 @@ export function HomeHeader({
           onClick={onChangeLocation}
         />
         <div className="flex shrink-0 gap-2">
-          {/* The wallet glyph every app of this shape puts in this corner.
-              What it opens is credits — money we owe, issued by us — and not a
-              wallet in the sense of somewhere to put your own money in, which
-              this app does not have and should not grow. */}
+          {/* The wallet glyph every app of this shape puts in this corner,
+              opening the balance: credits we issued, plus whatever the
+              customer has added. Closed loop — it buys our own services and
+              nothing else — which is the condition on it being here at all. */}
           <HeaderTile
             href="/profile/wallet"
-            label="Credits"
+            label="Balance"
             icon={WalletMinimal}
           />
           <HeaderTile

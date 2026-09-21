@@ -183,6 +183,11 @@ service cloud.firestore {
       }
     }
 
+    // What a top-up order was for. Read by the webhook and the verify call to
+    // learn the amount, which is exactly why no client may see or set it: an
+    // amount a customer can write is an amount a customer can credit.
+    match /topupOrders/{orderId} { allow read, write: if false; }
+
     match /invoices/{invoiceId} {
       allow get: if signedIn() && resource.data.uid == request.auth.uid;
       // Split from get because request.query only exists on a list; reading

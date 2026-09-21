@@ -70,8 +70,8 @@ const ROWS = [
   },
   {
     href: '/profile/wallet',
-    label: 'Credits',
-    detail: 'What we owe you, and why',
+    label: 'Balance',
+    detail: 'Credits, and money you have added',
     icon: WalletMinimal,
   },
   {

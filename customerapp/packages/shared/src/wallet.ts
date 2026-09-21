@@ -1,40 +1,64 @@
 import { z } from 'zod'
-import { paiseSchema } from './money'
+import { paiseSchema, type Paise } from './money'
 
 /**
- * Credits: money we owe the customer, never money the customer gave us.
+ * The customer's balance with us, and the reason for every paisa of it.
  *
- * That distinction is the whole design. A wallet a customer can top up is a
- * prepaid instrument — it holds public money, it needs a float account, a
- * refund policy and, past a point, the RBI's permission. Credits are the other
- * thing entirely: we issue them when we owe an apology or a refund, they can
- * only be spent against our own invoices, and the customer never puts a rupee
- * in. Nothing here accepts money, and nothing here should ever learn how.
+ * Two kinds of money land in it. Credits, which we issue when we owe an
+ * apology or a refund and which cost the customer nothing; and top-ups, which
+ * are the customer's own money, paid in through the same gateway that takes
+ * every other payment in this app.
+ *
+ * Accepting a top-up makes this a prepaid instrument, so the shape of it is a
+ * decision and not an accident:
+ *
+ *   - Closed loop. The balance buys 24X7 services and nothing else. It cannot
+ *     be sent to another customer, spent anywhere else, or withdrawn as cash.
+ *     That is what keeps it outside the RBI's authorisation regime for
+ *     prepaid payment instruments, and every one of those three limits has to
+ *     stay true for that to keep holding.
+ *   - Refundable. A customer who topped up and changed their mind gets it
+ *     back to the card or account it came from, on request. Stored value the
+ *     customer cannot get out of is the version that draws attention.
+ *   - No expiry. Neither credits nor top-ups lapse. Expiry needs a sweep, a
+ *     warning notification and an argument with everyone whose balance went
+ *     the week before they needed it; if the business ever wants it, it is an
+ *     `expiresAt` on the entry plus that sweep, never the field alone.
+ *
+ * DECISION NEEDED: refunds are manual today — support raises them in the
+ * Razorpay dashboard against the original payment. The ledger records the
+ * reversal either way, but there is no self-serve "withdraw" and there should
+ * not be one until someone has decided how it is policed.
  *
  * The balance is a running total kept on the wallet document, and the ledger
  * under it is the reason for every paisa of it. Both are written in the same
  * transaction by the server and by nothing else, so the balance can never be a
  * number with no entries behind it.
- *
- * DECISION NEEDED: credits do not expire. Expiry is the usual practice and it
- * is also the usual complaint — it needs a sweep, a warning notification and a
- * lot of arguing with people whose credit lapsed the week before they needed
- * it. If the business wants expiry, it is an `expiresAt` on the entry, a
- * scheduled sweep that spends the lapsed lots, and a line in the FAQ; do not
- * add the field alone, because a balance that ignores it is worse than one
- * that never had it.
  */
 
 /** Which way an entry moved the balance, and on whose account. */
 export const walletEntryKindSchema = z.enum([
-  /** We gave credits. */
+  /** We gave credits. Costs the customer nothing. */
   'issued',
-  /** The customer spent them against a bill. */
+  /** The customer paid money in. */
+  'topup',
+  /** The balance went against a bill. */
   'spent',
-  /** We took back credits issued in error. */
+  /** We took it back — credits issued in error, or a top-up refunded. */
   'reversed',
 ])
 export type WalletEntryKind = z.infer<typeof walletEntryKindSchema>
+
+/**
+ * Whether an entry of this kind put money in or took it out.
+ *
+ * One function rather than a comparison at each call site: there are two
+ * inward kinds now and the day a third arrives, a `kind === 'issued'` left
+ * somewhere is a row with the wrong sign on a statement about money.
+ */
+export function isCreditEntry(kind: WalletEntryKind): boolean {
+  return kind === 'issued' || kind === 'topup'
+}
 
 /** Why credits were issued. Absent on entries that are not an issue. */
 export const creditReasonSchema = z.enum([
@@ -71,17 +95,47 @@ export const walletEntrySchema = z.object({
 export type WalletEntry = z.infer<typeof walletEntrySchema>
 
 export const walletSchema = z.object({
-  /** Unspent credits. This is the number on the card. */
+  /** Unspent. This is the number on the card. */
   balance: paiseSchema,
-  /** Everything ever issued, so "you have saved X with us" is answerable. */
+  /**
+   * Everything we ever gave, so "you have saved X with us" is answerable.
+   * Top-ups are not in here — the customer's own money is not a saving.
+   */
   lifetimeIssued: paiseSchema,
+  /** Everything the customer ever paid in. Defaults for wallets predating it. */
+  lifetimeToppedUp: paiseSchema.default(0),
   updatedAt: z.number().int().min(0),
 })
 export type Wallet = z.infer<typeof walletSchema>
+
+/**
+ * What a customer may put in at once.
+ *
+ * A floor because a gateway fee on a twenty rupee top-up costs more than it
+ * collects, and a ceiling because a closed-loop balance this size is already
+ * more than anyone needs for an appliance repair — and a stored balance is a
+ * liability, not a win.
+ */
+export const TOPUP_MIN = 10_000 as Paise // ₹100
+export const TOPUP_MAX = 2_000_000 as Paise // ₹20,000
+
+/**
+ * The amounts offered as buttons. Four, and no free-text field: a top-up is
+ * not a payment for anything in particular, so an empty box asking how much
+ * is a question with no right answer in it.
+ */
+export const TOPUP_PRESETS: readonly Paise[] = [
+  50_000, 100_000, 200_000, 500_000,
+]
+
+export const topupAmountSchema = paiseSchema
+  .min(TOPUP_MIN, 'The smallest top-up is ₹100')
+  .max(TOPUP_MAX, 'The largest top-up is ₹20,000')
 
 /** What a customer with no wallet document has: nothing, and no error. */
 export const EMPTY_WALLET: Wallet = {
   balance: 0,
   lifetimeIssued: 0,
+  lifetimeToppedUp: 0,
   updatedAt: 0,
 }

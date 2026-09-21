@@ -25,6 +25,12 @@ export const COL = {
   invoices: 'invoices',
   /** One per customer, keyed by uid, with the ledger underneath it. */
   wallets: 'wallets',
+  /**
+   * A top-up we raised an order for, keyed by the Razorpay order id. It is
+   * what tells the webhook and the verify call whose balance to move and by
+   * how much, so neither has to take an amount from the client.
+   */
+  topupOrders: 'topupOrders',
   warranties: 'warranties',
   reviews: 'reviews',
   supportTickets: 'supportTickets',

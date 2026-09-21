@@ -2,6 +2,7 @@ import { FieldValue } from 'firebase-admin/firestore'
 import {
   COL,
   SUB,
+  isCreditEntry,
   type CreditReason,
   type Paise,
   type WalletEntryKind,
@@ -22,7 +23,8 @@ import { db } from './admin'
  *
  * Nothing here is callable. Credits are issued by server code that has already
  * decided we owe them — a cancellation, a visit we missed, a support agent's
- * goodwill — and spent by the checkout path against a bill the server priced.
+ * goodwill — top-ups by the payment path once the gateway says the money
+ * arrived, and spends by the checkout path against a bill the server priced.
  * There is deliberately no endpoint a client can reach, because the first one
  * would be the last line of defence for real money.
  */
@@ -52,6 +54,14 @@ export interface CreditInput {
   note: string
   bookingId?: string
   /** See movementId. Two calls with the same id are one credit. */
+  id: string
+}
+
+export interface TopupInput {
+  uid: string
+  amount: Paise
+  note: string
+  /** See movementId. Built from the payment id, so a retry is one top-up. */
   id: string
 }
 
@@ -96,6 +106,38 @@ export async function issueCredit({
     note,
     bookingId,
     // A credit is never refused. There is no ceiling on what we can owe.
+    allow: () => amount,
+  })
+}
+
+/**
+ * Put the customer's own money in.
+ *
+ * Called only after the gateway has confirmed a capture — from the webhook,
+ * and from the verify call the client makes when checkout returns, whichever
+ * arrives first. Both pass the same id, built from the Razorpay payment id, so
+ * the second one to arrive moves nothing and says so.
+ *
+ * It is the one movement that does not touch `lifetimeIssued`: that figure
+ * answers "what have 24X7 given me", and a customer's own money is not an
+ * answer to it.
+ */
+export async function topUpWallet({
+  uid,
+  amount,
+  note,
+  id,
+}: TopupInput): Promise<MovementResult> {
+  if (!Number.isInteger(amount) || amount <= 0) {
+    throw new Error(`topUpWallet: amount must be positive paise, got ${amount}`)
+  }
+  return move({
+    uid,
+    id,
+    kind: 'topup',
+    amount,
+    note,
+    // Money that has already been captured is never refused.
     allow: () => amount,
   })
 }
@@ -189,7 +231,8 @@ async function move({
     const applied = allow(balance)
     if (applied <= 0) return { balance, applied: 0 }
 
-    const balanceAfter = kind === 'issued' ? balance + applied : balance - applied
+    const inward = isCreditEntry(kind)
+    const balanceAfter = inward ? balance + applied : balance - applied
     const now = Date.now()
 
     tx.set(entryRef, {
@@ -206,7 +249,11 @@ async function move({
       walletRef,
       {
         balance: balanceAfter,
+        // Two lifetime figures, because they answer different questions: what
+        // we have given, and what the customer has put in. Summing them would
+        // answer neither.
         lifetimeIssued: FieldValue.increment(kind === 'issued' ? applied : 0),
+        lifetimeToppedUp: FieldValue.increment(kind === 'topup' ? applied : 0),
         updatedAt: now,
       },
       { merge: true }

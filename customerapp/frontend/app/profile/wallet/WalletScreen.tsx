@@ -4,42 +4,52 @@ import { useCallback, useRef, useState } from 'react'
 import Link from 'next/link'
 import type { Route } from 'next'
 import {
+  ArrowDownToLine,
   ChevronDown,
   Gift,
   HandCoins,
+  Plus,
   ReceiptIndianRupee,
   WalletMinimal,
 } from 'lucide-react'
 import {
   formatPaise,
+  isCreditEntry,
+  TOPUP_PRESETS,
+  type Paise,
   type Wallet as WalletDoc,
   type WalletEntry,
 } from '@app/shared'
 
 import { Header } from '@/components/Header'
+import { BottomSheet } from '@/components/BottomSheet'
 import { ErrorState } from '@/components/ErrorState'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
+import { useToast } from '@/components/Toast'
 import { useAuth } from '@/lib/auth'
+import { topUp } from '@/lib/topup'
 import { fetchLedger, fetchWallet } from '@/lib/wallet'
 import { formatDateTime } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/cn'
 
 /**
- * Credits: what we owe this customer, and why.
+ * The customer's balance with us, and the reason for every paisa of it.
  *
  * Laid out the way every wallet screen on a phone here is laid out, because
  * that shape is now what people expect and fighting it wins nothing: a
  * coloured balance card at the top, two figures under it, the statement, and
  * the questions. What is deliberately missing from that shape is Add money.
  *
- * A wallet is a thing you put money into, and there is nothing here to put
- * money into — every paisa on this screen was issued by us, for a visit we
- * were late to, a job we could not make, or a referral. The moment this app
- * accepts a top-up it is holding public money: a float account, a refund
- * policy and, past a threshold, the RBI's permission. So the word wallet
- * appears nowhere a customer can read it, and the button that would start all
- * of that does not exist.
+ * Two kinds of money are on it, and the screen never pretends they are one.
+ * Credits, which we issued because we owed them; and the customer's own money,
+ * added through Add money. They share a balance because they buy the same
+ * thing, and the statement says which is which on every line.
+ *
+ * Add money is the reason the limits in the schema matter — see the note at
+ * the top of `shared/wallet.ts`. The balance is closed-loop: it buys 24X7
+ * services, it cannot be transferred or withdrawn, and it is refundable on
+ * request. Nothing on this screen may quietly stop any of those being true.
  *
  * The balance and the statement are fetched together. They are two reads of
  * the same fact, and a screen that showed one without the other would be a
@@ -72,7 +82,7 @@ export function WalletScreen() {
 
   return (
     <div className="min-h-dvh bg-bg">
-      <Header title="Credits" showBack backFallback="/profile" />
+      <Header title="Balance" showBack backFallback="/profile" />
       <main
         id="content"
         className="mx-auto w-full max-w-lg px-4 pb-16 lg:max-w-2xl"
@@ -108,14 +118,14 @@ function SignedOut() {
       given={0}
       used={0}
       entries={[]}
-      emptyNote="Sign in and everything we have credited you shows up here."
+      emptyNote="Sign in and everything on your balance shows up here."
       signedIn={false}
       action={
         <Link
           href={SIGN_IN}
           className="mt-3 flex h-12 w-full items-center justify-center rounded-pill bg-brand text-base font-semibold text-bg"
         >
-          Sign in to see your credits
+          Sign in to see your balance
         </Link>
       }
     />
@@ -124,7 +134,7 @@ function SignedOut() {
 
 function CreditsSkeleton() {
   return (
-    <SkeletonGroup label="Loading credits" className="mt-5 flex flex-col gap-4">
+    <SkeletonGroup label="Loading your balance" className="mt-5 flex flex-col gap-4">
       <Skeleton className="h-48" />
       <div className="grid grid-cols-2 gap-3">
         <Skeleton className="h-24" />
@@ -154,7 +164,7 @@ function Credits({ uid }: { uid: string }) {
 
   const { wallet, entries } = credits.data
   const used = entries
-    .filter((entry) => entry.kind !== 'issued')
+    .filter((entry) => !isCreditEntry(entry.kind))
     .reduce((total, entry) => total + entry.amount, 0)
 
   return (
@@ -164,7 +174,8 @@ function Credits({ uid }: { uid: string }) {
       used={used}
       entries={entries}
       signedIn
-      emptyNote="No credits yet. When we owe you something, it turns up here."
+      emptyNote="Nothing yet. Add money, or wait for us to owe you something."
+      onAdded={credits.reload}
     />
   )
 }
@@ -185,6 +196,7 @@ function CreditsBody({
   signedIn,
   emptyNote,
   action,
+  onAdded,
 }: {
   balance: number
   given: number
@@ -193,12 +205,15 @@ function CreditsBody({
   signedIn: boolean
   emptyNote: string
   action?: React.ReactNode
+  /** Re-reads the wallet once money has landed. */
+  onAdded?: () => void
 }) {
   // The filter lives up here because two controls set it: the pills above the
   // list, and the two figures above those. A figure that cannot be pressed to
   // see what it is made of is a number with the receipts locked in the
   // next room.
   const [filter, setFilter] = useState<FilterId>('all')
+  const [adding, setAdding] = useState(false)
   const activity = useRef<HTMLElement>(null)
 
   function show(next: FilterId): void {
@@ -221,15 +236,19 @@ function CreditsBody({
   return (
     <>
       <div className="mt-5">
-        <BalanceCard balance={balance} signedIn={signedIn} />
+        <BalanceCard
+          balance={balance}
+          signedIn={signedIn}
+          onAdd={signedIn ? () => setAdding(true) : undefined}
+        />
         {action}
 
         <div className="mt-3 grid grid-cols-2 gap-3">
           <StatTile
             icon={HandCoins}
-            label="Given to you"
+            label="Credited by us"
             value={formatPaise(given)}
-            hint="See what we credited"
+            hint="See everything added to your balance"
             selected={filter === 'issued'}
             onSelect={signedIn ? () => show('issued') : undefined}
           />
@@ -254,11 +273,104 @@ function CreditsBody({
       />
       <Band />
       <Faq />
+
+      <AddMoneySheet
+        open={adding}
+        onClose={() => setAdding(false)}
+        onAdded={onAdded}
+      />
     </>
   )
 }
 
 // ---------------------------------------------------------------------------
+
+/**
+ * Choosing how much to put in.
+ *
+ * Four amounts and no free-text field. A top-up is not a payment for anything
+ * in particular, so an empty box asking how much is a question with no right
+ * answer in it — and the bounds that box would need are the same four numbers
+ * with more ways to get them wrong.
+ *
+ * The sheet stays open while the gateway is up, and closes on the way back.
+ * Closing it under the payment sheet would leave a customer looking at the
+ * screen behind, unsure whether anything was charged.
+ */
+function AddMoneySheet({
+  open,
+  onClose,
+  onAdded,
+}: {
+  open: boolean
+  onClose: () => void
+  onAdded?: () => void
+}) {
+  const [busy, setBusy] = useState<Paise | null>(null)
+  const toast = useToast()
+
+  async function choose(amount: Paise): Promise<void> {
+    if (busy !== null) return
+    setBusy(amount)
+    try {
+      const outcome = await topUp(amount)
+      if (outcome.kind === 'added') {
+        toast.show(`${formatPaise(amount)} added to your balance`, {
+          tone: 'success',
+        })
+        onAdded?.()
+        onClose()
+      }
+      // Cancelled: the customer closed the payment sheet. The choices stay up
+      // so they can pick again, and nothing is announced — they know.
+    } catch {
+      // The real cause is in the console and the function logs. On screen it
+      // is one line, because "your money may or may not have moved" is the
+      // only thing a customer can act on.
+      toast.show(
+        'We could not complete that. If money has left your account, contact support.',
+        { tone: 'error' }
+      )
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  return (
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      dismissable={busy === null}
+      title="Add money"
+      description="Goes into your 24X7 balance and comes off your next bill. Refundable on request; it never expires."
+    >
+      <div className="grid grid-cols-2 gap-3 p-4">
+        {TOPUP_PRESETS.map((amount) => (
+          <button
+            key={amount}
+            type="button"
+            onClick={() => void choose(amount)}
+            disabled={busy !== null}
+            className={cn(
+              'flex h-14 items-center justify-center rounded-card border text-lg font-bold',
+              'transition-colors duration-[var(--duration-fast)]',
+              busy === amount
+                ? 'border-brand bg-brand-soft text-brand'
+                : 'border-border text-ink hover:border-brand disabled:opacity-60'
+            )}
+          >
+            {busy === amount ? 'Opening…' : formatPaise(amount)}
+          </button>
+        ))}
+      </div>
+
+      <p className="px-4 pb-4 text-xs text-muted">
+        Your balance can only be spent on 24X7 services. It cannot be
+        transferred or withdrawn as cash.
+      </p>
+    </BottomSheet>
+  )
+}
 
 /**
  * The full-width grey rule between blocks.
@@ -284,9 +396,12 @@ function Band() {
 function BalanceCard({
   balance,
   signedIn,
+  onAdd,
 }: {
   balance: number
   signedIn: boolean
+  /** Absent when nobody is signed in — there is no account to add to. */
+  onAdd?: () => void
 }) {
   return (
     <div className="relative overflow-hidden rounded-card bg-linear-to-br from-brand-deep to-brand p-5 text-bg">
@@ -305,14 +420,27 @@ function BalanceCard({
       <p className="relative mt-10 text-xs font-semibold tracking-[0.08em] uppercase text-bg/70">
         Balance
       </p>
-      <p className="relative mt-0.5 text-3xl font-bold">{formatPaise(balance)}</p>
+      <div className="relative mt-0.5 flex items-end justify-between gap-4">
+        <p className="text-3xl font-bold">{formatPaise(balance)}</p>
+
+        {onAdd ? (
+          <button
+            type="button"
+            onClick={onAdd}
+            className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-pill bg-bg px-4 text-sm font-semibold text-brand hover:bg-brand-soft"
+          >
+            <Plus className="size-4" aria-hidden="true" />
+            Add money
+          </button>
+        ) : null}
+      </div>
 
       <p className="relative mt-3 max-w-[22rem] text-sm text-bg/80">
         {!signedIn
-          ? 'Credits are tied to your number. Sign in to see yours.'
+          ? 'Your balance is tied to your number. Sign in to see it.'
           : balance > 0
             ? 'We take this off your next bill. Nothing to redeem.'
-            : 'Credits we owe you show up here and come off your next bill.'}
+            : 'Add money, or wait for us to credit you. Either way it comes off your next bill.'}
       </p>
     </div>
   )
@@ -392,7 +520,7 @@ function StatTile({
 
 const FILTERS = [
   { id: 'all', label: 'All' },
-  { id: 'issued', label: 'Received' },
+  { id: 'issued', label: 'Added' },
   { id: 'used', label: 'Used' },
 ] as const
 
@@ -424,13 +552,13 @@ function Activity({
     filter === 'all'
       ? true
       : filter === 'issued'
-        ? entry.kind === 'issued'
-        : entry.kind !== 'issued'
+        ? isCreditEntry(entry.kind)
+        : !isCreditEntry(entry.kind)
   )
 
   return (
     <section ref={ref} className="scroll-mt-16">
-      <h2 className="text-xl font-bold text-ink">Credits activity</h2>
+      <h2 className="text-xl font-bold text-ink">Balance activity</h2>
 
       {/* Wraps rather than holding its width. Three pills with padding come to
           about 250px, and a flex row that cannot shrink below that pushes the
@@ -489,7 +617,7 @@ function Activity({
  * them apart, and this is the screen where that matters most.
  */
 function LedgerRow({ entry }: { entry: WalletEntry }) {
-  const added = entry.kind === 'issued'
+  const added = isCreditEntry(entry.kind)
   return (
     <div className="flex items-start justify-between gap-4 py-4">
       <span
@@ -498,7 +626,9 @@ function LedgerRow({ entry }: { entry: WalletEntry }) {
           added ? 'bg-success-soft text-success' : 'bg-surface text-muted'
         )}
       >
-        {added ? (
+        {entry.kind === 'topup' ? (
+          <ArrowDownToLine className="size-4" aria-hidden="true" />
+        ) : added ? (
           <Gift className="size-4" aria-hidden="true" />
         ) : (
           <ReceiptIndianRupee className="size-4" aria-hidden="true" />
@@ -533,16 +663,20 @@ function LedgerRow({ entry }: { entry: WalletEntry }) {
 // ---------------------------------------------------------------------------
 
 /**
- * The questions this screen raises by existing. "Can I add money" is answered
- * first among the real ones, because it is the first thing anyone who has used
- * another app of this kind will look for.
+ * The questions this screen raises by existing.
  *
- * NEXT: "How do I use them?" says a person takes the credit off the bill,
- * because today a person does. Spending them at checkout needs `credits` in
- * the price breakdown and the spend inside markBookingPaid's own transaction —
- * the wallet and the booking have to settle together, or a customer loses
- * credits to a booking that never confirmed. When that lands, this answer
- * becomes "you do not have to do anything".
+ * Every limit stated here is a limit the code actually enforces, and they are
+ * the three that keep this balance a closed-loop instrument rather than a
+ * regulated one: it buys only our own services, it cannot be transferred, and
+ * it cannot be taken as cash. If any of those answers ever stops being true,
+ * it stops being true in the schema first — see `shared/wallet.ts`.
+ *
+ * NEXT: "How do I use it?" says a person takes the balance off the bill,
+ * because today a person does. Spending it at checkout needs `credits` in the
+ * price breakdown and the spend inside markBookingPaid's own transaction — the
+ * wallet and the booking have to settle together, or a customer loses money to
+ * a booking that never confirmed. When that lands, this answer becomes "you do
+ * not have to do anything".
  *
  * Native `<details>`, not a JavaScript accordion: it opens before hydration,
  * it is searchable by the browser's own find, and a screen reader announces
@@ -550,24 +684,28 @@ function LedgerRow({ entry }: { entry: WalletEntry }) {
  */
 const FAQ = [
   {
-    q: 'What are 24X7 Credits?',
-    a: 'Money we owe you. We add credits when something on our side goes wrong — a visit we reached late, a job we had to cancel — and sometimes as a thank you for a referral.',
+    q: 'What is my 24X7 balance?',
+    a: 'Two things in one number. Credits we gave you — for a visit we reached late, a job we had to cancel, a referral — and money you added yourself. Both are spent the same way, and the activity list above says which is which on every line.',
   },
   {
-    q: 'Can I add money to my credits?',
-    a: 'No, and there is no plan to. Credits only ever come from us. We do not hold your money at any point — every payment you make goes straight to the payment provider.',
+    q: 'How do I add money?',
+    a: 'Add money on the card above, pick an amount, and pay the way you would pay for a booking. It goes to the same payment provider; we never see your card.',
   },
   {
-    q: 'How do I use them?',
-    a: 'There is nothing to redeem and no code to enter. Tell us which booking you want them against and we take the credit off what you owe before you pay.',
+    q: 'How do I use it?',
+    a: 'There is nothing to redeem and no code to enter. Tell us which booking you want it against and we take it off what you owe before you pay.',
   },
   {
-    q: 'Do they expire?',
-    a: 'No. Credits stay on your account until you use them.',
+    q: 'Does it expire?',
+    a: 'No. Nothing on this screen expires — neither the credits we gave you nor the money you added. It stays until you use it.',
   },
   {
-    q: 'Can I transfer them or take them as cash?',
-    a: 'No. Credits can only be spent on 24X7 services, on this account. If you were expecting a refund to your bank instead, contact support and we will sort it out.',
+    q: 'Can I get money I added back?',
+    a: 'Yes. Ask support and we refund it to the card or account it came from. Credits we issued are not refundable in cash, because no cash came in for them.',
+  },
+  {
+    q: 'Can I send it to someone else, or withdraw it?',
+    a: 'No. Your balance can only be spent on 24X7 services, on this account. It is not a wallet you can pay other people from, and there is no cash withdrawal.',
   },
   {
     q: 'Why does my balance not match what I expected?',

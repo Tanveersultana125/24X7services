@@ -22,6 +22,7 @@ import {
 } from './support/tickets'
 import { registerFcmToken, deleteAccount } from './account/account'
 import { createPaymentOrder, verifyPayment } from './payments/orders'
+import { createTopupOrder, verifyTopup } from './payments/topup'
 import { razorpayWebhook } from './payments/webhook'
 import { onUserCreate } from './auth/onUserCreate'
 
@@ -38,6 +39,7 @@ import { onUserCreate } from './auth/onUserCreate'
  *   Phase 5  previewCancellation, cancelBooking, rescheduleBooking,
  *            createSupportTicket, sendSupportMessage, escalateTicket,
  *            registerFcmToken, deleteAccount, getMaskedNumber
+ *   Phase 6  createTopupOrder, verifyTopup
  *
  * The export name is the deployed function name, which is why each callable is
  * named after its entry in the shared registry and checked against it below.
@@ -59,6 +61,9 @@ export {
   createBooking,
   createPaymentOrder,
   verifyPayment,
+  // The balance
+  createTopupOrder,
+  verifyTopup,
   // The job
   getJobOtp,
   respondToRepairRequest,

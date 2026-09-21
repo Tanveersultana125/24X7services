@@ -20,6 +20,7 @@ import {
 } from './booking'
 import { createTicketInputSchema, sendMessageInputSchema } from './support'
 import { phoneSchema } from './user'
+import { topupAmountSchema } from './wallet'
 
 /**
  * One entry per callable: its input schema, its result schema, and the name it
@@ -129,6 +130,28 @@ export const createPaymentOrderResult = z.object({
   currency: z.literal('INR'),
   keyId: z.string(),
   bookingDisplayId: z.string(),
+})
+
+// --- createTopupOrder ------------------------------------------------------
+
+export const createTopupOrderInput = z.object({ amount: topupAmountSchema })
+export const createTopupOrderResult = z.object({
+  orderId: z.string(),
+  amount: z.number().int(),
+  currency: z.literal('INR'),
+  keyId: z.string(),
+})
+
+// --- verifyTopup -----------------------------------------------------------
+
+export const verifyTopupInput = z.object({
+  razorpayOrderId: z.string().min(1),
+  razorpayPaymentId: z.string().min(1),
+  razorpaySignature: z.string().min(1),
+})
+export const verifyTopupResult = z.object({
+  /** The balance after this call, whether or not this call is what moved it. */
+  balance: z.number().int(),
 })
 
 // --- verifyPayment ---------------------------------------------------------
@@ -276,6 +299,16 @@ export const CALLABLES = {
   verifyPayment: {
     input: verifyPaymentInput,
     result: verifyPaymentResult,
+    auth: true,
+  },
+  createTopupOrder: {
+    input: createTopupOrderInput,
+    result: createTopupOrderResult,
+    auth: true,
+  },
+  verifyTopup: {
+    input: verifyTopupInput,
+    result: verifyTopupResult,
     auth: true,
   },
   previewCancellation: {
