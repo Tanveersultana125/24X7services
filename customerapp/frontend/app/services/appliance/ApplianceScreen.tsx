@@ -299,12 +299,15 @@ export function ApplianceScreen() {
             title="Select your service"
             subtitle="The visit fee is what you pay to book. Everything after it is quoted first."
           >
-            <div className="flex flex-col gap-3">
+            {/* A rule between services rather than a box around each: the
+                cards are tall enough now that a border as well would be two
+                lines doing one job. */}
+            <div className="flex flex-col divide-y divide-border">
               {services.map((service) => (
                 <div
                   key={service.id}
                   id={`service-${service.id}`}
-                  className={JUMP_OFFSET}
+                  className={cn('py-6 first:pt-0 last:pb-0', JUMP_OFFSET)}
                 >
                   <ServiceCard
                     service={service}
