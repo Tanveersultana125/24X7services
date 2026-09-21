@@ -1,7 +1,8 @@
 'use client'
 
-import { Bell } from 'lucide-react'
+import { Bell, ReceiptIndianRupee } from 'lucide-react'
 import Link from 'next/link'
+import type { Route } from 'next'
 import { LocationSelector } from '@/components/LocationSelector'
 import { SearchBar } from '@/components/SearchBar'
 import { cn } from '@/lib/cn'
@@ -65,20 +66,56 @@ export function HomeHeader({
           onDark
           onClick={onChangeLocation}
         />
-        {/* A white tile rather than a bare icon: over artwork an outline-weight
-            glyph on its own reads as decoration, not as a button. */}
-        <Link
-          href="/profile/notifications"
-          aria-label="Notifications"
-          className="flex size-11 shrink-0 items-center justify-center rounded-card bg-bg text-brand hover:bg-brand-soft"
-        >
-          <Bell className="size-5" aria-hidden="true" />
-        </Link>
+        <div className="flex shrink-0 gap-2">
+          {/* Bills, not a wallet. The tile is where every app of this shape
+              puts its wallet, and this app has nowhere to put one — the cards
+              live at Razorpay and never reach us — so what it opens is the
+              list of invoices we have issued, which is the part of the money a
+              customer here actually comes looking for. */}
+          <HeaderTile
+            href="/profile/payments"
+            label="Invoices"
+            icon={ReceiptIndianRupee}
+          />
+          <HeaderTile
+            href="/profile/notifications"
+            label="Notifications"
+            icon={Bell}
+          />
+        </div>
       </div>
       <div className="mx-auto max-w-lg px-4 pt-3 pb-4">
         <SearchBar readOnly onDark onOpen={onSearch} />
       </div>
     </div>
+  )
+}
+
+/**
+ * One of the square buttons in the top right.
+ *
+ * A filled white tile rather than a bare icon: over a banner an outline-weight
+ * glyph on its own reads as decoration, not as something to press. Two of them
+ * is the ceiling — the location has to keep enough width to show an area name
+ * before it truncates, and a third tile takes that below a word.
+ */
+function HeaderTile({
+  href,
+  label,
+  icon: Icon,
+}: {
+  href: Route
+  label: string
+  icon: typeof Bell
+}) {
+  return (
+    <Link
+      href={href}
+      aria-label={label}
+      className="flex size-11 items-center justify-center rounded-card bg-bg text-brand hover:bg-brand-soft"
+    >
+      <Icon className="size-5" aria-hidden="true" />
+    </Link>
   )
 }
 
