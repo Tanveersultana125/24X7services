@@ -349,8 +349,11 @@ function StatTile({
     </>
   )
 
+  // `min-w-0` because a grid column is min-content wide by default, and a
+  // label that cannot wrap would push the page sideways the way the filter
+  // pills did.
   const base =
-    'block w-full rounded-card border p-4 text-left ' +
+    'block w-full min-w-0 rounded-card border p-4 text-left ' +
     'transition-colors duration-[var(--duration-fast)]'
 
   if (!onSelect) {
@@ -423,7 +426,15 @@ function Activity({
     <section ref={ref} className="scroll-mt-16">
       <h2 className="text-xl font-bold text-ink">Credits activity</h2>
 
-      <div role="tablist" aria-label="Filter activity" className="mt-3 flex gap-2">
+      {/* Wraps rather than holding its width. Three pills with padding come to
+          about 250px, and a flex row that cannot shrink below that pushes the
+          whole page sideways on anything narrower — which cuts every block on
+          the screen, not just this one. */}
+      <div
+        role="tablist"
+        aria-label="Filter activity"
+        className="mt-3 flex flex-wrap gap-2"
+      >
         {FILTERS.map((option) => {
           const active = option.id === filter
           return (
