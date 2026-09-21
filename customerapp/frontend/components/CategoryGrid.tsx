@@ -159,11 +159,16 @@ export function CategoryGrid({
           ) : null
         }
       >
-        {/* Rows, not a grid of pictures. Every service of an appliance shares
-            that appliance's one photograph, so a grid here would be the same
-            image four times with four different captions — which reads as a
-            loading bug. What separates a repair from an installation is the
-            price and the time, and those are words. */}
+        {/* Rows with a thumbnail, not a grid of full-size pictures. Every
+            service of an appliance shares that appliance's one photograph, so
+            four of them at tile size is the same image four times under four
+            captions — which reads as a loading bug. At thumbnail size it does
+            what a thumbnail is for: it anchors the row and says which
+            appliance you are still looking at. ServiceRail draws its cards the
+            same way, from the same image, for the same reason.
+
+            The day a service is seeded its own artwork, this is the one place
+            that has to change. */}
         <ul className="divide-y divide-border">
           {openServices.map((service) => (
             <li key={service.id}>
@@ -175,6 +180,18 @@ export function CategoryGrid({
                 }}
                 className="flex w-full items-center gap-3 py-3 text-left"
               >
+                {open ? (
+                  <span className="relative block size-12 shrink-0 overflow-hidden rounded-card bg-surface">
+                    <Image
+                      src={open.image}
+                      alt=""
+                      fill
+                      sizes="48px"
+                      className="object-contain p-1.5"
+                    />
+                  </span>
+                ) : null}
+
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-semibold text-ink">
                     {service.name}
@@ -186,6 +203,7 @@ export function CategoryGrid({
                     {formatPaise(service.visitFee)}
                   </span>
                 </span>
+
                 <ChevronRight
                   className="size-4 shrink-0 text-muted"
                   aria-hidden="true"
