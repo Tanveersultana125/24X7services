@@ -96,14 +96,30 @@ export function DiagnosisScreen() {
             what it actually is before anything is repaired.
           </p>
 
+          {/* A list, not a stack of cards.
+              
+              They were cards — bordered white boxes, the same shape as the
+              choices on the step before this one, where every box was a
+              CardButton you tapped to pick your problem. So the customer
+              arrives here, taps the cause that sounds like theirs, and
+              nothing happens, because nothing is meant to: this step collects
+              nothing and its `done` is unconditional. Reading as a form and
+              behaving as a page is the worst of both, and the fix is not to
+              make them tappable — picking a cause would be the customer
+              diagnosing their own appliance, which is the one thing this
+              screen says three times it is not doing. */}
           <section className="mt-6">
             <h2 className="text-sm font-semibold text-muted">Possible causes</h2>
-            <ul className="mt-2 flex flex-col gap-2">
+            <ul className="mt-3 flex flex-col gap-3">
               {causes.map((cause) => (
-                <li key={cause}>
-                  <Card className="p-4 text-sm leading-relaxed text-ink">
+                <li key={cause} className="flex items-start gap-2.5">
+                  <span
+                    aria-hidden="true"
+                    className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-border"
+                  />
+                  <span className="text-sm leading-relaxed text-ink">
                     {cause}
-                  </Card>
+                  </span>
                 </li>
               ))}
             </ul>
