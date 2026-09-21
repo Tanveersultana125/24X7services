@@ -230,7 +230,11 @@ export function HomeScreen() {
         {data ? (
           <>
             <h2 className="mb-3 text-xl font-bold text-ink">What we service</h2>
-            <CategoryGrid appliances={data.appliances} />
+            <CategoryGrid
+              appliances={data.appliances}
+              services={data.services}
+              onBook={startBooking}
+            />
           </>
         ) : home.status === 'error' ? (
           <ErrorState

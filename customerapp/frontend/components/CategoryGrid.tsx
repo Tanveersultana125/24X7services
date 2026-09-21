@@ -1,8 +1,20 @@
+'use client'
+
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Route } from 'next'
-import { ArrowRight } from 'lucide-react'
-import type { CatalogAppliance } from '@app/shared'
+import { ArrowRight, ChevronRight } from 'lucide-react'
+import {
+  formatPaise,
+  type ApplianceId,
+  type CatalogAppliance,
+  type CatalogService,
+  type ServiceKey,
+} from '@app/shared'
+
+import { BottomSheet } from '@/components/BottomSheet'
+import { durationNote } from '@/components/ServiceRail'
 import { cn } from '@/lib/cn'
 
 /**
@@ -14,10 +26,17 @@ import { cn } from '@/lib/cn'
  * smaller, the photograph became a centred icon on a plain fill, and the label
  * moved outside the tile where it can run to two lines without being cropped.
  *
- * No prices here. The grid is an index: it says what we touch, and the rails
- * underneath say what each thing costs. A "from" price on a tile is the
- * cheapest visit fee for that appliance, which across today's catalog is the
- * same number five times over — true, and indistinguishable from a bug.
+ * Tapping one opens a sheet rather than leaving the screen. The question a tap
+ * on "Washing machine" is asking is "what do you do for it", and that has a
+ * three-line answer — a whole page navigation to deliver three lines costs the
+ * customer their place on Home and makes going back the price of looking.
+ * From the sheet a booking is one more tap, so the grid is now two taps from a
+ * draft instead of a page load and a scroll.
+ *
+ * No prices on the tiles. The grid is an index: it says what we touch, and the
+ * sheet says what each thing costs. A "from" price on a tile is the cheapest
+ * visit fee for that appliance, which across today's catalog is the same
+ * number five times over — true, and indistinguishable from a bug.
  *
  * The last cell is the way out to the full list. It sits in the grid rather
  * than as a "See all" beside the heading because at three columns it also
@@ -27,58 +46,155 @@ import { cn } from '@/lib/cn'
 
 export interface CategoryGridProps {
   appliances: readonly CatalogAppliance[]
+  /** Every active service, of every appliance. The sheet filters its own. */
+  services: readonly CatalogService[]
+  /** Starts a draft and sends the customer into the booking flow. */
+  onBook: (applianceId: ApplianceId, serviceKey: ServiceKey) => void
   className?: string
 }
 
-export function CategoryGrid({ appliances, className }: CategoryGridProps) {
+export function CategoryGrid({
+  appliances,
+  services,
+  onBook,
+  className,
+}: CategoryGridProps) {
+  const [openId, setOpenId] = useState<ApplianceId | null>(null)
+
+  const open = appliances.find((appliance) => appliance.id === openId)
+  const openServices = services
+    .filter((service) => service.applianceId === openId)
+    .sort((a, b) => a.order - b.order)
+
   return (
-    <ul
-      className={cn(
-        'grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 lg:grid-cols-6',
-        className
-      )}
-    >
-      {appliances.map((appliance, index) => (
-        <li key={appliance.id}>
+    <>
+      <ul
+        className={cn(
+          'grid grid-cols-3 gap-x-3 gap-y-5 sm:grid-cols-4 lg:grid-cols-6',
+          className
+        )}
+      >
+        {appliances.map((appliance, index) => {
+          const has = services.some(
+            (service) => service.applianceId === appliance.id
+          )
+          const tile = (
+            <>
+              <span className="relative block aspect-square w-full overflow-hidden rounded-card bg-surface transition-colors duration-[var(--duration-fast)] group-hover:bg-border">
+                <Image
+                  src={appliance.image}
+                  alt=""
+                  fill
+                  // Roughly a third of a phone's width, and never larger than
+                  // the 132px the tile reaches on a desktop.
+                  sizes="(min-width: 1024px) 132px, 30vw"
+                  // The three tiles above the fold, and no others: the rest of
+                  // the grid can wait for layout.
+                  priority={index < 3}
+                  className="object-contain p-4"
+                />
+              </span>
+              <span className="text-center text-xs font-semibold leading-tight text-ink">
+                {appliance.name}
+              </span>
+            </>
+          )
+
+          return (
+            <li key={appliance.id}>
+              {/* An appliance whose services are all inactive has nothing to
+                  put in a sheet, so it keeps the old behaviour rather than
+                  opening an empty one. */}
+              {has ? (
+                <button
+                  type="button"
+                  onClick={() => setOpenId(appliance.id)}
+                  aria-haspopup="dialog"
+                  className="group flex w-full min-w-0 flex-col items-center gap-2"
+                >
+                  {tile}
+                </button>
+              ) : (
+                <Link
+                  href={`/services/appliance/?a=${appliance.id}` as Route}
+                  className="group flex min-w-0 flex-col items-center gap-2"
+                >
+                  {tile}
+                </Link>
+              )}
+            </li>
+          )
+        })}
+
+        <li>
           <Link
-            href={`/services/appliance/?a=${appliance.id}` as Route}
-            className="group flex flex-col items-center gap-2"
+            href="/services"
+            className="group flex min-w-0 flex-col items-center gap-2"
+            aria-label="See everything we service"
           >
-            <span className="relative block aspect-square w-full overflow-hidden rounded-card bg-surface transition-colors duration-[var(--duration-fast)] group-hover:bg-border">
-              <Image
-                src={appliance.image}
-                alt=""
-                fill
-                // Roughly a third of a phone's width, and never larger than the
-                // 132px the tile reaches on a desktop.
-                sizes="(min-width: 1024px) 132px, 30vw"
-                // The three tiles above the fold, and no others: the rest of
-                // the grid can wait for layout.
-                priority={index < 3}
-                className="object-contain p-4"
-              />
+            <span className="flex aspect-square w-full items-center justify-center rounded-card border border-dashed border-border transition-colors duration-[var(--duration-fast)] group-hover:border-brand">
+              <ArrowRight className="size-5 text-muted" aria-hidden="true" />
             </span>
             <span className="text-center text-xs font-semibold leading-tight text-ink">
-              {appliance.name}
+              All services
             </span>
           </Link>
         </li>
-      ))}
+      </ul>
 
-      <li>
-        <Link
-          href="/services"
-          className="group flex flex-col items-center gap-2"
-          aria-label="See everything we service"
-        >
-          <span className="flex aspect-square w-full items-center justify-center rounded-card border border-dashed border-border transition-colors duration-[var(--duration-fast)] group-hover:border-brand">
-            <ArrowRight className="size-5 text-muted" aria-hidden="true" />
-          </span>
-          <span className="text-center text-xs font-semibold leading-tight text-ink">
-            All services
-          </span>
-        </Link>
-      </li>
-    </ul>
+      <BottomSheet
+        open={open !== undefined}
+        onClose={() => setOpenId(null)}
+        title={open?.name ?? ''}
+        description="What we do for it, and what the visit costs."
+        footer={
+          open ? (
+            <Link
+              href={`/services/appliance/?a=${open.id}` as Route}
+              className="flex min-h-11 items-center justify-center gap-1 text-sm font-semibold text-brand"
+            >
+              See everything for {open.name.toLowerCase()}
+              <ChevronRight className="size-4" aria-hidden="true" />
+            </Link>
+          ) : null
+        }
+      >
+        {/* Rows, not a grid of pictures. Every service of an appliance shares
+            that appliance's one photograph, so a grid here would be the same
+            image four times with four different captions — which reads as a
+            loading bug. What separates a repair from an installation is the
+            price and the time, and those are words. */}
+        <ul className="divide-y divide-border">
+          {openServices.map((service) => (
+            <li key={service.id}>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpenId(null)
+                  onBook(service.applianceId, service.serviceKey)
+                }}
+                className="flex w-full items-center gap-3 py-3 text-left"
+              >
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-semibold text-ink">
+                    {service.name}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-muted">
+                    {[durationNote(service.durationMinutes), 'Visit fee']
+                      .filter(Boolean)
+                      .join(' · ')}{' '}
+                    {formatPaise(service.visitFee)}
+                  </span>
+                </span>
+                <ChevronRight
+                  className="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                />
+              </button>
+            </li>
+          ))}
+        </ul>
+      </BottomSheet>
+    </>
   )
 }
