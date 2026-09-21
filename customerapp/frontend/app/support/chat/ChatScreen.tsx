@@ -6,6 +6,11 @@ import type { Route } from 'next'
 import { supportCategorySchema, type SupportCategory } from '@app/shared'
 
 import { Header } from '@/components/Header'
+import {
+  BottomNavigation,
+  BOTTOM_NAV_CLEARANCE,
+} from '@/components/BottomNavigation'
+import { cn } from '@/lib/cn'
 import { CardButton } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Textarea } from '@/components/ui/Field'
@@ -116,7 +121,13 @@ export function ChatScreen() {
     <div className="min-h-dvh bg-bg">
       <Header title="Tell us what happened" showBack backFallback="/support" />
 
-      <main id="content" className="mx-auto w-full max-w-lg px-4 pb-16 lg:max-w-2xl">
+      <main
+        id="content"
+        className={cn(
+          'mx-auto w-full max-w-lg px-4 lg:max-w-2xl',
+          BOTTOM_NAV_CLEARANCE
+        )}
+      >
         <fieldset className="mt-5">
           <legend className="text-sm font-semibold text-muted">
             What is this about?
@@ -173,6 +184,8 @@ export function ChatScreen() {
           ask for one.
         </p>
       </main>
+
+      <BottomNavigation />
     </div>
   )
 }

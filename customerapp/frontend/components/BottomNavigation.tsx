@@ -28,6 +28,17 @@ const TABS = [
 /** The height sticky CTAs and the toast viewport have to clear. */
 export const BOTTOM_NAV_HEIGHT = 72
 
+/**
+ * The bottom padding a scrolling screen needs so its last card is not stuck
+ * under the nav.
+ *
+ * One definition rather than the same calc written into each shell: the nav is
+ * fixed, so every screen that shows it owes it this much room, and a shell
+ * that forgets loses whatever is at the end of its content.
+ */
+export const BOTTOM_NAV_CLEARANCE =
+  'pb-[calc(72px+2rem+var(--safe-bottom))] lg:pb-16'
+
 export function BottomNavigation({ className }: { className?: string }) {
   const pathname = usePathname()
 

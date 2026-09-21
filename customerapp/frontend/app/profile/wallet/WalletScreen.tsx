@@ -22,6 +22,10 @@ import {
 } from '@app/shared'
 
 import { Header } from '@/components/Header'
+import {
+  BottomNavigation,
+  BOTTOM_NAV_CLEARANCE,
+} from '@/components/BottomNavigation'
 import { BottomSheet } from '@/components/BottomSheet'
 import { ErrorState } from '@/components/ErrorState'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
@@ -85,7 +89,10 @@ export function WalletScreen() {
       <Header title="Balance" showBack backFallback="/profile" />
       <main
         id="content"
-        className="mx-auto w-full max-w-lg px-4 pb-16 lg:max-w-2xl"
+        className={cn(
+          'mx-auto w-full max-w-lg px-4 lg:max-w-2xl',
+          BOTTOM_NAV_CLEARANCE
+        )}
       >
         {!ready ? (
           <CreditsSkeleton />
@@ -95,6 +102,8 @@ export function WalletScreen() {
           <SignedOut />
         )}
       </main>
+
+      <BottomNavigation />
     </div>
   )
 }

@@ -6,6 +6,11 @@ import type { Route } from 'next'
 import type { Booking, BookingEvent } from '@app/shared'
 
 import { Header } from '@/components/Header'
+import {
+  BottomNavigation,
+  BOTTOM_NAV_CLEARANCE,
+} from '@/components/BottomNavigation'
+import { cn } from '@/lib/cn'
 import { ErrorState } from '@/components/ErrorState'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { useAuth } from '@/lib/auth'
@@ -68,7 +73,13 @@ export function BookingShell({
         right={right}
       />
 
-      <main id="content" className="mx-auto w-full max-w-lg px-4 pb-16 lg:max-w-2xl">
+      <main
+        id="content"
+        className={cn(
+          'mx-auto w-full max-w-lg px-4 lg:max-w-2xl',
+          BOTTOM_NAV_CLEARANCE
+        )}
+      >
         {!ready || status === 'loading' ? (
           <SkeletonGroup label="Loading" className="mt-6 flex flex-col gap-4">
             <Skeleton className="h-28 w-full" />
@@ -87,6 +98,8 @@ export function BookingShell({
           children({ booking, events })
         )}
       </main>
+
+      <BottomNavigation />
     </div>
   )
 }

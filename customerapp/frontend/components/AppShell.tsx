@@ -1,6 +1,9 @@
 'use client'
 
-import { BottomNavigation } from '@/components/BottomNavigation'
+import {
+  BottomNavigation,
+  BOTTOM_NAV_CLEARANCE,
+} from '@/components/BottomNavigation'
 import { DesktopNav } from '@/components/DesktopNav'
 import { useLocation } from '@/lib/useLocation'
 import { locationLabel } from '@/lib/location'
@@ -44,9 +47,7 @@ export function AppShell({
         id="content"
         className={cn(
           'mx-auto w-full max-w-lg px-4 lg:max-w-5xl lg:px-6',
-          bottomNav
-            ? 'pb-[calc(72px+2rem+var(--safe-bottom))] lg:pb-16'
-            : 'pb-12',
+          bottomNav ? BOTTOM_NAV_CLEARANCE : 'pb-12',
           className
         )}
       >

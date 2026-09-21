@@ -128,7 +128,6 @@ export function ApplianceScreen() {
 
   return (
     <AppShell
-      bottomNav={false}
       mobileHeader={
         <Header
           title={appliance?.name ?? 'Services'}
@@ -297,8 +296,9 @@ export function ApplianceScreen() {
 
           {headline ? (
             <>
-              <StickySpacer />
+              <StickySpacer aboveBottomNav />
               <StickyCTA
+                aboveBottomNav
                 detail={
                   <>
                     <p className="truncate text-sm font-semibold text-ink">
