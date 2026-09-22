@@ -1,6 +1,6 @@
 'use client'
 
-import { useSyncExternalStore } from 'react'
+import { useEffect, useRef, useSyncExternalStore } from 'react'
 import Image from 'next/image'
 import type { CatalogService } from '@app/shared'
 import { formatPaise } from '@/lib/format'
@@ -23,9 +23,11 @@ import { cn } from '@/lib/cn'
  * A service that has been seeded a clip shows it in place of the picture.
  * Muted, looping and inline, because that is the only shape a browser will
  * play unasked — and not played at all for a customer who has asked their
- * system for less motion, who gets the still instead. Most services will never
- * have one; the card is written to look right either way and the clip is never
- * the thing carrying the meaning.
+ * system for less motion, who gets the still instead. Every seeded service
+ * carries one, because a page where some cards move and some do not reads as
+ * a page where half the clips failed to load. The still branch stays for the
+ * service somebody adds tomorrow and does not draw a clip for, and the clip
+ * is never the thing carrying the meaning either way.
  *
  * The "Book" pill is drawn as a button but is not one. The whole card is the
  * control, and a real button inside it would be a second target nested in the
@@ -58,6 +60,7 @@ export function ServiceCard({
 }: ServiceCardProps) {
   const duration = durationNote(service.durationMinutes)
   const reducedMotion = usePrefersReducedMotion()
+  const video = useVisiblePlayback(service.video, reducedMotion)
 
   return (
     <CardButton
@@ -76,11 +79,11 @@ export function ServiceCard({
     >
       {service.video && !reducedMotion ? (
         <video
+          ref={video}
           // The drawing stands in before a frame has decoded, and stands in
           // for good on a connection that never gets one.
           poster={image}
           src={service.video}
-          autoPlay
           muted
           loop
           playsInline
@@ -149,6 +152,48 @@ export function ServiceCard({
       </ul>
     </CardButton>
   )
+}
+
+/**
+ * Play a card's clip while it is on screen, and pause it the rest of the time.
+ *
+ * `autoplay` would be one attribute instead of this hook, and it plays every
+ * clip on the page at once. An appliance page lists up to six services and now
+ * every one of them carries a clip, so that is six decoders running for the
+ * five cards nobody is looking at — which on a cheap phone is where the
+ * scrolling starts to stutter, and on a metered connection is five downloads
+ * the customer did not ask for.
+ *
+ * The margin starts a clip a screen-height early, so one that is scrolled to
+ * is already moving rather than starting from its first frame on arrival.
+ *
+ * `play()` returns a promise that rejects when the browser declines — a tab in
+ * the background, a battery-saver policy. That is the browser doing its job,
+ * not an error to report, so the rejection is swallowed and the poster stays.
+ */
+function useVisiblePlayback(
+  src: string | undefined,
+  reducedMotion: boolean
+): React.RefObject<HTMLVideoElement | null> {
+  const ref = useRef<HTMLVideoElement | null>(null)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries[entries.length - 1]?.isIntersecting
+        if (visible === undefined) return
+        if (visible) void el.play().catch(() => {})
+        else el.pause()
+      },
+      { rootMargin: '100% 0px' }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [src, reducedMotion])
+
+  return ref
 }
 
 /** One line of what the service covers. */

@@ -9,7 +9,8 @@
     "startingPrice": 29900,
     "durationMinutes": 60,
     "order": 1,
-    "active": true
+    "active": true,
+    "video": "/services/washing-machine-repair.mp4"
   },
   {
     "id": "washing-machine_service",
@@ -21,7 +22,8 @@
     "startingPrice": 49900,
     "durationMinutes": 60,
     "order": 2,
-    "active": true
+    "active": true,
+    "video": "/services/washing-machine-service.mp4"
   },
   {
     "id": "washing-machine_installation",
@@ -33,7 +35,8 @@
     "startingPrice": 39900,
     "durationMinutes": 45,
     "order": 3,
-    "active": true
+    "active": true,
+    "video": "/services/washing-machine-installation.mp4"
   },
   {
     "id": "washing-machine_uninstallation",
@@ -45,7 +48,8 @@
     "startingPrice": 29900,
     "durationMinutes": 30,
     "order": 4,
-    "active": true
+    "active": true,
+    "video": "/services/washing-machine-uninstallation.mp4"
   },
   {
     "id": "air-conditioner_service",
@@ -57,7 +61,8 @@
     "startingPrice": 39900,
     "durationMinutes": 75,
     "order": 1,
-    "active": true
+    "active": true,
+    "video": "/services/ac-service.mp4"
   },
   {
     "id": "air-conditioner_repair",
@@ -69,7 +74,8 @@
     "startingPrice": 29900,
     "durationMinutes": 75,
     "order": 2,
-    "active": true
+    "active": true,
+    "video": "/services/ac-repair.mp4"
   },
   {
     "id": "air-conditioner_deep-clean",
@@ -94,7 +100,8 @@
     "startingPrice": 219900,
     "durationMinutes": 105,
     "order": 4,
-    "active": true
+    "active": true,
+    "video": "/services/ac-gas-refill.mp4"
   },
   {
     "id": "air-conditioner_installation",
@@ -106,7 +113,8 @@
     "startingPrice": 149900,
     "durationMinutes": 60,
     "order": 5,
-    "active": true
+    "active": true,
+    "video": "/services/ac-installation.mp4"
   },
   {
     "id": "air-conditioner_uninstallation",
@@ -118,7 +126,8 @@
     "startingPrice": 79900,
     "durationMinutes": 45,
     "order": 6,
-    "active": true
+    "active": true,
+    "video": "/services/ac-uninstallation.mp4"
   },
   {
     "id": "refrigerator_repair",
@@ -143,7 +152,8 @@
     "startingPrice": 44900,
     "durationMinutes": 75,
     "order": 2,
-    "active": true
+    "active": true,
+    "video": "/services/refrigerator-service.mp4"
   },
   {
     "id": "refrigerator_gas-refill",
@@ -155,7 +165,8 @@
     "startingPrice": 189900,
     "durationMinutes": 105,
     "order": 3,
-    "active": true
+    "active": true,
+    "video": "/services/refrigerator-gas-refill.mp4"
   },
   {
     "id": "refrigerator_installation",
@@ -167,7 +178,8 @@
     "startingPrice": 29900,
     "durationMinutes": 60,
     "order": 4,
-    "active": true
+    "active": true,
+    "video": "/services/refrigerator-installation.mp4"
   },
   {
     "id": "geyser_service",
@@ -179,7 +191,8 @@
     "startingPrice": 34900,
     "durationMinutes": 60,
     "order": 1,
-    "active": true
+    "active": true,
+    "video": "/services/geyser-service.mp4"
   },
   {
     "id": "geyser_repair",
@@ -191,7 +204,8 @@
     "startingPrice": 29900,
     "durationMinutes": 60,
     "order": 2,
-    "active": true
+    "active": true,
+    "video": "/services/geyser-repair.mp4"
   },
   {
     "id": "geyser_installation",
@@ -203,7 +217,8 @@
     "startingPrice": 59900,
     "durationMinutes": 45,
     "order": 3,
-    "active": true
+    "active": true,
+    "video": "/services/geyser-installation.mp4"
   },
   {
     "id": "geyser_uninstallation",
@@ -215,7 +230,8 @@
     "startingPrice": 29900,
     "durationMinutes": 30,
     "order": 4,
-    "active": true
+    "active": true,
+    "video": "/services/geyser-uninstallation.mp4"
   },
   {
     "id": "microwave_repair",
@@ -227,7 +243,8 @@
     "startingPrice": 29900,
     "durationMinutes": 60,
     "order": 1,
-    "active": true
+    "active": true,
+    "video": "/services/microwave-repair.mp4"
   },
   {
     "id": "microwave_service",
@@ -239,7 +256,8 @@
     "startingPrice": 34900,
     "durationMinutes": 60,
     "order": 2,
-    "active": true
+    "active": true,
+    "video": "/services/microwave-service.mp4"
   },
   {
     "id": "microwave_installation",
@@ -251,6 +269,7 @@
     "startingPrice": 29900,
     "durationMinutes": 45,
     "order": 3,
-    "active": true
+    "active": true,
+    "video": "/services/microwave-installation.mp4"
   }
 ]

@@ -56,12 +56,64 @@ SECONDS = 4
 FRAMES = FPS * SECONDS
 ROWS = 20                # frames per filmstrip, so no image is absurdly tall
 
+# Every service gets one. A card that sometimes moves and sometimes does not
+# reads as a card that is half broken, and the customer has no way to know the
+# difference between "no clip for this one" and "the clip failed to load".
+#
 # (file name, appliance drawing, headline, the line under it)
+WASHER = '/appliances/washing-machine.svg'
+AC = '/appliances/air-conditioner.svg'
+FRIDGE = '/appliances/refrigerator.svg'
+GEYSER = '/appliances/geyser.svg'
+MICROWAVE = '/appliances/microwave.svg'
+
 CLIPS = [
-    ('refrigerator-repair', '/appliances/refrigerator.svg',
-     'Cooling checked on site', 'Thermostat · Gas · Compressor'),
-    ('ac-deep-clean', '/appliances/air-conditioner.svg',
+    ('washing-machine-repair', WASHER,
+     'Quoted before we open it', 'Drain · Spin · Error codes'),
+    ('washing-machine-service', WASHER,
+     'Drum, filter, drain line', 'Clean · Flush · Test wash'),
+    ('washing-machine-installation', WASHER,
+     'Levelled and test run', 'Inlet · Drain · Transit bolts'),
+    ('washing-machine-uninstallation', WASHER,
+     'Packed for the move', 'Disconnect · Bolts · Pack'),
+
+    ('ac-service', AC,
+     'Cleaned, checked, cooled', 'Filter · Coil · Drain · Gas'),
+    ('ac-repair', AC,
+     'Diagnosed before repair', 'Cooling · Leak · Tripping'),
+    ('ac-deep-clean', AC,
      'Jet wash, coil to drain', 'Filters · Coil · Drain line'),
+    ('ac-gas-refill', AC,
+     'Leak found, then filled', 'Leak test · Vacuum · Charge'),
+    ('ac-installation', AC,
+     'Mounted and cooling', 'Piping · Drain · Vacuum'),
+    ('ac-uninstallation', AC,
+     'Gas saved, units down', 'Recover · Dismount · Pack'),
+
+    ('refrigerator-repair', FRIDGE,
+     'Cooling checked on site', 'Thermostat · Gas · Compressor'),
+    ('refrigerator-service', FRIDGE,
+     'Defrost to door seal', 'Coils · Drain · Temperature'),
+    ('refrigerator-gas-refill', FRIDGE,
+     'Leak traced and sealed', 'Repair · Vacuum · Charge'),
+    ('refrigerator-installation', FRIDGE,
+     'Placed, levelled, started', 'Level · Doors · First start'),
+
+    ('geyser-service', GEYSER,
+     'Descaled and flushed', 'Element · Thermostat · Valve'),
+    ('geyser-repair', GEYSER,
+     'Hot water, back on', 'Element · Leak · Tripping'),
+    ('geyser-installation', GEYSER,
+     'Mounted and heating', 'Inlet · Outlet · Safety valve'),
+    ('geyser-uninstallation', GEYSER,
+     'Drained and dismounted', 'Drain · Disconnect · Pack'),
+
+    ('microwave-repair', MICROWAVE,
+     'Opened, then quoted', 'Heating · Panel · Turntable'),
+    ('microwave-service', MICROWAVE,
+     'Cavity clean, heat test', 'Magnetron · Interlock · Test'),
+    ('microwave-installation', MICROWAVE,
+     'Fitted and first heat', 'Placement · Power · Test'),
 ]
 
 
