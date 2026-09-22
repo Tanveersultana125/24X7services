@@ -36,12 +36,18 @@ import { cn } from '@/lib/cn'
  * has asked their system for less motion — they get the still like everyone
  * below them. The clip is never the thing carrying the meaning either way.
  *
- * The "Book" pill is drawn as a button but is not one. The whole card is the
- * control, and a real button inside it would be a second target nested in the
- * first: two things to tab to, one of which a screen reader cannot describe
- * without repeating the other. Drawn this way, the affordance is where a
- * customer expects it and there is still only one thing to press — including
- * the pill itself, which is inside the thing it appears to be.
+ * The pill says "View", and it says it because that is what the card does: it
+ * opens the service's own page. It used to say "Book" and start the nine-step
+ * flow, which is a lot to ask of somebody still working out whether a ₹299
+ * visit fee is a good idea — the card had the price and two lines, and the
+ * screen after it wanted their address.
+ *
+ * It is drawn as a button but is not one. The whole card is the control, and a
+ * real button inside it would be a second target nested in the first: two
+ * things to tab to, one of which a screen reader cannot describe without
+ * repeating the other. Drawn this way, the affordance is where a customer
+ * expects it and there is still only one thing to press — including the pill
+ * itself, which is inside the thing it appears to be.
  */
 
 export interface ServiceCardProps {
@@ -84,7 +90,7 @@ export function ServiceCard({
     <CardButton
       onClick={() => onSelect(service)}
       selected={selected}
-      ariaLabel={`Book ${service.name}, visit fee ${formatPaise(service.visitFee)}`}
+      ariaLabel={`${service.name}, visit fee ${formatPaise(service.visitFee)}. See what it covers.`}
       // Not a box. The page puts a rule between services, which is enough of a
       // boundary once each one is this tall — a border as well would be two
       // lines doing one job.
@@ -137,7 +143,7 @@ export function ServiceCard({
           )}
           aria-hidden="true"
         >
-          Book
+          View
         </span>
       </div>
 
