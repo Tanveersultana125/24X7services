@@ -70,7 +70,7 @@ export function BookingsScreen() {
     )?.name ?? 'Service'
 
   return (
-    <AppShell mobileHeader={<Header title="Your bookings" />}>
+    <AppShell mobileHeader={<Header title="Your bookings" showBack backFallback="/home" />}>
       <div
         role="tablist"
         aria-label="Booking status"

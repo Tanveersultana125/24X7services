@@ -53,7 +53,7 @@ export function SupportScreen() {
   const config = useAsync(load)
 
   return (
-    <AppShell mobileHeader={<Header title="Support" />}>
+    <AppShell mobileHeader={<Header title="Support" showBack backFallback="/home" />}>
       <p className="mt-5 text-sm leading-relaxed text-muted">
         Tell us what happened and we will sort it out. Most things are quicker
         to fix than to explain.

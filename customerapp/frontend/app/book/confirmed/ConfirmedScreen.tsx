@@ -56,8 +56,10 @@ export function ConfirmedScreen() {
 
   return (
     <div className="min-h-dvh bg-bg">
-      {/* No back button: the flow behind this screen no longer exists. */}
-      <Header showBack={false} />
+      {/* Back goes forward. The flow behind this screen no longer exists —
+          the slot is taken and the money is in — so walking into it would
+          offer to book a booking that has already happened. */}
+      <Header showBack onBack={() => router.replace('/bookings')} />
 
       <main id="content" className="mx-auto w-full max-w-lg px-4 pb-16 lg:max-w-2xl">
         {booking.status === 'loading' ? (

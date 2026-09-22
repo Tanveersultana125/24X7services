@@ -209,7 +209,7 @@ export function ProfileScreen() {
   }
 
   return (
-    <AppShell mobileHeader={<Header title="Profile" />}>
+    <AppShell mobileHeader={<Header title="Profile" showBack backFallback="/home" />}>
       {!ready || (user && profile.status === 'loading') ? (
         <div className="mt-6">
           <ProfileSkeleton />

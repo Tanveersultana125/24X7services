@@ -14,6 +14,10 @@ import { cn } from '@/lib/cn'
  * Android hardware back button and this button do the same thing — the booking
  * flow is a stack, and jumping to a canonical parent would skip steps the
  * customer just filled in.
+ *
+ * `onBack` is for the screens where that is wrong: the end of a flow you must
+ * not walk back into. There, back is a way out rather than a way back, and the
+ * screen says where to.
  */
 
 export interface HeaderProps {
@@ -23,6 +27,8 @@ export interface HeaderProps {
   showBack?: boolean
   /** Used when there is no history to go back to, e.g. a deep link. */
   backFallback?: Route
+  /** Replaces router.back() entirely. See the note above. */
+  onBack?: () => void
   right?: React.ReactNode
   /** Border and background vanish, for a header over a hero or a map. */
   transparent?: boolean
@@ -34,6 +40,7 @@ export function Header({
   subtitle,
   showBack = false,
   backFallback = '/home',
+  onBack,
   right,
   transparent = false,
   className,
@@ -41,6 +48,10 @@ export function Header({
   const router = useRouter()
 
   function goBack(): void {
+    if (onBack) {
+      onBack()
+      return
+    }
     // A customer who opened the app on this URL has nothing behind them.
     if (typeof window !== 'undefined' && window.history.length > 1) {
       router.back()
