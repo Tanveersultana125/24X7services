@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+import type { Route } from 'next'
 import { Loader2 } from 'lucide-react'
 import { cn } from '@/lib/cn'
 
@@ -74,6 +76,12 @@ export function Switch({
  * The whole row is not the target. A row that toggles when tapped anywhere is
  * a row a customer turns off while trying to read it, and this is a list where
  * every wrong tap is a message somebody stops getting.
+ *
+ * `href` is the exception, and it is what a setting that cannot be set yet
+ * should do. A disabled switch with a note under it is a control that answers
+ * a press with nothing, which reads as broken however carefully the note is
+ * worded. With `href` the whole row becomes one link to whatever unlocks it —
+ * usually the sign-in — and the switch is painted rather than pressed.
  */
 export function SwitchRow({
   icon: Icon,
@@ -83,6 +91,7 @@ export function SwitchRow({
   onChange,
   busy,
   disabled,
+  href,
 }: {
   icon: React.ComponentType<{ className?: string; 'aria-hidden'?: boolean }>
   label: string
@@ -91,9 +100,11 @@ export function SwitchRow({
   onChange: (next: boolean) => void
   busy?: boolean
   disabled?: boolean
+  /** Turns the row into a link to whatever has to happen first. */
+  href?: Route
 }) {
-  return (
-    <div className="flex items-start gap-3 py-4">
+  const body = (
+    <>
       <Icon className="mt-0.5 size-5 shrink-0 text-ink" aria-hidden={true} />
       <div className="min-w-0 flex-1">
         <p className="text-base font-medium text-ink">{label}</p>
@@ -101,6 +112,34 @@ export function SwitchRow({
           <p className="mt-0.5 text-sm text-muted">{description}</p>
         ) : null}
       </div>
+    </>
+  )
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        // The switch inside is scenery — the link already carries the whole
+        // row, and a second target inside it would be one thing to tab to
+        // that a screen reader cannot describe without repeating the first.
+        className="-mx-4 flex items-start gap-3 px-4 py-4 hover:bg-surface lg:mx-0 lg:px-0"
+      >
+        {body}
+        <span aria-hidden="true">
+          <Switch
+            checked={checked}
+            onChange={() => undefined}
+            label={label}
+            disabled
+          />
+        </span>
+      </Link>
+    )
+  }
+
+  return (
+    <div className="flex items-start gap-3 py-4">
+      {body}
       <Switch
         checked={checked}
         onChange={onChange}

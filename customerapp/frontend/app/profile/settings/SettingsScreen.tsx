@@ -310,7 +310,8 @@ function Notifications({ uid }: { uid: string | null }) {
           checked={Boolean(uid) && current.push && PUSH_IS_CONFIGURED}
           onChange={(next) => void set('push', next)}
           busy={saving === 'push'}
-          disabled={!uid || !PUSH_IS_CONFIGURED}
+          disabled={!PUSH_IS_CONFIGURED}
+          {...(uid ? {} : { href: signIn })}
         />
 
         <SwitchRow
@@ -320,17 +321,14 @@ function Notifications({ uid }: { uid: string | null }) {
           checked={Boolean(uid) && current.inApp}
           onChange={(next) => void set('inApp', next)}
           busy={saving === 'inApp'}
-          disabled={!uid}
+          {...(uid ? {} : { href: signIn })}
         />
       </div>
 
       {!uid ? (
         <p className="mt-3 text-sm text-muted">
-          These belong to an account.{' '}
-          <Link href={signIn} className="font-semibold text-brand">
-            Sign in
-          </Link>{' '}
-          to set them.
+          Both belong to an account — pressing either one signs you in first,
+          and brings you back here.
         </p>
       ) : null}
 
