@@ -3,7 +3,7 @@
 import { useCallback, useState } from 'react'
 import Link from 'next/link'
 import type { Route } from 'next'
-import { CalendarX, ClipboardList } from 'lucide-react'
+import { CalendarX } from 'lucide-react'
 import {
   ACTIVE_STATUSES,
   CLOSED_STATUSES,
@@ -17,7 +17,7 @@ import { Header } from '@/components/Header'
 import { BookingCard } from '@/components/BookingCard'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
-import { SignInPrompt } from '@/components/ProfileShell'
+import { useSignInHref } from '@/components/ProfileShell'
 import { BookingListSkeleton } from '@/components/SkeletonLoader'
 import { useAuth } from '@/lib/auth'
 import { fetchAllServices } from '@/lib/catalog'
@@ -56,6 +56,7 @@ type TabKey = (typeof TABS)[number]['key']
 export function BookingsScreen() {
   const { user, ready } = useAuth()
   const [tab, setTab] = useState<TabKey>('active')
+  const signIn = useSignInHref()
 
   const loadServices = useCallback(() => fetchAllServices(), [])
   const services = useAsync(loadServices)
@@ -131,12 +132,26 @@ export function BookingsScreen() {
         {!ready || (user && loading) ? (
           <BookingListSkeleton />
         ) : !user ? (
-          <SignInPrompt
-            className="py-16"
-            icon={ClipboardList}
-            title="Your bookings"
-            description="Everything you have booked, what is happening right now, and everything finished. Sign in to see yours."
-          />
+          // Signed out, the truthful thing to say is not "sign in" — it is
+          // that there is nothing here, which is the same sentence anyone
+          // with an empty account gets. So the way to fill it leads, and the
+          // way back into an account that already has bookings sits under it
+          // for the smaller number of people who need that instead.
+          <>
+            <EmptyState
+              className="pt-14 pb-2"
+              icon={CalendarX}
+              title="No bookings yet"
+              description="Looks like you have not had us out yet. A repair, a service or an installation all start the same way."
+              action={{ label: 'Explore our services', href: '/services' }}
+            />
+            <p className="pb-14 text-center text-sm text-muted">
+              Booked with us before?{' '}
+              <Link href={signIn} className="font-semibold text-brand">
+                Sign in
+              </Link>
+            </p>
+          </>
         ) : error ? (
           <ErrorState
             className="py-16"
