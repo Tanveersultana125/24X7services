@@ -6,7 +6,6 @@ import { doc, getDoc, setDoc } from 'firebase/firestore'
 import {
   Banknote,
   Check,
-  CreditCard,
   Lock,
   Smartphone,
   WalletMinimal,
@@ -19,7 +18,7 @@ import {
   type PaymentPreference,
 } from '@app/shared'
 
-import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
+import { ProfileShell, useSignInHref } from '@/components/ProfileShell'
 import { ErrorState } from '@/components/ErrorState'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { useToast } from '@/components/Toast'
@@ -45,6 +44,12 @@ import { cn } from '@/lib/cn'
  *
  * It is the one client-writable field added to the profile in a while, and the
  * rules validate it as an enum. There is nothing here worth stealing.
+ *
+ * Signed out it still draws itself. Three ways to pay and the fact that we
+ * hold no cards are things about this business, not about one account — they
+ * are worth reading before anybody signs in, and they are the answer somebody
+ * came to this screen for. Only the tick needs an account, so only the tick
+ * waits for one.
  */
 
 const OPTIONS = [
@@ -94,22 +99,18 @@ async function savePreference(
 
 export function PaymentMethodsScreen() {
   return (
-    <ProfileShell title="Payment methods"
-      signedOut={
-        <SignInPrompt
-          icon={CreditCard}
-          title="How you pay"
-          description="Pick which way to settle a bill comes up first at checkout. Sign in to set it."
-        />
-      }
-    >
+    <ProfileShell title="Payment methods" signedOut={<Methods uid={null} />}>
       {(user) => <Methods uid={user.uid} />}
     </ProfileShell>
   )
 }
 
-function Methods({ uid }: { uid: string }) {
+function Methods({ uid }: { uid: string | null }) {
+  const signIn = useSignInHref()
   const load = useCallback(async () => {
+    if (!uid) {
+      return { preference: DEFAULT_PAYMENT_PREFERENCE, balance: 0 }
+    }
     const [snap, wallet] = await Promise.all([
       getDoc(doc(db(), COL.users, uid)),
       fetchWallet(uid),
@@ -148,7 +149,7 @@ function Methods({ uid }: { uid: string }) {
   const current = chosen ?? data.data.preference
 
   async function choose(next: PaymentPreference): Promise<void> {
-    if (saving || next === current) return
+    if (saving || next === current || !uid) return
     const previous = current
     setChosen(next)
     setSaving(true)
@@ -171,21 +172,33 @@ function Methods({ uid }: { uid: string }) {
         this is what comes up first.
       </p>
 
+      {!uid ? (
+        <p className="mt-2 text-sm text-muted">
+          <Link href={signIn} className="font-semibold text-brand">
+            Sign in
+          </Link>{' '}
+          to set yours. The three below are what this app offers either way.
+        </p>
+      ) : null}
+
       <ul className="mt-4 flex flex-col gap-3">
         {OPTIONS.map((option) => {
-          const selected = option.id === current
+          const selected = Boolean(uid) && option.id === current
           return (
             <li key={option.id}>
               <button
                 type="button"
                 onClick={() => void choose(option.id)}
                 aria-pressed={selected}
+                disabled={!uid}
                 className={cn(
                   'flex w-full items-start gap-3 rounded-card border p-4 text-left',
                   'transition-colors duration-[var(--duration-fast)]',
                   selected
                     ? 'border-brand bg-brand-soft'
-                    : 'border-border hover:border-brand'
+                    : 'border-border',
+                  uid && !selected && 'hover:border-brand',
+                  !uid && 'cursor-default'
                 )}
               >
                 <option.icon
@@ -202,7 +215,7 @@ function Methods({ uid }: { uid: string }) {
                   <span className="mt-0.5 block text-sm text-muted">
                     {option.detail}
                   </span>
-                  {option.id === 'balance_first' ? (
+                  {option.id === 'balance_first' && uid ? (
                     <span className="mt-1 block text-xs font-semibold text-brand tabular-nums">
                       {formatPaise(data.data?.balance ?? 0)} on your balance
                     </span>
@@ -246,7 +259,7 @@ function Methods({ uid }: { uid: string }) {
           href="/profile/wallet"
           className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-pill border border-border px-4 text-sm font-semibold text-ink hover:border-brand hover:text-brand"
         >
-          <CreditCard className="size-4" aria-hidden="true" />
+          <WalletMinimal className="size-4" aria-hidden="true" />
           See your balance
         </Link>
       </section>

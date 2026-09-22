@@ -11,7 +11,6 @@ import {
   ChevronRight,
   Download,
   Lock,
-  Settings as SettingsIcon,
   ShieldAlert,
 } from 'lucide-react'
 import {
@@ -21,7 +20,7 @@ import {
   type NotificationPrefs,
 } from '@app/shared'
 
-import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
+import { ProfileShell, useSignInHref } from '@/components/ProfileShell'
 import { SwitchRow } from '@/components/ui/Switch'
 import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Field'
@@ -34,6 +33,7 @@ import { db } from '@/lib/firebase'
 import { collectMyData, downloadJson } from '@/lib/exportData'
 import { enablePushNotifications, PUSH_IS_CONFIGURED } from '@/lib/push'
 import { useAsync } from '@/lib/useAsync'
+import { cn } from '@/lib/cn'
 
 /**
  * What we may send, what we hold, and the way out.
@@ -55,6 +55,14 @@ import { useAsync } from '@/lib/useAsync'
  * bucket. Closing the account is under it, in the danger tone, behind a typed
  * confirmation — but it is here and plainly labelled. An app that makes
  * leaving hard has decided its customers are a resource.
+ *
+ * Signed out it draws itself rather than swapping for a sign-in prompt. On
+ * most profile screens that prompt is the honest answer, because the screen is
+ * nothing but one customer's own records. This one is not: the switches, what
+ * cannot be turned off, and the three legal documents are what the screen is
+ * *about*, and the documents are readable by anyone. So the structure stands,
+ * the controls that need an account are inert and say why, and the links that
+ * never needed one keep working.
  */
 
 const LEGAL = [
@@ -65,24 +73,16 @@ const LEGAL = [
 
 export function SettingsScreen() {
   return (
-    <ProfileShell
-      title="Settings"
-      signedOut={
-        <SignInPrompt
-          icon={SettingsIcon}
-          title="Your settings"
-          description="What we may send you, a copy of everything we hold, and closing your account. Sign in to change them."
-        />
-      }
-    >
+    <ProfileShell title="Settings" signedOut={<Settings uid={null} />}>
       {(user) => <Settings uid={user.uid} />}
     </ProfileShell>
   )
 }
 
-function Settings({ uid }: { uid: string }) {
+function Settings({ uid }: { uid: string | null }) {
   const router = useRouter()
   const toast = useToast()
+  const signIn = useSignInHref()
   const [closing, setClosing] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [confirmation, setConfirmation] = useState('')
@@ -108,7 +108,7 @@ function Settings({ uid }: { uid: string }) {
   }
 
   async function exportData(): Promise<void> {
-    if (exporting) return
+    if (exporting || !uid) return
     setExporting(true)
     try {
       const data = await collectMyData(uid)
@@ -134,51 +134,27 @@ function Settings({ uid }: { uid: string }) {
         <h2 className="text-lg font-bold text-ink">Privacy &amp; data</h2>
         <ul className="mt-2 divide-y divide-border border-y border-border">
           <li>
-            <button
-              type="button"
-              onClick={() => void exportData()}
+            <AccountRow
+              icon={Download}
+              label={
+                exporting ? 'Putting your file together…' : 'Download your data'
+              }
+              detail="Everything we hold about you, as one file"
+              signIn={uid ? null : signIn}
               disabled={exporting}
-              className="flex w-full items-center gap-4 py-4 text-left hover:bg-surface disabled:opacity-60"
-            >
-              <Download className="size-5 shrink-0 text-ink" aria-hidden="true" />
-              <span className="min-w-0 flex-1">
-                <span className="block text-base font-medium text-ink">
-                  {exporting ? 'Putting your file together…' : 'Download your data'}
-                </span>
-                <span className="mt-0.5 block text-xs text-muted">
-                  Everything we hold about you, as one file
-                </span>
-              </span>
-              <ChevronRight
-                className="size-5 shrink-0 text-muted"
-                aria-hidden="true"
-              />
-            </button>
+              onClick={() => void exportData()}
+            />
           </li>
 
           <li>
-            <button
-              type="button"
+            <AccountRow
+              icon={ShieldAlert}
+              label="Close your account"
+              detail="Removes your profile, addresses and saved appliances"
+              danger
+              signIn={uid ? null : signIn}
               onClick={() => setClosing(true)}
-              className="flex w-full items-center gap-4 py-4 text-left hover:bg-surface"
-            >
-              <ShieldAlert
-                className="size-5 shrink-0 text-error"
-                aria-hidden="true"
-              />
-              <span className="min-w-0 flex-1">
-                <span className="block text-base font-medium text-error">
-                  Close your account
-                </span>
-                <span className="mt-0.5 block text-xs text-muted">
-                  Removes your profile, addresses and saved appliances
-                </span>
-              </span>
-              <ChevronRight
-                className="size-5 shrink-0 text-muted"
-                aria-hidden="true"
-              />
-            </button>
+            />
           </li>
         </ul>
 
@@ -257,9 +233,11 @@ function Settings({ uid }: { uid: string }) {
  * browser that is blocking notifications would be a setting that reads as on
  * and sends nothing.
  */
-function Notifications({ uid }: { uid: string }) {
+function Notifications({ uid }: { uid: string | null }) {
   const toast = useToast()
+  const signIn = useSignInHref()
   const load = useCallback(async (): Promise<NotificationPrefs> => {
+    if (!uid) return DEFAULT_NOTIFICATION_PREFS
     const snap = await getDoc(doc(db(), COL.users, uid))
     const parsed = userProfileSchema.safeParse(snap.data())
     return (
@@ -275,7 +253,7 @@ function Notifications({ uid }: { uid: string }) {
   const current = local ?? prefs.data ?? DEFAULT_NOTIFICATION_PREFS
 
   async function set(key: keyof NotificationPrefs, next: boolean): Promise<void> {
-    if (saving) return
+    if (saving || !uid) return
     const before = current
     setLocal({ ...current, [key]: next })
     setSaving(key)
@@ -329,21 +307,32 @@ function Notifications({ uid }: { uid: string }) {
               ? 'On this device, when a booking moves'
               : 'Not set up on this build yet'
           }
-          checked={current.push && PUSH_IS_CONFIGURED}
+          checked={Boolean(uid) && current.push && PUSH_IS_CONFIGURED}
           onChange={(next) => void set('push', next)}
           busy={saving === 'push'}
-          disabled={!PUSH_IS_CONFIGURED}
+          disabled={!uid || !PUSH_IS_CONFIGURED}
         />
 
         <SwitchRow
           icon={Bell}
           label="In-app notifications"
           description="The list under Profile, Notifications"
-          checked={current.inApp}
+          checked={Boolean(uid) && current.inApp}
           onChange={(next) => void set('inApp', next)}
           busy={saving === 'inApp'}
+          disabled={!uid}
         />
       </div>
+
+      {!uid ? (
+        <p className="mt-3 text-sm text-muted">
+          These belong to an account.{' '}
+          <Link href={signIn} className="font-semibold text-brand">
+            Sign in
+          </Link>{' '}
+          to set them.
+        </p>
+      ) : null}
 
       {/* The gap, named. Leaving it to be noticed is how a customer decides
           the switches above are not the whole story. */}
@@ -360,6 +349,70 @@ function Notifications({ uid }: { uid: string }) {
         </p>
       </Card>
     </section>
+  )
+}
+
+/**
+ * A row under Privacy & data.
+ *
+ * A button when there is an account to act on, a link to the sign-in when
+ * there is not — same row, same words either way, so the screen does not
+ * change shape under somebody who signs in from it.
+ */
+function AccountRow({
+  icon: Icon,
+  label,
+  detail,
+  danger = false,
+  disabled = false,
+  signIn,
+  onClick,
+}: {
+  icon: typeof Download
+  label: string
+  detail: string
+  danger?: boolean
+  disabled?: boolean
+  /** Set when nobody is signed in: where the row goes instead. */
+  signIn: Route | null
+  onClick: () => void
+}) {
+  const body = (
+    <>
+      <Icon
+        className={cn('size-5 shrink-0', danger ? 'text-error' : 'text-ink')}
+        aria-hidden="true"
+      />
+      <span className="min-w-0 flex-1">
+        <span
+          className={cn(
+            'block text-base font-medium',
+            danger ? 'text-error' : 'text-ink'
+          )}
+        >
+          {label}
+        </span>
+        <span className="mt-0.5 block text-xs text-muted">{detail}</span>
+      </span>
+      <ChevronRight className="size-5 shrink-0 text-muted" aria-hidden="true" />
+    </>
+  )
+
+  const classes =
+    'flex w-full items-center gap-4 py-4 text-left hover:bg-surface disabled:opacity-60'
+
+  if (signIn) {
+    return (
+      <Link href={signIn} className={classes}>
+        {body}
+      </Link>
+    )
+  }
+
+  return (
+    <button type="button" onClick={onClick} disabled={disabled} className={classes}>
+      {body}
+    </button>
   )
 }
 
