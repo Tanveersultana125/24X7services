@@ -69,7 +69,7 @@ export function DateStrip({
       role="radiogroup"
       aria-label="Choose a date"
       onKeyDown={onKeyDown}
-      className={cn('no-scrollbar flex gap-2 overflow-x-auto pb-1', className)}
+      className={cn('no-scrollbar -mt-1 flex gap-2 overflow-x-auto pt-1 pb-1', className)}
     >
       {days.map((day) => {
         const selected = day.date === value

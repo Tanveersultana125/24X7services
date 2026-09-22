@@ -280,7 +280,7 @@ export function ApplianceScreen() {
               aria-label="Services on this appliance"
               className="sticky top-[calc(3.5rem+var(--safe-top))] z-20 -mx-4 mt-6 border-b border-border bg-bg px-4 py-2 lg:top-16 lg:mx-0 lg:px-0"
             >
-              <ul className="no-scrollbar flex gap-2 overflow-x-auto">
+              <ul className="no-scrollbar -my-1 flex gap-2 overflow-x-auto py-1">
                 {services.map((service) => (
                   <li key={service.id}>
                     <a

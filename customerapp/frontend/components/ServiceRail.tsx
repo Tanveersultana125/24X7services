@@ -50,7 +50,7 @@ export function ServiceRail({
   return (
     <ul
       className={cn(
-        'no-scrollbar -mx-4 flex snap-x gap-3 overflow-x-auto scroll-px-4 px-4 lg:mx-0 lg:px-0',
+        'no-scrollbar -mx-4 -my-1 flex snap-x gap-3 overflow-x-auto scroll-px-4 px-4 py-1 lg:mx-0 lg:px-0',
         className
       )}
     >

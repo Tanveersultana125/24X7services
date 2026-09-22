@@ -110,7 +110,7 @@ export function PromotionalBanner({
     >
       <div
         ref={railRef}
-        className="no-scrollbar flex snap-x snap-mandatory overflow-x-auto scroll-smooth lg:gap-3"
+        className="no-scrollbar -my-1 flex snap-x snap-mandatory overflow-x-auto scroll-smooth py-1 lg:gap-3"
       >
         {banners.map((banner, index) => (
           <article

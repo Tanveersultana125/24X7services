@@ -71,10 +71,16 @@ export function BookingsScreen() {
 
   return (
     <AppShell mobileHeader={<Header title="Your bookings" showBack backFallback="/home" />}>
+      {/* Wraps rather than scrolling. Three pills come to about 270px, and a
+          row that cannot shrink below that turns into a scroller on a narrow
+          phone — which slices the last pill at the edge and, because an
+          overflow box clips vertically too, shaves the focus ring off the
+          top and bottom of whichever one you just tapped. The Balance screen
+          made the same call for the same three-pill row. */}
       <div
         role="tablist"
         aria-label="Booking status"
-        className="no-scrollbar -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:px-0"
+        className="mt-4 flex flex-wrap gap-2"
       >
         {TABS.map((option) => {
           const selected = option.key === tab
