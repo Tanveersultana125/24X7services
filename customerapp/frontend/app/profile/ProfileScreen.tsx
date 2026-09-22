@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect } from 'react'
+import { useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { Route } from 'next'
@@ -8,8 +8,11 @@ import { doc, getDoc } from 'firebase/firestore'
 import {
   Bell,
   ChevronRight,
+  CircleAlert,
+  ClipboardList,
   CreditCard,
   FileText,
+  Headset,
   LogOut,
   MapPin,
   Settings,
@@ -21,9 +24,8 @@ import {
 } from 'lucide-react'
 import { COL, userProfileSchema, type UserProfile } from '@app/shared'
 
-import { AppShell, Section } from '@/components/AppShell'
+import { AppShell } from '@/components/AppShell'
 import { Header } from '@/components/Header'
-import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { ProfileSkeleton } from '@/components/SkeletonLoader'
 import { useToast } from '@/components/Toast'
@@ -35,13 +37,41 @@ import { useAsync } from '@/lib/useAsync'
 /**
  * The account, and everything filed under it.
  *
- * A list of doors rather than a screen of settings. Each row is one thing a
- * customer might have come here to do, named as they would say it — "Saved
- * addresses", not "Address management".
+ * Laid out the way an account screen is laid out everywhere, because a
+ * customer opening Profile is not reading it — they are aiming at one row. Who
+ * they are at the top, the three places people actually go as tiles under it,
+ * then everything else as a plain list, and signing out at the bottom where it
+ * cannot be pressed by accident. Each row is one thing a customer might have
+ * come here to do, named as they would say it — "Saved addresses", not
+ * "Address management".
  *
  * The phone number is shown and cannot be edited, because it is the account. A
  * row that looks editable and is not is worse than one that never offered.
+ *
+ * Nobody is turned away at the door. This screen used to send a signed-out
+ * customer straight to the login form, which answers a question they had not
+ * asked: they tapped Profile to see what an account here even holds, and got a
+ * phone field. So it draws itself either way — the same tiles, the same rows,
+ * and one button that signs in. A row that needs an account carries them back
+ * to it afterwards, which is what `next` is for. Balance already made this
+ * decision, for the same reason.
  */
+
+/** Where a row sends someone who is not signed in yet. */
+function signInTo(href: Route): Route {
+  return `/login?next=${encodeURIComponent(href)}` as Route
+}
+
+/** The three that the rest of this screen exists to be less important than. */
+const TILES = [
+  { href: '/bookings', label: 'My bookings', icon: ClipboardList },
+  { href: '/profile/appliances', label: 'My appliances', icon: WashingMachine },
+  { href: '/support', label: 'Help & support', icon: Headset },
+] as const satisfies ReadonlyArray<{
+  href: Route
+  label: string
+  icon: typeof User
+}>
 
 const ROWS = [
   {
@@ -55,12 +85,6 @@ const ROWS = [
     label: 'Saved addresses',
     detail: 'Where we come to',
     icon: MapPin,
-  },
-  {
-    href: '/profile/appliances',
-    label: 'My appliances',
-    detail: 'What we have serviced',
-    icon: WashingMachine,
   },
   {
     href: '/profile/warranties',
@@ -105,15 +129,14 @@ const ROWS = [
   icon: typeof User
 }>
 
+/** Inlined at build time from package.json — see next.config.ts. */
+const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION
+
 export function ProfileScreen() {
   const router = useRouter()
   const { user, ready } = useAuth()
   const toast = useToast()
   const uid = user?.uid
-
-  useEffect(() => {
-    if (ready && !user) router.replace('/login?next=%2Fprofile')
-  }, [ready, user, router])
 
   const load = useCallback(async (): Promise<UserProfile | null> => {
     if (!uid) return null
@@ -123,6 +146,12 @@ export function ProfileScreen() {
   }, [uid])
 
   const profile = useAsync(load)
+
+  // A name is what the technician is handed and what an invoice is made out
+  // to, so an account without one is worth saying out loud here rather than
+  // leaving the customer to find out at checkout.
+  const incomplete =
+    profile.status === 'ready' && (profile.data?.name ?? '').trim().length === 0
 
   async function leave(): Promise<void> {
     try {
@@ -137,79 +166,126 @@ export function ProfileScreen() {
 
   return (
     <AppShell mobileHeader={<Header title="Profile" />}>
-      {!ready || profile.status === 'loading' ? (
+      {!ready || (user && profile.status === 'loading') ? (
         <div className="mt-6">
           <ProfileSkeleton />
         </div>
       ) : (
         <>
-          <Card className="mt-5 flex items-center gap-4 p-4">
-            <span className="flex size-14 shrink-0 items-center justify-center rounded-full bg-surface text-xl font-bold text-muted">
-              {(profile.data?.name ?? '?').charAt(0).toUpperCase()}
-            </span>
-            <div className="min-w-0">
-              <p className="truncate text-lg font-semibold text-ink">
-                {profile.data?.name ?? 'Your account'}
-              </p>
-              <p className="mt-0.5 text-sm text-muted">
+          <div className="mt-6">
+            {user && incomplete ? (
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <span className="inline-flex items-center gap-1.5 rounded-pill bg-error-soft px-3 py-1.5 text-xs font-bold text-error">
+                  <CircleAlert className="size-3.5" aria-hidden="true" />
+                  Incomplete profile
+                </span>
+                <Link
+                  href="/profile/personal"
+                  className="inline-flex h-9 shrink-0 items-center rounded-pill border border-border px-4 text-sm font-bold text-ink hover:border-brand hover:text-brand"
+                >
+                  Complete
+                </Link>
+              </div>
+            ) : null}
+
+            <h1 className="text-3xl font-bold leading-tight text-ink">
+              {(user ? profile.data?.name : undefined) ?? 'Your account'}
+            </h1>
+
+            {user ? (
+              <p className="mt-1.5 text-base text-muted">
                 {/* The account is the number, so it is stated and not offered
                     as something to change. */}
-                {user?.phoneNumber
-                  ? formatPhone(user.phoneNumber)
-                  : 'Signed in'}
+                {user.phoneNumber ? formatPhone(user.phoneNumber) : 'Signed in'}
               </p>
-            </div>
-          </Card>
+            ) : (
+              <>
+                <p className="mt-1.5 text-base text-muted">
+                  Sign in to see your bookings, your addresses and everything on
+                  your balance.
+                </p>
+                <Link
+                  href={signInTo('/profile')}
+                  className="mt-4 flex h-12 w-full items-center justify-center rounded-pill bg-brand text-base font-semibold text-bg hover:bg-brand-deep sm:w-auto sm:px-8"
+                >
+                  Sign in
+                </Link>
+              </>
+            )}
+          </div>
 
-          <Section className="mt-6">
-            <Card className="overflow-hidden">
-              <ul>
-                {ROWS.map((row) => (
-                  <li
-                    key={row.href}
-                    className="border-b border-border last:border-b-0"
-                  >
-                    <Link
-                      href={row.href}
-                      className="flex items-center gap-3 px-4 py-3.5 hover:bg-surface"
-                    >
-                      <row.icon
-                        className="size-4 shrink-0 text-muted"
-                        aria-hidden="true"
-                      />
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-medium text-ink">
-                          {row.label}
-                        </span>
-                        <span className="mt-0.5 block text-xs text-muted">
-                          {row.detail}
-                        </span>
-                      </span>
-                      <ChevronRight
-                        className="size-4 shrink-0 text-muted"
-                        aria-hidden="true"
-                      />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          </Section>
+          <div className="mt-6 grid grid-cols-3 gap-3">
+            {TILES.map((tile) => (
+              <Link
+                key={tile.href}
+                href={user ? tile.href : signInTo(tile.href)}
+                className="flex flex-col gap-3 rounded-card border border-border p-4 hover:border-brand"
+              >
+                <tile.icon className="size-6 text-ink" aria-hidden="true" />
+                <span className="text-sm font-bold leading-snug text-ink">
+                  {tile.label}
+                </span>
+              </Link>
+            ))}
+          </div>
 
-          <Button
-            className="mt-6"
-            variant="secondary"
-            fullWidth
-            onClick={() => void leave()}
-            iconLeft={<LogOut className="size-4" aria-hidden="true" />}
-          >
-            Sign out
-          </Button>
+          {/* Full bleed, so the list below reads as a different part of the
+              screen rather than as more of the same column. */}
+          <div className="-mx-4 mt-8 h-2 bg-surface lg:-mx-6" />
 
-          <p className="mt-6 flex items-center justify-center gap-1.5 text-xs text-muted">
+          <ul className="-mx-4 lg:-mx-6">
+            {ROWS.map((row) => (
+              <li
+                key={row.href}
+                className="border-b border-border last:border-b-0"
+              >
+                <Link
+                  href={user ? row.href : signInTo(row.href)}
+                  className="flex items-center gap-4 px-4 py-4 hover:bg-surface lg:px-6"
+                >
+                  <row.icon
+                    className="size-5 shrink-0 text-ink"
+                    aria-hidden="true"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-base font-medium text-ink">
+                      {row.label}
+                    </span>
+                    <span className="mt-0.5 block text-xs text-muted">
+                      {row.detail}
+                    </span>
+                  </span>
+                  <ChevronRight
+                    className="size-5 shrink-0 text-muted"
+                    aria-hidden="true"
+                  />
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {user ? (
+            <Button
+              className="mt-8"
+              variant="secondary"
+              fullWidth
+              onClick={() => void leave()}
+              iconLeft={<LogOut className="size-4" aria-hidden="true" />}
+            >
+              Sign out
+            </Button>
+          ) : null}
+
+          <p className="mt-8 flex items-center justify-center gap-1.5 text-xs text-muted">
             <CreditCard className="size-3.5" aria-hidden="true" />
             We never store your card details. Payments go through Razorpay.
           </p>
+
+          {APP_VERSION ? (
+            <p className="mt-3 text-center text-xs text-muted">
+              Version {APP_VERSION}
+            </p>
+          ) : null}
         </>
       )}
     </AppShell>

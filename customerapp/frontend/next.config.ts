@@ -1,5 +1,16 @@
+import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import type { NextConfig } from 'next'
+
+/**
+ * The version Profile prints at the bottom, so a customer telling support
+ * "I'm on 0.1.0" is telling them something true. Read from package.json rather
+ * than written out again here: two places to bump is one place to forget, and
+ * the one nobody remembers is the one on screen.
+ */
+const { version } = JSON.parse(
+  readFileSync(path.join(__dirname, 'package.json'), 'utf8')
+) as { version: string }
 
 /**
  * The app ships two ways from one build: a PWA on the web, and a Capacitor
@@ -13,6 +24,23 @@ import type { NextConfig } from 'next'
  */
 const nextConfig: NextConfig = {
   output: 'export',
+
+  /**
+   * `next build` and `next dev` both own `.next` by default, so a production
+   * build run while the dev server is up overwrites the directory underneath
+   * it. The dev server keeps serving — HTML and every chunk come back 200 —
+   * but the client never hydrates, so every screen sits on its skeleton
+   * forever with nothing in the console. It looks exactly like a broken page
+   * and it is a broken build directory. Set NEXT_DIST_DIR to build somewhere
+   * else — the static export lands there too, so a verification build can be
+   * served and checked without touching either `.next` or `out`.
+   */
+  distDir: process.env.NEXT_DIST_DIR || '.next',
+
+  // Inlined at build time, which is the only way a static export can carry it.
+  env: {
+    NEXT_PUBLIC_APP_VERSION: version,
+  },
 
   turbopack: {
     // There is a second lockfile one directory up, for the marketing site that
