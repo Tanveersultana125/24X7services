@@ -52,6 +52,8 @@ export const service: CatalogService = {
   visitFee: 29900,
   startingPrice: 49900,
   durationMinutes: 60,
+  rating: 4.8,
+  reviewCount: 2140,
   order: 1,
   active: true,
   video: '/services/washing-machine-repair.mp4',

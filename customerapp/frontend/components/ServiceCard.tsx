@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useSyncExternalStore } from 'react'
 import Image from 'next/image'
+import { Star } from 'lucide-react'
 import type { CatalogService } from '@app/shared'
 import { formatPaise } from '@/lib/format'
 import { CardButton } from '@/components/ui/Card'
@@ -9,45 +10,40 @@ import { durationNote } from '@/components/ServiceRail'
 import { cn } from '@/lib/cn'
 
 /**
- * A service on the appliance page: what it looks like, what it is, what the
- * visit costs, and how long it takes.
+ * A service on the appliance page: what it looks like, what it is, what people
+ * scored it, what the visit costs, and how long it takes.
  *
  * Laid out the way the marketplaces lay this one out, because it is the screen
  * a customer compares two services on and the comparison has a shape: a wide
- * picture, the name large enough to read at a glance, the money and the time
- * on one line under it, then the detail below a rule for anyone still
- * deciding. It used to be a bordered box with the name at body size and the
- * picture shrunk into the corner beside a button, which read as a row in a
- * list rather than as a thing you choose.
+ * clip, the name large enough to read at a glance, the score under it, the
+ * money and the time on the line below, then the detail under a rule for
+ * anyone still deciding, and the way in at the foot. It used to be a bordered
+ * box with the name at body size and the picture shrunk into the corner beside
+ * a button, which read as a row in a list rather than as a thing you choose.
  *
- * One card on a page moves, and it is the first one. Six clips playing down a
- * single screen is six decoders on a cheap phone, six downloads on a metered
- * connection, and — the part that actually matters — nowhere for the eye to
- * rest: everything moving is the same as nothing moving. So the page hands
- * `motion` to its first card and to nothing else.
+ * Every card plays its own clip, and each one starts only once it is on
+ * screen and stops again when it leaves — so a page of six is at most the two
+ * or three a phone is actually showing, not six decoders and six downloads
+ * opened at once for cards nobody scrolled to. A customer who has asked their
+ * system for less motion gets the still instead, and the clip is never the
+ * thing carrying the meaning either way.
  *
- * The rest show a still *of their own clip*, not the appliance drawing. The
- * drawing is shared by every service on the appliance, so putting it on six
- * cards turns a list of services into a list of the same thing. The drawing
- * stays as the last fallback, for a service nobody has drawn a clip for.
+ * The still, when one is shown, is a frame *of that service's own clip*, not
+ * the appliance drawing. The drawing is shared by every service on the
+ * appliance, so putting it on six cards turns a list of services into a list
+ * of the same thing. The drawing stays as the last fallback, for a service
+ * nobody has drawn a clip for.
  *
- * The clip is muted, looping and inline, because that is the only shape a
- * browser will play unasked, and it is not played at all for a customer who
- * has asked their system for less motion — they get the still like everyone
- * below them. The clip is never the thing carrying the meaning either way.
+ * "View details" sits at the foot, where the marketplaces put it, and it is
+ * the only affordance on the card — the pill that used to sit beside the title
+ * opened the same page, and two controls for one action is one of them
+ * lying about being a choice.
  *
- * The pill says "View", and it says it because that is what the card does: it
- * opens the service's own page. It used to say "Book" and start the nine-step
- * flow, which is a lot to ask of somebody still working out whether a ₹299
- * visit fee is a good idea — the card had the price and two lines, and the
- * screen after it wanted their address.
- *
- * It is drawn as a button but is not one. The whole card is the control, and a
- * real button inside it would be a second target nested in the first: two
- * things to tab to, one of which a screen reader cannot describe without
- * repeating the other. Drawn this way, the affordance is where a customer
- * expects it and there is still only one thing to press — including the pill
- * itself, which is inside the thing it appears to be.
+ * It is drawn as a link but is not one. The whole card is the control, and a
+ * real link inside it would be a second target nested in the first: two things
+ * to tab to, one of which a screen reader cannot describe without repeating
+ * the other. Drawn this way, the affordance is where a customer expects it and
+ * there is still only one thing to press.
  */
 
 export interface ServiceCardProps {
@@ -60,8 +56,10 @@ export interface ServiceCardProps {
    */
   image?: string
   /**
-   * Whether this card is the one allowed to play its clip. Off by default:
-   * a page that wants movement asks for it, once. See the note above.
+   * Whether this card may play its clip at all. On by default; a screen that
+   * wants a page of stills — a dense list, a print view — turns it off. It is
+   * not a licence to play immediately: playback still waits for the card to be
+   * on screen. See the note above.
    */
   motion?: boolean
   onSelect: (service: CatalogService) => void
@@ -72,7 +70,7 @@ export interface ServiceCardProps {
 export function ServiceCard({
   service,
   image,
-  motion = false,
+  motion = true,
   onSelect,
   selected = false,
   className,
@@ -86,16 +84,30 @@ export function ServiceCard({
   // the appliance drawing, then nothing.
   const still = service.poster ?? image
 
+  // Both or neither. A score with no count behind it is a number a reader
+  // cannot weigh, so a half-filled catalog row draws no score at all.
+  const scored =
+    service.rating !== undefined && service.reviewCount !== undefined
+
   return (
     <CardButton
       onClick={() => onSelect(service)}
       selected={selected}
-      ariaLabel={`${service.name}, visit fee ${formatPaise(service.visitFee)}. See what it covers.`}
+      ariaLabel={[
+        service.name,
+        scored
+          ? `rated ${service.rating?.toFixed(1)} from ${service.reviewCount} reviews`
+          : null,
+        `visit fee ${formatPaise(service.visitFee)}`,
+        'See what it covers.',
+      ]
+        .filter(Boolean)
+        .join(', ')}
       // Not a box. The page puts a rule between services, which is enough of a
       // boundary once each one is this tall — a border as well would be two
       // lines doing one job.
       className={cn(
-        'w-full rounded-none border-0 bg-transparent p-0 text-left',
+        'group w-full rounded-none border-0 bg-transparent p-0 text-left',
         'hover:border-transparent',
         selected && 'ring-0',
         className
@@ -130,22 +142,21 @@ export function ServiceCard({
         </span>
       ) : null}
 
-      <div className="mt-4 flex items-start gap-4">
-        <h3 className="min-w-0 flex-1 text-xl font-bold leading-snug text-ink">
-          {service.name}
-        </h3>
-        <span
-          className={cn(
-            'inline-flex h-11 shrink-0 items-center justify-center rounded-card px-6',
-            'text-sm font-bold transition-colors duration-[var(--duration-fast)]',
-            'border border-brand text-brand',
-            'group-hover:bg-brand group-hover:text-bg'
-          )}
-          aria-hidden="true"
-        >
-          View
-        </span>
-      </div>
+      <h3 className="mt-4 text-xl font-bold leading-snug text-ink">
+        {service.name}
+      </h3>
+
+      {/* What other people made of it, before what it costs — which is the
+          order somebody weighs the two in. */}
+      {scored ? (
+        <p className="mt-1.5 flex items-center gap-1.5 text-sm text-muted">
+          <Star className="size-3.5 fill-ink text-ink" aria-hidden="true" />
+          <span className="font-bold text-ink">
+            {service.rating?.toFixed(1)}
+          </span>
+          <span>({countNote(service.reviewCount ?? 0)} reviews)</span>
+        </p>
+      ) : null}
 
       {/* The two numbers a customer weighs, on one line, in the order they
           weigh them. The fee is the only figure being committed to here, which
@@ -177,8 +188,35 @@ export function ServiceCard({
             : 'Any repair beyond this is quoted on site and starts only after you approve it.'}
         </Point>
       </ul>
+
+      <span
+        aria-hidden="true"
+        className={cn(
+          'mt-3 inline-flex items-center text-sm font-bold text-brand',
+          'transition-colors duration-[var(--duration-fast)]',
+          'group-hover:text-brand-deep'
+        )}
+      >
+        View details
+      </span>
     </CardButton>
   )
+}
+
+/**
+ * A review count at a glance rather than to the unit.
+ *
+ * Nobody reads "2140" as anything other than "a lot", and the four digits ask
+ * them to. Under a thousand the exact figure is short enough to be read, so it
+ * stays: rounding 240 to "0.2K" would be less information in more characters.
+ */
+function countNote(count: number): string {
+  if (count < 1000) return String(count)
+  const thousands = count / 1000
+  // 12.4K is noise at that size; 12K says the same thing. One decimal only
+  // while it is still telling the reader something.
+  const rounded = thousands < 10 ? thousands.toFixed(1) : String(Math.round(thousands))
+  return `${rounded.replace(/\.0$/, '')}K`
 }
 
 /**
@@ -186,9 +224,9 @@ export function ServiceCard({
  *
  * `autoplay` would be one attribute instead of this hook, and it starts the
  * download and the decoder whether or not the card has ever been on screen.
- * Only one card on a page plays now, but that card is often below the fold —
- * and a clip fetched for a page somebody never scrolled is a download the
- * customer did not ask for.
+ * With every card on the page playing, that is the difference between two or
+ * three clips running and all six — and a clip fetched for a card nobody
+ * scrolled to is a download the customer did not ask for.
  *
  * The margin starts a clip a screen-height early, so one that is scrolled to
  * is already moving rather than starting from its first frame on arrival.

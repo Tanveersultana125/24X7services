@@ -4,7 +4,7 @@ import { useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import type { Route } from 'next'
-import { Clock3, ReceiptIndianRupee, ShieldCheck, Wrench } from 'lucide-react'
+import { Clock3, ReceiptIndianRupee, ShieldCheck, Star, Wrench } from 'lucide-react'
 import {
   applianceIdSchema,
   formatPaise,
@@ -45,11 +45,11 @@ import { cn } from '@/lib/cn'
  * working out whether a ₹299 visit fee is a good idea — the card had the
  * price and two lines, and the next screen after it wanted their address.
  *
- * So the card says "View" and lands here, where the questions people actually
- * have get answered before the flow starts: what the fee covers and what it
- * does not, how long it takes, what is still covered afterwards, and the
- * symptoms this service is the answer to. Booking is one button at the bottom,
- * pinned, so the decision is available from anywhere on the page.
+ * So the card says "View details" and lands here, where the questions people
+ * actually have get answered before the flow starts: what the fee covers and
+ * what it does not, how long it takes, what is still covered afterwards, and
+ * the symptoms this service is the answer to. Booking is one button at the
+ * bottom, pinned, so the decision is available from anywhere on the page.
  *
  * Everything on it is read from the catalog. There is no per-service prose
  * here beyond what the catalog carries, because a page of marketing copy that
@@ -153,6 +153,21 @@ export function ServiceDetailScreen() {
             <h1 className="mt-5 text-2xl font-bold leading-tight text-ink">
               {service.name}
             </h1>
+            {/* The same score the card carried, so the page it opens does not
+                quietly drop the one number that got somebody here. Both or
+                neither: a score with no count behind it cannot be weighed. */}
+            {service.rating !== undefined &&
+            service.reviewCount !== undefined ? (
+              <p className="mt-2 flex items-center gap-1.5 text-sm text-muted">
+                <Star className="size-3.5 fill-ink text-ink" aria-hidden="true" />
+                <span className="font-bold text-ink">
+                  {service.rating.toFixed(1)}
+                </span>
+                <span>
+                  from {service.reviewCount.toLocaleString('en-IN')} reviews
+                </span>
+              </p>
+            ) : null}
             <p className="mt-2 text-base leading-relaxed text-muted">
               {service.description}
             </p>

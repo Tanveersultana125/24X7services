@@ -100,6 +100,22 @@ export const catalogServiceSchema = z.object({
    * promise — no screen may word it as one.
    */
   durationMinutes: z.number().int().min(1).optional(),
+  /**
+   * What customers scored this service out of five, and how many of them did.
+   *
+   * Both or neither: a rating with no count is a number nobody can weigh —
+   * 4.9 from three people and 4.9 from three thousand are not the same claim
+   * — so every screen draws the pair or draws nothing. Optional for the same
+   * reason: a service nobody has reviewed yet has no score, and inventing one
+   * is a claim about other customers that is not true.
+   *
+   * Seeded today. The honest source is a rollup over the reviews collection,
+   * which cannot be written yet: a review is filed against a booking and its
+   * technician, and carries no service key to group by. Until that exists,
+   * treat these as placeholders and replace them before launch.
+   */
+  rating: z.number().min(1).max(5).optional(),
+  reviewCount: z.number().int().min(1).optional(),
 })
 export type CatalogService = z.infer<typeof catalogServiceSchema>
 
