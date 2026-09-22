@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { Route } from 'next'
-import { ChevronRight, MapPinOff } from 'lucide-react'
+import { ChevronRight, MapPinOff, ShieldCheck } from 'lucide-react'
 import type {
   ApplianceId,
   Banner,
@@ -252,6 +252,25 @@ export function HomeScreen() {
           <CategoryGridSkeleton />
         )}
       </Card>
+
+      {/* The one thing on Home that is not a single visit. Both halves of it
+          — the annual plans and Plus — lived under Profile, behind an
+          account, which is where a price list goes to be unread. */}
+      <Link
+        href={'/care' as Route}
+        className="mt-5 flex items-center gap-3 rounded-card bg-brand-soft p-4 transition-colors duration-[var(--duration-fast)] hover:bg-brand-soft/70 lg:mt-8"
+      >
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-bg">
+          <ShieldCheck className="size-5 text-brand" aria-hidden="true" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-base font-bold text-ink">Care plans</span>
+          <span className="mt-0.5 block text-sm text-muted">
+            Cover a whole year in one go, and stop paying the visit fee.
+          </span>
+        </span>
+        <ChevronRight className="size-4 shrink-0 text-muted" aria-hidden="true" />
+      </Link>
 
       {data ? (
         <>
