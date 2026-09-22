@@ -266,13 +266,20 @@ export function CareScreen() {
                     {point.detail}
                   </p>
                 </div>
-                <span className="relative mt-auto block h-24 bg-surface">
+                <span
+                  className={cn(
+                    'relative mt-auto block bg-surface',
+                    point.photo ? 'h-32' : 'h-24'
+                  )}
+                >
                   <Image
                     src={point.art}
                     alt=""
                     fill
                     sizes="224px"
-                    className="object-contain p-4"
+                    className={
+                      point.photo ? 'object-cover' : 'object-contain p-4'
+                    }
                   />
                 </span>
               </Card>
@@ -695,20 +702,30 @@ const VISIT_POINTS: ReadonlyArray<{
   title: string
   detail: string
   art: string
+  /**
+   * Whether `art` is a photograph.
+   *
+   * A photograph fills the strip; a drawing is a symbol on a plate and needs
+   * the room around it. The two cannot share one set of classes without one
+   * of them looking like a mistake.
+   */
+  photo?: boolean
 }> = [
   {
     key: 'quote',
     title: 'Quoted before it is started',
     detail:
       'The fault is named, the repair is priced in writing, and nothing begins until you approve it.',
-    art: '/banners/estimate.svg',
+    art: '/photos/ac-technician.jpg',
+    photo: true,
   },
   {
     key: 'warranty',
     title: 'Covered after we leave',
     detail:
       'Every repair carries a service warranty, with what it covers and until when kept on the booking.',
-    art: '/banners/shield.svg',
+    art: '/photos/laundry-room.jpg',
+    photo: true,
   },
   {
     key: 'support',
