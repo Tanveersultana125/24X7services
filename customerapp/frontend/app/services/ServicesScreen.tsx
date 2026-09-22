@@ -16,6 +16,7 @@ import {
   cheapestByAppliance,
   fetchAllServices,
   fetchAppliances,
+  summaryByAppliance,
 } from '@/lib/catalog'
 import { formatPaise } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
@@ -46,6 +47,9 @@ export function ServicesScreen() {
 
   const all = useAsync(load)
   const fromPrices = all.data ? cheapestByAppliance(all.data.services) : null
+  // An appliance carries no clip and no score of its own — both are worked
+  // out from the services under it.
+  const summaries = all.data ? summaryByAppliance(all.data.services) : null
 
   return (
     // Services is a tab, and tabs do not usually carry a back arrow. This one
@@ -76,10 +80,15 @@ export function ServicesScreen() {
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
             {all.data?.appliances.map((appliance, index, appliances) => {
               const from = fromPrices?.get(appliance.id)
+              const summary = summaries?.get(appliance.id)
               return (
                 <ApplianceCard
                   key={appliance.id}
                   appliance={appliance}
+                  video={summary?.video}
+                  poster={summary?.poster}
+                  rating={summary?.rating}
+                  reviewCount={summary?.reviewCount}
                   // The tiles on screen before any scrolling.
                   priority={index < 2}
                   // The last one, when it would otherwise sit alone in a row.

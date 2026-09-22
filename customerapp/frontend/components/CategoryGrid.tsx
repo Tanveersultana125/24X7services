@@ -164,17 +164,13 @@ export function CategoryGrid({
         {/* A grid of tiles, the shape every app of this kind uses for a
             picker like this, and the shape that was asked for.
 
-            Every service of an appliance shares that appliance's one
-            photograph, so the pictures here repeat. That is the cost of the
-            shape and it is paid deliberately: what tells the tiles apart is
-            the label under each one, which is why the label is stripped down
-            to the part that differs. The sheet's own title already says which
-            appliance this is, so a tile that repeated it would spend three
-            lines saying "Washing Machine" to distinguish itself from "Washing
-            Machine".
-
-            The day a service is seeded its own artwork, nothing here changes
-            except that the pictures stop repeating. */}
+            A service shows a frame of its own clip, and falls back to the
+            appliance drawing where nobody has drawn one — which is the day
+            the pictures start repeating again, not the shape breaking. The
+            label is stripped to the part that differs either way: the sheet's
+            own title already says which appliance this is, so a tile that
+            repeated it would spend three lines saying "Washing Machine" to
+            distinguish itself from "Washing Machine". */}
         <ul className="grid grid-cols-3 gap-x-3 gap-y-4 sm:grid-cols-4">
           {openServices.map((service) => {
             const duration = durationNote(service.durationMinutes)
@@ -190,11 +186,15 @@ export function CategoryGrid({
                   <span className="relative block aspect-square w-full overflow-hidden rounded-card bg-surface transition-colors duration-[var(--duration-fast)] group-hover:bg-border">
                     {open ? (
                       <Image
-                        src={open.image}
+                        src={service.poster ?? open.image}
                         alt=""
                         fill
                         sizes="(min-width: 640px) 110px, 30vw"
-                        className="object-contain p-3"
+                        className={
+                          service.poster
+                            ? 'object-cover'
+                            : 'object-contain p-3'
+                        }
                       />
                     ) : null}
 

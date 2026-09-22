@@ -5,16 +5,27 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { Route } from 'next'
 import { ArrowLeft, ChevronRight, History, SearchX, X } from 'lucide-react'
-import type { SearchHit } from '@app/shared'
+import type {
+  CatalogAppliance,
+  CatalogService,
+  SearchHit,
+} from '@app/shared'
 
 import { AppShell } from '@/components/AppShell'
 import { SearchBar } from '@/components/SearchBar'
+import { ServiceCard } from '@/components/ServiceCard'
+import { ServiceClip } from '@/components/ServiceClip'
+import { ServiceScore } from '@/components/ServiceScore'
 import { Chip } from '@/components/ui/Chip'
 import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
-import { fetchAppliances } from '@/lib/catalog'
+import {
+  fetchAllServices,
+  fetchAppliances,
+  summaryByAppliance,
+} from '@/lib/catalog'
 import { callFn, friendlyError } from '@/lib/callables'
 import {
   forgetSearches,
@@ -22,6 +33,7 @@ import {
   useRecentSearches,
 } from '@/lib/recentSearches'
 import { useAsync } from '@/lib/useAsync'
+import { cn } from '@/lib/cn'
 
 /**
  * Search across appliances, services and the problems people describe.
@@ -36,6 +48,20 @@ import { useAsync } from '@/lib/useAsync'
  * That is what lets the screen work out what it is doing — a result for an
  * older query means this one is still in flight — without a status flag that
  * has to be set from inside an effect and kept in step by hand.
+ *
+ * A hit is a label and a route; the picture, the score and the price are not
+ * in the index and are not going into it — an index that carried them would
+ * be a second copy of the catalog going stale on its own schedule. They are
+ * joined here instead, against the catalog this screen already loads for its
+ * suggestions. A hit whose service has since been withdrawn simply joins to
+ * nothing and stays the row it always was.
+ *
+ * A service hit gets the whole card, the one the appliance page uses: a
+ * customer who searched "drum not spinning" has already described the job, so
+ * the answer should be the thing itself rather than a line of text about it.
+ * Appliances keep the compact row — "Washing Machine" is an answer you scan
+ * past on the way to a service — with the score added. A problem has no
+ * picture and no price, and gets neither.
  */
 
 /** Long enough for a prefix to mean something, short enough to feel instant. */
@@ -66,8 +92,20 @@ export function SearchScreen() {
 
   const recent = useRecentSearches()
 
-  const loadAppliances = useCallback(() => fetchAppliances(), [])
-  const appliances = useAsync(loadAppliances)
+  const loadCatalog = useCallback(
+    async (): Promise<{
+      appliances: CatalogAppliance[]
+      services: CatalogService[]
+    }> => {
+      const [appliances, services] = await Promise.all([
+        fetchAppliances(),
+        fetchAllServices(),
+      ])
+      return { appliances, services }
+    },
+    []
+  )
+  const catalog = useAsync(loadCatalog)
 
   // Every request gets a number, and only the newest one is allowed to write.
   const requestId = useRef(0)
@@ -97,6 +135,20 @@ export function SearchScreen() {
 
   const hits = result?.query === query ? result.hits : null
   const error = failure?.query === query ? failure.message : null
+
+  // What a hit joins to. Keyed the way a hit names itself, so the lookup is
+  // the hit's own fields rather than a string the two sides have to agree on.
+  const services = catalog.data?.services ?? []
+  const serviceFor = new Map(
+    services.map((service) => [
+      `${service.applianceId}/${service.serviceKey}`,
+      service,
+    ])
+  )
+  const applianceFor = new Map(
+    catalog.data?.appliances.map((appliance) => [appliance.id, appliance]) ?? []
+  )
+  const applianceSummaries = summaryByAppliance(services)
 
   /** A result the customer actually opened is worth remembering. */
   function open(href: string): void {
@@ -129,7 +181,8 @@ export function SearchScreen() {
           onPick={setTerm}
           onClearRecent={forgetSearches}
           appliances={
-            appliances.data?.map((a) => ({ id: a.id, name: a.name })) ?? []
+            catalog.data?.appliances.map((a) => ({ id: a.id, name: a.name })) ??
+            []
           }
         />
       ) : error !== null ? (
@@ -157,42 +210,95 @@ export function SearchScreen() {
           {GROUPS.map((group) => {
             const groupHits = hits.filter((hit) => hit.kind === group.kind)
             if (groupHits.length === 0) return null
+
+            // Services answer the search outright, so they are shown the way
+            // the appliance page shows them — a rule between them rather than
+            // a box around each, which at this height would be two lines
+            // doing one job.
+            if (group.kind === 'service') {
+              const cards = groupHits
+                .map((hit) => ({
+                  hit,
+                  service:
+                    hit.serviceKey === undefined
+                      ? undefined
+                      : serviceFor.get(`${hit.applianceId}/${hit.serviceKey}`),
+                }))
+                .filter(
+                  (row): row is { hit: SearchHit; service: CatalogService } =>
+                    row.service !== undefined
+                )
+
+              // Everything that joined to nothing — a withdrawn service still
+              // in the index — falls back to the row it has always been.
+              const rows = groupHits.filter(
+                (hit) => !cards.some((card) => card.hit === hit)
+              )
+
+              return (
+                <section key={group.kind} className="mb-6 last:mb-0">
+                  <h2 className="mb-2 text-sm font-semibold text-muted">
+                    {group.title}
+                  </h2>
+                  {cards.length > 0 ? (
+                    <div className="flex flex-col divide-y divide-border">
+                      {cards.map(({ hit, service }) => (
+                        <div
+                          key={`${hit.applianceId}-${service.serviceKey}`}
+                          className="py-5 first:pt-0 last:pb-0"
+                        >
+                          <ServiceCard
+                            service={service}
+                            image={applianceFor.get(hit.applianceId)?.image}
+                            onSelect={() =>
+                              open(
+                                `/services/detail/?a=${service.applianceId}&s=${service.serviceKey}`
+                              )
+                            }
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+                  {rows.length > 0 ? (
+                    <HitRows
+                      hits={rows}
+                      className={cards.length > 0 ? 'mt-4' : undefined}
+                      onOpen={open}
+                    />
+                  ) : null}
+                </section>
+              )
+            }
+
             return (
               <section key={group.kind} className="mb-6 last:mb-0">
                 <h2 className="mb-2 text-sm font-semibold text-muted">
                   {group.title}
                 </h2>
-                <Card className="overflow-hidden">
-                  <ul>
-                    {groupHits.map((hit) => (
-                      <li
-                        key={`${hit.kind}-${hit.label}-${hit.href}`}
-                        className="border-b border-border last:border-b-0"
-                      >
-                        <button
-                          type="button"
-                          onClick={() => open(hit.href)}
-                          className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-surface"
-                        >
-                          <span className="min-w-0 flex-1">
-                            <span className="block truncate text-base font-medium text-ink">
-                              {hit.label}
-                            </span>
-                            {hit.sublabel ? (
-                              <span className="mt-0.5 block truncate text-xs text-muted">
-                                {hit.sublabel}
-                              </span>
-                            ) : null}
-                          </span>
-                          <ChevronRight
-                            className="size-4 shrink-0 text-muted"
-                            aria-hidden="true"
-                          />
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </Card>
+                <HitRows
+                  hits={groupHits}
+                  onOpen={open}
+                  thumbFor={
+                    group.kind === 'appliance'
+                      ? (hit) => {
+                          const summary = applianceSummaries.get(
+                            hit.applianceId
+                          )
+                          return {
+                            // The drawing, not a frame of the clip: at 48px a
+                            // crop of a captioned clip is a blue smudge, and
+                            // the drawing is the one picture that still reads
+                            // at that size.
+                            still: applianceFor.get(hit.applianceId)?.image,
+                            cover: false,
+                            rating: summary?.rating,
+                            reviewCount: summary?.reviewCount,
+                          }
+                        }
+                      : undefined
+                  }
+                />
               </section>
             )
           })}
@@ -203,6 +309,84 @@ export function SearchScreen() {
 }
 
 // ---------------------------------------------------------------------------
+
+/**
+ * Hits as a list of rows: a label, what it belongs to, and a chevron.
+ *
+ * The shape for a hit that is not a thing you buy — an appliance, a symptom —
+ * and the fallback for a service the catalog no longer has. The picture, where
+ * there is one, is a still rather than a clip: a screen of moving thumbnails
+ * is a list nobody can read, and these rows exist to be scanned past.
+ */
+function HitRows({
+  hits,
+  onOpen,
+  thumbFor,
+  className,
+}: {
+  hits: readonly SearchHit[]
+  onOpen: (href: string) => void
+  thumbFor?: (hit: SearchHit) => {
+    still?: string
+    cover: boolean
+    rating?: number
+    reviewCount?: number
+  }
+  className?: string
+}) {
+  return (
+    <Card className={cn('overflow-hidden', className)}>
+      <ul>
+        {hits.map((hit) => {
+          const thumb = thumbFor?.(hit)
+          return (
+            <li
+              key={`${hit.kind}-${hit.label}-${hit.href}`}
+              className="border-b border-border last:border-b-0"
+            >
+              <button
+                type="button"
+                onClick={() => onOpen(hit.href)}
+                className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-surface"
+              >
+                {thumb?.still ? (
+                  <ServiceClip
+                    still={thumb.still}
+                    cover={thumb.cover}
+                    motion={false}
+                    sizes="48px"
+                    containClassName="p-1.5"
+                    className="size-12 shrink-0 rounded-card"
+                  />
+                ) : null}
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-base font-medium text-ink">
+                    {hit.label}
+                  </span>
+                  {hit.sublabel ? (
+                    <span className="mt-0.5 block truncate text-xs text-muted">
+                      {hit.sublabel}
+                    </span>
+                  ) : null}
+                  <ServiceScore
+                    rating={thumb?.rating}
+                    reviewCount={thumb?.reviewCount}
+                    variant="compact"
+                    className="mt-0.5"
+                  />
+                </span>
+                <ChevronRight
+                  className="size-4 shrink-0 text-muted"
+                  aria-hidden="true"
+                />
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+    </Card>
+  )
+}
 
 /**
  * What an empty search box offers: what this person looked for before, and the

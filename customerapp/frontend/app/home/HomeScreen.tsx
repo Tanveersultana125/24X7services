@@ -158,6 +158,13 @@ export function HomeScreen() {
         id: popular.id,
         name: popular.name,
         image: popular.image ?? imageFor.get(popular.applianceId),
+        // A promoted row names an appliance and a service key; the clip, the
+        // frame of it and the score all belong to the catalog entry behind
+        // that pair, not to the promotion.
+        video: listed?.video,
+        poster: listed?.poster,
+        rating: listed?.rating,
+        reviewCount: listed?.reviewCount,
         href: `/services/appliance/?a=${popular.applianceId}` as Route,
         note: durationNote(listed?.durationMinutes),
         priceLabel: 'Visit from',
@@ -293,6 +300,10 @@ export function HomeScreen() {
                       id: service.id,
                       name: service.name,
                       image: imageFor.get(service.applianceId),
+                      video: service.video,
+                      poster: service.poster,
+                      rating: service.rating,
+                      reviewCount: service.reviewCount,
                       href:
                         `/services/appliance/?a=${service.applianceId}` as Route,
                       note: durationNote(service.durationMinutes),

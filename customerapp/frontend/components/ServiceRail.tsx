@@ -1,9 +1,10 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import type { Route } from 'next'
 import { formatPaise } from '@/lib/format'
+import { ServiceClip } from '@/components/ServiceClip'
+import { ServiceScore, scoreLabel } from '@/components/ServiceScore'
 import { cn } from '@/lib/cn'
 
 /**
@@ -20,6 +21,12 @@ import { cn } from '@/lib/cn'
  * warranty live, and the button starts the booking. Nesting the second inside
  * the first is the usual way this is built and it leaves a screen reader with
  * one control that does two things.
+ *
+ * The picture moves where the row has a clip of the work to show, and the
+ * score sits under the name, so a rail says the same three things the card on
+ * the appliance page says — what it looks like, what people made of it, what
+ * it costs. A rail can hold six of these off the right edge; only the ones
+ * actually on screen play, which `ServiceClip` handles.
  */
 
 export interface ServiceRailItem {
@@ -27,6 +34,17 @@ export interface ServiceRailItem {
   name: string
   /** The appliance photo. These rails are never about a specific unit. */
   image?: string
+  /** A clip of the work. Optional, and most rows will never have one. */
+  video?: string
+  /**
+   * A frame of that clip, shown when the card is off screen or the customer
+   * asked for less motion. Falls back to `image`, which is a drawing on a
+   * plate rather than a photograph and so is contained rather than cropped.
+   */
+  poster?: string
+  /** Out of five, and how many said so. Both or neither — see `ServiceScore`. */
+  rating?: number
+  reviewCount?: number
   /** Where the name and the picture go — the appliance page. */
   href: Route
   /** "About 1 hr", or whatever else is worth knowing before a slot is picked. */
@@ -56,22 +74,38 @@ export function ServiceRail({
     >
       {items.map((item) => (
         <li key={item.id} className="flex w-40 shrink-0 snap-start flex-col">
-          <Link href={item.href} className="group block">
-            <span className="relative block aspect-square overflow-hidden rounded-card bg-surface transition-colors duration-[var(--duration-fast)] group-hover:bg-border">
-              {item.image ? (
-                <Image
-                  src={item.image}
-                  alt=""
-                  fill
-                  sizes="160px"
-                  className="object-contain p-5"
-                />
-              ) : null}
-            </span>
+          <Link
+            href={item.href}
+            className="group block"
+            aria-label={[item.name, scoreLabel(item.rating, item.reviewCount)]
+              .filter(Boolean)
+              .join(', ')}
+          >
+            <ServiceClip
+              video={item.video}
+              still={item.poster ?? item.image}
+              cover={Boolean(item.poster)}
+              sizes="160px"
+              containClassName="p-5"
+              // 16:9 for a clip, which is the shape it was drawn at and the
+              // only one that keeps the line along its foot whole; square for
+              // the appliance drawing, which the rail was laid out on.
+              className={cn(
+                'rounded-card transition-colors duration-[var(--duration-fast)] group-hover:bg-border',
+                item.poster ? 'aspect-video' : 'aspect-square'
+              )}
+            />
             <span className="mt-2.5 block line-clamp-2 text-sm font-semibold leading-snug text-ink">
               {item.name}
             </span>
           </Link>
+
+          <ServiceScore
+            rating={item.rating}
+            reviewCount={item.reviewCount}
+            variant="compact"
+            className="mt-1"
+          />
 
           {item.note ? (
             <p className="mt-1 text-xs text-muted">{item.note}</p>

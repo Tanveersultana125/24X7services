@@ -1,11 +1,10 @@
 'use client'
 
-import { useEffect, useRef, useSyncExternalStore } from 'react'
-import Image from 'next/image'
-import { Star } from 'lucide-react'
 import type { CatalogService } from '@app/shared'
 import { formatPaise } from '@/lib/format'
 import { CardButton } from '@/components/ui/Card'
+import { ServiceClip } from '@/components/ServiceClip'
+import { ServiceScore, scoreLabel } from '@/components/ServiceScore'
 import { durationNote } from '@/components/ServiceRail'
 import { cn } from '@/lib/cn'
 
@@ -76,18 +75,6 @@ export function ServiceCard({
   className,
 }: ServiceCardProps) {
   const duration = durationNote(service.durationMinutes)
-  const reducedMotion = usePrefersReducedMotion()
-  const plays = motion && Boolean(service.video) && !reducedMotion
-  const video = useVisiblePlayback(service.video, reducedMotion)
-
-  // The still, in the order it is worth having: this service's own frame, then
-  // the appliance drawing, then nothing.
-  const still = service.poster ?? image
-
-  // Both or neither. A score with no count behind it is a number a reader
-  // cannot weigh, so a half-filled catalog row draws no score at all.
-  const scored =
-    service.rating !== undefined && service.reviewCount !== undefined
 
   return (
     <CardButton
@@ -95,9 +82,7 @@ export function ServiceCard({
       selected={selected}
       ariaLabel={[
         service.name,
-        scored
-          ? `rated ${service.rating?.toFixed(1)} from ${service.reviewCount} reviews`
-          : null,
+        scoreLabel(service.rating, service.reviewCount),
         `visit fee ${formatPaise(service.visitFee)}`,
         'See what it covers.',
       ]
@@ -113,34 +98,18 @@ export function ServiceCard({
         className
       )}
     >
-      {plays ? (
-        <video
-          ref={video}
-          // Its own still stands in before a frame has decoded, and stands in
-          // for good on a connection that never gets one.
-          poster={still}
-          src={service.video}
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          aria-hidden="true"
-          className="aspect-video w-full rounded-card bg-surface object-cover"
-        />
-      ) : still ? (
-        <span className="relative block aspect-video w-full overflow-hidden rounded-card bg-surface">
-          <Image
-            src={still}
-            alt=""
-            fill
-            sizes="(min-width: 640px) 512px, 100vw"
-            // A frame of the clip fills the card the way the clip does. The
-            // appliance drawing is a drawing on a background and needs the
-            // room around it, so it is contained and padded instead.
-            className={service.poster ? 'object-cover' : 'object-contain p-6'}
-          />
-        </span>
-      ) : null}
+      {/* The still, in the order it is worth having: this service's own
+          frame, then the appliance drawing, then nothing. A frame fills the
+          box the way the clip does; the drawing needs the room around it. */}
+      <ServiceClip
+        video={service.video}
+        still={service.poster ?? image}
+        cover={Boolean(service.poster)}
+        motion={motion}
+        sizes="(min-width: 640px) 512px, 100vw"
+        containClassName="p-6"
+        className="aspect-video w-full rounded-card"
+      />
 
       <h3 className="mt-4 text-xl font-bold leading-snug text-ink">
         {service.name}
@@ -148,15 +117,11 @@ export function ServiceCard({
 
       {/* What other people made of it, before what it costs — which is the
           order somebody weighs the two in. */}
-      {scored ? (
-        <p className="mt-1.5 flex items-center gap-1.5 text-sm text-muted">
-          <Star className="size-3.5 fill-ink text-ink" aria-hidden="true" />
-          <span className="font-bold text-ink">
-            {service.rating?.toFixed(1)}
-          </span>
-          <span>({countNote(service.reviewCount ?? 0)} reviews)</span>
-        </p>
-      ) : null}
+      <ServiceScore
+        rating={service.rating}
+        reviewCount={service.reviewCount}
+        className="mt-1.5"
+      />
 
       {/* The two numbers a customer weighs, on one line, in the order they
           weigh them. The fee is the only figure being committed to here, which
@@ -203,63 +168,6 @@ export function ServiceCard({
   )
 }
 
-/**
- * A review count at a glance rather than to the unit.
- *
- * Nobody reads "2140" as anything other than "a lot", and the four digits ask
- * them to. Under a thousand the exact figure is short enough to be read, so it
- * stays: rounding 240 to "0.2K" would be less information in more characters.
- */
-function countNote(count: number): string {
-  if (count < 1000) return String(count)
-  const thousands = count / 1000
-  // 12.4K is noise at that size; 12K says the same thing. One decimal only
-  // while it is still telling the reader something.
-  const rounded = thousands < 10 ? thousands.toFixed(1) : String(Math.round(thousands))
-  return `${rounded.replace(/\.0$/, '')}K`
-}
-
-/**
- * Play a card's clip while it is on screen, and pause it the rest of the time.
- *
- * `autoplay` would be one attribute instead of this hook, and it starts the
- * download and the decoder whether or not the card has ever been on screen.
- * With every card on the page playing, that is the difference between two or
- * three clips running and all six — and a clip fetched for a card nobody
- * scrolled to is a download the customer did not ask for.
- *
- * The margin starts a clip a screen-height early, so one that is scrolled to
- * is already moving rather than starting from its first frame on arrival.
- *
- * `play()` returns a promise that rejects when the browser declines — a tab in
- * the background, a battery-saver policy. That is the browser doing its job,
- * not an error to report, so the rejection is swallowed and the poster stays.
- */
-function useVisiblePlayback(
-  src: string | undefined,
-  reducedMotion: boolean
-): React.RefObject<HTMLVideoElement | null> {
-  const ref = useRef<HTMLVideoElement | null>(null)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries[entries.length - 1]?.isIntersecting
-        if (visible === undefined) return
-        if (visible) void el.play().catch(() => {})
-        else el.pause()
-      },
-      { rootMargin: '100% 0px' }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [src, reducedMotion])
-
-  return ref
-}
-
 /** One line of what the service covers. */
 function Point({ children }: { children: React.ReactNode }) {
   return (
@@ -270,31 +178,5 @@ function Point({ children }: { children: React.ReactNode }) {
       />
       <span className="text-sm leading-relaxed text-muted">{children}</span>
     </li>
-  )
-}
-
-/**
- * Whether the customer has asked their system for less movement.
- *
- * An external store rather than state in an effect, the same shape auth and
- * location use here: the media query already lives outside React and already
- * pushes changes, so subscribing to it is the whole job. It is also a setting
- * someone can change while the app is open, and the server snapshot has to be
- * a definite value — false, so the prerender matches the common case and only
- * a customer who asked for less motion sees anything swap.
- */
-const MOTION_QUERY = '(prefers-reduced-motion: reduce)'
-
-function subscribeReducedMotion(onChange: () => void): () => void {
-  const query = window.matchMedia(MOTION_QUERY)
-  query.addEventListener('change', onChange)
-  return () => query.removeEventListener('change', onChange)
-}
-
-function usePrefersReducedMotion(): boolean {
-  return useSyncExternalStore(
-    subscribeReducedMotion,
-    () => window.matchMedia(MOTION_QUERY).matches,
-    () => false
   )
 }

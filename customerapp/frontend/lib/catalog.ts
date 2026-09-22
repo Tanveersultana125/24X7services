@@ -133,6 +133,64 @@ export function cheapestByAppliance(
   return cheapest
 }
 
+/**
+ * What stands for a whole appliance on a tile: a clip, a frame of it, and a
+ * score.
+ *
+ * An appliance has no artwork or score of its own — both belong to the
+ * services under it. The clip is the headline service's, because a tile has
+ * room for one and "repair" is the one people arrive looking for; where an
+ * appliance has no repair the first service in catalog order stands in.
+ *
+ * The score is every service under it, weighted by how many people scored
+ * each — a straight mean of the averages would let a service nobody books
+ * count as much as the one everybody does. Services with no score sit the
+ * round out rather than being counted as zero, and an appliance where nobody
+ * has a score gets none, which is what `ServiceScore` draws nothing for.
+ */
+export interface ApplianceSummary {
+  video?: string
+  poster?: string
+  rating?: number
+  reviewCount?: number
+}
+
+export function summaryByAppliance(
+  services: readonly CatalogService[]
+): Map<string, ApplianceSummary> {
+  const headline = new Map<string, CatalogService>()
+  const weighted = new Map<string, { score: number; count: number }>()
+
+  for (const service of services) {
+    const current = headline.get(service.applianceId)
+    const better =
+      current === undefined ||
+      (service.serviceKey === 'repair' && current.serviceKey !== 'repair') ||
+      (current.serviceKey !== 'repair' && service.order < current.order)
+    if (better) headline.set(service.applianceId, service)
+
+    if (service.rating === undefined || service.reviewCount === undefined) {
+      continue
+    }
+    const running = weighted.get(service.applianceId) ?? { score: 0, count: 0 }
+    running.score += service.rating * service.reviewCount
+    running.count += service.reviewCount
+    weighted.set(service.applianceId, running)
+  }
+
+  const out = new Map<string, ApplianceSummary>()
+  for (const [applianceId, service] of headline) {
+    const running = weighted.get(applianceId)
+    out.set(applianceId, {
+      video: service.video,
+      poster: service.poster,
+      rating: running ? running.score / running.count : undefined,
+      reviewCount: running?.count,
+    })
+  }
+  return out
+}
+
 // ---------------------------------------------------------------------------
 // Brands and issues
 // ---------------------------------------------------------------------------
