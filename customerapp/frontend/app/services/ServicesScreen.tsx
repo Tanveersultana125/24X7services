@@ -48,8 +48,12 @@ export function ServicesScreen() {
   const all = useAsync(load)
   const fromPrices = all.data ? cheapestByAppliance(all.data.services) : null
   // An appliance carries no clip and no score of its own — both are worked
-  // out from the services under it.
+  // out from the services under it, and so is how many there are.
   const summaries = all.data ? summaryByAppliance(all.data.services) : null
+  const countFor = (applianceId: string): number =>
+    all.data?.services.filter(
+      (service) => service.applianceId === applianceId
+    ).length ?? 0
 
   return (
     // Services is a tab, and tabs do not usually carry a back arrow. This one
@@ -85,6 +89,10 @@ export function ServicesScreen() {
                 <ApplianceCard
                   key={appliance.id}
                   appliance={appliance}
+                  serviceCount={countFor(appliance.id)}
+                  // One tile moves, and it is the first. Five clips in a grid
+                  // is a page that twitches; the rest are frames of their own.
+                  motion={index === 0}
                   video={summary?.video}
                   poster={summary?.poster}
                   rating={summary?.rating}

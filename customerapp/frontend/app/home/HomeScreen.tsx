@@ -260,7 +260,11 @@ export function HomeScreen() {
               title="Most booked"
               subtitle="What people call us about most"
             >
-              <ServiceRail items={popularItems} />
+              {/* The one moving thing on Home, and it is the first card of
+                  the first rail. Six rails all playing is a page nobody can
+                  read; none playing on the screen that sells the work is a
+                  page with nothing alive on it. */}
+              <ServiceRail items={popularItems} motion />
             </Section>
           ) : null}
 

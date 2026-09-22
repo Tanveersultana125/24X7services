@@ -22,11 +22,15 @@ import { cn } from '@/lib/cn'
  * the first is the usual way this is built and it leaves a screen reader with
  * one control that does two things.
  *
- * The picture moves where the row has a clip of the work to show, and the
- * score sits under the name, so a rail says the same three things the card on
- * the appliance page says — what it looks like, what people made of it, what
- * it costs. A rail can hold six of these off the right edge; only the ones
- * actually on screen play, which `ServiceClip` handles.
+ * The score sits under the name, so a rail says the same three things the
+ * card on the appliance page says — what it looks like, what people made of
+ * it, what it costs.
+ *
+ * Nothing moves unless the screen asks. Home is six rails of six cards; if
+ * each one played, a page whose job is to let somebody find their appliance
+ * would be thirty-six clips competing for the same glance. A screen that
+ * wants movement gives `motion` to one rail, and that rail gives it to its
+ * first card — everything else is a frame of its own clip.
  */
 
 export interface ServiceRailItem {
@@ -58,9 +62,15 @@ export interface ServiceRailItem {
 
 export function ServiceRail({
   items,
+  motion = false,
   className,
 }: {
   items: readonly ServiceRailItem[]
+  /**
+   * Let the first card play its clip. Off by default — see the note above.
+   * Even on, playback waits for the card to be on screen.
+   */
+  motion?: boolean
   className?: string
 }) {
   if (items.length === 0) return null
@@ -72,7 +82,7 @@ export function ServiceRail({
         className
       )}
     >
-      {items.map((item) => (
+      {items.map((item, index) => (
         <li key={item.id} className="flex w-40 shrink-0 snap-start flex-col">
           <Link
             href={item.href}
@@ -85,6 +95,7 @@ export function ServiceRail({
               video={item.video}
               still={item.poster ?? item.image}
               cover={Boolean(item.poster)}
+              motion={motion && index === 0}
               sizes="160px"
               containClassName="p-5"
               // 16:9 for a clip, which is the shape it was drawn at and the

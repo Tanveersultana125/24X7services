@@ -9,13 +9,14 @@ import { cn } from '@/lib/cn'
 /**
  * A tile in the Our Services grid. Tapping it opens that appliance.
  *
- * Where the appliance has a clip of the work, the tile plays it — cropped to
- * fill, because a frame of a clip is a photograph and has no margins to
- * preserve. The illustration, when that is what a tile falls back to, is
- * contained rather than cropped: these are drawings with their own margins,
- * and covering a 4:3 box with a squarer drawing takes a slice off the top and
- * bottom, which is how the geyser lost its base and the microwave lost its
- * feet.
+ * The picture is a frame of the appliance's clip, cropped to fill, because a
+ * frame of a clip is a photograph and has no margins to preserve. It only
+ * moves if the grid says so, and a grid says so for one tile — five tiles all
+ * playing is a page that twitches rather than a catalogue. The illustration,
+ * when that is what a tile falls back to, is contained rather than cropped:
+ * these are drawings with their own margins, and covering a 4:3 box with a
+ * squarer drawing takes a slice off the top and bottom, which is how the
+ * geyser lost its base and the microwave lost its feet.
  *
  * The chevron is not decoration either. A grid of drawings with a caption under
  * each reads as a picture list, and customers were treating it as one; the
@@ -27,6 +28,18 @@ export interface ApplianceCardProps {
   /** The cheapest visit fee for it, already formatted — "₹299". */
   from?: string
   /**
+   * How many services sit under it.
+   *
+   * It is here because the "from" price is not doing the job alone: across
+   * today's catalogue every appliance's cheapest visit is the same ₹299, so a
+   * column of tiles all reading "Visit from ₹299" is true and reads as a bug.
+   * The count is the number that actually differs between them, and it is
+   * also the more useful one — what people want to know off a tile is whether
+   * we do the thing they need, not that the visit is the same price it is
+   * everywhere else.
+   */
+  serviceCount?: number
+  /**
    * The clip that stands for the whole appliance, a frame of it, and what
    * people scored its services — all from `summaryByAppliance`, because an
    * appliance carries none of these itself.
@@ -35,6 +48,11 @@ export interface ApplianceCardProps {
   poster?: string
   rating?: number
   reviewCount?: number
+  /**
+   * Let this tile play its clip. Off by default; the grid turns it on for one
+   * tile. Even on, playback waits for the tile to be on screen.
+   */
+  motion?: boolean
   /**
    * Lay the tile out sideways and let it take the full width of a phone.
    *
@@ -64,10 +82,12 @@ export interface ApplianceCardProps {
 export function ApplianceCard({
   appliance,
   from,
+  serviceCount,
   video,
   poster,
   rating,
   reviewCount,
+  motion = false,
   wide = false,
   priority = false,
   className,
@@ -99,6 +119,7 @@ export function ApplianceCard({
         video={video}
         still={poster ?? appliance.image}
         cover={Boolean(poster)}
+        motion={motion}
         // The grid is 2-up on a phone and 5-up on a desktop, so the rendered
         // width barely changes. Anything wider is wasted bytes on mobile.
         sizes="(min-width: 1024px) 220px, 45vw"
@@ -131,10 +152,19 @@ export function ApplianceCard({
             variant="compact"
             className="mt-0.5"
           />
-          {from ? (
-            <p className="mt-0.5 text-xs text-muted">
-              Visit from{' '}
-              <span className="font-semibold text-ink">{from}</span>
+          {serviceCount || from ? (
+            <p className="mt-0.5 truncate text-xs text-muted">
+              {serviceCount ? (
+                <>
+                  {serviceCount} {serviceCount === 1 ? 'service' : 'services'}
+                </>
+              ) : null}
+              {serviceCount && from ? <span> · </span> : null}
+              {from ? (
+                <>
+                  from <span className="font-semibold text-ink">{from}</span>
+                </>
+              ) : null}
             </p>
           ) : null}
         </div>
