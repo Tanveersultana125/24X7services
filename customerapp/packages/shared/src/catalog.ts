@@ -116,6 +116,41 @@ export const catalogServiceSchema = z.object({
    */
   rating: z.number().min(1).max(5).optional(),
   reviewCount: z.number().int().min(1).optional(),
+  /**
+   * The visit, step by step, in the order it happens.
+   *
+   * What a customer is buying with a visit fee is an hour of somebody else's
+   * time, and the only way to make that concrete before it happens is to say
+   * what the hour consists of. Three or four steps; a list long enough to need
+   * scrolling is a list nobody reads.
+   */
+  process: z
+    .array(
+      z.object({
+        title: z.string().min(1).max(40),
+        body: z.string().min(1).max(200),
+      })
+    )
+    .max(6)
+    .optional(),
+  /**
+   * What this service is not.
+   *
+   * Every line here is one that would otherwise be found out on the day, with
+   * a technician in the room and somebody already annoyed. It is cheaper to
+   * lose the booking than to lose the argument.
+   */
+  excludes: z.array(z.string().min(1).max(200)).max(8).optional(),
+  /** The questions this service raises, answered where it is being chosen. */
+  faqs: z
+    .array(
+      z.object({
+        q: z.string().min(1).max(160),
+        a: z.string().min(1).max(600),
+      })
+    )
+    .max(8)
+    .optional(),
 })
 export type CatalogService = z.infer<typeof catalogServiceSchema>
 

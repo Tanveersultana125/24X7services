@@ -4,14 +4,26 @@ import { useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import type { Route } from 'next'
-import { Clock3, ReceiptIndianRupee, ShieldCheck, Star, Wrench } from 'lucide-react'
+import {
+  BadgeCheck,
+  ChevronDown,
+  Clock3,
+  ReceiptIndianRupee,
+  Share2,
+  ShieldCheck,
+  Star,
+  Wrench,
+  X,
+} from 'lucide-react'
 import {
   applianceIdSchema,
   formatPaise,
   serviceKeySchema,
   type CatalogAppliance,
+  type CatalogBrand,
   type CatalogIssue,
   type CatalogService,
+  type ServiceKey,
 } from '@app/shared'
 
 import { Header } from '@/components/Header'
@@ -22,6 +34,8 @@ import {
 import { Section } from '@/components/AppShell'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
 import { TrustPoints } from '@/components/TrustPoints'
+import { BrandDisclaimer } from '@/components/BrandCard'
+import { useToast } from '@/components/Toast'
 import { Button } from '@/components/ui/Button'
 import { StickyCTA, StickySpacer } from '@/components/StickyCTA'
 import { ErrorState } from '@/components/ErrorState'
@@ -29,11 +43,13 @@ import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { durationNote } from '@/components/ServiceRail'
 import {
   fetchAppliance,
+  fetchBrands,
   fetchBusinessConfig,
   fetchIssuesFor,
   fetchServicesFor,
 } from '@/lib/catalog'
 import { startDraft } from '@/lib/bookingDraft'
+import { shareText } from '@/lib/share'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/cn'
 
@@ -60,7 +76,55 @@ interface DetailData {
   appliance: CatalogAppliance | null
   service: CatalogService | null
   issues: CatalogIssue[]
+  brands: CatalogBrand[]
   warrantyDays: number | null
+}
+
+/**
+ * What is true of the person who turns up, on every one of these.
+ *
+ * Three lines, and each is something the business does rather than something
+ * it would like to be believed. A fourth that nobody checks would cost the
+ * other three their credibility.
+ */
+const TECHNICIAN_POINTS = [
+  {
+    icon: ShieldCheck,
+    label: 'On our own roster',
+    body: 'Not a marketplace of strangers. We know who we sent, and so do you — their name and photo are on the booking before they arrive.',
+  },
+  {
+    icon: BadgeCheck,
+    label: 'Verified before their first job',
+    body: 'Identity and address checked, and the appliances they are trained on recorded against them.',
+  },
+  {
+    icon: Star,
+    label: 'Rated by the people they visited',
+    body: 'Every finished job can be reviewed, and the rating on a technician is the average of those — not a badge we hand out.',
+  },
+] as const
+
+/**
+ * The middle line of "what the visit fee covers", per service.
+ *
+ * "The fault named rather than guessed at" is the right sentence on a repair
+ * and the wrong one in front of somebody installing a new machine who has not
+ * broken anything. One map rather than one sentence stretched over seven jobs.
+ */
+const COVERS: Record<ServiceKey, string> = {
+  repair: 'A full inspection, and the fault named rather than guessed at.',
+  service:
+    'A full working check before anything is opened, and the service itself.',
+  installation:
+    'The site checked before anything is fitted — power, water and clearance.',
+  uninstallation:
+    'The appliance disconnected and taken down safely, and the connections left safe.',
+  'gas-refill':
+    'A pressure and leak check first, because a refill into a leak is money poured away.',
+  'deep-clean': 'The clean itself, sheeting and drainage included.',
+  maintenance:
+    'A full working check, with anything wearing out named before it fails.',
 }
 
 export function ServiceDetailScreen() {
@@ -74,13 +138,20 @@ export function ServiceDetailScreen() {
 
   const load = useCallback(async (): Promise<DetailData> => {
     if (!applianceId || !serviceKey) {
-      return { appliance: null, service: null, issues: [], warrantyDays: null }
+      return {
+        appliance: null,
+        service: null,
+        issues: [],
+        brands: [],
+        warrantyDays: null,
+      }
     }
 
-    const [found, services, issues, config] = await Promise.all([
+    const [found, services, issues, brands, config] = await Promise.all([
       fetchAppliance(applianceId),
       fetchServicesFor(applianceId),
       fetchIssuesFor(applianceId),
+      fetchBrands(),
       // Only for the warranty line. A failed read leaves that line out rather
       // than the page, which is the right trade for one sentence.
       fetchBusinessConfig(),
@@ -92,6 +163,7 @@ export function ServiceDetailScreen() {
       appliance: found,
       service,
       issues,
+      brands,
       warrantyDays:
         service?.warrantyDays ?? config?.defaultWarrantyDays ?? null,
     }
@@ -201,9 +273,7 @@ export function ServiceDetailScreen() {
                 <Point>
                   A technician at your door inside the two-hour window you pick.
                 </Point>
-                <Point>
-                  A full inspection, and the fault named rather than guessed at.
-                </Point>
+                <Point>{COVERS[service.serviceKey]}</Point>
                 <Point>
                   A written quote for anything beyond the inspection — part and
                   labour listed separately.
@@ -234,13 +304,121 @@ export function ServiceDetailScreen() {
               </Section>
             ) : null}
 
-            <Section title="How it works" subtitle={HOW_IT_WORKS_SUBTITLE}>
-              <HowItWorks />
+            {service.process && service.process.length > 0 ? (
+              <Section
+                title="Our process"
+                subtitle="What the visit actually consists of"
+              >
+                <ol className="flex flex-col">
+                  {service.process.map((step, index) => (
+                    <ProcessStep
+                      key={step.title}
+                      n={index + 1}
+                      title={step.title}
+                      body={step.body}
+                      last={index === (service.process?.length ?? 0) - 1}
+                    />
+                  ))}
+                </ol>
+              </Section>
+            ) : (
+              <Section title="How it works" subtitle={HOW_IT_WORKS_SUBTITLE}>
+                <HowItWorks />
+              </Section>
+            )}
+
+            <Section title="Who turns up">
+              <ul className="flex flex-col gap-4">
+                {TECHNICIAN_POINTS.map((point) => (
+                  <li key={point.label} className="flex items-start gap-3">
+                    <point.icon
+                      className="mt-0.5 size-5 shrink-0 text-brand"
+                      aria-hidden="true"
+                    />
+                    <span className="min-w-0">
+                      <span className="block text-base font-semibold text-ink">
+                        {point.label}
+                      </span>
+                      <span className="mt-0.5 block text-sm leading-relaxed text-muted">
+                        {point.body}
+                      </span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </Section>
+
+            {data.data && data.data.brands.length > 0 ? (
+              <Section title="Brands we service">
+                <ul className="grid grid-cols-3 gap-2">
+                  {data.data.brands.map((brand) => (
+                    <li
+                      key={brand.id}
+                      className="flex min-h-16 items-center justify-center rounded-card bg-surface px-2 text-center text-sm font-bold text-ink"
+                    >
+                      {brand.wordmark}
+                    </li>
+                  ))}
+                  <li className="flex min-h-16 items-center justify-center rounded-card bg-surface px-2 text-center text-sm text-muted">
+                    &amp; more
+                  </li>
+                </ul>
+                <BrandDisclaimer className="mt-3" />
+              </Section>
+            ) : null}
+
+            {service.excludes && service.excludes.length > 0 ? (
+              <Section
+                title="What is not included"
+                subtitle="Cheaper to read now than to argue about on the day"
+              >
+                <ul className="flex flex-col gap-2.5">
+                  {service.excludes.map((item) => (
+                    <li key={item} className="flex items-start gap-2.5">
+                      <X
+                        className="mt-0.5 size-4 shrink-0 text-error"
+                        aria-hidden="true"
+                      />
+                      <span className="text-sm leading-relaxed text-muted">
+                        {item}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </Section>
+            ) : null}
+
+            {service.faqs && service.faqs.length > 0 ? (
+              <Section title="Frequently asked questions">
+                <ul className="divide-y divide-border border-y border-border">
+                  {service.faqs.map((item) => (
+                    <li key={item.q}>
+                      {/* Native details: it opens before hydration, the
+                          browser's own find searches inside it, and a screen
+                          reader announces its state without being told how. */}
+                      <details className="group">
+                        <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-4 text-base font-semibold text-ink [&::-webkit-details-marker]:hidden">
+                          {item.q}
+                          <ChevronDown
+                            className="size-4 shrink-0 text-muted transition-transform duration-[var(--duration-fast)] group-open:rotate-180"
+                            aria-hidden="true"
+                          />
+                        </summary>
+                        <p className="pb-4 text-sm leading-relaxed text-muted">
+                          {item.a}
+                        </p>
+                      </details>
+                    </li>
+                  ))}
+                </ul>
+              </Section>
+            ) : null}
 
             <Section title="Every booking, whatever we are fixing">
               <TrustPoints />
             </Section>
+
+            <ShareService service={service} />
 
             <StickySpacer aboveBottomNav />
           </>
@@ -312,6 +490,76 @@ function Media({
         className={service.poster ? 'object-cover' : 'object-contain p-6'}
       />
     </span>
+  )
+}
+
+/** One numbered step, with the rule that joins it to the next. */
+function ProcessStep({
+  n,
+  title,
+  body,
+  last,
+}: {
+  n: number
+  title: string
+  body: string
+  last: boolean
+}) {
+  return (
+    <li className="flex gap-3">
+      <span className="flex flex-col items-center" aria-hidden="true">
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-surface text-sm font-bold text-ink">
+          {n}
+        </span>
+        {/* The line between the steps, which is what makes them a sequence
+            rather than a list that happens to be numbered. */}
+        {!last ? <span className="w-px flex-1 bg-border" /> : null}
+      </span>
+      <span className={cn('min-w-0', last ? 'pb-0' : 'pb-5')}>
+        <span className="block text-base font-semibold text-ink">{title}</span>
+        <span className="mt-0.5 block text-sm leading-relaxed text-muted">
+          {body}
+        </span>
+      </span>
+    </li>
+  )
+}
+
+/**
+ * Passing the service on.
+ *
+ * The share sheet where the browser has one, the clipboard where it does not.
+ * Closing the sheet is a decision rather than a failure, so nothing is said
+ * about it — see `lib/share`.
+ */
+function ShareService({ service }: { service: CatalogService }) {
+  const toast = useToast()
+
+  async function send(): Promise<void> {
+    const url = typeof window !== 'undefined' ? window.location.href : ''
+    const outcome = await shareText(
+      `${service.name} on 24X7 — ${formatPaise(service.visitFee)} visit fee, quoted before any work starts. ${url}`,
+      service.name
+    )
+    if (outcome === 'copied') {
+      toast.show('Link copied.', { tone: 'success' })
+    } else if (outcome === 'failed') {
+      toast.show('We could not share that.', { tone: 'error' })
+    }
+  }
+
+  return (
+    <section className="mt-8 text-center">
+      <p className="text-sm text-muted">Know someone who needs this?</p>
+      <button
+        type="button"
+        onClick={() => void send()}
+        className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-pill border border-border px-5 text-sm font-semibold text-brand hover:border-brand"
+      >
+        <Share2 className="size-4" aria-hidden="true" />
+        Share this service
+      </button>
+    </section>
   )
 }
 

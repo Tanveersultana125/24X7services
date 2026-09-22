@@ -13,7 +13,53 @@
     "order": 1,
     "active": true,
     "video": "/services/washing-machine-repair.mp4",
-    "poster": "/services/washing-machine-repair.jpg"
+    "poster": "/services/washing-machine-repair.jpg",
+    "process": [
+      {
+        "title": "Inspection",
+        "body": "The technician runs the washing machine through the fault you described and finds what is actually causing it."
+      },
+      {
+        "title": "Quote",
+        "body": "Whatever is needed beyond the visit is written up — part and labour separately — and nothing starts until you approve it."
+      },
+      {
+        "title": "Repair",
+        "body": "Only what you approved. Parts we fit are ours, and they carry the service warranty with the labour."
+      },
+      {
+        "title": "Test and clean up",
+        "body": "The washing machine is run again in front of you, and the area is left as it was found."
+      }
+    ],
+    "excludes": [
+      "Spare parts. Anything needed is quoted on site and charged separately.",
+      "Any fault other than the one this visit was booked for, unless you approve it.",
+      "Appliances still under manufacturer warranty, where a third-party repair may void it — check with them first.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹299 covers the visit and the inspection. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "What if I do not want the repair after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the inspection and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "washing-machine_service",
@@ -29,7 +75,53 @@
     "order": 2,
     "active": true,
     "video": "/services/washing-machine-service.mp4",
-    "poster": "/services/washing-machine-service.jpg"
+    "poster": "/services/washing-machine-service.jpg",
+    "process": [
+      {
+        "title": "Check-up",
+        "body": "A full working check of the washing machine before anything is opened, so a fault that is already there is found now rather than blamed on us later."
+      },
+      {
+        "title": "Service",
+        "body": "Cleaning, clearing and adjusting as the appliance needs — the work this service is priced for."
+      },
+      {
+        "title": "Quote",
+        "body": "Whatever is needed beyond the visit is written up — part and labour separately — and nothing starts until you approve it."
+      },
+      {
+        "title": "Test and clean up",
+        "body": "The washing machine is run through a full cycle in front of you, and the area is left as it was found."
+      }
+    ],
+    "excludes": [
+      "Spare parts. Anything needed is quoted on site and charged separately.",
+      "Any fault other than the one this visit was booked for, unless you approve it.",
+      "Repairs. A service is a clean and a check; anything broken is quoted separately.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹499 covers the visit and the visit. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "What if I do not want the extra work after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the visit and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "washing-machine_installation",
@@ -45,7 +137,59 @@
     "order": 3,
     "active": true,
     "video": "/services/washing-machine-installation.mp4",
-    "poster": "/services/washing-machine-installation.jpg"
+    "poster": "/services/washing-machine-installation.jpg",
+    "process": [
+      {
+        "title": "Site check",
+        "body": "The spot you want the washing machine in is checked first — power, water, drainage and clearance, whichever of them apply."
+      },
+      {
+        "title": "Installation",
+        "body": "Fitted, levelled and connected, with the fixings the job needs."
+      },
+      {
+        "title": "Test run",
+        "body": "The washing machine is started and watched through a full cycle, with you there."
+      },
+      {
+        "title": "Clean up",
+        "body": "Packaging and offcuts taken away, and the area left as it was found."
+      }
+    ],
+    "excludes": [
+      "New wiring, a new socket, or any electrical work beyond plugging in.",
+      "Plumbing work — a new tap, a new drain point, or moving an existing one.",
+      "Drilling into tile, granite or a false ceiling where the structure will not take it.",
+      "Carrying the appliance up or down stairs.",
+      "Stands, trolleys, stabilisers and adaptors, unless you already have them.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹399 covers the visit and the site check. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "Do you bring the stand, pipes and fittings?",
+        "a": "Only the standard fixings. Stands, trolleys, stabilisers, extra pipe and adaptors are quoted separately if the job needs them and you do not already have them."
+      },
+      {
+        "q": "What if I do not want the extra work after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the site check and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "washing-machine_uninstallation",
@@ -61,7 +205,57 @@
     "order": 4,
     "active": true,
     "video": "/services/washing-machine-uninstallation.mp4",
-    "poster": "/services/washing-machine-uninstallation.jpg"
+    "poster": "/services/washing-machine-uninstallation.jpg",
+    "process": [
+      {
+        "title": "Disconnect",
+        "body": "Power, water and drainage taken off the washing machine safely, in that order."
+      },
+      {
+        "title": "Removal",
+        "body": "Unmounted and moved clear, without dragging it across your floor."
+      },
+      {
+        "title": "Make safe",
+        "body": "Open connections capped or covered so nothing is left live or dripping."
+      },
+      {
+        "title": "Clean up",
+        "body": "The area left as it was found. Moving the appliance out of the building is not part of this."
+      }
+    ],
+    "excludes": [
+      "Taking the appliance out of the building, or transporting it anywhere.",
+      "Capping off or rerouting plumbing beyond making the open ends safe.",
+      "Repairing the wall, tile or paint the fixings were in.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹299 covers the visit and the visit. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "Do you bring the stand, pipes and fittings?",
+        "a": "Only the standard fixings. Stands, trolleys, stabilisers, extra pipe and adaptors are quoted separately if the job needs them and you do not already have them."
+      },
+      {
+        "q": "What if I do not want the extra work after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the visit and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "air-conditioner_service",
@@ -77,7 +271,53 @@
     "order": 1,
     "active": true,
     "video": "/services/ac-service.mp4",
-    "poster": "/services/ac-service.jpg"
+    "poster": "/services/ac-service.jpg",
+    "process": [
+      {
+        "title": "Check-up",
+        "body": "A full working check of the AC before anything is opened, so a fault that is already there is found now rather than blamed on us later."
+      },
+      {
+        "title": "Service",
+        "body": "Cleaning, clearing and adjusting as the appliance needs — the work this service is priced for."
+      },
+      {
+        "title": "Quote",
+        "body": "Whatever is needed beyond the visit is written up — part and labour separately — and nothing starts until you approve it."
+      },
+      {
+        "title": "Test and clean up",
+        "body": "The AC is run through a full cycle in front of you, and the area is left as it was found."
+      }
+    ],
+    "excludes": [
+      "Spare parts. Anything needed is quoted on site and charged separately.",
+      "Any fault other than the one this visit was booked for, unless you approve it.",
+      "Repairs. A service is a clean and a check; anything broken is quoted separately.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹399 covers the visit and the visit. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "What if I do not want the extra work after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the visit and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "air-conditioner_repair",
@@ -93,7 +333,53 @@
     "order": 2,
     "active": true,
     "video": "/services/ac-repair.mp4",
-    "poster": "/services/ac-repair.jpg"
+    "poster": "/services/ac-repair.jpg",
+    "process": [
+      {
+        "title": "Inspection",
+        "body": "The technician runs the AC through the fault you described and finds what is actually causing it."
+      },
+      {
+        "title": "Quote",
+        "body": "Whatever is needed beyond the visit is written up — part and labour separately — and nothing starts until you approve it."
+      },
+      {
+        "title": "Repair",
+        "body": "Only what you approved. Parts we fit are ours, and they carry the service warranty with the labour."
+      },
+      {
+        "title": "Test and clean up",
+        "body": "The AC is run again in front of you, and the area is left as it was found."
+      }
+    ],
+    "excludes": [
+      "Spare parts. Anything needed is quoted on site and charged separately.",
+      "Any fault other than the one this visit was booked for, unless you approve it.",
+      "Appliances still under manufacturer warranty, where a third-party repair may void it — check with them first.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹299 covers the visit and the inspection. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "What if I do not want the repair after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the inspection and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "air-conditioner_deep-clean",
@@ -109,7 +395,53 @@
     "order": 3,
     "active": true,
     "video": "/services/ac-deep-clean.mp4",
-    "poster": "/services/ac-deep-clean.jpg"
+    "poster": "/services/ac-deep-clean.jpg",
+    "process": [
+      {
+        "title": "Cover up",
+        "body": "Sheeting under and around the unit before anything is opened, because this one makes a mess."
+      },
+      {
+        "title": "Jet clean",
+        "body": "Coil, blower and drain tray washed through under pressure, and the filters cleaned."
+      },
+      {
+        "title": "Drain and dry",
+        "body": "Water collected and taken out, and the unit dried before it is closed."
+      },
+      {
+        "title": "Test and clean up",
+        "body": "The AC is run and the cooling checked, and the area is left as it was found."
+      }
+    ],
+    "excludes": [
+      "Repairs of any kind. This is a clean; anything broken is quoted separately.",
+      "Gas top-up, which is its own service.",
+      "Dismantling a unit fitted into a false ceiling or a sealed box.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹699 covers the visit and the visit. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "What if I do not want the extra work after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the visit and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "air-conditioner_gas-refill",
@@ -125,7 +457,58 @@
     "order": 4,
     "active": true,
     "video": "/services/ac-gas-refill.mp4",
-    "poster": "/services/ac-gas-refill.jpg"
+    "poster": "/services/ac-gas-refill.jpg",
+    "process": [
+      {
+        "title": "Leak check",
+        "body": "Gas does not run out on its own. The AC is pressure-checked first, because refilling a leaking system is money poured into the same hole."
+      },
+      {
+        "title": "Quote",
+        "body": "Whatever is needed beyond the visit is written up — part and labour separately — and nothing starts until you approve it."
+      },
+      {
+        "title": "Refill",
+        "body": "Charged to the manufacturer’s stated weight, measured, not guessed."
+      },
+      {
+        "title": "Test and clean up",
+        "body": "Cooling checked at the vent and the readings shown to you before we leave."
+      }
+    ],
+    "excludes": [
+      "Spare parts. Anything needed is quoted on site and charged separately.",
+      "Any fault other than the one this visit was booked for, unless you approve it.",
+      "Repairing the leak itself, which is quoted separately once it is found.",
+      "Compressor replacement.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹299 covers the visit and the leak check. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "Why check for a leak before refilling?",
+        "a": "Because gas does not run out on its own. A AC that has lost its charge has lost it somewhere, and refilling without finding that is money poured into the same hole."
+      },
+      {
+        "q": "What if I do not want the refill after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the leak check and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "air-conditioner_installation",
@@ -141,7 +524,59 @@
     "order": 5,
     "active": true,
     "video": "/services/ac-installation.mp4",
-    "poster": "/services/ac-installation.jpg"
+    "poster": "/services/ac-installation.jpg",
+    "process": [
+      {
+        "title": "Site check",
+        "body": "The spot you want the AC in is checked first — power, water, drainage and clearance, whichever of them apply."
+      },
+      {
+        "title": "Installation",
+        "body": "Fitted, levelled and connected, with the fixings the job needs."
+      },
+      {
+        "title": "Test run",
+        "body": "The AC is started and watched through a full cycle, with you there."
+      },
+      {
+        "title": "Clean up",
+        "body": "Packaging and offcuts taken away, and the area left as it was found."
+      }
+    ],
+    "excludes": [
+      "New wiring, a new socket, or any electrical work beyond plugging in.",
+      "Plumbing work — a new tap, a new drain point, or moving an existing one.",
+      "Drilling into tile, granite or a false ceiling where the structure will not take it.",
+      "Carrying the appliance up or down stairs.",
+      "Stands, trolleys, stabilisers and adaptors, unless you already have them.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹1,499 covers the visit and the site check. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "Do you bring the stand, pipes and fittings?",
+        "a": "Only the standard fixings. Stands, trolleys, stabilisers, extra pipe and adaptors are quoted separately if the job needs them and you do not already have them."
+      },
+      {
+        "q": "What if I do not want the extra work after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the site check and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "air-conditioner_uninstallation",
@@ -157,7 +592,57 @@
     "order": 6,
     "active": true,
     "video": "/services/ac-uninstallation.mp4",
-    "poster": "/services/ac-uninstallation.jpg"
+    "poster": "/services/ac-uninstallation.jpg",
+    "process": [
+      {
+        "title": "Disconnect",
+        "body": "Power, water and drainage taken off the AC safely, in that order."
+      },
+      {
+        "title": "Removal",
+        "body": "Unmounted and moved clear, without dragging it across your floor."
+      },
+      {
+        "title": "Make safe",
+        "body": "Open connections capped or covered so nothing is left live or dripping."
+      },
+      {
+        "title": "Clean up",
+        "body": "The area left as it was found. Moving the appliance out of the building is not part of this."
+      }
+    ],
+    "excludes": [
+      "Taking the appliance out of the building, or transporting it anywhere.",
+      "Capping off or rerouting plumbing beyond making the open ends safe.",
+      "Repairing the wall, tile or paint the fixings were in.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹799 covers the visit and the visit. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "Do you bring the stand, pipes and fittings?",
+        "a": "Only the standard fixings. Stands, trolleys, stabilisers, extra pipe and adaptors are quoted separately if the job needs them and you do not already have them."
+      },
+      {
+        "q": "What if I do not want the extra work after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the visit and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "refrigerator_repair",
@@ -173,7 +658,53 @@
     "order": 1,
     "active": true,
     "video": "/services/refrigerator-repair.mp4",
-    "poster": "/services/refrigerator-repair.jpg"
+    "poster": "/services/refrigerator-repair.jpg",
+    "process": [
+      {
+        "title": "Inspection",
+        "body": "The technician runs the refrigerator through the fault you described and finds what is actually causing it."
+      },
+      {
+        "title": "Quote",
+        "body": "Whatever is needed beyond the visit is written up — part and labour separately — and nothing starts until you approve it."
+      },
+      {
+        "title": "Repair",
+        "body": "Only what you approved. Parts we fit are ours, and they carry the service warranty with the labour."
+      },
+      {
+        "title": "Test and clean up",
+        "body": "The refrigerator is run again in front of you, and the area is left as it was found."
+      }
+    ],
+    "excludes": [
+      "Spare parts. Anything needed is quoted on site and charged separately.",
+      "Any fault other than the one this visit was booked for, unless you approve it.",
+      "Appliances still under manufacturer warranty, where a third-party repair may void it — check with them first.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹299 covers the visit and the inspection. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "What if I do not want the repair after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the inspection and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "refrigerator_service",
@@ -189,7 +720,53 @@
     "order": 2,
     "active": true,
     "video": "/services/refrigerator-service.mp4",
-    "poster": "/services/refrigerator-service.jpg"
+    "poster": "/services/refrigerator-service.jpg",
+    "process": [
+      {
+        "title": "Check-up",
+        "body": "A full working check of the refrigerator before anything is opened, so a fault that is already there is found now rather than blamed on us later."
+      },
+      {
+        "title": "Service",
+        "body": "Cleaning, clearing and adjusting as the appliance needs — the work this service is priced for."
+      },
+      {
+        "title": "Quote",
+        "body": "Whatever is needed beyond the visit is written up — part and labour separately — and nothing starts until you approve it."
+      },
+      {
+        "title": "Test and clean up",
+        "body": "The refrigerator is run through a full cycle in front of you, and the area is left as it was found."
+      }
+    ],
+    "excludes": [
+      "Spare parts. Anything needed is quoted on site and charged separately.",
+      "Any fault other than the one this visit was booked for, unless you approve it.",
+      "Repairs. A service is a clean and a check; anything broken is quoted separately.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹449 covers the visit and the visit. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "What if I do not want the extra work after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the visit and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "refrigerator_gas-refill",
@@ -205,7 +782,58 @@
     "order": 3,
     "active": true,
     "video": "/services/refrigerator-gas-refill.mp4",
-    "poster": "/services/refrigerator-gas-refill.jpg"
+    "poster": "/services/refrigerator-gas-refill.jpg",
+    "process": [
+      {
+        "title": "Leak check",
+        "body": "Gas does not run out on its own. The refrigerator is pressure-checked first, because refilling a leaking system is money poured into the same hole."
+      },
+      {
+        "title": "Quote",
+        "body": "Whatever is needed beyond the visit is written up — part and labour separately — and nothing starts until you approve it."
+      },
+      {
+        "title": "Refill",
+        "body": "Charged to the manufacturer’s stated weight, measured, not guessed."
+      },
+      {
+        "title": "Test and clean up",
+        "body": "Cooling checked at the vent and the readings shown to you before we leave."
+      }
+    ],
+    "excludes": [
+      "Spare parts. Anything needed is quoted on site and charged separately.",
+      "Any fault other than the one this visit was booked for, unless you approve it.",
+      "Repairing the leak itself, which is quoted separately once it is found.",
+      "Compressor replacement.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹299 covers the visit and the leak check. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "Why check for a leak before refilling?",
+        "a": "Because gas does not run out on its own. A refrigerator that has lost its charge has lost it somewhere, and refilling without finding that is money poured into the same hole."
+      },
+      {
+        "q": "What if I do not want the refill after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the leak check and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "refrigerator_installation",
@@ -221,7 +849,59 @@
     "order": 4,
     "active": true,
     "video": "/services/refrigerator-installation.mp4",
-    "poster": "/services/refrigerator-installation.jpg"
+    "poster": "/services/refrigerator-installation.jpg",
+    "process": [
+      {
+        "title": "Site check",
+        "body": "The spot you want the refrigerator in is checked first — power, water, drainage and clearance, whichever of them apply."
+      },
+      {
+        "title": "Installation",
+        "body": "Fitted, levelled and connected, with the fixings the job needs."
+      },
+      {
+        "title": "Test run",
+        "body": "The refrigerator is started and watched through a full cycle, with you there."
+      },
+      {
+        "title": "Clean up",
+        "body": "Packaging and offcuts taken away, and the area left as it was found."
+      }
+    ],
+    "excludes": [
+      "New wiring, a new socket, or any electrical work beyond plugging in.",
+      "Plumbing work — a new tap, a new drain point, or moving an existing one.",
+      "Drilling into tile, granite or a false ceiling where the structure will not take it.",
+      "Carrying the appliance up or down stairs.",
+      "Stands, trolleys, stabilisers and adaptors, unless you already have them.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹299 covers the visit and the site check. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "Do you bring the stand, pipes and fittings?",
+        "a": "Only the standard fixings. Stands, trolleys, stabilisers, extra pipe and adaptors are quoted separately if the job needs them and you do not already have them."
+      },
+      {
+        "q": "What if I do not want the extra work after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the site check and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "geyser_service",
@@ -237,7 +917,53 @@
     "order": 1,
     "active": true,
     "video": "/services/geyser-service.mp4",
-    "poster": "/services/geyser-service.jpg"
+    "poster": "/services/geyser-service.jpg",
+    "process": [
+      {
+        "title": "Check-up",
+        "body": "A full working check of the geyser before anything is opened, so a fault that is already there is found now rather than blamed on us later."
+      },
+      {
+        "title": "Service",
+        "body": "Cleaning, clearing and adjusting as the appliance needs — the work this service is priced for."
+      },
+      {
+        "title": "Quote",
+        "body": "Whatever is needed beyond the visit is written up — part and labour separately — and nothing starts until you approve it."
+      },
+      {
+        "title": "Test and clean up",
+        "body": "The geyser is run through a full cycle in front of you, and the area is left as it was found."
+      }
+    ],
+    "excludes": [
+      "Spare parts. Anything needed is quoted on site and charged separately.",
+      "Any fault other than the one this visit was booked for, unless you approve it.",
+      "Repairs. A service is a clean and a check; anything broken is quoted separately.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹349 covers the visit and the visit. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "What if I do not want the extra work after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the visit and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "geyser_repair",
@@ -253,7 +979,53 @@
     "order": 2,
     "active": true,
     "video": "/services/geyser-repair.mp4",
-    "poster": "/services/geyser-repair.jpg"
+    "poster": "/services/geyser-repair.jpg",
+    "process": [
+      {
+        "title": "Inspection",
+        "body": "The technician runs the geyser through the fault you described and finds what is actually causing it."
+      },
+      {
+        "title": "Quote",
+        "body": "Whatever is needed beyond the visit is written up — part and labour separately — and nothing starts until you approve it."
+      },
+      {
+        "title": "Repair",
+        "body": "Only what you approved. Parts we fit are ours, and they carry the service warranty with the labour."
+      },
+      {
+        "title": "Test and clean up",
+        "body": "The geyser is run again in front of you, and the area is left as it was found."
+      }
+    ],
+    "excludes": [
+      "Spare parts. Anything needed is quoted on site and charged separately.",
+      "Any fault other than the one this visit was booked for, unless you approve it.",
+      "Appliances still under manufacturer warranty, where a third-party repair may void it — check with them first.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹299 covers the visit and the inspection. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "What if I do not want the repair after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the inspection and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "geyser_installation",
@@ -269,7 +1041,59 @@
     "order": 3,
     "active": true,
     "video": "/services/geyser-installation.mp4",
-    "poster": "/services/geyser-installation.jpg"
+    "poster": "/services/geyser-installation.jpg",
+    "process": [
+      {
+        "title": "Site check",
+        "body": "The spot you want the geyser in is checked first — power, water, drainage and clearance, whichever of them apply."
+      },
+      {
+        "title": "Installation",
+        "body": "Fitted, levelled and connected, with the fixings the job needs."
+      },
+      {
+        "title": "Test run",
+        "body": "The geyser is started and watched through a full cycle, with you there."
+      },
+      {
+        "title": "Clean up",
+        "body": "Packaging and offcuts taken away, and the area left as it was found."
+      }
+    ],
+    "excludes": [
+      "New wiring, a new socket, or any electrical work beyond plugging in.",
+      "Plumbing work — a new tap, a new drain point, or moving an existing one.",
+      "Drilling into tile, granite or a false ceiling where the structure will not take it.",
+      "Carrying the appliance up or down stairs.",
+      "Stands, trolleys, stabilisers and adaptors, unless you already have them.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹599 covers the visit and the site check. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "Do you bring the stand, pipes and fittings?",
+        "a": "Only the standard fixings. Stands, trolleys, stabilisers, extra pipe and adaptors are quoted separately if the job needs them and you do not already have them."
+      },
+      {
+        "q": "What if I do not want the extra work after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the site check and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "geyser_uninstallation",
@@ -285,7 +1109,57 @@
     "order": 4,
     "active": true,
     "video": "/services/geyser-uninstallation.mp4",
-    "poster": "/services/geyser-uninstallation.jpg"
+    "poster": "/services/geyser-uninstallation.jpg",
+    "process": [
+      {
+        "title": "Disconnect",
+        "body": "Power, water and drainage taken off the geyser safely, in that order."
+      },
+      {
+        "title": "Removal",
+        "body": "Unmounted and moved clear, without dragging it across your floor."
+      },
+      {
+        "title": "Make safe",
+        "body": "Open connections capped or covered so nothing is left live or dripping."
+      },
+      {
+        "title": "Clean up",
+        "body": "The area left as it was found. Moving the appliance out of the building is not part of this."
+      }
+    ],
+    "excludes": [
+      "Taking the appliance out of the building, or transporting it anywhere.",
+      "Capping off or rerouting plumbing beyond making the open ends safe.",
+      "Repairing the wall, tile or paint the fixings were in.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹299 covers the visit and the visit. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "Do you bring the stand, pipes and fittings?",
+        "a": "Only the standard fixings. Stands, trolleys, stabilisers, extra pipe and adaptors are quoted separately if the job needs them and you do not already have them."
+      },
+      {
+        "q": "What if I do not want the extra work after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the visit and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "microwave_repair",
@@ -301,7 +1175,53 @@
     "order": 1,
     "active": true,
     "video": "/services/microwave-repair.mp4",
-    "poster": "/services/microwave-repair.jpg"
+    "poster": "/services/microwave-repair.jpg",
+    "process": [
+      {
+        "title": "Inspection",
+        "body": "The technician runs the microwave through the fault you described and finds what is actually causing it."
+      },
+      {
+        "title": "Quote",
+        "body": "Whatever is needed beyond the visit is written up — part and labour separately — and nothing starts until you approve it."
+      },
+      {
+        "title": "Repair",
+        "body": "Only what you approved. Parts we fit are ours, and they carry the service warranty with the labour."
+      },
+      {
+        "title": "Test and clean up",
+        "body": "The microwave is run again in front of you, and the area is left as it was found."
+      }
+    ],
+    "excludes": [
+      "Spare parts. Anything needed is quoted on site and charged separately.",
+      "Any fault other than the one this visit was booked for, unless you approve it.",
+      "Appliances still under manufacturer warranty, where a third-party repair may void it — check with them first.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹299 covers the visit and the inspection. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "What if I do not want the repair after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the inspection and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "microwave_service",
@@ -317,7 +1237,53 @@
     "order": 2,
     "active": true,
     "video": "/services/microwave-service.mp4",
-    "poster": "/services/microwave-service.jpg"
+    "poster": "/services/microwave-service.jpg",
+    "process": [
+      {
+        "title": "Check-up",
+        "body": "A full working check of the microwave before anything is opened, so a fault that is already there is found now rather than blamed on us later."
+      },
+      {
+        "title": "Service",
+        "body": "Cleaning, clearing and adjusting as the appliance needs — the work this service is priced for."
+      },
+      {
+        "title": "Quote",
+        "body": "Whatever is needed beyond the visit is written up — part and labour separately — and nothing starts until you approve it."
+      },
+      {
+        "title": "Test and clean up",
+        "body": "The microwave is run through a full cycle in front of you, and the area is left as it was found."
+      }
+    ],
+    "excludes": [
+      "Spare parts. Anything needed is quoted on site and charged separately.",
+      "Any fault other than the one this visit was booked for, unless you approve it.",
+      "Repairs. A service is a clean and a check; anything broken is quoted separately.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹349 covers the visit and the visit. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "What if I do not want the extra work after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the visit and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   },
   {
     "id": "microwave_installation",
@@ -333,6 +1299,58 @@
     "order": 3,
     "active": true,
     "video": "/services/microwave-installation.mp4",
-    "poster": "/services/microwave-installation.jpg"
+    "poster": "/services/microwave-installation.jpg",
+    "process": [
+      {
+        "title": "Site check",
+        "body": "The spot you want the microwave in is checked first — power, water, drainage and clearance, whichever of them apply."
+      },
+      {
+        "title": "Installation",
+        "body": "Fitted, levelled and connected, with the fixings the job needs."
+      },
+      {
+        "title": "Test run",
+        "body": "The microwave is started and watched through a full cycle, with you there."
+      },
+      {
+        "title": "Clean up",
+        "body": "Packaging and offcuts taken away, and the area left as it was found."
+      }
+    ],
+    "excludes": [
+      "New wiring, a new socket, or any electrical work beyond plugging in.",
+      "Plumbing work — a new tap, a new drain point, or moving an existing one.",
+      "Drilling into tile, granite or a false ceiling where the structure will not take it.",
+      "Carrying the appliance up or down stairs.",
+      "Stands, trolleys, stabilisers and adaptors, unless you already have them.",
+      "Commercial or industrial appliances."
+    ],
+    "faqs": [
+      {
+        "q": "Does the price include spare parts?",
+        "a": "No. ₹299 covers the visit and the site check. Any part the job needs is quoted on site, itemised with its labour, and nothing is ordered or fitted until you approve it."
+      },
+      {
+        "q": "Do you bring the stand, pipes and fittings?",
+        "a": "Only the standard fixings. Stands, trolleys, stabilisers, extra pipe and adaptors are quoted separately if the job needs them and you do not already have them."
+      },
+      {
+        "q": "What if I do not want the extra work after the quote?",
+        "a": "Then nothing happens beyond the visit. You pay the visit fee for the site check and the technician leaves — there is no pressure and no cancellation charge at that point."
+      },
+      {
+        "q": "What if the same fault comes back?",
+        "a": "Every completed job carries a 30-day service warranty on the work and the parts we supplied. While it is valid, a return visit for the same fault costs nothing."
+      },
+      {
+        "q": "Who is coming to my home?",
+        "a": "A technician on our own roster, not a marketplace of strangers. Their name, photo and rating are on the booking before they arrive, and they cannot start until you read out the code on that screen."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
+      }
+    ]
   }
 ]
