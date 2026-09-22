@@ -35,6 +35,7 @@ import {
   catalogIssueSchema,
   catalogPlanSchema,
   catalogServiceSchema,
+  serviceReviewSchema,
   diagnosisRuleSchema,
   matrixDocId,
   popularServiceSchema,
@@ -119,11 +120,26 @@ class Batcher {
     this.batch = firestore.batch()
   }
 
+  /**
+   * A fixture that brings its own `createdAt` keeps it.
+   *
+   * These used to be stamped unconditionally, which overwrote every date a
+   * fixture had deliberately spread over time — the wallet statement's entries
+   * all landed in the same second, and the seeded reviews came back as
+   * Timestamps where their schema wanted epoch milliseconds, so every one of
+   * them failed to parse and the section they belong to simply never appeared.
+   * Silently: a row that does not parse is dropped, which is right, and gives
+   * you an empty list with nothing in the console.
+   */
   set(path: string, data: Record<string, unknown>): void {
     this.batch.set(this.firestore.doc(path), {
+      ...('createdAt' in data
+        ? {}
+        : { createdAt: FieldValue.serverTimestamp() }),
+      ...('updatedAt' in data
+        ? {}
+        : { updatedAt: FieldValue.serverTimestamp() }),
       ...data,
-      createdAt: FieldValue.serverTimestamp(),
-      updatedAt: FieldValue.serverTimestamp(),
     })
     this.count += 1
     this.total += 1
@@ -162,6 +178,10 @@ const brands = fixture('brands', z.array(catalogBrandSchema))
 const issues = fixture('issues', z.array(catalogIssueSchema))
 const diagnosisRules = fixture('diagnosis', z.array(diagnosisRuleSchema))
 const plans = fixture('plans', z.array(catalogPlanSchema))
+// Fictional, like the technician ratings beside them, and for the same reason:
+// a service page with nothing on it cannot be looked at while it is being
+// built. See scripts note in the fixture — both go before launch.
+const serviceReviews = fixture('serviceReviews', z.array(serviceReviewSchema))
 const serviceAreas = fixture('serviceAreas', z.array(serviceAreaSchema))
 const home = fixture(
   'home',
@@ -393,6 +413,9 @@ async function main(): Promise<void> {
   }
   for (const plan of plans) {
     b.set(`${COL.catalogPlans}/${plan.id}`, plan)
+  }
+  for (const review of serviceReviews) {
+    b.set(`${COL.serviceReviews}/${review.id}`, review)
   }
   for (const banner of home.banners) {
     b.set(`${COL.banners}/${banner.id}`, banner)

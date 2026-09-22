@@ -278,6 +278,18 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // The half of a review that goes on a service page: a score, the words,
+    // and a first name. No uid, no booking id, no surname — see the note on
+    // serviceReviewSchema for why this is a second document rather than a rule
+    // that hides fields.
+    match /serviceReviews/{reviewId} {
+      allow get: if true;
+      // Capped like every other list here, so a service page cannot be asked
+      // for every review anyone has ever left in one page.
+      allow list: if request.query.limit <= 50;
+      allow write: if false;
+    }
+
     match /reviews/{reviewId} {
       allow get: if signedIn() && resource.data.uid == request.auth.uid;
       // Split from get because request.query only exists on a list; reading

@@ -373,6 +373,42 @@ export const reviewSchema = reviewInputSchema.extend({
   bookingId: z.string().min(1),
   uid: z.string().min(1),
   technicianId: z.string().min(1).optional(),
+  /**
+   * What was reviewed, copied off the booking when the review is filed.
+   *
+   * Without these a review can only be grouped by the booking it came from,
+   * which means answering "what do people say about AC repair" is a scan of
+   * every booking anyone has ever made. Optional because reviews filed before
+   * this existed do not have them.
+   */
+  applianceId: applianceIdSchema.optional(),
+  serviceKey: serviceKeySchema.optional(),
   createdAt: z.number().int().min(0),
 })
 export type Review = z.infer<typeof reviewSchema>
+
+/**
+ * A review as everyone else sees it.
+ *
+ * The same arrangement the technicians have: the record with the uid and the
+ * booking id on it stays private, and this is the part that goes on a public
+ * page. It is a separate document rather than a rule that hides fields,
+ * because a rule cannot hide a field — a client reading a document reads all
+ * of it, and "the uid is only an opaque id" is the sentence people say right
+ * before it turns out to be joinable with something else.
+ *
+ * The name is a first name and nothing else, taken from the profile at the
+ * moment the review is filed. A customer reviewing their washing machine did
+ * not agree to have their full name on a page about washing machines.
+ */
+export const serviceReviewSchema = z.object({
+  id: z.string().min(1),
+  applianceId: applianceIdSchema,
+  serviceKey: serviceKeySchema,
+  rating: z.number().int().min(1).max(5),
+  text: z.string().trim().max(1000).optional(),
+  /** First name, or "A customer" where there is no name to use. */
+  authorName: z.string().min(1).max(40),
+  createdAt: z.number().int().min(0),
+})
+export type ServiceReview = z.infer<typeof serviceReviewSchema>

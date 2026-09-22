@@ -1,0 +1,2306 @@
+[
+  {
+    "id": "washing-machine_repair_r1",
+    "applianceId": "washing-machine",
+    "serviceKey": "repair",
+    "rating": 4,
+    "text": "Good service, but the part took an extra day to arrive.",
+    "authorName": "Faisal",
+    "createdAt": 1749582400000
+  },
+  {
+    "id": "washing-machine_repair_r2",
+    "applianceId": "washing-machine",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Meera",
+    "createdAt": 1752088000000
+  },
+  {
+    "id": "washing-machine_repair_r3",
+    "applianceId": "washing-machine",
+    "serviceKey": "repair",
+    "rating": 4,
+    "text": "Work was fine. Arrived towards the end of the window rather than the start.",
+    "authorName": "Arjun",
+    "createdAt": 1758395200000
+  },
+  {
+    "id": "washing-machine_repair_r4",
+    "applianceId": "washing-machine",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Sowmya",
+    "createdAt": 1751656000000
+  },
+  {
+    "id": "washing-machine_repair_r5",
+    "applianceId": "washing-machine",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Naveen",
+    "createdAt": 1758740800000
+  },
+  {
+    "id": "washing-machine_repair_r6",
+    "applianceId": "washing-machine",
+    "serviceKey": "repair",
+    "rating": 2,
+    "text": "Turned up late and I was not told until I called.",
+    "authorName": "Ganesh",
+    "createdAt": 1752174400000
+  },
+  {
+    "id": "washing-machine_repair_r7",
+    "applianceId": "washing-machine",
+    "serviceKey": "repair",
+    "rating": 4,
+    "text": "Work was fine. Arrived towards the end of the window rather than the start.",
+    "authorName": "Arjun",
+    "createdAt": 1753124800000
+  },
+  {
+    "id": "washing-machine_repair_r8",
+    "applianceId": "washing-machine",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Lakshmi",
+    "createdAt": 1758913600000
+  },
+  {
+    "id": "washing-machine_repair_r9",
+    "applianceId": "washing-machine",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Meera",
+    "createdAt": 1755544000000
+  },
+  {
+    "id": "washing-machine_service_r1",
+    "applianceId": "washing-machine",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Rahul",
+    "createdAt": 1758568000000
+  },
+  {
+    "id": "washing-machine_service_r2",
+    "applianceId": "washing-machine",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Ayesha",
+    "createdAt": 1751051200000
+  },
+  {
+    "id": "washing-machine_service_r3",
+    "applianceId": "washing-machine",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Imran",
+    "createdAt": 1752088000000
+  },
+  {
+    "id": "washing-machine_service_r4",
+    "applianceId": "washing-machine",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Ravi",
+    "createdAt": 1751137600000
+  },
+  {
+    "id": "washing-machine_service_r5",
+    "applianceId": "washing-machine",
+    "serviceKey": "service",
+    "rating": 4,
+    "text": "Good service, but the part took an extra day to arrive.",
+    "authorName": "Meera",
+    "createdAt": 1756235200000
+  },
+  {
+    "id": "washing-machine_service_r6",
+    "applianceId": "washing-machine",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Sowmya",
+    "createdAt": 1755198400000
+  },
+  {
+    "id": "washing-machine_service_r7",
+    "applianceId": "washing-machine",
+    "serviceKey": "service",
+    "rating": 4,
+    "text": "Did the job properly, though I had to ring to find out where he was.",
+    "authorName": "Ayesha",
+    "createdAt": 1755025600000
+  },
+  {
+    "id": "washing-machine_service_r8",
+    "applianceId": "washing-machine",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Rahul",
+    "createdAt": 1755544000000
+  },
+  {
+    "id": "washing-machine_service_r9",
+    "applianceId": "washing-machine",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Vikram",
+    "createdAt": 1754075200000
+  },
+  {
+    "id": "washing-machine_installation_r1",
+    "applianceId": "washing-machine",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Meera",
+    "createdAt": 1755803200000
+  },
+  {
+    "id": "washing-machine_installation_r2",
+    "applianceId": "washing-machine",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Ganesh",
+    "createdAt": 1754420800000
+  },
+  {
+    "id": "washing-machine_installation_r3",
+    "applianceId": "washing-machine",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Pavan",
+    "createdAt": 1748804800000
+  },
+  {
+    "id": "washing-machine_installation_r4",
+    "applianceId": "washing-machine",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Imran",
+    "createdAt": 1750187200000
+  },
+  {
+    "id": "washing-machine_installation_r5",
+    "applianceId": "washing-machine",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Nikhil",
+    "createdAt": 1749496000000
+  },
+  {
+    "id": "washing-machine_installation_r6",
+    "applianceId": "washing-machine",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Divya",
+    "createdAt": 1756321600000
+  },
+  {
+    "id": "washing-machine_installation_r7",
+    "applianceId": "washing-machine",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Rahul",
+    "createdAt": 1758481600000
+  },
+  {
+    "id": "washing-machine_installation_r8",
+    "applianceId": "washing-machine",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Ganesh",
+    "createdAt": 1756062400000
+  },
+  {
+    "id": "washing-machine_installation_r9",
+    "applianceId": "washing-machine",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Ganesh",
+    "createdAt": 1754248000000
+  },
+  {
+    "id": "washing-machine_installation_r10",
+    "applianceId": "washing-machine",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Naveen",
+    "createdAt": 1757617600000
+  },
+  {
+    "id": "washing-machine_installation_r11",
+    "applianceId": "washing-machine",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Nikhil",
+    "createdAt": 1753297600000
+  },
+  {
+    "id": "washing-machine_installation_r12",
+    "applianceId": "washing-machine",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Zoya",
+    "createdAt": 1754680000000
+  },
+  {
+    "id": "washing-machine_installation_r13",
+    "applianceId": "washing-machine",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Anjali",
+    "createdAt": 1750532800000
+  },
+  {
+    "id": "washing-machine_installation_r14",
+    "applianceId": "washing-machine",
+    "serviceKey": "installation",
+    "rating": 4,
+    "text": "Did the job properly, though I had to ring to find out where he was.",
+    "authorName": "Arjun",
+    "createdAt": 1755544000000
+  },
+  {
+    "id": "washing-machine_installation_r15",
+    "applianceId": "washing-machine",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Kiran",
+    "createdAt": 1750705600000
+  },
+  {
+    "id": "washing-machine_installation_r16",
+    "applianceId": "washing-machine",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Deepa",
+    "createdAt": 1757790400000
+  },
+  {
+    "id": "washing-machine_installation_r17",
+    "applianceId": "washing-machine",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Imran",
+    "createdAt": 1757444800000
+  },
+  {
+    "id": "washing-machine_installation_r18",
+    "applianceId": "washing-machine",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Faisal",
+    "createdAt": 1752433600000
+  },
+  {
+    "id": "washing-machine_uninstallation_r1",
+    "applianceId": "washing-machine",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Ravi",
+    "createdAt": 1755284800000
+  },
+  {
+    "id": "washing-machine_uninstallation_r2",
+    "applianceId": "washing-machine",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Sowmya",
+    "createdAt": 1751051200000
+  },
+  {
+    "id": "washing-machine_uninstallation_r3",
+    "applianceId": "washing-machine",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Nikhil",
+    "createdAt": 1755976000000
+  },
+  {
+    "id": "washing-machine_uninstallation_r4",
+    "applianceId": "washing-machine",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Imran",
+    "createdAt": 1755457600000
+  },
+  {
+    "id": "washing-machine_uninstallation_r5",
+    "applianceId": "washing-machine",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Priya",
+    "createdAt": 1755976000000
+  },
+  {
+    "id": "washing-machine_uninstallation_r6",
+    "applianceId": "washing-machine",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Sneha",
+    "createdAt": 1758740800000
+  },
+  {
+    "id": "washing-machine_uninstallation_r7",
+    "applianceId": "washing-machine",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Pavan",
+    "createdAt": 1755025600000
+  },
+  {
+    "id": "washing-machine_uninstallation_r8",
+    "applianceId": "washing-machine",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Faisal",
+    "createdAt": 1754507200000
+  },
+  {
+    "id": "washing-machine_uninstallation_r9",
+    "applianceId": "washing-machine",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Vikram",
+    "createdAt": 1752260800000
+  },
+  {
+    "id": "washing-machine_uninstallation_r10",
+    "applianceId": "washing-machine",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Ravi",
+    "createdAt": 1755889600000
+  },
+  {
+    "id": "washing-machine_uninstallation_r11",
+    "applianceId": "washing-machine",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Meera",
+    "createdAt": 1753124800000
+  },
+  {
+    "id": "washing-machine_uninstallation_r12",
+    "applianceId": "washing-machine",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Nikhil",
+    "createdAt": 1758481600000
+  },
+  {
+    "id": "washing-machine_uninstallation_r13",
+    "applianceId": "washing-machine",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Fatima",
+    "createdAt": 1754507200000
+  },
+  {
+    "id": "washing-machine_uninstallation_r14",
+    "applianceId": "washing-machine",
+    "serviceKey": "uninstallation",
+    "rating": 4,
+    "text": "Did the job properly, though I had to ring to find out where he was.",
+    "authorName": "Imran",
+    "createdAt": 1748718400000
+  },
+  {
+    "id": "air-conditioner_service_r1",
+    "applianceId": "air-conditioner",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Rahul",
+    "createdAt": 1757099200000
+  },
+  {
+    "id": "air-conditioner_service_r2",
+    "applianceId": "air-conditioner",
+    "serviceKey": "service",
+    "rating": 4,
+    "text": "Work was fine. Arrived towards the end of the window rather than the start.",
+    "authorName": "Naveen",
+    "createdAt": 1753816000000
+  },
+  {
+    "id": "air-conditioner_service_r3",
+    "applianceId": "air-conditioner",
+    "serviceKey": "service",
+    "rating": 4,
+    "text": "Work was fine. Arrived towards the end of the window rather than the start.",
+    "authorName": "Ravi",
+    "createdAt": 1755457600000
+  },
+  {
+    "id": "air-conditioner_service_r4",
+    "applianceId": "air-conditioner",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Anjali",
+    "createdAt": 1757963200000
+  },
+  {
+    "id": "air-conditioner_service_r5",
+    "applianceId": "air-conditioner",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Shruti",
+    "createdAt": 1758913600000
+  },
+  {
+    "id": "air-conditioner_service_r6",
+    "applianceId": "air-conditioner",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Deepa",
+    "createdAt": 1749928000000
+  },
+  {
+    "id": "air-conditioner_service_r7",
+    "applianceId": "air-conditioner",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Imran",
+    "createdAt": 1751310400000
+  },
+  {
+    "id": "air-conditioner_service_r8",
+    "applianceId": "air-conditioner",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Zoya",
+    "createdAt": 1758740800000
+  },
+  {
+    "id": "air-conditioner_service_r9",
+    "applianceId": "air-conditioner",
+    "serviceKey": "service",
+    "rating": 4,
+    "text": "Work was fine. Arrived towards the end of the window rather than the start.",
+    "authorName": "Nikhil",
+    "createdAt": 1753643200000
+  },
+  {
+    "id": "air-conditioner_repair_r1",
+    "applianceId": "air-conditioner",
+    "serviceKey": "repair",
+    "rating": 2,
+    "text": "Turned up late and I was not told until I called.",
+    "authorName": "Meera",
+    "createdAt": 1750360000000
+  },
+  {
+    "id": "air-conditioner_repair_r2",
+    "applianceId": "air-conditioner",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Meera",
+    "createdAt": 1757358400000
+  },
+  {
+    "id": "air-conditioner_repair_r3",
+    "applianceId": "air-conditioner",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Anjali",
+    "createdAt": 1756062400000
+  },
+  {
+    "id": "air-conditioner_repair_r4",
+    "applianceId": "air-conditioner",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Sowmya",
+    "createdAt": 1750619200000
+  },
+  {
+    "id": "air-conditioner_repair_r5",
+    "applianceId": "air-conditioner",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Ayesha",
+    "createdAt": 1751137600000
+  },
+  {
+    "id": "air-conditioner_repair_r6",
+    "applianceId": "air-conditioner",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Pavan",
+    "createdAt": 1753729600000
+  },
+  {
+    "id": "air-conditioner_repair_r7",
+    "applianceId": "air-conditioner",
+    "serviceKey": "repair",
+    "rating": 4,
+    "text": "Good service, but the part took an extra day to arrive.",
+    "authorName": "Imran",
+    "createdAt": 1754766400000
+  },
+  {
+    "id": "air-conditioner_repair_r8",
+    "applianceId": "air-conditioner",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Sowmya",
+    "createdAt": 1752520000000
+  },
+  {
+    "id": "air-conditioner_repair_r9",
+    "applianceId": "air-conditioner",
+    "serviceKey": "repair",
+    "rating": 4,
+    "text": "Work was fine. Arrived towards the end of the window rather than the start.",
+    "authorName": "Sneha",
+    "createdAt": 1753038400000
+  },
+  {
+    "id": "air-conditioner_repair_r10",
+    "applianceId": "air-conditioner",
+    "serviceKey": "repair",
+    "rating": 1,
+    "text": "Turned up late and I was not told until I called.",
+    "authorName": "Kiran",
+    "createdAt": 1756494400000
+  },
+  {
+    "id": "air-conditioner_repair_r11",
+    "applianceId": "air-conditioner",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Ayesha",
+    "createdAt": 1754852800000
+  },
+  {
+    "id": "air-conditioner_deep-clean_r1",
+    "applianceId": "air-conditioner",
+    "serviceKey": "deep-clean",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Nikhil",
+    "createdAt": 1757358400000
+  },
+  {
+    "id": "air-conditioner_deep-clean_r2",
+    "applianceId": "air-conditioner",
+    "serviceKey": "deep-clean",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Deepa",
+    "createdAt": 1757790400000
+  },
+  {
+    "id": "air-conditioner_deep-clean_r3",
+    "applianceId": "air-conditioner",
+    "serviceKey": "deep-clean",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Ganesh",
+    "createdAt": 1748632000000
+  },
+  {
+    "id": "air-conditioner_deep-clean_r4",
+    "applianceId": "air-conditioner",
+    "serviceKey": "deep-clean",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Nikhil",
+    "createdAt": 1751310400000
+  },
+  {
+    "id": "air-conditioner_deep-clean_r5",
+    "applianceId": "air-conditioner",
+    "serviceKey": "deep-clean",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Lakshmi",
+    "createdAt": 1753211200000
+  },
+  {
+    "id": "air-conditioner_deep-clean_r6",
+    "applianceId": "air-conditioner",
+    "serviceKey": "deep-clean",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Sneha",
+    "createdAt": 1750878400000
+  },
+  {
+    "id": "air-conditioner_deep-clean_r7",
+    "applianceId": "air-conditioner",
+    "serviceKey": "deep-clean",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Arjun",
+    "createdAt": 1753902400000
+  },
+  {
+    "id": "air-conditioner_deep-clean_r8",
+    "applianceId": "air-conditioner",
+    "serviceKey": "deep-clean",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Nikhil",
+    "createdAt": 1751483200000
+  },
+  {
+    "id": "air-conditioner_deep-clean_r9",
+    "applianceId": "air-conditioner",
+    "serviceKey": "deep-clean",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Shruti",
+    "createdAt": 1757963200000
+  },
+  {
+    "id": "air-conditioner_deep-clean_r10",
+    "applianceId": "air-conditioner",
+    "serviceKey": "deep-clean",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Divya",
+    "createdAt": 1751569600000
+  },
+  {
+    "id": "air-conditioner_deep-clean_r11",
+    "applianceId": "air-conditioner",
+    "serviceKey": "deep-clean",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Sandeep",
+    "createdAt": 1757531200000
+  },
+  {
+    "id": "air-conditioner_deep-clean_r12",
+    "applianceId": "air-conditioner",
+    "serviceKey": "deep-clean",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Rahul",
+    "createdAt": 1751137600000
+  },
+  {
+    "id": "air-conditioner_gas-refill_r1",
+    "applianceId": "air-conditioner",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Lakshmi",
+    "createdAt": 1755198400000
+  },
+  {
+    "id": "air-conditioner_gas-refill_r2",
+    "applianceId": "air-conditioner",
+    "serviceKey": "gas-refill",
+    "rating": 1,
+    "text": "Had to book a second visit for the same fault. It was covered, but still a day off work.",
+    "authorName": "Ravi",
+    "createdAt": 1750792000000
+  },
+  {
+    "id": "air-conditioner_gas-refill_r3",
+    "applianceId": "air-conditioner",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Naveen",
+    "createdAt": 1751224000000
+  },
+  {
+    "id": "air-conditioner_gas-refill_r4",
+    "applianceId": "air-conditioner",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Shruti",
+    "createdAt": 1755630400000
+  },
+  {
+    "id": "air-conditioner_gas-refill_r5",
+    "applianceId": "air-conditioner",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Arjun",
+    "createdAt": 1753124800000
+  },
+  {
+    "id": "air-conditioner_gas-refill_r6",
+    "applianceId": "air-conditioner",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Arjun",
+    "createdAt": 1752865600000
+  },
+  {
+    "id": "air-conditioner_gas-refill_r7",
+    "applianceId": "air-conditioner",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Harsha",
+    "createdAt": 1749236800000
+  },
+  {
+    "id": "air-conditioner_gas-refill_r8",
+    "applianceId": "air-conditioner",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Faisal",
+    "createdAt": 1753643200000
+  },
+  {
+    "id": "air-conditioner_gas-refill_r9",
+    "applianceId": "air-conditioner",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Nikhil",
+    "createdAt": 1749755200000
+  },
+  {
+    "id": "air-conditioner_gas-refill_r10",
+    "applianceId": "air-conditioner",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Rahul",
+    "createdAt": 1754680000000
+  },
+  {
+    "id": "air-conditioner_gas-refill_r11",
+    "applianceId": "air-conditioner",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Divya",
+    "createdAt": 1752088000000
+  },
+  {
+    "id": "air-conditioner_gas-refill_r12",
+    "applianceId": "air-conditioner",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Deepa",
+    "createdAt": 1749236800000
+  },
+  {
+    "id": "air-conditioner_gas-refill_r13",
+    "applianceId": "air-conditioner",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Deepa",
+    "createdAt": 1750014400000
+  },
+  {
+    "id": "air-conditioner_installation_r1",
+    "applianceId": "air-conditioner",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Faisal",
+    "createdAt": 1756753600000
+  },
+  {
+    "id": "air-conditioner_installation_r2",
+    "applianceId": "air-conditioner",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Sneha",
+    "createdAt": 1748891200000
+  },
+  {
+    "id": "air-conditioner_installation_r3",
+    "applianceId": "air-conditioner",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Naveen",
+    "createdAt": 1758136000000
+  },
+  {
+    "id": "air-conditioner_installation_r4",
+    "applianceId": "air-conditioner",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Divya",
+    "createdAt": 1751915200000
+  },
+  {
+    "id": "air-conditioner_installation_r5",
+    "applianceId": "air-conditioner",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Shruti",
+    "createdAt": 1755716800000
+  },
+  {
+    "id": "air-conditioner_installation_r6",
+    "applianceId": "air-conditioner",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Naveen",
+    "createdAt": 1757012800000
+  },
+  {
+    "id": "air-conditioner_installation_r7",
+    "applianceId": "air-conditioner",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Ravi",
+    "createdAt": 1751569600000
+  },
+  {
+    "id": "air-conditioner_installation_r8",
+    "applianceId": "air-conditioner",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Naveen",
+    "createdAt": 1748804800000
+  },
+  {
+    "id": "air-conditioner_installation_r9",
+    "applianceId": "air-conditioner",
+    "serviceKey": "installation",
+    "rating": 4,
+    "text": "Good service, but the part took an extra day to arrive.",
+    "authorName": "Kiran",
+    "createdAt": 1750964800000
+  },
+  {
+    "id": "air-conditioner_installation_r10",
+    "applianceId": "air-conditioner",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Sneha",
+    "createdAt": 1756062400000
+  },
+  {
+    "id": "air-conditioner_uninstallation_r1",
+    "applianceId": "air-conditioner",
+    "serviceKey": "uninstallation",
+    "rating": 4,
+    "text": "Good service, but the part took an extra day to arrive.",
+    "authorName": "Ayesha",
+    "createdAt": 1752174400000
+  },
+  {
+    "id": "air-conditioner_uninstallation_r2",
+    "applianceId": "air-conditioner",
+    "serviceKey": "uninstallation",
+    "rating": 4,
+    "text": "Good service, but the part took an extra day to arrive.",
+    "authorName": "Naveen",
+    "createdAt": 1752520000000
+  },
+  {
+    "id": "air-conditioner_uninstallation_r3",
+    "applianceId": "air-conditioner",
+    "serviceKey": "uninstallation",
+    "rating": 2,
+    "text": "Had to book a second visit for the same fault. It was covered, but still a day off work.",
+    "authorName": "Pavan",
+    "createdAt": 1750360000000
+  },
+  {
+    "id": "air-conditioner_uninstallation_r4",
+    "applianceId": "air-conditioner",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Vikram",
+    "createdAt": 1755371200000
+  },
+  {
+    "id": "air-conditioner_uninstallation_r5",
+    "applianceId": "air-conditioner",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Naveen",
+    "createdAt": 1752433600000
+  },
+  {
+    "id": "air-conditioner_uninstallation_r6",
+    "applianceId": "air-conditioner",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Imran",
+    "createdAt": 1750532800000
+  },
+  {
+    "id": "air-conditioner_uninstallation_r7",
+    "applianceId": "air-conditioner",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Ayesha",
+    "createdAt": 1758740800000
+  },
+  {
+    "id": "air-conditioner_uninstallation_r8",
+    "applianceId": "air-conditioner",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Fatima",
+    "createdAt": 1758395200000
+  },
+  {
+    "id": "air-conditioner_uninstallation_r9",
+    "applianceId": "air-conditioner",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Vikram",
+    "createdAt": 1756321600000
+  },
+  {
+    "id": "air-conditioner_uninstallation_r10",
+    "applianceId": "air-conditioner",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Imran",
+    "createdAt": 1749496000000
+  },
+  {
+    "id": "air-conditioner_uninstallation_r11",
+    "applianceId": "air-conditioner",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Vikram",
+    "createdAt": 1757876800000
+  },
+  {
+    "id": "air-conditioner_uninstallation_r12",
+    "applianceId": "air-conditioner",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Imran",
+    "createdAt": 1757790400000
+  },
+  {
+    "id": "air-conditioner_uninstallation_r13",
+    "applianceId": "air-conditioner",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Naveen",
+    "createdAt": 1754593600000
+  },
+  {
+    "id": "air-conditioner_uninstallation_r14",
+    "applianceId": "air-conditioner",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Pavan",
+    "createdAt": 1756926400000
+  },
+  {
+    "id": "refrigerator_repair_r1",
+    "applianceId": "refrigerator",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Faisal",
+    "createdAt": 1754420800000
+  },
+  {
+    "id": "refrigerator_repair_r2",
+    "applianceId": "refrigerator",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Lakshmi",
+    "createdAt": 1753988800000
+  },
+  {
+    "id": "refrigerator_repair_r3",
+    "applianceId": "refrigerator",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Naveen",
+    "createdAt": 1750014400000
+  },
+  {
+    "id": "refrigerator_repair_r4",
+    "applianceId": "refrigerator",
+    "serviceKey": "repair",
+    "rating": 4,
+    "text": "Work was fine. Arrived towards the end of the window rather than the start.",
+    "authorName": "Deepa",
+    "createdAt": 1753038400000
+  },
+  {
+    "id": "refrigerator_repair_r5",
+    "applianceId": "refrigerator",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Zoya",
+    "createdAt": 1754420800000
+  },
+  {
+    "id": "refrigerator_repair_r6",
+    "applianceId": "refrigerator",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Sandeep",
+    "createdAt": 1755803200000
+  },
+  {
+    "id": "refrigerator_repair_r7",
+    "applianceId": "refrigerator",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Harsha",
+    "createdAt": 1753470400000
+  },
+  {
+    "id": "refrigerator_repair_r8",
+    "applianceId": "refrigerator",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Naveen",
+    "createdAt": 1753988800000
+  },
+  {
+    "id": "refrigerator_repair_r9",
+    "applianceId": "refrigerator",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Lakshmi",
+    "createdAt": 1750705600000
+  },
+  {
+    "id": "refrigerator_repair_r10",
+    "applianceId": "refrigerator",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Faisal",
+    "createdAt": 1751828800000
+  },
+  {
+    "id": "refrigerator_repair_r11",
+    "applianceId": "refrigerator",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Deepa",
+    "createdAt": 1758049600000
+  },
+  {
+    "id": "refrigerator_repair_r12",
+    "applianceId": "refrigerator",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Vikram",
+    "createdAt": 1754248000000
+  },
+  {
+    "id": "refrigerator_repair_r13",
+    "applianceId": "refrigerator",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Deepa",
+    "createdAt": 1752001600000
+  },
+  {
+    "id": "refrigerator_repair_r14",
+    "applianceId": "refrigerator",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Sneha",
+    "createdAt": 1757272000000
+  },
+  {
+    "id": "refrigerator_service_r1",
+    "applianceId": "refrigerator",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Fatima",
+    "createdAt": 1753729600000
+  },
+  {
+    "id": "refrigerator_service_r2",
+    "applianceId": "refrigerator",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Ganesh",
+    "createdAt": 1749064000000
+  },
+  {
+    "id": "refrigerator_service_r3",
+    "applianceId": "refrigerator",
+    "serviceKey": "service",
+    "rating": 3,
+    "text": "Had to book a second visit for the same fault. It was covered, but still a day off work.",
+    "authorName": "Zoya",
+    "createdAt": 1752260800000
+  },
+  {
+    "id": "refrigerator_service_r4",
+    "applianceId": "refrigerator",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Ravi",
+    "createdAt": 1754161600000
+  },
+  {
+    "id": "refrigerator_service_r5",
+    "applianceId": "refrigerator",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Meera",
+    "createdAt": 1757790400000
+  },
+  {
+    "id": "refrigerator_service_r6",
+    "applianceId": "refrigerator",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Shruti",
+    "createdAt": 1753211200000
+  },
+  {
+    "id": "refrigerator_service_r7",
+    "applianceId": "refrigerator",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Priya",
+    "createdAt": 1753729600000
+  },
+  {
+    "id": "refrigerator_service_r8",
+    "applianceId": "refrigerator",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Anjali",
+    "createdAt": 1754161600000
+  },
+  {
+    "id": "refrigerator_gas-refill_r1",
+    "applianceId": "refrigerator",
+    "serviceKey": "gas-refill",
+    "rating": 4,
+    "text": "Good service, but the part took an extra day to arrive.",
+    "authorName": "Ayesha",
+    "createdAt": 1754593600000
+  },
+  {
+    "id": "refrigerator_gas-refill_r2",
+    "applianceId": "refrigerator",
+    "serviceKey": "gas-refill",
+    "rating": 4,
+    "text": "Good service, but the part took an extra day to arrive.",
+    "authorName": "Zoya",
+    "createdAt": 1756148800000
+  },
+  {
+    "id": "refrigerator_gas-refill_r3",
+    "applianceId": "refrigerator",
+    "serviceKey": "gas-refill",
+    "rating": 4,
+    "text": "Work was fine. Arrived towards the end of the window rather than the start.",
+    "authorName": "Nikhil",
+    "createdAt": 1756148800000
+  },
+  {
+    "id": "refrigerator_gas-refill_r4",
+    "applianceId": "refrigerator",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Ravi",
+    "createdAt": 1751396800000
+  },
+  {
+    "id": "refrigerator_gas-refill_r5",
+    "applianceId": "refrigerator",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Vikram",
+    "createdAt": 1750619200000
+  },
+  {
+    "id": "refrigerator_gas-refill_r6",
+    "applianceId": "refrigerator",
+    "serviceKey": "gas-refill",
+    "rating": 4,
+    "text": "Did the job properly, though I had to ring to find out where he was.",
+    "authorName": "Arjun",
+    "createdAt": 1755198400000
+  },
+  {
+    "id": "refrigerator_gas-refill_r7",
+    "applianceId": "refrigerator",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Vikram",
+    "createdAt": 1748804800000
+  },
+  {
+    "id": "refrigerator_gas-refill_r8",
+    "applianceId": "refrigerator",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Deepa",
+    "createdAt": 1750446400000
+  },
+  {
+    "id": "refrigerator_gas-refill_r9",
+    "applianceId": "refrigerator",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Vikram",
+    "createdAt": 1758049600000
+  },
+  {
+    "id": "refrigerator_gas-refill_r10",
+    "applianceId": "refrigerator",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Divya",
+    "createdAt": 1752174400000
+  },
+  {
+    "id": "refrigerator_gas-refill_r11",
+    "applianceId": "refrigerator",
+    "serviceKey": "gas-refill",
+    "rating": 4,
+    "text": "Did the job properly, though I had to ring to find out where he was.",
+    "authorName": "Shruti",
+    "createdAt": 1754852800000
+  },
+  {
+    "id": "refrigerator_gas-refill_r12",
+    "applianceId": "refrigerator",
+    "serviceKey": "gas-refill",
+    "rating": 2,
+    "text": "Turned up late and I was not told until I called.",
+    "authorName": "Priya",
+    "createdAt": 1753556800000
+  },
+  {
+    "id": "refrigerator_gas-refill_r13",
+    "applianceId": "refrigerator",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Divya",
+    "createdAt": 1755630400000
+  },
+  {
+    "id": "refrigerator_gas-refill_r14",
+    "applianceId": "refrigerator",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Vikram",
+    "createdAt": 1750273600000
+  },
+  {
+    "id": "refrigerator_gas-refill_r15",
+    "applianceId": "refrigerator",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Nikhil",
+    "createdAt": 1754680000000
+  },
+  {
+    "id": "refrigerator_gas-refill_r16",
+    "applianceId": "refrigerator",
+    "serviceKey": "gas-refill",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Priya",
+    "createdAt": 1748891200000
+  },
+  {
+    "id": "refrigerator_installation_r1",
+    "applianceId": "refrigerator",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Shruti",
+    "createdAt": 1755371200000
+  },
+  {
+    "id": "refrigerator_installation_r2",
+    "applianceId": "refrigerator",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Sowmya",
+    "createdAt": 1749150400000
+  },
+  {
+    "id": "refrigerator_installation_r3",
+    "applianceId": "refrigerator",
+    "serviceKey": "installation",
+    "rating": 4,
+    "text": "Good service, but the part took an extra day to arrive.",
+    "authorName": "Imran",
+    "createdAt": 1752001600000
+  },
+  {
+    "id": "refrigerator_installation_r4",
+    "applianceId": "refrigerator",
+    "serviceKey": "installation",
+    "rating": 4,
+    "text": "Good service, but the part took an extra day to arrive.",
+    "authorName": "Rahul",
+    "createdAt": 1749323200000
+  },
+  {
+    "id": "refrigerator_installation_r5",
+    "applianceId": "refrigerator",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Faisal",
+    "createdAt": 1757012800000
+  },
+  {
+    "id": "refrigerator_installation_r6",
+    "applianceId": "refrigerator",
+    "serviceKey": "installation",
+    "rating": 4,
+    "text": "Did the job properly, though I had to ring to find out where he was.",
+    "authorName": "Zoya",
+    "createdAt": 1750792000000
+  },
+  {
+    "id": "refrigerator_installation_r7",
+    "applianceId": "refrigerator",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Ravi",
+    "createdAt": 1751224000000
+  },
+  {
+    "id": "refrigerator_installation_r8",
+    "applianceId": "refrigerator",
+    "serviceKey": "installation",
+    "rating": 1,
+    "text": "Turned up late and I was not told until I called.",
+    "authorName": "Imran",
+    "createdAt": 1758395200000
+  },
+  {
+    "id": "refrigerator_installation_r9",
+    "applianceId": "refrigerator",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Faisal",
+    "createdAt": 1757185600000
+  },
+  {
+    "id": "refrigerator_installation_r10",
+    "applianceId": "refrigerator",
+    "serviceKey": "installation",
+    "rating": 1,
+    "text": "Turned up late and I was not told until I called.",
+    "authorName": "Deepa",
+    "createdAt": 1749841600000
+  },
+  {
+    "id": "refrigerator_installation_r11",
+    "applianceId": "refrigerator",
+    "serviceKey": "installation",
+    "rating": 1,
+    "text": "Had to book a second visit for the same fault. It was covered, but still a day off work.",
+    "authorName": "Nikhil",
+    "createdAt": 1750878400000
+  },
+  {
+    "id": "refrigerator_installation_r12",
+    "applianceId": "refrigerator",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Sneha",
+    "createdAt": 1754852800000
+  },
+  {
+    "id": "refrigerator_installation_r13",
+    "applianceId": "refrigerator",
+    "serviceKey": "installation",
+    "rating": 4,
+    "text": "Good service, but the part took an extra day to arrive.",
+    "authorName": "Nikhil",
+    "createdAt": 1755716800000
+  },
+  {
+    "id": "refrigerator_installation_r14",
+    "applianceId": "refrigerator",
+    "serviceKey": "installation",
+    "rating": 3,
+    "text": "Turned up late and I was not told until I called.",
+    "authorName": "Anjali",
+    "createdAt": 1752779200000
+  },
+  {
+    "id": "refrigerator_installation_r15",
+    "applianceId": "refrigerator",
+    "serviceKey": "installation",
+    "rating": 4,
+    "text": "Work was fine. Arrived towards the end of the window rather than the start.",
+    "authorName": "Kiran",
+    "createdAt": 1750532800000
+  },
+  {
+    "id": "refrigerator_installation_r16",
+    "applianceId": "refrigerator",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Ravi",
+    "createdAt": 1754161600000
+  },
+  {
+    "id": "geyser_service_r1",
+    "applianceId": "geyser",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Sandeep",
+    "createdAt": 1758222400000
+  },
+  {
+    "id": "geyser_service_r2",
+    "applianceId": "geyser",
+    "serviceKey": "service",
+    "rating": 4,
+    "text": "Good service, but the part took an extra day to arrive.",
+    "authorName": "Rahul",
+    "createdAt": 1758740800000
+  },
+  {
+    "id": "geyser_service_r3",
+    "applianceId": "geyser",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Shruti",
+    "createdAt": 1758481600000
+  },
+  {
+    "id": "geyser_service_r4",
+    "applianceId": "geyser",
+    "serviceKey": "service",
+    "rating": 4,
+    "text": "Work was fine. Arrived towards the end of the window rather than the start.",
+    "authorName": "Imran",
+    "createdAt": 1758568000000
+  },
+  {
+    "id": "geyser_service_r5",
+    "applianceId": "geyser",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Fatima",
+    "createdAt": 1756062400000
+  },
+  {
+    "id": "geyser_service_r6",
+    "applianceId": "geyser",
+    "serviceKey": "service",
+    "rating": 4,
+    "text": "Good service, but the part took an extra day to arrive.",
+    "authorName": "Shruti",
+    "createdAt": 1752952000000
+  },
+  {
+    "id": "geyser_service_r7",
+    "applianceId": "geyser",
+    "serviceKey": "service",
+    "rating": 3,
+    "text": "Had to book a second visit for the same fault. It was covered, but still a day off work.",
+    "authorName": "Vikram",
+    "createdAt": 1753902400000
+  },
+  {
+    "id": "geyser_service_r8",
+    "applianceId": "geyser",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Sneha",
+    "createdAt": 1751137600000
+  },
+  {
+    "id": "geyser_repair_r1",
+    "applianceId": "geyser",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Pavan",
+    "createdAt": 1755284800000
+  },
+  {
+    "id": "geyser_repair_r2",
+    "applianceId": "geyser",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Sowmya",
+    "createdAt": 1748891200000
+  },
+  {
+    "id": "geyser_repair_r3",
+    "applianceId": "geyser",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Faisal",
+    "createdAt": 1756580800000
+  },
+  {
+    "id": "geyser_repair_r4",
+    "applianceId": "geyser",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Ganesh",
+    "createdAt": 1756580800000
+  },
+  {
+    "id": "geyser_repair_r5",
+    "applianceId": "geyser",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Faisal",
+    "createdAt": 1753470400000
+  },
+  {
+    "id": "geyser_repair_r6",
+    "applianceId": "geyser",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Vikram",
+    "createdAt": 1753297600000
+  },
+  {
+    "id": "geyser_repair_r7",
+    "applianceId": "geyser",
+    "serviceKey": "repair",
+    "rating": 3,
+    "text": "Had to book a second visit for the same fault. It was covered, but still a day off work.",
+    "authorName": "Shruti",
+    "createdAt": 1752692800000
+  },
+  {
+    "id": "geyser_repair_r8",
+    "applianceId": "geyser",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Divya",
+    "createdAt": 1751828800000
+  },
+  {
+    "id": "geyser_repair_r9",
+    "applianceId": "geyser",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Anjali",
+    "createdAt": 1754334400000
+  },
+  {
+    "id": "geyser_repair_r10",
+    "applianceId": "geyser",
+    "serviceKey": "repair",
+    "rating": 4,
+    "text": "Good service, but the part took an extra day to arrive.",
+    "authorName": "Faisal",
+    "createdAt": 1758481600000
+  },
+  {
+    "id": "geyser_repair_r11",
+    "applianceId": "geyser",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Sandeep",
+    "createdAt": 1749409600000
+  },
+  {
+    "id": "geyser_repair_r12",
+    "applianceId": "geyser",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Meera",
+    "createdAt": 1754852800000
+  },
+  {
+    "id": "geyser_repair_r13",
+    "applianceId": "geyser",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Nikhil",
+    "createdAt": 1756408000000
+  },
+  {
+    "id": "geyser_repair_r14",
+    "applianceId": "geyser",
+    "serviceKey": "repair",
+    "rating": 4,
+    "text": "Did the job properly, though I had to ring to find out where he was.",
+    "authorName": "Fatima",
+    "createdAt": 1748804800000
+  },
+  {
+    "id": "geyser_repair_r15",
+    "applianceId": "geyser",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Sowmya",
+    "createdAt": 1752865600000
+  },
+  {
+    "id": "geyser_repair_r16",
+    "applianceId": "geyser",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Lakshmi",
+    "createdAt": 1748804800000
+  },
+  {
+    "id": "geyser_installation_r1",
+    "applianceId": "geyser",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Faisal",
+    "createdAt": 1750360000000
+  },
+  {
+    "id": "geyser_installation_r2",
+    "applianceId": "geyser",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Shruti",
+    "createdAt": 1757012800000
+  },
+  {
+    "id": "geyser_installation_r3",
+    "applianceId": "geyser",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Nikhil",
+    "createdAt": 1756926400000
+  },
+  {
+    "id": "geyser_installation_r4",
+    "applianceId": "geyser",
+    "serviceKey": "installation",
+    "rating": 4,
+    "text": "Did the job properly, though I had to ring to find out where he was.",
+    "authorName": "Arjun",
+    "createdAt": 1757704000000
+  },
+  {
+    "id": "geyser_installation_r5",
+    "applianceId": "geyser",
+    "serviceKey": "installation",
+    "rating": 4,
+    "text": "Work was fine. Arrived towards the end of the window rather than the start.",
+    "authorName": "Lakshmi",
+    "createdAt": 1749582400000
+  },
+  {
+    "id": "geyser_installation_r6",
+    "applianceId": "geyser",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Divya",
+    "createdAt": 1755025600000
+  },
+  {
+    "id": "geyser_installation_r7",
+    "applianceId": "geyser",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Ayesha",
+    "createdAt": 1751915200000
+  },
+  {
+    "id": "geyser_installation_r8",
+    "applianceId": "geyser",
+    "serviceKey": "installation",
+    "rating": 4,
+    "text": "Work was fine. Arrived towards the end of the window rather than the start.",
+    "authorName": "Arjun",
+    "createdAt": 1757790400000
+  },
+  {
+    "id": "geyser_installation_r9",
+    "applianceId": "geyser",
+    "serviceKey": "installation",
+    "rating": 4,
+    "text": "Good service, but the part took an extra day to arrive.",
+    "authorName": "Sneha",
+    "createdAt": 1752433600000
+  },
+  {
+    "id": "geyser_installation_r10",
+    "applianceId": "geyser",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Meera",
+    "createdAt": 1757272000000
+  },
+  {
+    "id": "geyser_installation_r11",
+    "applianceId": "geyser",
+    "serviceKey": "installation",
+    "rating": 2,
+    "text": "Had to book a second visit for the same fault. It was covered, but still a day off work.",
+    "authorName": "Ravi",
+    "createdAt": 1750964800000
+  },
+  {
+    "id": "geyser_installation_r12",
+    "applianceId": "geyser",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Naveen",
+    "createdAt": 1758913600000
+  },
+  {
+    "id": "geyser_installation_r13",
+    "applianceId": "geyser",
+    "serviceKey": "installation",
+    "rating": 3,
+    "text": "Turned up late and I was not told until I called.",
+    "authorName": "Sowmya",
+    "createdAt": 1751656000000
+  },
+  {
+    "id": "geyser_installation_r14",
+    "applianceId": "geyser",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Imran",
+    "createdAt": 1748804800000
+  },
+  {
+    "id": "geyser_installation_r15",
+    "applianceId": "geyser",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Rahul",
+    "createdAt": 1752174400000
+  },
+  {
+    "id": "geyser_installation_r16",
+    "applianceId": "geyser",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Pavan",
+    "createdAt": 1757876800000
+  },
+  {
+    "id": "geyser_uninstallation_r1",
+    "applianceId": "geyser",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Anjali",
+    "createdAt": 1758481600000
+  },
+  {
+    "id": "geyser_uninstallation_r2",
+    "applianceId": "geyser",
+    "serviceKey": "uninstallation",
+    "rating": 4,
+    "text": "Did the job properly, though I had to ring to find out where he was.",
+    "authorName": "Vikram",
+    "createdAt": 1750360000000
+  },
+  {
+    "id": "geyser_uninstallation_r3",
+    "applianceId": "geyser",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Lakshmi",
+    "createdAt": 1750273600000
+  },
+  {
+    "id": "geyser_uninstallation_r4",
+    "applianceId": "geyser",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Lakshmi",
+    "createdAt": 1755716800000
+  },
+  {
+    "id": "geyser_uninstallation_r5",
+    "applianceId": "geyser",
+    "serviceKey": "uninstallation",
+    "rating": 4,
+    "text": "Did the job properly, though I had to ring to find out where he was.",
+    "authorName": "Ganesh",
+    "createdAt": 1751569600000
+  },
+  {
+    "id": "geyser_uninstallation_r6",
+    "applianceId": "geyser",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Divya",
+    "createdAt": 1748718400000
+  },
+  {
+    "id": "geyser_uninstallation_r7",
+    "applianceId": "geyser",
+    "serviceKey": "uninstallation",
+    "rating": 4,
+    "text": "Work was fine. Arrived towards the end of the window rather than the start.",
+    "authorName": "Ayesha",
+    "createdAt": 1755976000000
+  },
+  {
+    "id": "geyser_uninstallation_r8",
+    "applianceId": "geyser",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Rahul",
+    "createdAt": 1756321600000
+  },
+  {
+    "id": "geyser_uninstallation_r9",
+    "applianceId": "geyser",
+    "serviceKey": "uninstallation",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Sowmya",
+    "createdAt": 1756235200000
+  },
+  {
+    "id": "microwave_repair_r1",
+    "applianceId": "microwave",
+    "serviceKey": "repair",
+    "rating": 4,
+    "text": "Did the job properly, though I had to ring to find out where he was.",
+    "authorName": "Arjun",
+    "createdAt": 1753988800000
+  },
+  {
+    "id": "microwave_repair_r2",
+    "applianceId": "microwave",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Naveen",
+    "createdAt": 1758568000000
+  },
+  {
+    "id": "microwave_repair_r3",
+    "applianceId": "microwave",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Harsha",
+    "createdAt": 1748977600000
+  },
+  {
+    "id": "microwave_repair_r4",
+    "applianceId": "microwave",
+    "serviceKey": "repair",
+    "rating": 4,
+    "text": "Good service, but the part took an extra day to arrive.",
+    "authorName": "Ayesha",
+    "createdAt": 1751656000000
+  },
+  {
+    "id": "microwave_repair_r5",
+    "applianceId": "microwave",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Faisal",
+    "createdAt": 1752606400000
+  },
+  {
+    "id": "microwave_repair_r6",
+    "applianceId": "microwave",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Faisal",
+    "createdAt": 1756235200000
+  },
+  {
+    "id": "microwave_repair_r7",
+    "applianceId": "microwave",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Sowmya",
+    "createdAt": 1755284800000
+  },
+  {
+    "id": "microwave_repair_r8",
+    "applianceId": "microwave",
+    "serviceKey": "repair",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Fatima",
+    "createdAt": 1750878400000
+  },
+  {
+    "id": "microwave_service_r1",
+    "applianceId": "microwave",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Zoya",
+    "createdAt": 1750532800000
+  },
+  {
+    "id": "microwave_service_r2",
+    "applianceId": "microwave",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Imran",
+    "createdAt": 1756840000000
+  },
+  {
+    "id": "microwave_service_r3",
+    "applianceId": "microwave",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Second time I have used them. Same technician, which helped.",
+    "authorName": "Priya",
+    "createdAt": 1757272000000
+  },
+  {
+    "id": "microwave_service_r4",
+    "applianceId": "microwave",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Arjun",
+    "createdAt": 1757272000000
+  },
+  {
+    "id": "microwave_service_r5",
+    "applianceId": "microwave",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Divya",
+    "createdAt": 1754680000000
+  },
+  {
+    "id": "microwave_service_r6",
+    "applianceId": "microwave",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Sandeep",
+    "createdAt": 1753470400000
+  },
+  {
+    "id": "microwave_service_r7",
+    "applianceId": "microwave",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Told me honestly that a part was not worth replacing yet. Saved me money.",
+    "authorName": "Nikhil",
+    "createdAt": 1753556800000
+  },
+  {
+    "id": "microwave_service_r8",
+    "applianceId": "microwave",
+    "serviceKey": "service",
+    "rating": 5,
+    "text": "Turned up inside the window and called before setting off.",
+    "authorName": "Arjun",
+    "createdAt": 1753556800000
+  },
+  {
+    "id": "microwave_service_r9",
+    "applianceId": "microwave",
+    "serviceKey": "service",
+    "rating": 4,
+    "text": "Good service, but the part took an extra day to arrive.",
+    "authorName": "Fatima",
+    "createdAt": 1756926400000
+  },
+  {
+    "id": "microwave_service_r10",
+    "applianceId": "microwave",
+    "serviceKey": "service",
+    "rating": 4,
+    "text": "Work was fine. Arrived towards the end of the window rather than the start.",
+    "authorName": "Lakshmi",
+    "createdAt": 1756494400000
+  },
+  {
+    "id": "microwave_installation_r1",
+    "applianceId": "microwave",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Priya",
+    "createdAt": 1751051200000
+  },
+  {
+    "id": "microwave_installation_r2",
+    "applianceId": "microwave",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Sandeep",
+    "createdAt": 1751569600000
+  },
+  {
+    "id": "microwave_installation_r3",
+    "applianceId": "microwave",
+    "serviceKey": "installation",
+    "rating": 4,
+    "text": "Work was fine. Arrived towards the end of the window rather than the start.",
+    "authorName": "Ravi",
+    "createdAt": 1749236800000
+  },
+  {
+    "id": "microwave_installation_r4",
+    "applianceId": "microwave",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Ravi",
+    "createdAt": 1748891200000
+  },
+  {
+    "id": "microwave_installation_r5",
+    "applianceId": "microwave",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Meera",
+    "createdAt": 1756840000000
+  },
+  {
+    "id": "microwave_installation_r6",
+    "applianceId": "microwave",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Imran",
+    "createdAt": 1757012800000
+  },
+  {
+    "id": "microwave_installation_r7",
+    "applianceId": "microwave",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Quote came on the app, I approved it, and that is exactly what I was charged.",
+    "authorName": "Ganesh",
+    "createdAt": 1758740800000
+  },
+  {
+    "id": "microwave_installation_r8",
+    "applianceId": "microwave",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Faisal",
+    "createdAt": 1749496000000
+  },
+  {
+    "id": "microwave_installation_r9",
+    "applianceId": "microwave",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Vikram",
+    "createdAt": 1751569600000
+  },
+  {
+    "id": "microwave_installation_r10",
+    "applianceId": "microwave",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Polite, on time, and the price was what the app said it would be.",
+    "authorName": "Rahul",
+    "createdAt": 1757185600000
+  },
+  {
+    "id": "microwave_installation_r11",
+    "applianceId": "microwave",
+    "serviceKey": "installation",
+    "rating": 4,
+    "text": "Good service, but the part took an extra day to arrive.",
+    "authorName": "Zoya",
+    "createdAt": 1752174400000
+  },
+  {
+    "id": "microwave_installation_r12",
+    "applianceId": "microwave",
+    "serviceKey": "installation",
+    "rating": 4,
+    "text": "Work was fine. Arrived towards the end of the window rather than the start.",
+    "authorName": "Ganesh",
+    "createdAt": 1756926400000
+  },
+  {
+    "id": "microwave_installation_r13",
+    "applianceId": "microwave",
+    "serviceKey": "installation",
+    "rating": 4,
+    "text": "Work was fine. Arrived towards the end of the window rather than the start.",
+    "authorName": "Ravi",
+    "createdAt": 1754334400000
+  },
+  {
+    "id": "microwave_installation_r14",
+    "applianceId": "microwave",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Explained what was wrong before touching anything. No pressure to spend more.",
+    "authorName": "Meera",
+    "createdAt": 1748632000000
+  },
+  {
+    "id": "microwave_installation_r15",
+    "applianceId": "microwave",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Quick and tidy. Cleaned up after himself, which is rare.",
+    "authorName": "Anjali",
+    "createdAt": 1756235200000
+  },
+  {
+    "id": "microwave_installation_r16",
+    "applianceId": "microwave",
+    "serviceKey": "installation",
+    "rating": 5,
+    "text": "Fixed in one visit. Invoice came through on the app straight away.",
+    "authorName": "Zoya",
+    "createdAt": 1750792000000
+  }
+]

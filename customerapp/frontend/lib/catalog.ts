@@ -5,6 +5,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  limit,
   orderBy,
   query,
   where,
@@ -21,6 +22,7 @@ import {
   DOC,
   popularServiceSchema,
   serviceAreaSchema,
+  serviceReviewSchema,
   type ApplianceId,
   type Banner,
   type BusinessConfig,
@@ -30,6 +32,8 @@ import {
   type CatalogService,
   type PopularService,
   type ServiceArea,
+  type ServiceKey,
+  type ServiceReview,
 } from '@app/shared'
 import type { z } from 'zod'
 import { db } from './firebase'
@@ -203,6 +207,30 @@ export function fetchBrands(): Promise<CatalogBrand[]> {
       orderBy('order')
     ),
     catalogBrandSchema
+  )
+}
+
+/**
+ * The reviews on one service, newest first.
+ *
+ * The public half only — `serviceReviews`, which carries a score, the words
+ * and a first name. The review itself stays private to whoever wrote it.
+ * Capped at the same fifty the rules allow, because a service page is not the
+ * place to ask for every review anybody has ever left.
+ */
+export function fetchServiceReviews(
+  applianceId: ApplianceId,
+  serviceKey: ServiceKey
+): Promise<ServiceReview[]> {
+  return readAll(
+    query(
+      collection(db(), COL.serviceReviews),
+      where('applianceId', '==', applianceId),
+      where('serviceKey', '==', serviceKey),
+      orderBy('createdAt', 'desc'),
+      limit(50)
+    ),
+    serviceReviewSchema
   )
 }
 

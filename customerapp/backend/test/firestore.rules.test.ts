@@ -480,6 +480,55 @@ describe('the balance and its ledger', () => {
 
 // ---------------------------------------------------------------------------
 
+describe('the public half of a review', () => {
+  beforeEach(async () => {
+    await asAdmin(async (db) => {
+      await setDoc(doc(db, 'serviceReviews/r1'), {
+        applianceId: 'washing-machine',
+        serviceKey: 'repair',
+        rating: 5,
+        text: 'Turned up inside the window.',
+        authorName: 'Anjali',
+        createdAt: 1,
+      })
+    })
+  })
+
+  it('lets anyone read the reviews on a service', async () => {
+    // A service page is public, so what people said about it has to be.
+    await assertSucceeds(getDoc(doc(guest(), 'serviceReviews/r1')))
+    await assertSucceeds(
+      getDocs(
+        query(
+          collection(guest(), 'serviceReviews'),
+          where('applianceId', '==', 'washing-machine'),
+          limit(50)
+        )
+      )
+    )
+  })
+
+  it('caps the list and refuses every write', async () => {
+    await assertFails(
+      getDocs(query(collection(guest(), 'serviceReviews'), limit(500)))
+    )
+    // submitReview writes this, after checking the job was actually finished.
+    // A client that could write it could review a visit that never happened.
+    await assertFails(
+      setDoc(doc(alice(), 'serviceReviews/r2'), {
+        applianceId: 'washing-machine',
+        serviceKey: 'repair',
+        rating: 5,
+        authorName: 'Mallory',
+        createdAt: 2,
+      })
+    )
+    await assertFails(updateDoc(doc(alice(), 'serviceReviews/r1'), { rating: 1 }))
+  })
+})
+
+// ---------------------------------------------------------------------------
+
 describe('invoices, warranties and reviews', () => {
   beforeEach(async () => {
     await asAdmin(async (db) => {

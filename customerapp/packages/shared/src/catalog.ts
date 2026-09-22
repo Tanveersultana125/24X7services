@@ -117,6 +117,22 @@ export const catalogServiceSchema = z.object({
   rating: z.number().min(1).max(5).optional(),
   reviewCount: z.number().int().min(1).optional(),
   /**
+   * The real thing, kept beside the seeded one rather than overwriting it.
+   *
+   * Counted and summed as reviews arrive, the way a technician's rating is,
+   * because this number appears on every card and recounting the reviews
+   * collection per card is a query per card. `serviceRating` decides which of
+   * the two a screen shows, and the answer is: the real one the moment there
+   * is one.
+   */
+  reviewStats: z
+    .object({
+      count: z.number().int().min(0),
+      sum: z.number().int().min(0),
+      average: z.number().min(0).max(5),
+    })
+    .optional(),
+  /**
    * The visit, step by step, in the order it happens.
    *
    * What a customer is buying with a visit fee is an hour of somebody else's
@@ -154,6 +170,29 @@ export const catalogServiceSchema = z.object({
 })
 export type CatalogService = z.infer<typeof catalogServiceSchema>
 
+/**
+ * The score to show for a service, and how many people are behind it.
+ *
+ * Real reviews win the moment there is one. The seeded pair is a placeholder
+ * that exists so the screens could be built before anybody had reviewed
+ * anything, and every screen asks this function rather than reading the
+ * fields, so the day the placeholders are deleted nothing else has to change.
+ */
+export function serviceRating(
+  service: Pick<CatalogService, 'rating' | 'reviewCount' | 'reviewStats'>
+): { average: number; count: number } | null {
+  if (service.reviewStats && service.reviewStats.count > 0) {
+    return {
+      average: service.reviewStats.average,
+      count: service.reviewStats.count,
+    }
+  }
+  if (service.rating !== undefined && service.reviewCount !== undefined) {
+    return { average: service.rating, count: service.reviewCount }
+  }
+  return null
+}
+
 // ---------------------------------------------------------------------------
 // Brands
 // ---------------------------------------------------------------------------
@@ -177,6 +216,17 @@ export const brandApplianceMatrixEntrySchema = z.object({
 export type BrandApplianceMatrixEntry = z.infer<
   typeof brandApplianceMatrixEntrySchema
 >
+
+/**
+ * A service's document id, which is the pair that identifies it.
+ *
+ * The seed, the completion trigger and the rating rollup all build this string
+ * today, each in its own line of code. One of them getting the separator wrong
+ * is a document nobody finds and no error anywhere.
+ */
+export function serviceDocId(applianceId: string, serviceKey: string): string {
+  return `${applianceId}_${serviceKey}`
+}
 
 export function matrixDocId(brandId: string, applianceId: string): string {
   return `${brandId}_${applianceId}`

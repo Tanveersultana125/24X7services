@@ -52,6 +52,14 @@ export const COL = {
   referralCodes: 'referralCodes',
   warranties: 'warranties',
   reviews: 'reviews',
+  /**
+   * The half of a review everyone is allowed to read.
+   *
+   * Same arrangement as technicians and technicianPublic: the review itself
+   * carries a uid and a booking id and stays private, and this carries the
+   * score, the words and a first name. Written only by submitReview.
+   */
+  serviceReviews: 'serviceReviews',
   supportTickets: 'supportTickets',
   waitlist: 'waitlist',
   notifications: 'notifications',

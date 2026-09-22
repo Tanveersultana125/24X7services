@@ -19,11 +19,13 @@ import {
   applianceIdSchema,
   formatPaise,
   serviceKeySchema,
+  serviceRating,
   type CatalogAppliance,
   type CatalogBrand,
   type CatalogIssue,
   type CatalogService,
   type ServiceKey,
+  type ServiceReview,
 } from '@app/shared'
 
 import { Header } from '@/components/Header'
@@ -35,6 +37,7 @@ import { Section } from '@/components/AppShell'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
 import { TrustPoints } from '@/components/TrustPoints'
 import { BrandDisclaimer } from '@/components/BrandCard'
+import { ServiceReviews } from '@/components/ServiceReviews'
 import { useToast } from '@/components/Toast'
 import { Button } from '@/components/ui/Button'
 import { StickyCTA, StickySpacer } from '@/components/StickyCTA'
@@ -46,6 +49,7 @@ import {
   fetchBrands,
   fetchBusinessConfig,
   fetchIssuesFor,
+  fetchServiceReviews,
   fetchServicesFor,
 } from '@/lib/catalog'
 import { startDraft } from '@/lib/bookingDraft'
@@ -77,6 +81,7 @@ interface DetailData {
   service: CatalogService | null
   issues: CatalogIssue[]
   brands: CatalogBrand[]
+  reviews: ServiceReview[]
   warrantyDays: number | null
 }
 
@@ -143,15 +148,17 @@ export function ServiceDetailScreen() {
         service: null,
         issues: [],
         brands: [],
+        reviews: [],
         warrantyDays: null,
       }
     }
 
-    const [found, services, issues, brands, config] = await Promise.all([
+    const [found, services, issues, brands, reviews, config] = await Promise.all([
       fetchAppliance(applianceId),
       fetchServicesFor(applianceId),
       fetchIssuesFor(applianceId),
       fetchBrands(),
+      fetchServiceReviews(applianceId, serviceKey),
       // Only for the warranty line. A failed read leaves that line out rather
       // than the page, which is the right trade for one sentence.
       fetchBusinessConfig(),
@@ -164,6 +171,7 @@ export function ServiceDetailScreen() {
       service,
       issues,
       brands,
+      reviews,
       warrantyDays:
         service?.warrantyDays ?? config?.defaultWarrantyDays ?? null,
     }
@@ -226,20 +234,11 @@ export function ServiceDetailScreen() {
               {service.name}
             </h1>
             {/* The same score the card carried, so the page it opens does not
-                quietly drop the one number that got somebody here. Both or
-                neither: a score with no count behind it cannot be weighed. */}
-            {service.rating !== undefined &&
-            service.reviewCount !== undefined ? (
-              <p className="mt-2 flex items-center gap-1.5 text-sm text-muted">
-                <Star className="size-3.5 fill-ink text-ink" aria-hidden="true" />
-                <span className="font-bold text-ink">
-                  {service.rating.toFixed(1)}
-                </span>
-                <span>
-                  from {service.reviewCount.toLocaleString('en-IN')} reviews
-                </span>
-              </p>
-            ) : null}
+                quietly drop the one number that got somebody here. Which of
+                the two scores that is — the real rollup or the seeded
+                placeholder — is `serviceRating`'s decision, not this page's,
+                so the day the placeholders go nothing here changes. */}
+            <Rating service={service} />
             <p className="mt-2 text-base leading-relaxed text-muted">
               {service.description}
             </p>
@@ -414,6 +413,8 @@ export function ServiceDetailScreen() {
               </Section>
             ) : null}
 
+            <ServiceReviews reviews={data.data?.reviews ?? []} />
+
             <Section title="Every booking, whatever we are fixing">
               <TrustPoints />
             </Section>
@@ -490,6 +491,20 @@ function Media({
         className={service.poster ? 'object-cover' : 'object-contain p-6'}
       />
     </span>
+  )
+}
+
+/** The score under the title, or nothing where there is not one yet. */
+function Rating({ service }: { service: CatalogService }) {
+  const score = serviceRating(service)
+  if (!score) return null
+
+  return (
+    <p className="mt-2 flex items-center gap-1.5 text-sm text-muted">
+      <Star className="size-3.5 fill-ink text-ink" aria-hidden="true" />
+      <span className="font-bold text-ink">{score.average.toFixed(1)}</span>
+      <span>from {score.count.toLocaleString('en-IN')} reviews</span>
+    </p>
   )
 }
 

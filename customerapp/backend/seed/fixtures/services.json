@@ -59,7 +59,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 9,
+      "sum": 39,
+      "average": 4.3
+    }
   },
   {
     "id": "washing-machine_service",
@@ -121,7 +126,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 9,
+      "sum": 43,
+      "average": 4.8
+    }
   },
   {
     "id": "washing-machine_installation",
@@ -189,7 +199,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 18,
+      "sum": 89,
+      "average": 4.9
+    }
   },
   {
     "id": "washing-machine_uninstallation",
@@ -255,7 +270,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 14,
+      "sum": 69,
+      "average": 4.9
+    }
   },
   {
     "id": "air-conditioner_service",
@@ -317,7 +337,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 9,
+      "sum": 42,
+      "average": 4.7
+    }
   },
   {
     "id": "air-conditioner_repair",
@@ -379,7 +404,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 11,
+      "sum": 46,
+      "average": 4.2
+    }
   },
   {
     "id": "air-conditioner_deep-clean",
@@ -441,7 +471,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 12,
+      "sum": 60,
+      "average": 5.0
+    }
   },
   {
     "id": "air-conditioner_gas-refill",
@@ -508,7 +543,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 13,
+      "sum": 61,
+      "average": 4.7
+    }
   },
   {
     "id": "air-conditioner_installation",
@@ -576,7 +616,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 10,
+      "sum": 49,
+      "average": 4.9
+    }
   },
   {
     "id": "air-conditioner_uninstallation",
@@ -642,7 +687,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 14,
+      "sum": 65,
+      "average": 4.6
+    }
   },
   {
     "id": "refrigerator_repair",
@@ -704,7 +754,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 14,
+      "sum": 69,
+      "average": 4.9
+    }
   },
   {
     "id": "refrigerator_service",
@@ -766,7 +821,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 8,
+      "sum": 38,
+      "average": 4.8
+    }
   },
   {
     "id": "refrigerator_gas-refill",
@@ -833,7 +893,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 16,
+      "sum": 72,
+      "average": 4.5
+    }
   },
   {
     "id": "refrigerator_installation",
@@ -901,7 +966,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 16,
+      "sum": 61,
+      "average": 3.8
+    }
   },
   {
     "id": "geyser_service",
@@ -963,7 +1033,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 8,
+      "sum": 35,
+      "average": 4.4
+    }
   },
   {
     "id": "geyser_repair",
@@ -1025,7 +1100,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 16,
+      "sum": 76,
+      "average": 4.8
+    }
   },
   {
     "id": "geyser_installation",
@@ -1093,7 +1173,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 16,
+      "sum": 71,
+      "average": 4.4
+    }
   },
   {
     "id": "geyser_uninstallation",
@@ -1159,7 +1244,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 9,
+      "sum": 42,
+      "average": 4.7
+    }
   },
   {
     "id": "microwave_repair",
@@ -1221,7 +1311,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 8,
+      "sum": 38,
+      "average": 4.8
+    }
   },
   {
     "id": "microwave_service",
@@ -1283,7 +1378,12 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 10,
+      "sum": 48,
+      "average": 4.8
+    }
   },
   {
     "id": "microwave_installation",
@@ -1351,6 +1451,11 @@
         "q": "How do I pay?",
         "a": "Card, UPI or netbanking through our payment provider, or after the service where that is offered. Every booking ends with a GST invoice you can download."
       }
-    ]
+    ],
+    "reviewStats": {
+      "count": 16,
+      "sum": 76,
+      "average": 4.8
+    }
   }
 ]
