@@ -70,14 +70,15 @@ interface CareData {
   membership: Membership | null
 }
 
-/** The drawing that stands for a plan: the appliance it covers. */
-const APPLIANCE_ART: Record<string, string> = {
-  'air-conditioner': '/appliances/air-conditioner.svg',
-  refrigerator: '/appliances/refrigerator.svg',
-  'washing-machine': '/appliances/washing-machine.svg',
-  microwave: '/appliances/microwave.svg',
-  geyser: '/appliances/geyser.svg',
-}
+/**
+ * What stands for a plan: the picture of the appliance it covers.
+ *
+ * Read off the catalog rather than listed here. A second copy of the five
+ * paths would carry on pointing at the drawings the day an appliance is given
+ * a photograph, and this page would be the one place still showing the old
+ * one. The catalog is already fetched for the appliance names.
+ */
+const ART_FALLBACK = '/banners/shield.svg'
 
 export function CareScreen() {
   const { user } = useAuth()
@@ -96,9 +97,9 @@ export function CareScreen() {
 
   const data = useAsync(load)
   const plans = data.data?.plans ?? []
-  const names = new Map(
-    (data.data?.appliances ?? []).map((each) => [each.id, each.name])
-  )
+  const appliances = data.data?.appliances ?? []
+  const names = new Map(appliances.map((each) => [each.id, each.name]))
+  const art = new Map(appliances.map((each) => [each.id, each.image]))
   const member = isMembershipActive(data.data?.membership ?? null)
 
   // The largest saving anybody can check on this page, in rupees. It is a
@@ -129,7 +130,7 @@ export function CareScreen() {
             label="Annual plans"
             note="From one appliance up"
             badge="No visit fee"
-            art="/appliances/washing-machine.svg"
+            art={art.get('washing-machine') ?? ART_FALLBACK}
           />
           <RangeTile
             href="#plus"
@@ -178,6 +179,7 @@ export function CareScreen() {
                   <PlanTile
                     plan={plan}
                     names={names}
+                    art={art}
                     signInHref={user ? undefined : signIn}
                     onBought={data.reload}
                   />
@@ -329,13 +331,13 @@ export function CareScreen() {
             light plate: the drawings are coloured line art on a pale disc and
             would sit on this black looking like a mistake rather than a set. */}
         <ul className="mt-8 flex items-center justify-between gap-2">
-          {Object.entries(APPLIANCE_ART).map(([id, art]) => (
+          {appliances.map((appliance) => (
             <li
-              key={id}
+              key={appliance.id}
               className="relative size-12 shrink-0 overflow-hidden rounded-card bg-bg sm:size-14"
             >
               <Image
-                src={art}
+                src={appliance.image}
                 alt=""
                 fill
                 sizes="56px"
@@ -414,11 +416,14 @@ function RangeTile({
 function PlanTile({
   plan,
   names,
+  art,
   signInHref,
   onBought,
 }: {
   plan: CatalogPlan
   names: Map<string, string>
+  /** Appliance id to its picture, from the catalog. */
+  art: Map<string, string>
   /** Set when nobody is signed in — the button becomes the way in. */
   signInHref?: Route
   onBought: () => void
@@ -431,7 +436,7 @@ function PlanTile({
       ? plan.compareAt - plan.price
       : 0
   const months = Math.round(plan.durationDays / 30)
-  const art = APPLIANCE_ART[plan.applianceIds[0] ?? ''] ?? '/banners/shield.svg'
+  const picture = art.get(plan.applianceIds[0] ?? '') ?? ART_FALLBACK
   const covers = plan.applianceIds
     .map((id) => names.get(id) ?? id)
     .join(', ')
@@ -467,7 +472,7 @@ function PlanTile({
           </span>
         ) : null}
         <Image
-          src={art}
+          src={picture}
           alt=""
           fill
           sizes="(min-width: 640px) 240px, 45vw"
