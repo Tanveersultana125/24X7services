@@ -179,6 +179,26 @@ describe('user profile', () => {
     )
   })
 
+  it('lets a user choose what we may send, within the two channels there are', async () => {
+    await assertSucceeds(
+      setDoc(doc(alice(), `users/${ALICE}`), {
+        notifications: { push: false, inApp: true },
+      })
+    )
+    // Which channels exist is decided in the schema. A client that could add
+    // one here would be a client inventing a promise for us to keep.
+    await assertFails(
+      setDoc(doc(alice(), `users/${ALICE}`), {
+        notifications: { push: true, sms: true },
+      })
+    )
+    await assertFails(
+      setDoc(doc(alice(), `users/${ALICE}`), {
+        notifications: { push: 'yes' },
+      })
+    )
+  })
+
   it('refuses a phone number written by the client', async () => {
     // Phone comes from the auth token; letting the profile set it would let a
     // customer claim someone else's number on an invoice.

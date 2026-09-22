@@ -160,7 +160,21 @@ function AddressBook({ uid }: { uid: string }) {
         />
       ) : (
         <>
-          <div className="mt-5 flex flex-col gap-3">
+          {/* Above the list, not under it. On an account with four addresses
+              the button under them is off the bottom of the screen, and
+              "where do I add one" is the only question this screen gets. */}
+          <button
+            type="button"
+            onClick={() => setEditing('new')}
+            className="-mx-4 flex w-[calc(100%+2rem)] items-center gap-3 border-b border-border px-4 py-4 text-left hover:bg-surface lg:mx-0 lg:w-full lg:px-0"
+          >
+            <Plus className="size-5 shrink-0 text-brand" aria-hidden="true" />
+            <span className="text-base font-semibold text-brand">
+              Add another address
+            </span>
+          </button>
+
+          <div className="mt-4 flex flex-col gap-3">
             {data.data?.addresses.map((address) => (
               <AddressCard
                 key={address.id}
@@ -171,16 +185,6 @@ function AddressBook({ uid }: { uid: string }) {
               />
             ))}
           </div>
-
-          <Button
-            className="mt-4"
-            variant="secondary"
-            fullWidth
-            onClick={() => setEditing('new')}
-            iconLeft={<Plus className="size-4" aria-hidden="true" />}
-          >
-            Add a new address
-          </Button>
         </>
       )}
 

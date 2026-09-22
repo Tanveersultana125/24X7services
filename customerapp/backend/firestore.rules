@@ -82,14 +82,22 @@ service cloud.firestore {
       // so neither is writable here. fcmTokens is managed by registerFcmToken.
       allow create, update: if isOwner(uid)
         && onlyFields([], ['name', 'email', 'defaultAddressId', 'paymentPreference',
-                           'createdAt', 'updatedAt'])
+                           'notifications', 'createdAt', 'updatedAt'])
         && (!('name' in incoming()) || isString(incoming().name, 80))
         && (!('email' in incoming()) || isString(incoming().email, 160))
         && (!('defaultAddressId' in incoming()) || isString(incoming().defaultAddressId, 200))
         // A stated habit, not an instrument: no card, token or last-four ever
         // reaches Firestore, so the only thing to validate is the enum.
         && (!('paymentPreference' in incoming())
-            || incoming().paymentPreference in ['balance_first', 'online', 'pay_after_service']);
+            || incoming().paymentPreference in ['balance_first', 'online', 'pay_after_service'])
+        // Two booleans and nothing else. Which channels exist is decided in
+        // the schema, not by whatever a client decides to write here.
+        && (!('notifications' in incoming())
+            || (incoming().notifications.keys().hasOnly(['push', 'inApp'])
+                && (!('push' in incoming().notifications)
+                    || incoming().notifications.push is bool)
+                && (!('inApp' in incoming().notifications)
+                    || incoming().notifications.inApp is bool)));
 
       allow delete: if false; // deleteAccount() handles this
 

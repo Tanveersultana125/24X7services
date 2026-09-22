@@ -14,11 +14,13 @@ import {
   PackageOpen,
   Star,
   Bell,
+  BellRing,
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/Button'
 import { Input, Textarea } from '@/components/ui/Field'
 import { Chip, Tag } from '@/components/ui/Chip'
+import { Switch, SwitchRow } from '@/components/ui/Switch'
 
 import { Header, HeaderAction } from '@/components/Header'
 import { BottomNavigation } from '@/components/BottomNavigation'
@@ -469,6 +471,34 @@ function Discovery() {
               image: '/appliances/air-conditioner.jpg',
             }}
             from="₹399"
+          />
+        </div>
+      </Case>
+
+      <Case label="Switch — on, off, saving, unavailable">
+        <div className="flex items-center gap-4">
+          <Switch checked onChange={() => {}} label="On" />
+          <Switch checked={false} onChange={() => {}} label="Off" />
+          <Switch checked onChange={() => {}} label="Saving" busy />
+          <Switch checked={false} onChange={() => {}} label="Unavailable" disabled />
+        </div>
+      </Case>
+
+      <Case label="SwitchRow — the list a settings screen is made of">
+        <div className="divide-y divide-border border-y border-border">
+          <SwitchRow
+            icon={BellRing}
+            label="Push notifications"
+            description="On this device, when a booking moves"
+            checked
+            onChange={() => {}}
+          />
+          <SwitchRow
+            icon={Bell}
+            label="In-app notifications"
+            description="The list under Profile, Notifications"
+            checked={false}
+            onChange={() => {}}
           />
         </div>
       </Case>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import type { Route } from 'next'
 import {
@@ -79,18 +80,44 @@ export function AboutScreen() {
           BOTTOM_NAV_CLEARANCE
         )}
       >
+        {/*
+          The mark, the name and the build, in that order and at the top.
+          It is the first thing an About screen is asked for — somebody
+          reporting a problem is usually here to read the version number back
+          to support, and making them scroll to the footer for it is the whole
+          reason they rang.
+        */}
         <section className="mt-6">
-          <p className="text-sm font-semibold tracking-[0.08em] uppercase text-muted">
+          <span className="block size-16 overflow-hidden rounded-card bg-ink">
+            <Image
+              src="/icons/icon-192.png"
+              alt=""
+              width={64}
+              height={64}
+              className="size-16 object-cover"
+            />
+          </span>
+
+          <h1 className="mt-4 text-2xl font-bold leading-tight text-ink">
             24X7 Home Services
-          </p>
-          <h1 className="mt-1 text-2xl font-bold leading-tight text-ink">
-            Appliance repair that turns up when it said it would
           </h1>
-          <p className="mt-2 text-sm text-muted">
-            We service refrigerators, washing machines, air conditioners,
-            microwaves and geysers across Hyderabad. Every technician is on our
-            own roster, every price is quoted before the work starts, and every
-            completed job carries a written warranty.
+          {APP_VERSION ? (
+            <p className="mt-0.5 text-sm text-muted tabular-nums">
+              Version {APP_VERSION}
+            </p>
+          ) : null}
+
+          <p className="mt-4 text-base leading-relaxed text-ink">
+            Appliance repair that turns up when it said it would. We service
+            refrigerators, washing machines, air conditioners, microwaves and
+            geysers across Hyderabad.
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-muted">
+            Every technician is on our own roster, not a marketplace of
+            strangers. The visit fee is what you pay to book, and anything
+            beyond it is itemised and quoted on site — nothing is started until
+            you approve it. Every completed job carries a written warranty, and
+            every bill is a GST invoice you can download.
           </p>
         </section>
 
@@ -206,11 +233,6 @@ export function AboutScreen() {
             </p>
           )}
 
-          {APP_VERSION ? (
-            <p className="mt-8 text-center text-xs text-muted">
-              Version {APP_VERSION}
-            </p>
-          ) : null}
         </section>
       </main>
 

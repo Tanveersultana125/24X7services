@@ -12,6 +12,32 @@ export const phoneSchema = z
   .string()
   .regex(/^\+91[6-9][0-9]{9}$/, 'Enter a valid 10-digit Indian mobile number')
 
+/**
+ * What a customer has agreed to be sent.
+ *
+ * Two switches, because this app sends on two channels and no others. A
+ * settings screen listing SMS, email, WhatsApp and voice calls would be four
+ * switches, three of which do nothing — and a switch that does nothing is
+ * worse than no switch, because it is a promise the customer will act on.
+ *
+ * What is not here is the job itself: the message saying a technician is on
+ * their way, or that a quote needs an answer. Those are the service, not
+ * marketing, and there is nowhere to turn them off because turning them off
+ * would mean a technician arriving at a door nobody was told about.
+ */
+export const notificationPrefsSchema = z.object({
+  /** Push to this customer's devices. Needs the browser's permission too. */
+  push: z.boolean().default(true),
+  /** The list inside the app. Off means we still write it, nothing pings. */
+  inApp: z.boolean().default(true),
+})
+export type NotificationPrefs = z.infer<typeof notificationPrefsSchema>
+
+export const DEFAULT_NOTIFICATION_PREFS: NotificationPrefs = {
+  push: true,
+  inApp: true,
+}
+
 export const consentSchema = z.object({
   termsVersion: z.string().min(1),
   acceptedAt: z.number().int().min(0),
@@ -27,6 +53,15 @@ export const userProfileSchema = z.object({
   defaultAddressId: z.string().min(1).optional(),
   /** How they would rather pay. Absent means they have never said. */
   paymentPreference: paymentPreferenceSchema.optional(),
+  /**
+   * Which ways we may reach them, and about what.
+   *
+   * Only the channels this app actually sends on appear here, because a switch
+   * for a channel nobody sends on is a promise with nothing behind it. There
+   * is deliberately no switch for the messages about a booking in progress —
+   * see the note on the schema.
+   */
+  notifications: notificationPrefsSchema.optional(),
 })
 export type UserProfile = z.infer<typeof userProfileSchema>
 
