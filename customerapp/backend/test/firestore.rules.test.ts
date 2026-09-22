@@ -168,6 +168,17 @@ describe('user profile', () => {
     )
   })
 
+  it('lets a user state how they would rather pay, but not invent a value', async () => {
+    await assertSucceeds(
+      setDoc(doc(alice(), `users/${ALICE}`), { paymentPreference: 'online' })
+    )
+    // The enum is the whole validation, because there is nothing else in this
+    // field — no token, no card, no last four.
+    await assertFails(
+      setDoc(doc(alice(), `users/${ALICE}`), { paymentPreference: 'free' })
+    )
+  })
+
   it('refuses a phone number written by the client', async () => {
     // Phone comes from the auth token; letting the profile set it would let a
     // customer claim someone else's number on an invoice.
@@ -548,6 +559,176 @@ describe('notifications', () => {
     )
     await assertFails(deleteDoc(doc(alice(), `notifications/${ALICE}/items/n1`)))
     await assertFails(getDoc(doc(bob(), `notifications/${ALICE}/items/n1`)))
+  })
+})
+
+// ---------------------------------------------------------------------------
+
+describe('plans, membership and gift cards', () => {
+  beforeEach(async () => {
+    await asAdmin(async (db) => {
+      await setDoc(doc(db, 'catalogPlans/ac-annual-care'), {
+        name: 'AC Annual Care',
+        price: 249900,
+        active: true,
+        order: 1,
+      })
+      await setDoc(doc(db, 'userPlans/p_1'), {
+        uid: ALICE,
+        planId: 'ac-annual-care',
+        visitsIncluded: 2,
+        visitsUsed: 0,
+        expiresAt: 9_000_000_000_000,
+      })
+      await setDoc(doc(db, `memberships/${ALICE}`), {
+        tier: 'plus',
+        period: 'yearly',
+        expiresAt: 9_000_000_000_000,
+        updatedAt: 1,
+      })
+      await setDoc(doc(db, 'giftCards/24X7-ABCD-EFGH'), {
+        code: '24X7-ABCD-EFGH',
+        amount: 100000,
+        status: 'active',
+        purchasedBy: ALICE,
+        purchasedAt: 1,
+      })
+      await setDoc(doc(db, 'purchaseOrders/order_p1'), {
+        uid: ALICE,
+        kind: 'plan',
+        amount: 249900,
+        createdAt: 1,
+      })
+    })
+  })
+
+  it('lets anyone read the plans on offer and nobody write them', async () => {
+    await assertSucceeds(getDoc(doc(guest(), 'catalogPlans/ac-annual-care')))
+    await assertFails(
+      setDoc(doc(alice(), 'catalogPlans/ac-annual-care'), { price: 1 })
+    )
+  })
+
+  it('lets the owner read a plan they bought, and nobody else', async () => {
+    await assertSucceeds(getDoc(doc(alice(), 'userPlans/p_1')))
+    await assertSucceeds(
+      getDocs(
+        query(collection(alice(), 'userPlans'), where('uid', '==', ALICE), limit(50))
+      )
+    )
+    await assertFails(getDoc(doc(bob(), 'userPlans/p_1')))
+    await assertFails(
+      getDocs(query(collection(alice(), 'userPlans'), limit(50)))
+    )
+  })
+
+  it('refuses a client that would spend or extend its own plan', async () => {
+    // visitsUsed is the count a plan is spent from and expiresAt is when it
+    // ends. A client that can write either owns an unlimited plan.
+    await assertFails(updateDoc(doc(alice(), 'userPlans/p_1'), { visitsUsed: 0 }))
+    await assertFails(
+      updateDoc(doc(alice(), 'userPlans/p_1'), { expiresAt: 9_900_000_000_000 })
+    )
+  })
+
+  it('lets the owner read their membership and never write it', async () => {
+    await assertSucceeds(getDoc(doc(alice(), `memberships/${ALICE}`)))
+    await assertFails(getDoc(doc(bob(), `memberships/${ALICE}`)))
+    await assertFails(
+      setDoc(doc(alice(), `memberships/${ALICE}`), {
+        tier: 'plus',
+        period: 'yearly',
+        expiresAt: 9_900_000_000_000,
+        updatedAt: 2,
+      })
+    )
+  })
+
+  it('lets the buyer list their gift cards and refuses a fetch by code', async () => {
+    // A get on a guessed code that succeeded would confirm the code, and a
+    // confirmed code is a spent one. Redeeming goes through the callable.
+    await assertFails(getDoc(doc(alice(), 'giftCards/24X7-ABCD-EFGH')))
+    await assertSucceeds(
+      getDocs(
+        query(
+          collection(alice(), 'giftCards'),
+          where('purchasedBy', '==', ALICE),
+          limit(50)
+        )
+      )
+    )
+    await assertFails(
+      getDocs(
+        query(
+          collection(bob(), 'giftCards'),
+          where('purchasedBy', '==', ALICE),
+          limit(50)
+        )
+      )
+    )
+    await assertFails(
+      setDoc(doc(alice(), 'giftCards/24X7-ZZZZ-ZZZZ'), {
+        code: '24X7-ZZZZ-ZZZZ',
+        amount: 500000,
+        status: 'active',
+        purchasedBy: ALICE,
+        purchasedAt: 1,
+      })
+    )
+  })
+
+  it('hides what a purchase was raised to buy', async () => {
+    // Same reason as topupOrders: an amount a customer can read is one they
+    // can argue about, and one they could write is one they can be given.
+    await assertFails(getDoc(doc(alice(), 'purchaseOrders/order_p1')))
+    await assertFails(
+      setDoc(doc(alice(), 'purchaseOrders/order_p2'), { uid: ALICE, amount: 1 })
+    )
+  })
+})
+
+// ---------------------------------------------------------------------------
+
+describe('referrals', () => {
+  beforeEach(async () => {
+    await asAdmin(async (db) => {
+      await setDoc(doc(db, `referrals/${ALICE}`), {
+        code: '24X7-ABCDEF',
+        invited: 2,
+        earned: 50000,
+        createdAt: 1,
+        updatedAt: 1,
+      })
+      await setDoc(doc(db, 'referralCodes/24X7-ABCDEF'), {
+        uid: ALICE,
+        createdAt: 1,
+      })
+    })
+  })
+
+  it('lets a customer read their own code and what it earned', async () => {
+    await assertSucceeds(getDoc(doc(alice(), `referrals/${ALICE}`)))
+    await assertFails(getDoc(doc(bob(), `referrals/${ALICE}`)))
+  })
+
+  it('refuses a client that would credit itself', async () => {
+    // `earned` is money and `referredBy` decides who gets paid. Both are
+    // written by the callables, which check that a job was actually finished.
+    await assertFails(
+      updateDoc(doc(alice(), `referrals/${ALICE}`), { earned: 9999900 })
+    )
+    await assertFails(
+      updateDoc(doc(alice(), `referrals/${ALICE}`), { referredBy: BOB })
+    )
+  })
+
+  it('keeps the code-to-customer lookup private', async () => {
+    // It maps a code to the person behind it. applyReferralCode is the only
+    // thing that needs to ask, and it asks from the server.
+    await assertFails(getDoc(doc(alice(), 'referralCodes/24X7-ABCDEF')))
+    await assertFails(
+      setDoc(doc(alice(), 'referralCodes/24X7-MINE01'), { uid: ALICE })
+    )
   })
 })
 

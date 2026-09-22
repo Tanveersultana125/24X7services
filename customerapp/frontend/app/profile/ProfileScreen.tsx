@@ -354,9 +354,16 @@ function ReferCard({ signedIn }: { signedIn: boolean }) {
           <p className="text-xl font-bold leading-snug text-ink">
             Refer &amp; earn {formatPaise(REFERRAL_REWARD)}
           </p>
+          {/*
+            The space after the amount is written out. A JSX text run that
+            both follows an expression and contains an HTML entity loses its
+            leading whitespace through this toolchain's transform — it
+            compiled to "₹250in credits" and nothing warned.
+          */}
           <p className="mt-1 max-w-[22rem] text-sm text-muted">
-            Get {formatPaise(REFERRAL_REWARD)} in credits when a friend&apos;s
-            first booking is finished. They get the same.
+            Get {formatPaise(REFERRAL_REWARD)}{' '}
+            in credits when a friend&apos;s first booking is finished. They get
+            the same.
           </p>
         </div>
 
