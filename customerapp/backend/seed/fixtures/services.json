@@ -10,7 +10,8 @@
     "durationMinutes": 60,
     "order": 1,
     "active": true,
-    "video": "/services/washing-machine-repair.mp4"
+    "video": "/services/washing-machine-repair.mp4",
+    "poster": "/services/washing-machine-repair.jpg"
   },
   {
     "id": "washing-machine_service",
@@ -23,7 +24,8 @@
     "durationMinutes": 60,
     "order": 2,
     "active": true,
-    "video": "/services/washing-machine-service.mp4"
+    "video": "/services/washing-machine-service.mp4",
+    "poster": "/services/washing-machine-service.jpg"
   },
   {
     "id": "washing-machine_installation",
@@ -36,7 +38,8 @@
     "durationMinutes": 45,
     "order": 3,
     "active": true,
-    "video": "/services/washing-machine-installation.mp4"
+    "video": "/services/washing-machine-installation.mp4",
+    "poster": "/services/washing-machine-installation.jpg"
   },
   {
     "id": "washing-machine_uninstallation",
@@ -49,7 +52,8 @@
     "durationMinutes": 30,
     "order": 4,
     "active": true,
-    "video": "/services/washing-machine-uninstallation.mp4"
+    "video": "/services/washing-machine-uninstallation.mp4",
+    "poster": "/services/washing-machine-uninstallation.jpg"
   },
   {
     "id": "air-conditioner_service",
@@ -62,7 +66,8 @@
     "durationMinutes": 75,
     "order": 1,
     "active": true,
-    "video": "/services/ac-service.mp4"
+    "video": "/services/ac-service.mp4",
+    "poster": "/services/ac-service.jpg"
   },
   {
     "id": "air-conditioner_repair",
@@ -75,7 +80,8 @@
     "durationMinutes": 75,
     "order": 2,
     "active": true,
-    "video": "/services/ac-repair.mp4"
+    "video": "/services/ac-repair.mp4",
+    "poster": "/services/ac-repair.jpg"
   },
   {
     "id": "air-conditioner_deep-clean",
@@ -88,7 +94,8 @@
     "durationMinutes": 135,
     "order": 3,
     "active": true,
-    "video": "/services/ac-deep-clean.mp4"
+    "video": "/services/ac-deep-clean.mp4",
+    "poster": "/services/ac-deep-clean.jpg"
   },
   {
     "id": "air-conditioner_gas-refill",
@@ -101,7 +108,8 @@
     "durationMinutes": 105,
     "order": 4,
     "active": true,
-    "video": "/services/ac-gas-refill.mp4"
+    "video": "/services/ac-gas-refill.mp4",
+    "poster": "/services/ac-gas-refill.jpg"
   },
   {
     "id": "air-conditioner_installation",
@@ -114,7 +122,8 @@
     "durationMinutes": 60,
     "order": 5,
     "active": true,
-    "video": "/services/ac-installation.mp4"
+    "video": "/services/ac-installation.mp4",
+    "poster": "/services/ac-installation.jpg"
   },
   {
     "id": "air-conditioner_uninstallation",
@@ -127,7 +136,8 @@
     "durationMinutes": 45,
     "order": 6,
     "active": true,
-    "video": "/services/ac-uninstallation.mp4"
+    "video": "/services/ac-uninstallation.mp4",
+    "poster": "/services/ac-uninstallation.jpg"
   },
   {
     "id": "refrigerator_repair",
@@ -140,7 +150,8 @@
     "durationMinutes": 75,
     "order": 1,
     "active": true,
-    "video": "/services/refrigerator-repair.mp4"
+    "video": "/services/refrigerator-repair.mp4",
+    "poster": "/services/refrigerator-repair.jpg"
   },
   {
     "id": "refrigerator_service",
@@ -153,7 +164,8 @@
     "durationMinutes": 75,
     "order": 2,
     "active": true,
-    "video": "/services/refrigerator-service.mp4"
+    "video": "/services/refrigerator-service.mp4",
+    "poster": "/services/refrigerator-service.jpg"
   },
   {
     "id": "refrigerator_gas-refill",
@@ -166,7 +178,8 @@
     "durationMinutes": 105,
     "order": 3,
     "active": true,
-    "video": "/services/refrigerator-gas-refill.mp4"
+    "video": "/services/refrigerator-gas-refill.mp4",
+    "poster": "/services/refrigerator-gas-refill.jpg"
   },
   {
     "id": "refrigerator_installation",
@@ -179,7 +192,8 @@
     "durationMinutes": 60,
     "order": 4,
     "active": true,
-    "video": "/services/refrigerator-installation.mp4"
+    "video": "/services/refrigerator-installation.mp4",
+    "poster": "/services/refrigerator-installation.jpg"
   },
   {
     "id": "geyser_service",
@@ -192,7 +206,8 @@
     "durationMinutes": 60,
     "order": 1,
     "active": true,
-    "video": "/services/geyser-service.mp4"
+    "video": "/services/geyser-service.mp4",
+    "poster": "/services/geyser-service.jpg"
   },
   {
     "id": "geyser_repair",
@@ -205,7 +220,8 @@
     "durationMinutes": 60,
     "order": 2,
     "active": true,
-    "video": "/services/geyser-repair.mp4"
+    "video": "/services/geyser-repair.mp4",
+    "poster": "/services/geyser-repair.jpg"
   },
   {
     "id": "geyser_installation",
@@ -218,7 +234,8 @@
     "durationMinutes": 45,
     "order": 3,
     "active": true,
-    "video": "/services/geyser-installation.mp4"
+    "video": "/services/geyser-installation.mp4",
+    "poster": "/services/geyser-installation.jpg"
   },
   {
     "id": "geyser_uninstallation",
@@ -231,7 +248,8 @@
     "durationMinutes": 30,
     "order": 4,
     "active": true,
-    "video": "/services/geyser-uninstallation.mp4"
+    "video": "/services/geyser-uninstallation.mp4",
+    "poster": "/services/geyser-uninstallation.jpg"
   },
   {
     "id": "microwave_repair",
@@ -244,7 +262,8 @@
     "durationMinutes": 60,
     "order": 1,
     "active": true,
-    "video": "/services/microwave-repair.mp4"
+    "video": "/services/microwave-repair.mp4",
+    "poster": "/services/microwave-repair.jpg"
   },
   {
     "id": "microwave_service",
@@ -257,7 +276,8 @@
     "durationMinutes": 60,
     "order": 2,
     "active": true,
-    "video": "/services/microwave-service.mp4"
+    "video": "/services/microwave-service.mp4",
+    "poster": "/services/microwave-service.jpg"
   },
   {
     "id": "microwave_installation",
@@ -270,6 +290,7 @@
     "durationMinutes": 45,
     "order": 3,
     "active": true,
-    "video": "/services/microwave-installation.mp4"
+    "video": "/services/microwave-installation.mp4",
+    "poster": "/services/microwave-installation.jpg"
   }
 ]

@@ -473,14 +473,20 @@ function Discovery() {
         </div>
       </Case>
 
-      <Case label="ServiceCard — unselected and selected">
+      <Case label="ServiceCard — the one card that moves, and one that does not">
         <div className="flex flex-col gap-3">
           <ServiceCard
             service={fx.service}
             image={fx.appliance.image}
+            motion
             onSelect={() => {}}
           />
-          <ServiceCard service={fx.service} onSelect={() => {}} selected />
+          <ServiceCard
+            service={fx.service}
+            image={fx.appliance.image}
+            onSelect={() => {}}
+            selected
+          />
         </div>
       </Case>
 

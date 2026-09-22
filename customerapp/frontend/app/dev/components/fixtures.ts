@@ -51,8 +51,11 @@ export const service: CatalogService = {
     'Not draining, not spinning, leaking or throwing an error code. The expert inspects it and quotes the repair before touching anything.',
   visitFee: 29900,
   startingPrice: 49900,
+  durationMinutes: 60,
   order: 1,
   active: true,
+  video: '/services/washing-machine-repair.mp4',
+  poster: '/services/washing-machine-repair.jpg',
 }
 
 export const brands: CatalogBrand[] = [

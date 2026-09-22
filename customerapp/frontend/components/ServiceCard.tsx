@@ -20,14 +20,21 @@ import { cn } from '@/lib/cn'
  * picture shrunk into the corner beside a button, which read as a row in a
  * list rather than as a thing you choose.
  *
- * A service that has been seeded a clip shows it in place of the picture.
- * Muted, looping and inline, because that is the only shape a browser will
- * play unasked — and not played at all for a customer who has asked their
- * system for less motion, who gets the still instead. Every seeded service
- * carries one, because a page where some cards move and some do not reads as
- * a page where half the clips failed to load. The still branch stays for the
- * service somebody adds tomorrow and does not draw a clip for, and the clip
- * is never the thing carrying the meaning either way.
+ * One card on a page moves, and it is the first one. Six clips playing down a
+ * single screen is six decoders on a cheap phone, six downloads on a metered
+ * connection, and — the part that actually matters — nowhere for the eye to
+ * rest: everything moving is the same as nothing moving. So the page hands
+ * `motion` to its first card and to nothing else.
+ *
+ * The rest show a still *of their own clip*, not the appliance drawing. The
+ * drawing is shared by every service on the appliance, so putting it on six
+ * cards turns a list of services into a list of the same thing. The drawing
+ * stays as the last fallback, for a service nobody has drawn a clip for.
+ *
+ * The clip is muted, looping and inline, because that is the only shape a
+ * browser will play unasked, and it is not played at all for a customer who
+ * has asked their system for less motion — they get the still like everyone
+ * below them. The clip is never the thing carrying the meaning either way.
  *
  * The "Book" pill is drawn as a button but is not one. The whole card is the
  * control, and a real button inside it would be a second target nested in the
@@ -46,6 +53,11 @@ export interface ServiceCardProps {
    * clip shows before its first frame decodes.
    */
   image?: string
+  /**
+   * Whether this card is the one allowed to play its clip. Off by default:
+   * a page that wants movement asks for it, once. See the note above.
+   */
+  motion?: boolean
   onSelect: (service: CatalogService) => void
   selected?: boolean
   className?: string
@@ -54,13 +66,19 @@ export interface ServiceCardProps {
 export function ServiceCard({
   service,
   image,
+  motion = false,
   onSelect,
   selected = false,
   className,
 }: ServiceCardProps) {
   const duration = durationNote(service.durationMinutes)
   const reducedMotion = usePrefersReducedMotion()
+  const plays = motion && Boolean(service.video) && !reducedMotion
   const video = useVisiblePlayback(service.video, reducedMotion)
+
+  // The still, in the order it is worth having: this service's own frame, then
+  // the appliance drawing, then nothing.
+  const still = service.poster ?? image
 
   return (
     <CardButton
@@ -77,12 +95,12 @@ export function ServiceCard({
         className
       )}
     >
-      {service.video && !reducedMotion ? (
+      {plays ? (
         <video
           ref={video}
-          // The drawing stands in before a frame has decoded, and stands in
+          // Its own still stands in before a frame has decoded, and stands in
           // for good on a connection that never gets one.
-          poster={image}
+          poster={still}
           src={service.video}
           muted
           loop
@@ -91,14 +109,17 @@ export function ServiceCard({
           aria-hidden="true"
           className="aspect-video w-full rounded-card bg-surface object-cover"
         />
-      ) : image ? (
+      ) : still ? (
         <span className="relative block aspect-video w-full overflow-hidden rounded-card bg-surface">
           <Image
-            src={image}
+            src={still}
             alt=""
             fill
             sizes="(min-width: 640px) 512px, 100vw"
-            className="object-contain p-6"
+            // A frame of the clip fills the card the way the clip does. The
+            // appliance drawing is a drawing on a background and needs the
+            // room around it, so it is contained and padded instead.
+            className={service.poster ? 'object-cover' : 'object-contain p-6'}
           />
         </span>
       ) : null}
@@ -157,12 +178,11 @@ export function ServiceCard({
 /**
  * Play a card's clip while it is on screen, and pause it the rest of the time.
  *
- * `autoplay` would be one attribute instead of this hook, and it plays every
- * clip on the page at once. An appliance page lists up to six services and now
- * every one of them carries a clip, so that is six decoders running for the
- * five cards nobody is looking at — which on a cheap phone is where the
- * scrolling starts to stutter, and on a metered connection is five downloads
- * the customer did not ask for.
+ * `autoplay` would be one attribute instead of this hook, and it starts the
+ * download and the decoder whether or not the card has ever been on screen.
+ * Only one card on a page plays now, but that card is often below the fold —
+ * and a clip fetched for a page somebody never scrolled is a download the
+ * customer did not ask for.
  *
  * The margin starts a clip a screen-height early, so one that is scrolled to
  * is already moving rather than starting from its first frame on arrival.

@@ -82,6 +82,17 @@ export const catalogServiceSchema = z.object({
    */
   video: z.string().min(1).optional(),
   /**
+   * A still of that clip, for every card that is not the one playing.
+   *
+   * Only the first service on an appliance page moves; the rest show this.
+   * It is a frame of the same clip rather than the appliance drawing, because
+   * the drawing is shared by every service on the appliance and putting it on
+   * six cards turns a list of services into a list of the same thing. Made by
+   * `frontend/scripts/makeServicePosters.mjs`, which takes it from the middle
+   * of the clip where the work is actually happening.
+   */
+  poster: z.string().min(1).optional(),
+  /**
    * How long the visit usually takes, in minutes.
    *
    * It lets a rail card separate a twenty-minute installation from a two-hour
