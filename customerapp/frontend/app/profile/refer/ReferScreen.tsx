@@ -1,41 +1,50 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import { Copy, Gift, Share2, Ticket, UserRoundPlus } from 'lucide-react'
+import Link from 'next/link'
+import type { Route } from 'next'
+import { ChevronDown, Gift, Ticket, UserRoundPlus } from 'lucide-react'
 import {
   REFERRAL_REWARD,
   REFERRAL_WELCOME,
   formatPaise,
   normaliseReferralCode,
   referralCodeSchema,
-  referralShareText,
 } from '@app/shared'
 
 import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
+import { ReferCard } from '@/components/ReferCard'
 import { ErrorState } from '@/components/ErrorState'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Field'
 import { useToast } from '@/components/Toast'
 import { callFn, friendlyError } from '@/lib/callables'
-import { copyText, shareText } from '@/lib/share'
 import { useAsync } from '@/lib/useAsync'
+import { cn } from '@/lib/cn'
 
 /**
- * Your code, what it has earned, and the box for somebody else's.
+ * Your code, the ways to send it, and what it has earned.
  *
- * The promise on this screen is written the way the code actually pays: both
- * people are credited when the person who used the code has had a job
- * *finished*. Not on sign-up, not on booking. Saying "get ₹250 when your friend
- * signs up" and paying three weeks later is how a referral scheme turns into a
- * support queue, so the sentence and the server agree here, word for word.
+ * The promise is written the way the code actually pays: both people are
+ * credited when the person who used it has had a job *finished*. Not on
+ * sign-up, not on booking. "Get ₹250 when your friend signs up" and paying
+ * three weeks later is how a referral scheme turns into a support queue, so
+ * the sentence and the server agree here, word for word.
  *
- * The code is made by the server the first time this screen is opened. There is
- * nothing to generate, claim or activate — it exists because you asked to see
- * it, which is the only moment anyone needs one.
+ * The code is made by the server the first time this screen is opened. There
+ * is nothing to generate, claim or activate — it exists because you asked to
+ * see it, which is the only moment anyone needs one.
+ *
+ * Sending it is named channels rather than one Share button, because a share
+ * sheet is a list of forty apps between somebody and the one they were always
+ * going to use. WhatsApp is first and it is not a close-run thing here. The
+ * sheet is still there, last, for everyone the three do not cover.
  */
 export function ReferScreen() {
-  return <ProfileShell title="Refer a friend"
+  return (
+    <ProfileShell
+      title="Refer & earn"
       signedOut={
         <SignInPrompt
           icon={Gift}
@@ -43,7 +52,10 @@ export function ReferScreen() {
           description="Refer a friend and you both get credits once their first job is finished. Sign in for your code."
         />
       }
-    >{() => <Refer />}</ProfileShell>
+    >
+      {() => <Refer />}
+    </ProfileShell>
+  )
 }
 
 function Refer() {
@@ -53,7 +65,7 @@ function Refer() {
   if (referral.status === 'loading') {
     return (
       <SkeletonGroup label="Loading your code" className="mt-6 flex flex-col gap-4">
-        <Skeleton className="h-52" />
+        <Skeleton className="h-64" />
         <Skeleton className="h-24" />
       </SkeletonGroup>
     )
@@ -73,7 +85,7 @@ function Refer() {
 
   return (
     <>
-      <CodeCard code={code} />
+      <ReferCard code={code} />
 
       <div className="mt-3 grid grid-cols-2 gap-3">
         <Stat
@@ -84,37 +96,16 @@ function Refer() {
         <Stat icon={Gift} label="You have earned" value={formatPaise(earned)} />
       </div>
 
-      <Band />
+      <HowItWorks />
 
-      <section>
-        <h2 className="text-lg font-bold text-ink">How it works</h2>
-        <ol className="mt-3 flex flex-col gap-4">
-          <Step
-            n={1}
-            title="Send them your code"
-            body="Anyone who has not booked with 24X7 before can use it."
-          />
-          <Step
-            n={2}
-            title="They enter it before their first booking"
-            body="On this screen, in the box at the bottom. It only works before their first job."
-          />
-          <Step
-            n={3}
-            title="Their first job gets finished"
-            body={`That is when we pay — ${formatPaise(REFERRAL_REWARD)} to you and ${formatPaise(
-              REFERRAL_WELCOME
-            )} to them, as credits on your balances. Not before, because a booking that never happened is not a referral.`}
-          />
-        </ol>
-      </section>
+      <Faq />
 
       <Band />
 
       {canApplyCode ? (
         <ApplyCode onApplied={referral.reload} />
       ) : (
-        <section className="pb-6">
+        <section>
           <h2 className="text-lg font-bold text-ink">
             Using someone&apos;s code
           </h2>
@@ -125,94 +116,16 @@ function Refer() {
           </p>
         </section>
       )}
+
+      <p className="mt-6 pb-6 text-center text-sm">
+        <Link
+          href={'/legal/terms' as Route}
+          className="font-semibold text-brand"
+        >
+          Terms and conditions
+        </Link>
+      </p>
     </>
-  )
-}
-
-/**
- * The code itself, as the one thing on the screen allowed to be large.
- *
- * Brand colours and the same speckle as the balance card, because this is the
- * other screen in the app that hands a customer a number worth money — and a
- * second decorative treatment invented for one card is how a design system
- * starts leaking.
- */
-function CodeCard({ code }: { code: string }) {
-  const toast = useToast()
-  const [busy, setBusy] = useState(false)
-
-  const url =
-    typeof window !== 'undefined' ? window.location.origin : 'https://24x7.app'
-  const message = referralShareText(code, url)
-
-  async function send(): Promise<void> {
-    if (busy) return
-    setBusy(true)
-    const outcome = await shareText(message, 'Try 24X7')
-    setBusy(false)
-    if (outcome === 'copied') {
-      toast.show('Invite copied. Paste it wherever you like.', { tone: 'success' })
-    } else if (outcome === 'failed') {
-      toast.show('We could not open the share sheet. Long-press the code to copy it.', {
-        tone: 'error',
-      })
-    }
-    // 'shared' and 'dismissed' are both the customer's own doing — nothing to say.
-  }
-
-  async function copy(): Promise<void> {
-    const outcome = await copyText(code)
-    toast.show(
-      outcome === 'copied' ? `${code} copied` : 'We could not copy that.',
-      { tone: outcome === 'copied' ? 'success' : 'error' }
-    )
-  }
-
-  return (
-    <div className="relative mt-5 overflow-hidden rounded-card bg-linear-to-br from-brand-deep to-brand p-5 text-bg">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-10 -right-10 size-56 opacity-25 [background-image:radial-gradient(circle,var(--color-bg)_1.5px,transparent_1.6px)] [background-size:14px_14px] [mask-image:radial-gradient(circle_at_70%_30%,#000,transparent_70%)]"
-      />
-
-      <p className="relative text-sm font-semibold tracking-[0.06em] uppercase">
-        Refer &amp; earn
-      </p>
-      <p className="relative mt-2 max-w-[20rem] text-2xl font-bold leading-snug">
-        {formatPaise(REFERRAL_REWARD)} for you, {formatPaise(REFERRAL_WELCOME)}{' '}
-        for them
-      </p>
-      <p className="relative mt-1 text-sm text-bg/80">
-        Paid when their first job is finished.
-      </p>
-
-      <p className="relative mt-6 text-xs font-semibold tracking-[0.08em] uppercase text-bg/70">
-        Your code
-      </p>
-      <p className="relative mt-0.5 font-mono text-2xl font-bold tracking-[0.12em]">
-        {code}
-      </p>
-
-      <div className="relative mt-4 flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={() => void send()}
-          disabled={busy}
-          className="inline-flex h-11 items-center gap-2 rounded-pill bg-bg px-5 text-sm font-semibold text-brand hover:bg-brand-soft disabled:opacity-60"
-        >
-          <Share2 className="size-4" aria-hidden="true" />
-          Share invite
-        </button>
-        <button
-          type="button"
-          onClick={() => void copy()}
-          className="inline-flex h-11 items-center gap-2 rounded-pill border border-bg/40 px-5 text-sm font-semibold text-bg hover:bg-bg/10"
-        >
-          <Copy className="size-4" aria-hidden="true" />
-          Copy code
-        </button>
-      </div>
-    </div>
   )
 }
 
@@ -234,20 +147,115 @@ function Stat({
   )
 }
 
-function Step({ n, title, body }: { n: number; title: string; body: string }) {
+/**
+ * The three steps, in a card, with the line that makes them a sequence.
+ *
+ * The third one is the one that matters and it is worded to be impossible to
+ * misread: the money arrives when the job is done, not when somebody signs up.
+ */
+function HowItWorks() {
+  const steps = [
+    {
+      title: 'Send your code',
+      body: 'To anyone who has not booked with 24X7 before.',
+    },
+    {
+      title: 'They enter it before their first booking',
+      body: 'Under Profile, Refer & earn. It only works before that first job.',
+    },
+    {
+      title: 'Their first job gets finished',
+      body: `That is when we pay — ${formatPaise(REFERRAL_REWARD)} to you and ${formatPaise(
+        REFERRAL_WELCOME
+      )} to them, as credits. Not before, because a booking that never happened is not a referral.`,
+    },
+  ]
+
   return (
-    <li className="flex gap-3">
-      <span
-        className="flex size-7 shrink-0 items-center justify-center rounded-full bg-surface text-sm font-bold text-ink"
-        aria-hidden="true"
-      >
-        {n}
-      </span>
-      <span className="min-w-0">
-        <span className="block text-base font-semibold text-ink">{title}</span>
-        <span className="mt-0.5 block text-sm text-muted">{body}</span>
-      </span>
-    </li>
+    <section className="mt-6 rounded-card bg-surface p-5">
+      <h2 className="text-lg font-bold text-ink">How it works</h2>
+      <ol className="mt-4 flex flex-col">
+        {steps.map((step, index) => (
+          <li key={step.title} className="flex gap-3">
+            <span className="flex flex-col items-center" aria-hidden="true">
+              <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-bg text-sm font-bold text-ink">
+                {index + 1}
+              </span>
+              {index < steps.length - 1 ? (
+                <span className="w-px flex-1 bg-border" />
+              ) : null}
+            </span>
+            <span
+              className={cn('min-w-0', index < steps.length - 1 && 'pb-5')}
+            >
+              <span className="block text-base font-semibold text-ink">
+                {step.title}
+              </span>
+              <span className="mt-0.5 block text-sm leading-relaxed text-muted">
+                {step.body}
+              </span>
+            </span>
+          </li>
+        ))}
+      </ol>
+    </section>
+  )
+}
+
+/**
+ * The questions a referral scheme raises by existing.
+ *
+ * Every answer here is a rule the server actually enforces — one code per
+ * account, before the first booking, paid on completion. A scheme whose small
+ * print is looser than its code is a scheme that pays people who read it
+ * carefully.
+ */
+const FAQ = [
+  {
+    q: 'When exactly do I get paid?',
+    a: 'When the person who used your code has had their first job finished. Not when they sign up, and not when they book — a booking that gets cancelled has cost nobody anything.',
+  },
+  {
+    q: 'How many people can use my code?',
+    a: 'As many as you like. You are paid once for each of them, the first time each one has a job finished.',
+  },
+  {
+    q: 'Can I use my own code?',
+    a: 'No. A code cannot be used on the account that owns it, and it only works on an account that has never booked with us.',
+  },
+  {
+    q: 'Where does the money go?',
+    a: 'Onto your 24X7 balance as credits, which come off your next bill. Like the rest of the balance it never expires, and it can only be spent on 24X7 services.',
+  },
+  {
+    q: 'Can I use more than one code myself?',
+    a: 'One per account. If you have already used one, the box on this screen is gone rather than waiting to refuse you.',
+  },
+] as const
+
+function Faq() {
+  return (
+    <section className="mt-8">
+      <h2 className="text-lg font-bold text-ink">Questions</h2>
+      <ul className="mt-2 divide-y divide-border border-y border-border">
+        {FAQ.map((item) => (
+          <li key={item.q}>
+            {/* Native details: open before hydration, searchable by the
+                browser's own find, and announced without being told how. */}
+            <details className="group">
+              <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-4 text-base font-semibold text-ink [&::-webkit-details-marker]:hidden">
+                {item.q}
+                <ChevronDown
+                  className="size-4 shrink-0 text-muted transition-transform duration-[var(--duration-fast)] group-open:rotate-180"
+                  aria-hidden="true"
+                />
+              </summary>
+              <p className="pb-4 text-sm leading-relaxed text-muted">{item.a}</p>
+            </details>
+          </li>
+        ))}
+      </ul>
+    </section>
   )
 }
 
@@ -280,7 +288,7 @@ function ApplyCode({ onApplied }: { onApplied: () => void }) {
     try {
       await callFn('applyReferralCode', { code: parsed.data })
       toast.show(
-        `Code applied. You will both be credited once your first job is done.`,
+        'Code applied. You will both be credited once your first job is done.',
         { tone: 'success' }
       )
       setValue('')
@@ -293,10 +301,8 @@ function ApplyCode({ onApplied }: { onApplied: () => void }) {
   }
 
   return (
-    <section className="pb-6">
-      <h2 className="text-lg font-bold text-ink">
-        Have someone&apos;s code?
-      </h2>
+    <section>
+      <h2 className="text-lg font-bold text-ink">Have someone&apos;s code?</h2>
       <p className="mt-1 text-sm text-muted">
         Enter it before your first booking and you both get{' '}
         {formatPaise(REFERRAL_WELCOME)} once that job is finished.

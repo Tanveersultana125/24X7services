@@ -42,6 +42,7 @@ import { SupportCard } from '@/components/SupportCard'
 import { ReviewCard, Stars } from '@/components/ReviewCard'
 import { WarrantyCard } from '@/components/WarrantyCard'
 import { PlanCard, PlanOfferCard } from '@/components/PlanCard'
+import { ReferCard } from '@/components/ReferCard'
 import { InvoiceView } from '@/components/InvoiceView'
 import { Modal, ConfirmModal } from '@/components/Modal'
 import { BottomSheet } from '@/components/BottomSheet'
@@ -699,6 +700,10 @@ function Lifecycle() {
             onBuy={() => undefined}
           />
         </div>
+      </Case>
+
+      <Case label="ReferCard — the offer, the code, and the ways to send it">
+        <ReferCard code="24X7-K7M2QD" />
       </Case>
 
       <Case label="ReviewCard">
