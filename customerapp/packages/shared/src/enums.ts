@@ -143,9 +143,34 @@ export const paymentStatusSchema = z.enum([
 ])
 export type PaymentStatus = z.infer<typeof paymentStatusSchema>
 
+/**
+ * How a customer would rather settle a bill.
+ *
+ * A preference, not an instrument. Nothing here is a stored card: the gateway
+ * keeps those and we never see them, which is the whole reason this is an
+ * enum of three habits rather than a list of last-four digits.
+ *
+ *   - balance_first  take it off the 24X7 balance, then charge the rest
+ *   - online         card, UPI or netbanking, every time
+ *   - pay_after_service  settle with the technician once the job is done
+ */
+export const paymentPreferenceSchema = z.enum([
+  'balance_first',
+  'online',
+  'pay_after_service',
+])
+export type PaymentPreference = z.infer<typeof paymentPreferenceSchema>
+export const PAYMENT_PREFERENCES = paymentPreferenceSchema.options
+/** What an account that has never said applies. */
+export const DEFAULT_PAYMENT_PREFERENCE: PaymentPreference = 'balance_first'
+
 /** What a Razorpay order is being raised for. */
 export const paymentPurposeSchema = z.enum(['visit_fee', 'final_due'])
 export type PaymentPurpose = z.infer<typeof paymentPurposeSchema>
+
+/** What a purchase order was raised to buy. */
+export const purchaseKindSchema = z.enum(['plan', 'membership', 'gift_card'])
+export type PurchaseKind = z.infer<typeof purchaseKindSchema>
 
 // ---------------------------------------------------------------------------
 // Job OTPs

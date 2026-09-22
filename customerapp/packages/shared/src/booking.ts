@@ -209,6 +209,26 @@ export const bookingSchema = z.object({
   price: priceBreakdownSchema,
   payment: paymentInfoSchema,
 
+  /**
+   * What already covered part of this bill before it was quoted.
+   *
+   * Recorded on the booking rather than worked out again later, because a
+   * membership lapses and a plan runs out — and when they do, the bill for a
+   * job booked while they were live must not quietly change. It is also what
+   * makes a covered visit traceable: the plan named here is the one a visit
+   * comes off when the job is finished.
+   */
+  cover: z
+    .object({
+      /** 24X7 Plus was live when this was booked. */
+      membership: z.boolean().default(false),
+      /** The plan covering the visit, if one did. */
+      userPlanId: z.string().min(1).optional(),
+      /** Stamped when the visit is taken off that plan, so it happens once. */
+      visitConsumedAt: z.number().int().min(0).optional(),
+    })
+    .optional(),
+
   /** Only when each OTP was revealed. The values live in a private subcollection. */
   otp: z
     .object({

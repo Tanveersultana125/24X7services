@@ -31,6 +31,25 @@ export const COL = {
    * how much, so neither has to take an amount from the client.
    */
   topupOrders: 'topupOrders',
+  /**
+   * A purchase we raised an order for, keyed by the Razorpay order id. Same
+   * job as topupOrders and the same reason for existing: it says what was
+   * bought and for how much, so nothing that arrives with the confirmation
+   * has to be believed.
+   */
+  purchaseOrders: 'purchaseOrders',
+  /** Plans on offer. Public to read, written by the seed. */
+  catalogPlans: 'catalogPlans',
+  /** A plan somebody has paid for. */
+  userPlans: 'userPlans',
+  /** One membership per customer, keyed by uid. */
+  memberships: 'memberships',
+  /** Keyed by the code, which is the card. */
+  giftCards: 'giftCards',
+  /** One per customer, keyed by uid: their code, and whose they used. */
+  referrals: 'referrals',
+  /** code -> uid, so a code can be resolved without scanning. */
+  referralCodes: 'referralCodes',
   warranties: 'warranties',
   reviews: 'reviews',
   supportTickets: 'supportTickets',

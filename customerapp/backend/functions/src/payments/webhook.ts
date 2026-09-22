@@ -8,6 +8,7 @@ import { markBookingPaid } from './markPaid'
 import { topupMovementId } from './topup'
 import { topUpWallet } from '../lib/wallet'
 import { PAYMENT_SECRETS, verifyWebhookSignature } from '../lib/razorpay'
+import { fulfilPurchase } from '../commerce/purchase'
 
 /**
  * Razorpay's account of what happened, which is the account that counts.
@@ -94,9 +95,12 @@ export const razorpayWebhook = onRequest(
     }
 
     const isTopup = payment.notes?.purpose === 'wallet_topup'
+    // A plan, a membership or a gift card. What it bought is on the order
+    // record this server wrote, which is the only thing fulfilment reads.
+    const isPurchase = payment.notes?.purpose === 'purchase'
     const bookingId = payment.notes?.bookingId
 
-    if (!isTopup && !bookingId) {
+    if (!isTopup && !isPurchase && !bookingId) {
       logger.warn('razorpayWebhook: captured payment matched nothing we raised', {
         paymentId: payment.id,
       })
@@ -112,6 +116,7 @@ export const razorpayWebhook = onRequest(
         paymentId: payment.id,
         ...(bookingId ? { bookingId } : {}),
         ...(isTopup ? { purpose: 'wallet_topup' } : {}),
+        ...(isPurchase ? { purpose: 'purchase' } : {}),
         receivedAt: Date.now(),
       })
     } catch {
@@ -122,6 +127,8 @@ export const razorpayWebhook = onRequest(
     try {
       if (isTopup) {
         await creditTopup(payment.id, payment.order_id)
+      } else if (isPurchase) {
+        await creditPurchase(payment.id, payment.order_id)
       } else if (bookingId) {
         const result = await markBookingPaid(bookingId, payment.id)
         logger.info('razorpayWebhook: handled a captured payment', {
@@ -138,6 +145,7 @@ export const razorpayWebhook = onRequest(
       logger.error('razorpayWebhook: failed to handle a captured payment', {
         bookingId,
         isTopup,
+        isPurchase,
         error,
       })
       response.status(500).send('Retry')
@@ -158,6 +166,42 @@ export const razorpayWebhook = onRequest(
  * order we have no record of raising, which redelivery cannot fix and which
  * somebody needs to look at.
  */
+/**
+ * Hand over a plan, a membership or a gift card that has been paid for.
+ *
+ * Identical in shape to the top-up above and for the same reason: what was
+ * bought is read off the order record this server wrote, never off the event.
+ * Fulfilment is idempotent on the payment id, so arriving here after the
+ * customer's own verify call has already run does nothing.
+ */
+async function creditPurchase(
+  paymentId: string,
+  orderId: string | undefined
+): Promise<void> {
+  if (!orderId) {
+    logger.error('razorpayWebhook: purchase capture carried no order id', {
+      paymentId,
+    })
+    return
+  }
+
+  try {
+    const outcome = await fulfilPurchase(orderId, paymentId)
+    logger.info('razorpayWebhook: handled a captured purchase', {
+      orderId,
+      kind: outcome.kind,
+    })
+  } catch (error) {
+    // A purchase we have no record of raising is not something redelivery
+    // fixes, and it is not something to keep 500ing over either.
+    logger.error('razorpayWebhook: could not hand over a purchase', {
+      orderId,
+      paymentId,
+      error,
+    })
+  }
+}
+
 async function creditTopup(
   paymentId: string,
   orderId: string | undefined

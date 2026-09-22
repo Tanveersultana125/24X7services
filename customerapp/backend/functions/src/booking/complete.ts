@@ -17,9 +17,12 @@ import {
 import { db } from '../lib/admin'
 import { REGION } from '../lib/options'
 import { renderInvoicePdf } from '../lib/invoicePdf'
+import { consumePlanVisit } from '../lib/cover'
+import { rewardReferral } from '../commerce/referral'
 
 /**
- * What a finished job leaves behind: an invoice and a warranty.
+ * What a finished job leaves behind: an invoice, a warranty, and — where they
+ * apply — a visit off a plan and a referral paid out.
  *
  * Both are documents, written once, and both freeze what was true on the day.
  * The invoice copies the seller's legal name, GSTIN, address, SAC code and rate
@@ -67,6 +70,15 @@ export const onBookingCompleted = onDocumentWritten(
       return
     }
     const booking = parsed.data
+
+    // A plan visit and a referral are settled before the early return below,
+    // because both have to happen on a job whose paperwork was already
+    // issued — a retried trigger that stopped at the invoice check would
+    // never pay them. Each is idempotent in its own right, and neither can
+    // throw: a referral that failed to pay is a support conversation, and an
+    // invoice that failed to issue is not.
+    await consumePlanVisit(bookingId)
+    await rewardReferral(booking.uid)
 
     // Already issued. The trigger is at-least-once, and an invoice number is
     // the one thing in this system that must never be handed out twice.

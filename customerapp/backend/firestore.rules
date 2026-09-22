@@ -55,6 +55,7 @@ service cloud.firestore {
     match /popularServices/{id}      { allow read: if true; allow write: if false; }
     match /serviceAreas/{pincode}    { allow read: if true; allow write: if false; }
     match /searchIndex/{id}          { allow read: if true; allow write: if false; }
+    match /catalogPlans/{id}         { allow read: if true; allow write: if false; }
 
     // The public half of the config. Provider keys and anything with a margin
     // in it live in config/private, which no rule below grants.
@@ -80,10 +81,15 @@ service cloud.firestore {
       // `phone` comes from the auth token and `consent` is stamped at sign-in,
       // so neither is writable here. fcmTokens is managed by registerFcmToken.
       allow create, update: if isOwner(uid)
-        && onlyFields([], ['name', 'email', 'defaultAddressId', 'createdAt', 'updatedAt'])
+        && onlyFields([], ['name', 'email', 'defaultAddressId', 'paymentPreference',
+                           'createdAt', 'updatedAt'])
         && (!('name' in incoming()) || isString(incoming().name, 80))
         && (!('email' in incoming()) || isString(incoming().email, 160))
-        && (!('defaultAddressId' in incoming()) || isString(incoming().defaultAddressId, 200));
+        && (!('defaultAddressId' in incoming()) || isString(incoming().defaultAddressId, 200))
+        // A stated habit, not an instrument: no card, token or last-four ever
+        // reaches Firestore, so the only thing to validate is the enum.
+        && (!('paymentPreference' in incoming())
+            || incoming().paymentPreference in ['balance_first', 'online', 'pay_after_service']);
 
       allow delete: if false; // deleteAccount() handles this
 
@@ -182,6 +188,56 @@ service cloud.firestore {
         allow write: if false;
       }
     }
+
+    // -----------------------------------------------------------------------
+    // What a customer has bought: plans, membership, gift cards, referrals
+    // -----------------------------------------------------------------------
+
+    // A plan somebody paid for. Read-only: the price, the cover and the count
+    // of visits left are all things a client that could write them would.
+    match /userPlans/{planId} {
+      allow get: if signedIn() && resource.data.uid == request.auth.uid;
+      // Split from get because request.query only exists on a list; reading
+      // .limit during a get raises, and a raising rule denies.
+      allow list: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.query.limit <= 100;
+      allow write: if false;
+    }
+
+    // Keyed by uid, like the wallet, so ownership is the document id.
+    match /memberships/{uid} {
+      allow get: if isOwner(uid);
+      allow write: if false;
+    }
+
+    // The code is the card, so nothing here is fetched by id: a get would let
+    // anyone confirm a guessed code, and a code confirmed is a code spent.
+    // The buyer lists their own cards; everyone else goes through
+    // redeemGiftCard, which claims the card before it credits anything.
+    match /giftCards/{code} {
+      allow get: if false;
+      allow list: if signedIn()
+        && resource.data.purchasedBy == request.auth.uid
+        && request.query.limit <= 100;
+      allow write: if false;
+    }
+
+    // A customer's own code, and whose they used. Written by getReferral and
+    // applyReferralCode, because both halves decide whether money is owed.
+    match /referrals/{uid} {
+      allow get: if isOwner(uid);
+      allow write: if false;
+    }
+
+    // code -> uid. Readable by nobody: it maps a code to the person behind it,
+    // and applyReferralCode is the only thing that needs to ask.
+    match /referralCodes/{code} { allow read, write: if false; }
+
+    // What a purchase order was raised to buy, and for how much. Same reason
+    // as topupOrders below: an amount a customer can write is an amount a
+    // customer can be given.
+    match /purchaseOrders/{orderId} { allow read, write: if false; }
 
     // What a top-up order was for. Read by the webhook and the verify call to
     // learn the amount, which is exactly why no client may see or set it: an

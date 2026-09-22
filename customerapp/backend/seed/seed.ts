@@ -33,6 +33,7 @@ import {
   catalogApplianceSchema,
   catalogBrandSchema,
   catalogIssueSchema,
+  catalogPlanSchema,
   catalogServiceSchema,
   diagnosisRuleSchema,
   matrixDocId,
@@ -160,6 +161,7 @@ const services = fixture('services', z.array(catalogServiceSchema))
 const brands = fixture('brands', z.array(catalogBrandSchema))
 const issues = fixture('issues', z.array(catalogIssueSchema))
 const diagnosisRules = fixture('diagnosis', z.array(diagnosisRuleSchema))
+const plans = fixture('plans', z.array(catalogPlanSchema))
 const serviceAreas = fixture('serviceAreas', z.array(serviceAreaSchema))
 const home = fixture(
   'home',
@@ -388,6 +390,9 @@ async function main(): Promise<void> {
   }
   for (const rule of diagnosisRules) {
     b.set(`${COL.diagnosisRules}/${rule.id}`, rule)
+  }
+  for (const plan of plans) {
+    b.set(`${COL.catalogPlans}/${plan.id}`, plan)
   }
   for (const banner of home.banners) {
     b.set(`${COL.banners}/${banner.id}`, banner)

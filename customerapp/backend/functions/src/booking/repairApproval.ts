@@ -13,6 +13,7 @@ import {
 import { db } from '../lib/admin'
 import { defineCallable } from '../lib/callable'
 import { priceBooking } from '../lib/pricing'
+import { coverDiscount } from '../lib/cover'
 import { applyTransition, writeEvent } from '../lib/transition'
 
 /**
@@ -112,10 +113,21 @@ export const respondToRepairRequest = defineCallable(
         .map((id) => repairItemTotal(quoted.get(id)!))
         .reduce((total, amount) => total + amount, 0)
 
+      // Read off the booking, not off the account. What covered this job is
+      // what was true when it was booked; a membership that lapsed in between
+      // must not re-price a repair the customer is being asked to approve.
+      const cover = {
+        membership: booking.data.cover?.membership ?? false,
+        ...(booking.data.cover?.userPlanId
+          ? { userPlanId: booking.data.cover.userPlanId }
+          : {}),
+      }
+
       const price = priceBooking({
         service: service.data,
         config,
         additional,
+        discount: coverDiscount(service.data.visitFee, additional, cover),
         paid: booking.data.price.paid,
       })
 

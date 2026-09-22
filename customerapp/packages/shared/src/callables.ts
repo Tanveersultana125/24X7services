@@ -3,6 +3,7 @@ import {
   applianceIdSchema,
   otpKindSchema,
   paymentPurposeSchema,
+  purchaseKindSchema,
   serviceKeySchema,
   techPreferenceSchema,
 } from './enums'
@@ -21,6 +22,9 @@ import {
 import { createTicketInputSchema, sendMessageInputSchema } from './support'
 import { phoneSchema } from './user'
 import { topupAmountSchema } from './wallet'
+import { membershipOptionIdSchema } from './plans'
+import { giftCardAmountSchema, giftCardCodeSchema } from './giftcard'
+import { referralCodeSchema } from './referral'
 
 /**
  * One entry per callable: its input schema, its result schema, and the name it
@@ -153,6 +157,86 @@ export const verifyTopupResult = z.object({
   /** The balance after this call, whether or not this call is what moved it. */
   balance: z.number().int(),
 })
+
+// --- createPurchaseOrder ---------------------------------------------------
+
+/**
+ * What is being bought. One call raises the order for all three, because all
+ * three are the same transaction from the gateway's side and splitting them
+ * would be three copies of the same signature check.
+ *
+ * Notice what the client does not send: a price. A plan is priced from the
+ * catalog, a membership from the table in plans.ts, and only the gift card
+ * carries an amount — which is bounded by its own schema and checked again by
+ * the handler.
+ */
+export const purchaseRequestSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('plan'), planId: z.string().min(1).max(60) }),
+  z.object({ kind: z.literal('membership'), optionId: membershipOptionIdSchema }),
+  z.object({
+    kind: z.literal('gift_card'),
+    amount: giftCardAmountSchema,
+    recipientName: z.string().trim().max(60).optional(),
+    message: z.string().trim().max(200).optional(),
+  }),
+])
+export type PurchaseRequest = z.infer<typeof purchaseRequestSchema>
+
+export const createPurchaseOrderInput = z.object({
+  request: purchaseRequestSchema,
+})
+export const createPurchaseOrderResult = z.object({
+  orderId: z.string(),
+  amount: z.number().int(),
+  currency: z.literal('INR'),
+  keyId: z.string(),
+  /** What the payment sheet says the money is for. */
+  description: z.string(),
+})
+
+// --- verifyPurchase --------------------------------------------------------
+
+export const verifyPurchaseInput = z.object({
+  razorpayOrderId: z.string().min(1),
+  razorpayPaymentId: z.string().min(1),
+  razorpaySignature: z.string().min(1),
+})
+export const verifyPurchaseResult = z.object({
+  kind: purchaseKindSchema,
+  /** A plan or a membership: the day the cover runs out. */
+  expiresAt: z.number().int().optional(),
+  /** A gift card: the code to hand over. Returned once, then listed. */
+  code: giftCardCodeSchema.optional(),
+})
+
+// --- redeemGiftCard --------------------------------------------------------
+
+export const redeemGiftCardInput = z.object({ code: giftCardCodeSchema })
+export const redeemGiftCardResult = z.object({
+  amount: z.number().int(),
+  /** The balance after redeeming, so the screen never has to guess. */
+  balance: z.number().int(),
+})
+
+// --- getReferral -----------------------------------------------------------
+
+/** No input: the code belongs to whoever is asking. */
+export const getReferralInput = z.object({})
+export const getReferralResult = z.object({
+  code: referralCodeSchema,
+  /** People who used it and have had a job finished. */
+  invited: z.number().int().min(0),
+  earned: z.number().int().min(0),
+  /** True once this account has used somebody else's code. */
+  usedCode: z.boolean(),
+  /** False once they have a booking, or have already used one. */
+  canApplyCode: z.boolean(),
+})
+
+// --- applyReferralCode -----------------------------------------------------
+
+export const applyReferralCodeInput = z.object({ code: referralCodeSchema })
+export const applyReferralCodeResult = z.object({ ok: z.literal(true) })
 
 // --- verifyPayment ---------------------------------------------------------
 
@@ -309,6 +393,27 @@ export const CALLABLES = {
   verifyTopup: {
     input: verifyTopupInput,
     result: verifyTopupResult,
+    auth: true,
+  },
+  createPurchaseOrder: {
+    input: createPurchaseOrderInput,
+    result: createPurchaseOrderResult,
+    auth: true,
+  },
+  verifyPurchase: {
+    input: verifyPurchaseInput,
+    result: verifyPurchaseResult,
+    auth: true,
+  },
+  redeemGiftCard: {
+    input: redeemGiftCardInput,
+    result: redeemGiftCardResult,
+    auth: true,
+  },
+  getReferral: { input: getReferralInput, result: getReferralResult, auth: true },
+  applyReferralCode: {
+    input: applyReferralCodeInput,
+    result: applyReferralCodeResult,
     auth: true,
   },
   previewCancellation: {

@@ -66,6 +66,7 @@ export const creditReasonSchema = z.enum([
   'late_visit',
   'service_recovery',
   'referral',
+  'gift_card',
   'goodwill',
 ])
 export type CreditReason = z.infer<typeof creditReasonSchema>

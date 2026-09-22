@@ -1,0 +1,80 @@
+[
+  {
+    "id": "ac-annual-care",
+    "name": "AC Annual Care",
+    "tagline": "Two services a year, and the visit fee gone on both",
+    "applianceIds": ["air-conditioner"],
+    "price": 249900,
+    "compareAt": 319800,
+    "durationDays": 365,
+    "visitsIncluded": 2,
+    "benefits": [
+      "Two full services, booked when you want them",
+      "No visit fee on either",
+      "Gas top-up checked at every visit",
+      "Same technician wherever we can"
+    ],
+    "order": 1,
+    "active": true
+  },
+  {
+    "id": "fridge-annual-care",
+    "name": "Refrigerator Annual Care",
+    "tagline": "A yearly service and a cooling check, visit fee included",
+    "applianceIds": ["refrigerator"],
+    "price": 179900,
+    "compareAt": 219800,
+    "durationDays": 365,
+    "visitsIncluded": 2,
+    "benefits": [
+      "Two services in the year",
+      "No visit fee on either",
+      "Cooling, gas and door seal checked each time",
+      "Priority slots in summer"
+    ],
+    "order": 2,
+    "active": true
+  },
+  {
+    "id": "washer-annual-care",
+    "name": "Washing Machine Annual Care",
+    "tagline": "Two deep cleans, and nothing to pay for the visit",
+    "applianceIds": ["washing-machine"],
+    "price": 159900,
+    "compareAt": 199800,
+    "durationDays": 365,
+    "visitsIncluded": 2,
+    "benefits": [
+      "Two drum deep cleans a year",
+      "No visit fee on either",
+      "Inlet, outlet and drain checked each time",
+      "Descaling included"
+    ],
+    "order": 3,
+    "active": true
+  },
+  {
+    "id": "home-annual-care",
+    "name": "Whole Home Annual Care",
+    "tagline": "Four visits a year, any appliance in the house",
+    "applianceIds": [
+      "refrigerator",
+      "washing-machine",
+      "air-conditioner",
+      "microwave",
+      "geyser"
+    ],
+    "price": 449900,
+    "compareAt": 639600,
+    "durationDays": 365,
+    "visitsIncluded": 4,
+    "benefits": [
+      "Four service visits, on whichever appliance needs one",
+      "No visit fee on any of them",
+      "Every appliance in the house covered",
+      "Priority slots, including same day"
+    ],
+    "order": 4,
+    "active": true
+  }
+]

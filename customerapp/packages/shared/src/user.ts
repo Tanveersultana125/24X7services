@@ -1,5 +1,10 @@
 import { z } from 'zod'
-import { addressLabelSchema, applianceIdSchema, brandIdSchema } from './enums'
+import {
+  addressLabelSchema,
+  applianceIdSchema,
+  brandIdSchema,
+  paymentPreferenceSchema,
+} from './enums'
 import { geoPointSchema, pincodeSchema } from './catalog'
 
 /** Indian mobile number in E.164, which is what Firebase Auth returns. */
@@ -20,6 +25,8 @@ export const userProfileSchema = z.object({
   consent: consentSchema.optional(),
   fcmTokens: z.array(z.string().min(1)).default([]),
   defaultAddressId: z.string().min(1).optional(),
+  /** How they would rather pay. Absent means they have never said. */
+  paymentPreference: paymentPreferenceSchema.optional(),
 })
 export type UserProfile = z.infer<typeof userProfileSchema>
 

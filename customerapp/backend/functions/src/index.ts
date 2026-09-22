@@ -23,6 +23,9 @@ import {
 import { registerFcmToken, deleteAccount } from './account/account'
 import { createPaymentOrder, verifyPayment } from './payments/orders'
 import { createTopupOrder, verifyTopup } from './payments/topup'
+import { createPurchaseOrder, verifyPurchase } from './commerce/purchase'
+import { redeemGiftCard } from './commerce/giftCards'
+import { getReferral, applyReferralCode } from './commerce/referral'
 import { razorpayWebhook } from './payments/webhook'
 import { onUserCreate } from './auth/onUserCreate'
 
@@ -40,6 +43,8 @@ import { onUserCreate } from './auth/onUserCreate'
  *            createSupportTicket, sendSupportMessage, escalateTicket,
  *            registerFcmToken, deleteAccount, getMaskedNumber
  *   Phase 6  createTopupOrder, verifyTopup
+ *   Phase 7  createPurchaseOrder, verifyPurchase, redeemGiftCard,
+ *            getReferral, applyReferralCode
  *
  * The export name is the deployed function name, which is why each callable is
  * named after its entry in the shared registry and checked against it below.
@@ -64,6 +69,12 @@ export {
   // The balance
   createTopupOrder,
   verifyTopup,
+  // Plans, membership, gift cards and referrals
+  createPurchaseOrder,
+  verifyPurchase,
+  redeemGiftCard,
+  getReferral,
+  applyReferralCode,
   // The job
   getJobOtp,
   respondToRepairRequest,
@@ -109,6 +120,13 @@ assertCallableNames({
   createBooking,
   createPaymentOrder,
   verifyPayment,
+  createTopupOrder,
+  verifyTopup,
+  createPurchaseOrder,
+  verifyPurchase,
+  redeemGiftCard,
+  getReferral,
+  applyReferralCode,
   getJobOtp,
   respondToRepairRequest,
   submitReview,

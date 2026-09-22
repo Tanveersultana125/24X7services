@@ -19,6 +19,7 @@ import {
 import { db } from '../lib/admin'
 import { defineCallable } from '../lib/callable'
 import { priceBooking } from '../lib/pricing'
+import { coverDiscount, coverFor, coverRecord } from '../lib/cover'
 import { writeEvent } from '../lib/transition'
 import { findWindow, freeIn, windowHasPassed } from '../lib/slots'
 
@@ -57,6 +58,12 @@ export const createBooking = defineCallable(
 
     const bookingRef = db().collection(COL.bookings).doc()
     const counterRef = db().collection(COL.counters).doc(DOC.bookingCounter)
+
+    // What this customer already holds — a plan, a membership, or neither.
+    // Read before the transaction rather than inside it: it is not part of
+    // what the transaction has to hold atomically, and the slot hold below is
+    // not a place to add two more reads. See lib/cover.
+    const cover = await coverFor(uid, draft.applianceId)
 
     return db().runTransaction(async (tx) => {
       // --- Reads. All of them, before anything is written. ------------------
@@ -170,15 +177,26 @@ export const createBooking = defineCallable(
 
       // --- Money, from the catalog and nowhere else. ------------------------
 
-      const price = priceBooking({ service: service.data, config })
+      const price = priceBooking({
+        service: service.data,
+        config,
+        // A plan covers the visit; 24X7 Plus waives the fee outright. Either
+        // way it comes off here, where the quote is made, so the customer
+        // never sees a number they then have to be talked out of.
+        discount: coverDiscount(service.data.visitFee, 0, cover),
+      })
 
       // --- Writes. ----------------------------------------------------------
 
       const now = Date.now()
       const online = draft.paymentMode === 'online'
+      // Cover can take the whole visit fee off, and no gateway charges zero.
+      // A booking with nothing left to pay is confirmed outright whichever
+      // mode was chosen — there is no moment left for it to be pending on.
+      const takesPayment = online && price.due > 0
       const payment: PaymentInfo = {
         mode: draft.paymentMode,
-        status: 'pending',
+        status: price.due > 0 ? 'pending' : 'not_required',
       }
 
       // Paying online holds the place until the money lands; paying after the
@@ -187,8 +205,8 @@ export const createBooking = defineCallable(
         index === found.index
           ? {
               ...window,
-              held: online ? window.held + 1 : window.held,
-              booked: online ? window.booked : window.booked + 1,
+              held: takesPayment ? window.held + 1 : window.held,
+              booked: takesPayment ? window.booked : window.booked + 1,
             }
           : window
       )
@@ -197,7 +215,7 @@ export const createBooking = defineCallable(
       tx.set(counterRef, { next: nextNumber + 1 }, { merge: true })
 
       const displayId = `#AP${nextNumber}`
-      const holdExpiresAt = online
+      const holdExpiresAt = takesPayment
         ? now + config.slotHoldMinutes * 60 * 1000
         : undefined
 
@@ -223,9 +241,10 @@ export const createBooking = defineCallable(
         techPreference: draft.techPreference,
         technicianId: technician?.id,
         technicianSnapshot: technician ?? undefined,
-        status: online ? 'pending_payment' : 'confirmed',
+        status: takesPayment ? 'pending_payment' : 'confirmed',
         price,
         payment,
+        cover: coverRecord(cover),
         rescheduleCount: 0,
         createdAt: now,
         updatedAt: now,
@@ -236,12 +255,14 @@ export const createBooking = defineCallable(
       writeEvent(
         tx,
         bookingRef,
-        online ? 'pending_payment' : 'confirmed',
+        takesPayment ? 'pending_payment' : 'confirmed',
         {
-          title: online ? 'Booking started' : 'Booking confirmed',
-          note: online
+          title: takesPayment ? 'Booking started' : 'Booking confirmed',
+          note: takesPayment
             ? 'Your slot is held until the visit fee is paid.'
-            : 'You will pay after the service is done.',
+            : price.due > 0
+              ? 'You will pay after the service is done.'
+              : 'Nothing to pay — this visit is covered.',
         },
         now
       )
@@ -250,7 +271,7 @@ export const createBooking = defineCallable(
         bookingId: bookingRef.id,
         displayId,
         price,
-        requiresPayment: online,
+        requiresPayment: takesPayment,
         ...(holdExpiresAt === undefined ? {} : { holdExpiresAt }),
       }
     })
