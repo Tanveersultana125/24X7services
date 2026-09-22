@@ -1,6 +1,7 @@
 import type {
   Address,
   Banner,
+  CatalogPlan,
   BookingEvent,
   CatalogAppliance,
   CatalogBrand,
@@ -11,6 +12,7 @@ import type {
   Review,
   SlotOption,
   TechnicianPublic,
+  UserPlan,
   Warranty,
 } from '@app/shared'
 
@@ -279,3 +281,74 @@ function todayKeyPlus(days: number): string {
 }
 
 export { todayKeyPlus }
+
+// ---------------------------------------------------------------------------
+// Plans
+// ---------------------------------------------------------------------------
+
+export const catalogPlan: CatalogPlan = {
+  id: 'ac-annual-care',
+  name: 'AC Annual Care',
+  tagline: 'Two services a year, and the visit fee gone on both',
+  applianceIds: ['air-conditioner'],
+  price: 249900,
+  compareAt: 319800,
+  durationDays: 365,
+  visitsIncluded: 2,
+  benefits: [
+    'Two full services, booked when you want them',
+    'No visit fee on either',
+    'Gas top-up checked at every visit',
+    'Same technician wherever we can',
+  ],
+  order: 1,
+  active: true,
+}
+
+export const wholeHomePlan: CatalogPlan = {
+  ...catalogPlan,
+  id: 'home-annual-care',
+  name: 'Whole Home Annual Care',
+  tagline: 'Four visits a year, any appliance in the house',
+  applianceIds: ['refrigerator', 'washing-machine', 'air-conditioner'],
+  price: 449900,
+  compareAt: 639600,
+  visitsIncluded: 4,
+  benefits: [
+    'Four service visits, on whichever appliance needs one',
+    'No visit fee on any of them',
+    'Every appliance in the house covered',
+    'Priority slots, including same day',
+  ],
+  order: 4,
+}
+
+export const userPlan: UserPlan = {
+  id: 'p_1',
+  uid: 'demo-user-1',
+  planId: 'ac-annual-care',
+  name: 'AC Annual Care',
+  applianceIds: ['air-conditioner'],
+  price: 249900,
+  visitsIncluded: 2,
+  visitsUsed: 1,
+  benefits: catalogPlan.benefits,
+  startsAt: Date.now() - 120 * day,
+  expiresAt: Date.now() + 245 * day,
+  createdAt: Date.now() - 120 * day,
+}
+
+export const spentPlan: UserPlan = {
+  ...userPlan,
+  id: 'p_2',
+  visitsUsed: 2,
+  startsAt: Date.now() - 400 * day,
+  expiresAt: Date.now() - 35 * day,
+}
+
+/** What the plan cards are handed instead of the appliance catalog. */
+export const applianceNames = new Map<string, string>([
+  ['air-conditioner', 'Air conditioner'],
+  ['refrigerator', 'Refrigerator'],
+  ['washing-machine', 'Washing machine'],
+])

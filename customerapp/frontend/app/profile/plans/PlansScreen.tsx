@@ -1,60 +1,43 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import Link from 'next/link'
-import { CalendarCheck, Check, ClipboardList } from 'lucide-react'
-import {
-  formatPaise,
-  isPlanActive,
-  planVisitsLeft,
-  type CatalogPlan,
-  type UserPlan,
-} from '@app/shared'
+import { ClipboardList } from 'lucide-react'
+import { isPlanActive, type CatalogPlan, type UserPlan } from '@app/shared'
 
 import {
   ProfileShell,
   SignInPrompt,
   useSignInHref,
 } from '@/components/ProfileShell'
+import { PlanCard, PlanOfferCard } from '@/components/PlanCard'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
-import { Button } from '@/components/ui/Button'
-import { Tag } from '@/components/ui/Chip'
 import { useToast } from '@/components/Toast'
 import { fetchAppliances } from '@/lib/catalog'
 import { fetchCatalogPlans, fetchMyPlans } from '@/lib/plans'
 import { buy } from '@/lib/purchase'
-import { daysUntil, formatDateTime } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
-import { cn } from '@/lib/cn'
 
 /**
  * Annual plans: the ones this customer holds, and the ones on offer.
  *
  * A plan is a number of service visits on named appliances, for a year, paid
- * for up front. Two things are therefore always on screen for a plan somebody
- * owns — visits left and days left — because those are the two ways it ends,
- * and a customer who can only see one of them is being told half of what they
- * bought.
- *
- * Visits come off the plan when a job is *finished*, not when it is booked. A
- * booking that gets cancelled has cost nobody a visit, and a plan that debited
- * at booking time would have to give one back on every cancellation — which is
- * a refund path, written twice, for a thing that is not money.
+ * for up front. Visits come off it when a job is *finished*, not when it is
+ * booked — a booking that gets cancelled has cost nobody a visit, and a plan
+ * that debited at booking time would have to give one back on every
+ * cancellation, which is a refund path written twice for a thing that is not
+ * money.
  *
  * What a plan covers at checkout is the visit fee on the appliances it names.
- * It is not a discount on parts, and this screen never implies it is.
+ * It is not a discount on parts, and nothing on this screen implies it is.
+ *
+ * The offer list is public. It is a price list, and a price list you have to
+ * sign in to read is a shop with the shutters down.
  */
 export function PlansScreen() {
   return (
-    <ProfileShell
-      title="Plans"
-      // What is on offer is public — it is a price list. Only the plans this
-      // customer already holds need an account, so signing out takes away the
-      // top of the screen and nothing else.
-      signedOut={<PlansOnOffer />}
-    >
+    <ProfileShell title="Plans" signedOut={<PlansOnOffer />}>
       {(user) => <Plans uid={user.uid} />}
     </ProfileShell>
   )
@@ -71,9 +54,6 @@ function PlansOnOffer() {
   }, [])
 
   const data = useAsync(load)
-  const names = new Map(
-    (data.data?.appliances ?? []).map((each) => [each.id, each.name])
-  )
 
   return (
     <>
@@ -84,11 +64,11 @@ function PlansOnOffer() {
         description="A plan covers a set number of services on your appliances for a year. Sign in to see the ones you are on."
       />
 
-      <div aria-hidden="true" className="-mx-4 my-2 h-2 bg-surface" />
+      <Band />
 
       <Offers
         offered={data.data?.offered ?? []}
-        names={names}
+        names={nameMap(data.data?.appliances)}
         loading={data.status === 'loading'}
         failed={data.status === 'error'}
         onRetry={data.reload}
@@ -113,34 +93,35 @@ function Plans({ uid }: { uid: string }) {
     return (
       <SkeletonGroup label="Loading your plans" className="mt-6 flex flex-col gap-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton key={i} className="h-36" />
+          <Skeleton key={i} className="h-40" />
         ))}
       </SkeletonGroup>
     )
   }
 
   if (data.status === 'error' || !data.data) {
-    return <ErrorState className="py-16" onRetry={data.reload} retrying={data.refreshing} />
+    return (
+      <ErrorState
+        className="py-16"
+        onRetry={data.reload}
+        retrying={data.refreshing}
+      />
+    )
   }
 
   const { mine, offered, appliances } = data.data
-  const names = new Map(appliances.map((each) => [each.id, each.name]))
+  const names = nameMap(appliances)
   const live = mine.filter((plan) => isPlanActive(plan))
   const done = mine.filter((plan) => !isPlanActive(plan))
 
   return (
     <>
+      <h1 className="mt-6 text-2xl font-bold leading-tight text-ink">
+        Your plans
+      </h1>
+
       {live.length > 0 ? (
-        <section className="mt-5">
-          <h2 className="mb-2 text-sm font-semibold text-muted">Running now</h2>
-          <ul className="flex flex-col gap-3">
-            {live.map((plan) => (
-              <li key={plan.id}>
-                <MyPlanCard plan={plan} names={names} />
-              </li>
-            ))}
-          </ul>
-        </section>
+        <Held title="Running now" plans={live} names={names} />
       ) : mine.length === 0 ? (
         <EmptyState
           className="py-12"
@@ -151,22 +132,38 @@ function Plans({ uid }: { uid: string }) {
       ) : null}
 
       {done.length > 0 ? (
-        <section className="mt-7">
-          <h2 className="mb-2 text-sm font-semibold text-muted">Finished</h2>
-          <ul className="flex flex-col gap-3">
-            {done.map((plan) => (
-              <li key={plan.id}>
-                <MyPlanCard plan={plan} names={names} />
-              </li>
-            ))}
-          </ul>
-        </section>
+        <Held title="Finished" plans={done} names={names} className="mt-7" />
       ) : null}
 
-      <div aria-hidden="true" className="-mx-4 my-6 h-2 bg-surface" />
+      <Band />
 
       <Offers offered={offered} names={names} onBought={data.reload} />
     </>
+  )
+}
+
+function Held({
+  title,
+  plans,
+  names,
+  className,
+}: {
+  title: string
+  plans: readonly UserPlan[]
+  names: Map<string, string>
+  className?: string
+}) {
+  return (
+    <section className={className ?? 'mt-5'}>
+      <h2 className="mb-2 text-sm font-semibold text-muted">{title}</h2>
+      <ul className="flex flex-col gap-3">
+        {plans.map((plan) => (
+          <li key={plan.id}>
+            <PlanCard plan={plan} applianceNames={names} />
+          </li>
+        ))}
+      </ul>
+    </section>
   )
 }
 
@@ -177,6 +174,10 @@ function Plans({ uid }: { uid: string }) {
  * each card's button becomes the way in rather than disappearing — a price
  * list that hides its own buttons until you sign in is a price list you cannot
  * tell is a shop.
+ *
+ * The plan with the largest checkable saving leads. Not one somebody picked as
+ * "recommended": the ribbon goes on whichever the subtraction says it is, so
+ * it cannot drift from the prices printed under it.
  */
 function Offers({
   offered,
@@ -195,9 +196,11 @@ function Offers({
   /** Absent when nobody is signed in — see above. */
   onBought?: () => void
 }) {
+  const best = bestValue(offered)
+
   return (
     <section className="pb-6">
-      <h2 className="text-lg font-bold text-ink">Plans you can buy</h2>
+      <h2 className="text-xl font-bold text-ink">Plans you can buy</h2>
       <p className="mt-1 text-sm text-muted">
         Each one covers the visit fee on the appliances it names, for a year.
         Repairs are quoted as usual and you approve them before any work starts.
@@ -206,7 +209,7 @@ function Offers({
       {loading ? (
         <SkeletonGroup label="Loading plans" className="mt-4 flex flex-col gap-3">
           {Array.from({ length: 2 }).map((_, i) => (
-            <Skeleton key={i} className="h-56" />
+            <Skeleton key={i} className="h-72" />
           ))}
         </SkeletonGroup>
       ) : failed ? (
@@ -223,7 +226,12 @@ function Offers({
         <ul className="mt-4 flex flex-col gap-3">
           {offered.map((plan) => (
             <li key={plan.id}>
-              <OfferCard plan={plan} names={names} onBought={onBought} />
+              <Offer
+                plan={plan}
+                names={names}
+                highlight={plan.id === best}
+                onBought={onBought}
+              />
             </li>
           ))}
         </ul>
@@ -232,81 +240,28 @@ function Offers({
   )
 }
 
-// ---------------------------------------------------------------------------
-
-/** A plan this customer owns. Visits left and days left, both, always. */
-function MyPlanCard({
-  plan,
-  names,
-}: {
-  plan: UserPlan
-  names: Map<string, string>
-}) {
-  const left = planVisitsLeft(plan)
-  const days = daysUntil(plan.expiresAt)
-  const live = isPlanActive(plan)
-
-  return (
-    <div
-      className={cn(
-        'rounded-card border p-4',
-        live ? 'border-border' : 'border-border bg-surface'
-      )}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-base font-bold text-ink">{plan.name}</p>
-          <p className="mt-0.5 text-xs text-muted">
-            {plan.applianceIds
-              .map((id) => names.get(id) ?? id)
-              .join(', ')}
-          </p>
-        </div>
-        <Tag
-          className={
-            live ? 'border-success/30 bg-success-soft text-success' : undefined
-          }
-        >
-          {live ? 'Active' : days <= 0 ? 'Expired' : 'All visits used'}
-        </Tag>
-      </div>
-
-      <dl className="mt-4 grid grid-cols-2 gap-3">
-        <div className="rounded-card bg-surface p-3">
-          <dt className="text-xs text-muted">Visits left</dt>
-          <dd className="mt-0.5 text-lg font-bold text-ink tabular-nums">
-            {left} of {plan.visitsIncluded}
-          </dd>
-        </div>
-        <div className="rounded-card bg-surface p-3">
-          <dt className="text-xs text-muted">
-            {days > 0 ? 'Days left' : 'Ended'}
-          </dt>
-          <dd className="mt-0.5 text-lg font-bold text-ink tabular-nums">
-            {days > 0 ? days : formatDateTime(plan.expiresAt).split(',')[0]}
-          </dd>
-        </div>
-      </dl>
-
-      {live ? (
-        <p className="mt-3 text-xs text-muted">
-          Book as usual — we take the visit fee off when the appliance is one
-          this plan covers.
-        </p>
-      ) : null}
-    </div>
-  )
+/** The id of the plan that saves the most, or null when none says. */
+function bestValue(plans: readonly CatalogPlan[]): string | null {
+  let best: { id: string; saving: number } | null = null
+  for (const plan of plans) {
+    const saving = plan.compareAt ? plan.compareAt - plan.price : 0
+    if (saving > 0 && (!best || saving > best.saving)) {
+      best = { id: plan.id, saving }
+    }
+  }
+  return best?.id ?? null
 }
 
-/** A plan on offer, with the one button that buys it. */
-function OfferCard({
+/** One offer card, and the payment it opens. */
+function Offer({
   plan,
   names,
+  highlight,
   onBought,
 }: {
   plan: CatalogPlan
   names: Map<string, string>
-  /** Absent when nobody is signed in; the button becomes the way in. */
+  highlight: boolean
   onBought?: () => void
 }) {
   const [busy, setBusy] = useState(false)
@@ -336,60 +291,22 @@ function OfferCard({
   }
 
   return (
-    <div className="rounded-card border border-border p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-base font-bold text-ink">{plan.name}</p>
-          <p className="mt-0.5 text-sm text-muted">{plan.tagline}</p>
-        </div>
-        <div className="shrink-0 text-right">
-          <p className="text-lg font-bold text-ink tabular-nums">
-            {formatPaise(plan.price)}
-          </p>
-          {plan.compareAt && plan.compareAt > plan.price ? (
-            <p className="text-xs text-muted line-through tabular-nums">
-              {formatPaise(plan.compareAt)}
-            </p>
-          ) : null}
-        </div>
-      </div>
-
-      <p className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-brand">
-        <CalendarCheck className="size-3.5" aria-hidden="true" />
-        {plan.visitsIncluded} visits · {plan.durationDays} days ·{' '}
-        {plan.applianceIds.map((id) => names.get(id) ?? id).join(', ')}
-      </p>
-
-      <ul className="mt-3 flex flex-col gap-2">
-        {plan.benefits.map((benefit) => (
-          <li key={benefit} className="flex items-start gap-2">
-            <Check
-              className="mt-0.5 size-4 shrink-0 text-success"
-              aria-hidden="true"
-            />
-            <span className="text-sm text-ink">{benefit}</span>
-          </li>
-        ))}
-      </ul>
-
-      {onBought ? (
-        <Button
-          className="mt-4"
-          fullWidth
-          variant="secondary"
-          loading={busy}
-          onClick={() => void pay()}
-        >
-          Buy for {formatPaise(plan.price)}
-        </Button>
-      ) : (
-        <Link
-          href={signIn}
-          className="mt-4 flex h-12 w-full items-center justify-center rounded-pill border border-brand text-base font-semibold text-brand hover:bg-brand-soft"
-        >
-          Sign in to buy
-        </Link>
-      )}
-    </div>
+    <PlanOfferCard
+      plan={plan}
+      applianceNames={names}
+      highlight={highlight}
+      busy={busy}
+      {...(onBought ? { onBuy: () => void pay() } : { signInHref: signIn })}
+    />
   )
+}
+
+function nameMap(
+  appliances: ReadonlyArray<{ id: string; name: string }> | undefined
+): Map<string, string> {
+  return new Map((appliances ?? []).map((each) => [each.id, each.name]))
+}
+
+function Band() {
+  return <div aria-hidden="true" className="-mx-4 my-6 h-2 bg-surface" />
 }

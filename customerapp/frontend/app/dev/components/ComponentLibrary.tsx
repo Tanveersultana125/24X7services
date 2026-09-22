@@ -39,6 +39,7 @@ import { StatusTimeline } from '@/components/StatusTimeline'
 import { SupportCard } from '@/components/SupportCard'
 import { ReviewCard, Stars } from '@/components/ReviewCard'
 import { WarrantyCard } from '@/components/WarrantyCard'
+import { PlanCard, PlanOfferCard } from '@/components/PlanCard'
 import { InvoiceView } from '@/components/InvoiceView'
 import { Modal, ConfirmModal } from '@/components/Modal'
 import { BottomSheet } from '@/components/BottomSheet'
@@ -637,6 +638,29 @@ function Lifecycle() {
             warranty={fx.expiredWarranty}
             serviceName="Refrigerator Repair"
             applianceName="Samsung double door"
+          />
+        </div>
+      </Case>
+
+      <Case label="PlanCard — running, and one that is finished">
+        <div className="flex flex-col gap-3">
+          <PlanCard plan={fx.userPlan} applianceNames={fx.applianceNames} />
+          <PlanCard plan={fx.spentPlan} applianceNames={fx.applianceNames} />
+        </div>
+      </Case>
+
+      <Case label="PlanOfferCard — highlighted, and plain">
+        <div className="flex flex-col gap-3">
+          <PlanOfferCard
+            plan={fx.wholeHomePlan}
+            applianceNames={fx.applianceNames}
+            highlight
+            onBuy={() => undefined}
+          />
+          <PlanOfferCard
+            plan={fx.catalogPlan}
+            applianceNames={fx.applianceNames}
+            onBuy={() => undefined}
           />
         </div>
       </Case>
