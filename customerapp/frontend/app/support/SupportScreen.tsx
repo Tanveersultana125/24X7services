@@ -3,9 +3,20 @@
 import { useCallback } from 'react'
 import Link from 'next/link'
 import type { Route } from 'next'
-import { ChevronDown, MessageSquare, Phone } from 'lucide-react'
+import {
+  BadgeCheck,
+  CalendarClock,
+  ChevronRight,
+  MessageSquare,
+  Phone,
+  ReceiptIndianRupee,
+  ShieldCheck,
+  Compass,
+  UserRound,
+} from 'lucide-react'
 
 import { AppShell, Section } from '@/components/AppShell'
+import { SUPPORT_TOPICS } from './topics'
 import { Header } from '@/components/Header'
 import { Card } from '@/components/ui/Card'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
@@ -21,32 +32,21 @@ import { useAsync } from '@/lib/useAsync'
  * problems people want to say out loud, and hiding the number to deflect them
  * into a form only makes the call angrier when it comes.
  *
- * The answers below are the ones the support inbox actually fills up with, so
- * they are here in full rather than as links to an article.
+ * Under it, every topic the inbox actually fills up with, each opening to its
+ * questions answered in full rather than to an article somewhere else. The
+ * answers live in `topics.ts`; this screen only decides the order they are
+ * offered in, which is roughly the order people arrive needing them.
  */
 
-const FAQS = [
-  {
-    question: 'How much will the repair cost?',
-    answer:
-      'You pay the visit fee to book. Your expert inspects the appliance and quotes anything beyond that, itemised, and nothing is charged or started until you approve it.',
-  },
-  {
-    question: 'Can I cancel or change the time?',
-    answer:
-      'Both are on the booking itself. Cancelling well before your slot is free; closer to it a small fee applies, and the exact figure is shown before you confirm.',
-  },
-  {
-    question: 'What if the same fault comes back?',
-    answer:
-      'Every completed repair carries a service warranty. While it is valid, a return visit for the same fault costs nothing — open a conversation here with the booking reference.',
-  },
-  {
-    question: 'How do I know the person at my door is from you?',
-    answer:
-      'Their name and photo are on the booking before they arrive, and they cannot start the job until you read out the start code shown on that screen.',
-  },
-] as const
+/** Which icon stands for which topic. The topics themselves carry no JSX. */
+const TOPIC_ICONS: Record<string, typeof UserRound> = {
+  'getting-started': Compass,
+  'booking-changes': CalendarClock,
+  payments: ReceiptIndianRupee,
+  'plans-membership': BadgeCheck,
+  warranty: ShieldCheck,
+  account: UserRound,
+}
 
 export function SupportScreen() {
   const load = useCallback(() => fetchBusinessConfig(), [])
@@ -102,12 +102,37 @@ export function SupportScreen() {
         Your past conversations
       </Link>
 
-      <Section title="Common questions">
-        <div className="flex flex-col gap-2">
-          {FAQS.map((faq) => (
-            <Faq key={faq.question} question={faq.question} answer={faq.answer} />
-          ))}
-        </div>
+      <Section title="All topics">
+        <ul className="-mx-4 divide-y divide-border border-y border-border lg:mx-0">
+          {SUPPORT_TOPICS.map((topic) => {
+            const Icon = TOPIC_ICONS[topic.id] ?? UserRound
+            return (
+              <li key={topic.id}>
+                <Link
+                  href={`/support/topic?t=${topic.id}` as Route}
+                  className="flex items-center gap-4 px-4 py-4 hover:bg-surface lg:px-0"
+                >
+                  <Icon
+                    className="size-5 shrink-0 text-ink"
+                    aria-hidden="true"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-base font-medium text-ink">
+                      {topic.label}
+                    </span>
+                    <span className="mt-0.5 block text-xs text-muted">
+                      {topic.blurb}
+                    </span>
+                  </span>
+                  <ChevronRight
+                    className="size-5 shrink-0 text-muted"
+                    aria-hidden="true"
+                  />
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
       </Section>
 
       <Card className="mt-6 p-4">
@@ -117,25 +142,5 @@ export function SupportScreen() {
         </p>
       </Card>
     </AppShell>
-  )
-}
-
-/**
- * A native `details` element rather than a hand-rolled accordion: the browser
- * gives keyboard handling, the open state and the screen-reader semantics, and
- * an unopened answer is still findable with the browser's own page search.
- */
-function Faq({ question, answer }: { question: string; answer: string }) {
-  return (
-    <details className="group rounded-card border border-border bg-bg">
-      <summary className="flex min-h-12 cursor-pointer list-none items-center gap-3 px-4 py-3 text-sm font-medium text-ink">
-        <span className="flex-1">{question}</span>
-        <ChevronDown
-          className="size-4 shrink-0 text-muted transition-transform group-open:rotate-180"
-          aria-hidden="true"
-        />
-      </summary>
-      <p className="px-4 pb-4 text-sm leading-relaxed text-muted">{answer}</p>
-    </details>
   )
 }

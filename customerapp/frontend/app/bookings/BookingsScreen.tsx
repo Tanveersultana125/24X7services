@@ -1,6 +1,8 @@
 'use client'
 
 import { useCallback, useState } from 'react'
+import Link from 'next/link'
+import type { Route } from 'next'
 import { CalendarX, ClipboardList } from 'lucide-react'
 import {
   ACTIVE_STATUSES,
@@ -70,7 +72,27 @@ export function BookingsScreen() {
     )?.name ?? 'Service'
 
   return (
-    <AppShell mobileHeader={<Header title="Your bookings" showBack backFallback="/home" />}>
+    <AppShell
+      mobileHeader={
+        <Header
+          title="My bookings"
+          showBack
+          backFallback="/home"
+          // Help sits on this screen because this is where the questions are.
+          // A booking that has gone wrong is the reason most people open
+          // support at all, and making them find it from the nav is a tap
+          // spent on navigation instead of on the problem.
+          right={
+            <Link
+              href={'/support' as Route}
+              className="inline-flex h-9 items-center rounded-pill border border-border px-4 text-sm font-semibold text-brand hover:border-brand"
+            >
+              Help
+            </Link>
+          }
+        />
+      }
+    >
       {/* Wraps rather than scrolling. Three pills come to about 270px, and a
           row that cannot shrink below that turns into a scroller on a narrow
           phone — which slices the last pill at the edge and, because an
@@ -128,15 +150,17 @@ export function BookingsScreen() {
               tab === 'active'
                 ? 'Nothing happening right now'
                 : tab === 'upcoming'
-                  ? 'Nothing booked yet'
+                  ? 'No bookings yet'
                   : 'Nothing finished yet'
             }
             description={
               tab === 'past'
                 ? 'Completed and cancelled bookings collect here.'
-                : 'Book a repair, service or installation and it will show up here.'
+                : tab === 'active'
+                  ? 'A job shows up here from the moment your technician is on the way until it is done.'
+                  : 'Looks like you have not had us out yet. A repair, a service or an installation all start the same way.'
             }
-            action={{ label: 'Book a service', href: '/services' }}
+            action={{ label: 'Explore our services', href: '/services' }}
           />
         ) : (
           <ul className="flex flex-col gap-3">

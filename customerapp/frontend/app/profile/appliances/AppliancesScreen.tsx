@@ -55,6 +55,22 @@ export function AppliancesScreen() {
   )
 }
 
+/**
+ * The heading in the body, under the bar.
+ *
+ * The bar says where you are while you scroll; this says what you are looking
+ * at, in the customer's words, at a size worth reading. The profile screen
+ * itself is built the same way — "Profile" in the bar, "Your account" on the
+ * page.
+ */
+function PageTitle() {
+  return (
+    <h1 className="mt-6 text-2xl font-bold leading-tight text-ink">
+      Your appliances
+    </h1>
+  )
+}
+
 function ApplianceList({ uid }: { uid: string }) {
   const toast = useToast()
   const [deleting, setDeleting] = useState<SavedAppliance | null>(null)
@@ -127,19 +143,24 @@ function ApplianceList({ uid }: { uid: string }) {
 
   if ((data.data?.saved.length ?? 0) === 0) {
     return (
-      <EmptyState
-        className="py-16"
-        icon={PackageOpen}
-        title="Nothing saved yet"
-        description="Appliances are saved from the details you give when you book, so the next booking for the same machine is two taps shorter."
-        action={{ label: 'Book a service', href: '/services' }}
-      />
+      <>
+        <PageTitle />
+        <EmptyState
+          className="py-14"
+          icon={PackageOpen}
+          title="No appliances yet"
+          description="Appliances are saved from the details you give when you book, so the next booking for the same machine is two taps shorter."
+          action={{ label: 'Explore our services', href: '/services' }}
+        />
+      </>
     )
   }
 
   return (
     <>
-      <ul className="mt-5 flex flex-col gap-3">
+      <PageTitle />
+
+      <ul className="mt-4 flex flex-col gap-3">
         {data.data?.saved.map((appliance) => (
           <li key={appliance.id}>
             <Card className="overflow-hidden">
