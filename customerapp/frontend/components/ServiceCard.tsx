@@ -20,11 +20,13 @@ import { cn } from '@/lib/cn'
  * box with the name at body size and the picture shrunk into the corner beside
  * a button, which read as a row in a list rather than as a thing you choose.
  *
- * Every card plays its own clip, and each one starts only once it is on
- * screen and stops again when it leaves — so a page of six is at most the two
- * or three a phone is actually showing, not six decoders and six downloads
- * opened at once for cards nobody scrolled to. A customer who has asked their
- * system for less motion gets the still instead, and the clip is never the
+ * One card in a list moves, and it is the first one. Everything moving reads
+ * the same as nothing moving — a screen of clips gives the eye nowhere to
+ * rest and no card comes out ahead — and it is also six decoders on a cheap
+ * phone and six downloads on a metered connection. So the list hands `motion`
+ * to its first card and to nothing else, and the clip that does play waits
+ * until it is on screen. A customer who has asked their system for less
+ * motion gets the still like everyone below them, and the clip is never the
  * thing carrying the meaning either way.
  *
  * The still, when one is shown, is a frame *of that service's own clip*, not
@@ -55,10 +57,10 @@ export interface ServiceCardProps {
    */
   image?: string
   /**
-   * Whether this card may play its clip at all. On by default; a screen that
-   * wants a page of stills — a dense list, a print view — turns it off. It is
-   * not a licence to play immediately: playback still waits for the card to be
-   * on screen. See the note above.
+   * Whether this card is the one allowed to play its clip. Off by default: a
+   * list that wants movement asks for it, once, on its first card. It is not
+   * a licence to play immediately either — playback still waits for the card
+   * to be on screen. See the note above.
    */
   motion?: boolean
   onSelect: (service: CatalogService) => void
@@ -69,7 +71,7 @@ export interface ServiceCardProps {
 export function ServiceCard({
   service,
   image,
-  motion = true,
+  motion = false,
   onSelect,
   selected = false,
   className,

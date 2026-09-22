@@ -503,17 +503,17 @@ function Discovery() {
         </div>
       </Case>
 
-      <Case label="ServiceCard — playing, and the still a reduced-motion reader gets">
+      <Case label="ServiceCard — the one card that moves, and one that does not">
         <div className="flex flex-col gap-3">
           <ServiceCard
             service={fx.service}
             image={fx.appliance.image}
+            motion
             onSelect={() => {}}
           />
           <ServiceCard
             service={fx.service}
             image={fx.appliance.image}
-            motion={false}
             onSelect={() => {}}
             selected
           />

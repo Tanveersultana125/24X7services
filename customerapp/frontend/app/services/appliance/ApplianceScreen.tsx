@@ -318,20 +318,20 @@ export function ApplianceScreen() {
                 cards are tall enough now that a border as well would be two
                 lines doing one job. */}
             <div className="flex flex-col divide-y divide-border">
-              {services.map((service) => (
+              {services.map((service, index) => (
                 <div
                   key={service.id}
                   id={`service-${service.id}`}
                   className={cn('py-6 first:pt-0 last:pb-0', JUMP_OFFSET)}
                 >
-                  {/* Every card shows its own work moving. The card itself
-                      only plays while it is on screen, so a page of six is
-                      the two or three a phone is actually showing — and a
-                      customer who asked their system for less motion gets
-                      stills throughout. */}
+                  {/* Only the first card moves. Six clips down one screen is
+                      six decoders and nowhere for the eye to rest —
+                      everything moving reads the same as nothing moving.
+                      Every other card shows a still of its own clip. */}
                   <ServiceCard
                     service={service}
                     image={appliance.image}
+                    motion={index === 0}
                     onSelect={() => openService(service.serviceKey)}
                   />
                 </div>

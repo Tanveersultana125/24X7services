@@ -242,14 +242,17 @@ export function SearchScreen() {
                   </h2>
                   {cards.length > 0 ? (
                     <div className="flex flex-col divide-y divide-border">
-                      {cards.map(({ hit, service }) => (
+                      {cards.map(({ hit, service }, index) => (
                         <div
                           key={`${hit.applianceId}-${service.serviceKey}`}
                           className="py-5 first:pt-0 last:pb-0"
                         >
+                          {/* The top result moves and the rest are stills,
+                              the same rule the appliance page follows. */}
                           <ServiceCard
                             service={service}
                             image={applianceFor.get(hit.applianceId)?.image}
+                            motion={index === 0}
                             onSelect={() =>
                               open(
                                 `/services/detail/?a=${service.applianceId}&s=${service.serviceKey}`
