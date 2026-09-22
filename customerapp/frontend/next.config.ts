@@ -61,6 +61,18 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
 
+  /**
+   * Off. It is a dev-only badge and it sits bottom-left, which on this app is
+   * on top of the Home tab in the bottom nav — the one control every screen
+   * has. Anything checked over the dev server has it covering that tab, and a
+   * screenshot taken to look at the nav has a Next.js logo in it instead.
+   *
+   * Nothing is lost: compile and runtime errors still surface on screen, and
+   * the badge never shipped in the first place — a static export has no dev
+   * server to draw it.
+   */
+  devIndicators: false,
+
   // Every internal href is checked against the routes that actually exist. With
   // no server to 404 gracefully, a typo'd link in a WebView is a dead end.
   typedRoutes: true,
