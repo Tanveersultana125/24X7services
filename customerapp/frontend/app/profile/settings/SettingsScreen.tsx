@@ -305,7 +305,7 @@ function Notifications({ uid }: { uid: string | null }) {
           description={
             PUSH_IS_CONFIGURED
               ? 'On this device, when a booking moves'
-              : 'Not set up on this build yet'
+              : 'Needs the Web Push key this build was made without'
           }
           checked={Boolean(uid) && current.push && PUSH_IS_CONFIGURED}
           onChange={(next) => void set('push', next)}

@@ -33,9 +33,10 @@ import { cn } from '@/lib/cn'
  * of what we told someone and when; a client that could edit the text could
  * rewrite that.
  *
- * DECISION NEEDED: nothing writes these yet. The status triggers know every
- * moment worth telling a customer about, and push delivery is Phase 6 — when it
- * lands, the same trigger should write the row this screen reads.
+ * These are written by `onBookingStatusNotify`, which watches a booking's
+ * status rather than being called from each path that moves one — so a path
+ * added later is announced without anybody remembering to announce it. The
+ * same call pushes to the customer's devices where they have asked for it.
  */
 export function NotificationsScreen() {
   return (

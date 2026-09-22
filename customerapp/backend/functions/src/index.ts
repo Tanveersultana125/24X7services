@@ -12,6 +12,7 @@ import { getJobOtp } from './booking/jobOtp'
 import { respondToRepairRequest } from './booking/repairApproval'
 import { submitReview } from './booking/review'
 import { onBookingCompleted } from './booking/complete'
+import { onBookingStatusNotify } from './booking/notifyStatus'
 import { previewCancellation, cancelBooking } from './booking/cancel'
 import { rescheduleBooking } from './booking/reschedule'
 import { getMaskedNumber } from './booking/maskedNumber'
@@ -44,7 +45,7 @@ import { onUserCreate } from './auth/onUserCreate'
  *            registerFcmToken, deleteAccount, getMaskedNumber
  *   Phase 6  createTopupOrder, verifyTopup
  *   Phase 7  createPurchaseOrder, verifyPurchase, redeemGiftCard,
- *            getReferral, applyReferralCode
+ *            getReferral, applyReferralCode, onBookingStatusNotify
  *
  * The export name is the deployed function name, which is why each callable is
  * named after its entry in the shared registry and checked against it below.
@@ -92,13 +93,14 @@ export {
   deleteAccount,
 }
 
-// Not callables: an HTTP endpoint Razorpay posts to, a schedule, and three
+// Not callables: an HTTP endpoint Razorpay posts to, a schedule, and four
 // triggers. None of them is in the registry, so none is checked against it.
 export {
   razorpayWebhook,
   expireSlotHolds,
   assignTechnician,
   onBookingCompleted,
+  onBookingStatusNotify,
   onUserCreate,
 }
 

@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { OfflineBanner } from '@/components/ErrorState'
+import { useToast } from '@/components/Toast'
+import { useAuth } from '@/lib/auth'
+import { onPushWhileOpen } from '@/lib/push'
 import { useOnline } from '@/lib/useOnline'
 
 /**
@@ -11,8 +14,9 @@ import { useOnline } from '@/lib/useOnline'
  * A skip link, so a keyboard or screen-reader user does not walk through the
  * navigation on every page. A live region that says where they have arrived,
  * because a client-side navigation changes the whole page without the browser
- * announcing anything. And the offline banner, which belongs above everything
- * rather than being remembered on each screen.
+ * announcing anything. The offline banner, which belongs above everything
+ * rather than being remembered on each screen. And the handler for a push that
+ * lands while the app is open.
  */
 export function AppChrome() {
   return (
@@ -20,8 +24,49 @@ export function AppChrome() {
       <SkipLink />
       <OfflineBar />
       <RouteAnnouncer />
+      <PushWhileOpen />
     </>
   )
+}
+
+/**
+ * A push that arrives while the customer is looking at the app.
+ *
+ * The browser shows no banner for these, and that is right: a system
+ * notification on top of the screen it is about is the app talking over
+ * itself. A toast says the same thing in the same place as everything else
+ * this app tells somebody, and tapping it goes where the push would have.
+ *
+ * Nothing happens at all until somebody is signed in and push is configured —
+ * `onPushWhileOpen` returns a no-op otherwise, so this costs a closed-over
+ * function and nothing else on a build without it.
+ */
+function PushWhileOpen() {
+  const { user } = useAuth()
+  const toast = useToast()
+
+  useEffect(() => {
+    if (!user) return
+    let stop: (() => void) | undefined
+    let live = true
+
+    void onPushWhileOpen((message) => {
+      // No button on it. The toast has no action slot, and inventing one for
+      // this would be a control that appears on one message in a hundred. The
+      // same notification is in the list under Profile with its link intact.
+      toast.show(`${message.title} — ${message.body}`, { duration: 8000 })
+    }).then((unsubscribe) => {
+      if (live) stop = unsubscribe
+      else unsubscribe()
+    })
+
+    return () => {
+      live = false
+      stop?.()
+    }
+  }, [user, toast])
+
+  return null
 }
 
 /**

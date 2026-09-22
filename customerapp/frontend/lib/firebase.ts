@@ -58,7 +58,12 @@ const EMULATOR_PLACEHOLDERS = {
 
 const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
 
-const config = {
+/**
+ * Exported because the messaging worker needs it too, and that worker is a
+ * static file that cannot read the bundle's env. Nothing in here is secret:
+ * every value is compiled into the app and readable by anyone who installs it.
+ */
+export const firebaseConfig = {
   apiKey:
     process.env.NEXT_PUBLIC_FIREBASE_API_KEY ||
     (usingEmulators ? EMULATOR_PLACEHOLDERS.apiKey : undefined),
@@ -76,6 +81,8 @@ const config = {
     process.env.NEXT_PUBLIC_FIREBASE_APP_ID ||
     (usingEmulators ? EMULATOR_PLACEHOLDERS.appId : undefined),
 }
+
+const config = firebaseConfig
 
 /** Emulator host, as reachable from wherever the app is running. */
 export const EMULATOR_HOST =
