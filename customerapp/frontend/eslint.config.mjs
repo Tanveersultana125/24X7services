@@ -7,7 +7,17 @@ import nextTypeScript from 'eslint-config-next/typescript'
 // inside the legacy config validator.
 const config = [
   {
-    ignores: ['.next/**', 'out/**', 'android/**', 'next-env.d.ts'],
+    // `.next-verify` is the build directory the visual check uses so it can
+    // compile without stamping on the dev server's `.next`. Both are build
+    // output, and linting minified chunks reports thousands of problems in
+    // code nobody wrote.
+    ignores: [
+      '.next/**',
+      '.next-verify/**',
+      'out/**',
+      'android/**',
+      'next-env.d.ts',
+    ],
   },
   ...nextCoreWebVitals,
   ...nextTypeScript,

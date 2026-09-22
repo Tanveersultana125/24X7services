@@ -6,13 +6,17 @@ import Link from 'next/link'
 import type { Route } from 'next'
 import { doc, getDoc } from 'firebase/firestore'
 import {
+  BadgeCheck,
   Bell,
+  CalendarCheck,
   ChevronRight,
   CircleAlert,
   ClipboardList,
   CreditCard,
   FileText,
+  Gift,
   Headset,
+  Info,
   LogOut,
   MapPin,
   Settings,
@@ -22,7 +26,13 @@ import {
   WalletMinimal,
   WashingMachine,
 } from 'lucide-react'
-import { COL, userProfileSchema, type UserProfile } from '@app/shared'
+import {
+  COL,
+  REFERRAL_REWARD,
+  formatPaise,
+  userProfileSchema,
+  type UserProfile,
+} from '@app/shared'
 
 import { AppShell } from '@/components/AppShell'
 import { Header } from '@/components/Header'
@@ -81,16 +91,10 @@ const ROWS = [
     icon: User,
   },
   {
-    href: '/profile/addresses',
-    label: 'Saved addresses',
-    detail: 'Where we come to',
-    icon: MapPin,
-  },
-  {
-    href: '/profile/warranties',
-    label: 'Warranties',
-    detail: 'What is still covered',
-    icon: ShieldCheck,
+    href: '/profile/plans',
+    label: 'Plans',
+    detail: 'Yearly cover on your appliances',
+    icon: CalendarCheck,
   },
   {
     href: '/profile/wallet',
@@ -99,16 +103,46 @@ const ROWS = [
     icon: WalletMinimal,
   },
   {
-    href: '/profile/payments',
-    label: 'Invoices',
-    detail: 'Every bill we have issued you',
-    icon: FileText,
+    href: '/profile/gift-cards',
+    label: 'Gift cards',
+    detail: 'Redeem one, or buy one for someone',
+    icon: Gift,
+  },
+  {
+    href: '/profile/membership',
+    label: 'Membership',
+    detail: '24X7 Plus — no visit fee, 10% off repairs',
+    icon: BadgeCheck,
   },
   {
     href: '/profile/reviews',
     label: 'Your reviews',
     detail: 'What you told us',
     icon: Star,
+  },
+  {
+    href: '/profile/addresses',
+    label: 'Saved addresses',
+    detail: 'Where we come to',
+    icon: MapPin,
+  },
+  {
+    href: '/profile/payment-methods',
+    label: 'Payment methods',
+    detail: 'How you would rather pay',
+    icon: CreditCard,
+  },
+  {
+    href: '/profile/warranties',
+    label: 'Warranties',
+    detail: 'What is still covered',
+    icon: ShieldCheck,
+  },
+  {
+    href: '/profile/payments',
+    label: 'Invoices',
+    detail: 'Every bill we have issued you',
+    icon: FileText,
   },
   {
     href: '/profile/notifications',
@@ -121,6 +155,12 @@ const ROWS = [
     label: 'Settings',
     detail: 'Permissions, legal, closing your account',
     icon: Settings,
+  },
+  {
+    href: '/profile/about',
+    label: 'About 24X7',
+    detail: 'Who we are, and the paperwork',
+    icon: Info,
   },
 ] as const satisfies ReadonlyArray<{
   href: Route
@@ -264,6 +304,8 @@ export function ProfileScreen() {
             ))}
           </ul>
 
+          <ReferCard signedIn={Boolean(user)} />
+
           {user ? (
             <Button
               className="mt-8"
@@ -289,5 +331,49 @@ export function ProfileScreen() {
         </>
       )}
     </AppShell>
+  )
+}
+
+/**
+ * The one thing on this screen that is not a row.
+ *
+ * It sits below the list rather than above it because it is an offer, not
+ * something the customer came here to do — and an offer placed above the rows
+ * people actually came for is an advertisement wearing a navigation item's
+ * clothes. Below the list, after everything useful, it is still the largest
+ * thing on the screen at that point and impossible to miss.
+ *
+ * The figure comes from the same constant the server pays out, so the promise
+ * on this card cannot drift from what lands on the balance.
+ */
+function ReferCard({ signedIn }: { signedIn: boolean }) {
+  return (
+    <div className="mt-8 overflow-hidden rounded-card bg-brand-soft p-5">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-xl font-bold leading-snug text-ink">
+            Refer &amp; earn {formatPaise(REFERRAL_REWARD)}
+          </p>
+          <p className="mt-1 max-w-[22rem] text-sm text-muted">
+            Get {formatPaise(REFERRAL_REWARD)} in credits when a friend&apos;s
+            first booking is finished. They get the same.
+          </p>
+        </div>
+
+        <span
+          className="flex size-14 shrink-0 items-center justify-center rounded-full bg-bg text-brand"
+          aria-hidden="true"
+        >
+          <Gift className="size-7" />
+        </span>
+      </div>
+
+      <Link
+        href={signedIn ? '/profile/refer' : signInTo('/profile/refer')}
+        className="mt-4 inline-flex h-12 items-center justify-center rounded-pill bg-brand px-6 text-base font-semibold text-bg hover:bg-brand-deep"
+      >
+        Refer now
+      </Link>
+    </div>
   )
 }
