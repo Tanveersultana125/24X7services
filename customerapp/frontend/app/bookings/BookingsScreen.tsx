@@ -1,8 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { CalendarX } from 'lucide-react'
+import { useCallback, useState } from 'react'
+import { CalendarX, ClipboardList } from 'lucide-react'
 import {
   ACTIVE_STATUSES,
   CLOSED_STATUSES,
@@ -16,6 +15,7 @@ import { Header } from '@/components/Header'
 import { BookingCard } from '@/components/BookingCard'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
+import { SignInPrompt } from '@/components/ProfileShell'
 import { BookingListSkeleton } from '@/components/SkeletonLoader'
 import { useAuth } from '@/lib/auth'
 import { fetchAllServices } from '@/lib/catalog'
@@ -33,6 +33,10 @@ import { cn } from '@/lib/cn'
  *
  * Active leads, because a job in progress is the one thing on this screen that
  * might need an answer in the next ten minutes.
+ *
+ * Signed out it draws itself rather than bouncing to the login form. The tabs
+ * are the point of the screen and they still make sense empty; a phone number
+ * field in their place tells somebody nothing about what they tapped.
  */
 
 const TABS = [
@@ -48,13 +52,8 @@ const TABS = [
 type TabKey = (typeof TABS)[number]['key']
 
 export function BookingsScreen() {
-  const router = useRouter()
   const { user, ready } = useAuth()
   const [tab, setTab] = useState<TabKey>('active')
-
-  useEffect(() => {
-    if (ready && !user) router.replace('/login?next=%2Fbookings')
-  }, [ready, user, router])
 
   const loadServices = useCallback(() => fetchAllServices(), [])
   const services = useAsync(loadServices)
@@ -101,8 +100,15 @@ export function BookingsScreen() {
       </div>
 
       <div className="mt-5">
-        {!ready || loading ? (
+        {!ready || (user && loading) ? (
           <BookingListSkeleton />
+        ) : !user ? (
+          <SignInPrompt
+            className="py-16"
+            icon={ClipboardList}
+            title="Your bookings"
+            description="Everything you have booked, what is happening right now, and everything finished. Sign in to see yours."
+          />
         ) : error ? (
           <ErrorState
             className="py-16"

@@ -11,7 +11,7 @@ import {
   type Paise,
 } from '@app/shared'
 
-import { ProfileShell } from '@/components/ProfileShell'
+import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
 import { BottomSheet } from '@/components/BottomSheet'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
@@ -44,9 +44,55 @@ import { cn } from '@/lib/cn'
  */
 export function GiftCardsScreen() {
   return (
-    <ProfileShell title="Gift cards">
+    <ProfileShell
+      title="Gift cards"
+      // Both halves of this screen need an account — a code becomes credits on
+      // a balance, and a balance belongs to somebody. So signed out it says
+      // what a gift card is and offers the way in, rather than handing over a
+      // code box that would refuse whatever was typed into it.
+      signedOut={<GiftCardsSignedOut />}
+    >
       {(user) => <GiftCards uid={user.uid} />}
     </ProfileShell>
+  )
+}
+
+function GiftCardsSignedOut() {
+  return (
+    <>
+      <SignInPrompt
+        className="py-10"
+        icon={Gift}
+        title="Redeem one, or send one"
+        description="Redeem a code onto your balance, or buy one to pass on. Both need an account, because a balance belongs to somebody."
+      />
+
+      <Band />
+
+      <section className="pb-6">
+        <h2 className="text-lg font-bold text-ink">How they work</h2>
+        <ul className="mt-3 flex flex-col gap-3 text-sm text-ink">
+          <li>
+            <span className="font-semibold">A code, not a card.</span> We give
+            you a code like 24X7-ABCD-EFGH. Forward it, screenshot it, read it
+            out — whoever has it can redeem it, once.
+          </li>
+          <li>
+            <span className="font-semibold">It lands on a balance.</span>{' '}
+            Redeeming puts the amount on the 24X7 balance and it comes off the
+            next bill. Nothing to enter at checkout.
+          </li>
+          <li>
+            <span className="font-semibold">It never expires.</span> There is no
+            date on it and no sweep that takes it back.
+          </li>
+          <li>
+            <span className="font-semibold">24X7 services only.</span> Like the
+            rest of the balance, it cannot be transferred or taken as cash.
+          </li>
+        </ul>
+      </section>
+    </>
   )
 }
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useState } from 'react'
+import Link from 'next/link'
 import { CalendarCheck, Check, ClipboardList } from 'lucide-react'
 import {
   formatPaise,
@@ -10,7 +11,11 @@ import {
   type UserPlan,
 } from '@app/shared'
 
-import { ProfileShell } from '@/components/ProfileShell'
+import {
+  ProfileShell,
+  SignInPrompt,
+  useSignInHref,
+} from '@/components/ProfileShell'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
@@ -42,7 +47,54 @@ import { cn } from '@/lib/cn'
  * It is not a discount on parts, and this screen never implies it is.
  */
 export function PlansScreen() {
-  return <ProfileShell title="Plans">{(user) => <Plans uid={user.uid} />}</ProfileShell>
+  return (
+    <ProfileShell
+      title="Plans"
+      // What is on offer is public — it is a price list. Only the plans this
+      // customer already holds need an account, so signing out takes away the
+      // top of the screen and nothing else.
+      signedOut={<PlansOnOffer />}
+    >
+      {(user) => <Plans uid={user.uid} />}
+    </ProfileShell>
+  )
+}
+
+/** The offer list on its own, for someone who has not signed in. */
+function PlansOnOffer() {
+  const load = useCallback(async () => {
+    const [offered, appliances] = await Promise.all([
+      fetchCatalogPlans(),
+      fetchAppliances(),
+    ])
+    return { offered, appliances }
+  }, [])
+
+  const data = useAsync(load)
+  const names = new Map(
+    (data.data?.appliances ?? []).map((each) => [each.id, each.name])
+  )
+
+  return (
+    <>
+      <SignInPrompt
+        className="py-10"
+        icon={ClipboardList}
+        title="Plans you hold"
+        description="A plan covers a set number of services on your appliances for a year. Sign in to see the ones you are on."
+      />
+
+      <div aria-hidden="true" className="-mx-4 my-2 h-2 bg-surface" />
+
+      <Offers
+        offered={data.data?.offered ?? []}
+        names={names}
+        loading={data.status === 'loading'}
+        failed={data.status === 'error'}
+        onRetry={data.reload}
+      />
+    </>
+  )
 }
 
 function Plans({ uid }: { uid: string }) {
@@ -113,28 +165,70 @@ function Plans({ uid }: { uid: string }) {
 
       <div aria-hidden="true" className="-mx-4 my-6 h-2 bg-surface" />
 
-      <section className="pb-6">
-        <h2 className="text-lg font-bold text-ink">Plans you can buy</h2>
-        <p className="mt-1 text-sm text-muted">
-          Each one covers the visit fee on the appliances it names, for a year.
-          Repairs are quoted as usual and you approve them before any work starts.
-        </p>
-
-        {offered.length === 0 ? (
-          <p className="py-10 text-center text-sm text-muted">
-            No plans are on offer right now.
-          </p>
-        ) : (
-          <ul className="mt-4 flex flex-col gap-3">
-            {offered.map((plan) => (
-              <li key={plan.id}>
-                <OfferCard plan={plan} names={names} onBought={data.reload} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      <Offers offered={offered} names={names} onBought={data.reload} />
     </>
+  )
+}
+
+/**
+ * Everything on offer.
+ *
+ * One component for both states. Signed out there is nothing to buy with, so
+ * each card's button becomes the way in rather than disappearing — a price
+ * list that hides its own buttons until you sign in is a price list you cannot
+ * tell is a shop.
+ */
+function Offers({
+  offered,
+  names,
+  loading = false,
+  failed = false,
+  onRetry,
+  onBought,
+}: {
+  offered: readonly CatalogPlan[]
+  names: Map<string, string>
+  loading?: boolean
+  /** A read that failed is not an empty shop, and must not read like one. */
+  failed?: boolean
+  onRetry?: () => void
+  /** Absent when nobody is signed in — see above. */
+  onBought?: () => void
+}) {
+  return (
+    <section className="pb-6">
+      <h2 className="text-lg font-bold text-ink">Plans you can buy</h2>
+      <p className="mt-1 text-sm text-muted">
+        Each one covers the visit fee on the appliances it names, for a year.
+        Repairs are quoted as usual and you approve them before any work starts.
+      </p>
+
+      {loading ? (
+        <SkeletonGroup label="Loading plans" className="mt-4 flex flex-col gap-3">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <Skeleton key={i} className="h-56" />
+          ))}
+        </SkeletonGroup>
+      ) : failed ? (
+        <ErrorState
+          className="py-10"
+          description="We could not load the plans on offer. Please try again."
+          onRetry={onRetry}
+        />
+      ) : offered.length === 0 ? (
+        <p className="py-10 text-center text-sm text-muted">
+          No plans are on offer right now.
+        </p>
+      ) : (
+        <ul className="mt-4 flex flex-col gap-3">
+          {offered.map((plan) => (
+            <li key={plan.id}>
+              <OfferCard plan={plan} names={names} onBought={onBought} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   )
 }
 
@@ -212,10 +306,12 @@ function OfferCard({
 }: {
   plan: CatalogPlan
   names: Map<string, string>
-  onBought: () => void
+  /** Absent when nobody is signed in; the button becomes the way in. */
+  onBought?: () => void
 }) {
   const [busy, setBusy] = useState(false)
   const toast = useToast()
+  const signIn = useSignInHref()
 
   async function pay(): Promise<void> {
     if (busy) return
@@ -226,7 +322,7 @@ function OfferCard({
         toast.show(`${plan.name} is running. It covers your next visit.`, {
           tone: 'success',
         })
-        onBought()
+        onBought?.()
       }
       // Cancelled: the customer closed the payment sheet. Nothing to announce.
     } catch {
@@ -276,15 +372,24 @@ function OfferCard({
         ))}
       </ul>
 
-      <Button
-        className="mt-4"
-        fullWidth
-        variant="secondary"
-        loading={busy}
-        onClick={() => void pay()}
-      >
-        Buy for {formatPaise(plan.price)}
-      </Button>
+      {onBought ? (
+        <Button
+          className="mt-4"
+          fullWidth
+          variant="secondary"
+          loading={busy}
+          onClick={() => void pay()}
+        >
+          Buy for {formatPaise(plan.price)}
+        </Button>
+      ) : (
+        <Link
+          href={signIn}
+          className="mt-4 flex h-12 w-full items-center justify-center rounded-pill border border-brand text-base font-semibold text-brand hover:bg-brand-soft"
+        >
+          Sign in to buy
+        </Link>
+      )}
     </div>
   )
 }

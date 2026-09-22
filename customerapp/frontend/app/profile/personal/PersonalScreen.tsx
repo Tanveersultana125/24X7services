@@ -2,9 +2,10 @@
 
 import { useCallback, useState } from 'react'
 import { doc, getDoc } from 'firebase/firestore'
+import { UserRound } from 'lucide-react'
 import { COL, updateProfileInputSchema, userProfileSchema } from '@app/shared'
 
-import { ProfileShell } from '@/components/ProfileShell'
+import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Field'
@@ -25,7 +26,16 @@ import { useAsync } from '@/lib/useAsync'
  */
 export function PersonalScreen() {
   return (
-    <ProfileShell title="Personal details">
+    <ProfileShell
+      title="Personal details"
+      signedOut={
+        <SignInPrompt
+          icon={UserRound}
+          title="Your details"
+          description="The name a technician is handed and an invoice is made out to. Sign in to set it."
+        />
+      }
+    >
       {(user) => <PersonalForm uid={user.uid} phone={user.phoneNumber} />}
     </ProfileShell>
   )

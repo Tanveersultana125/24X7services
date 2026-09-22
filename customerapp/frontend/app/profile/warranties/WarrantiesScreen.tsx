@@ -5,7 +5,7 @@ import { collection, getDocs, limit, orderBy, query, where } from 'firebase/fire
 import { ShieldCheck } from 'lucide-react'
 import { COL, warrantySchema, type Warranty } from '@app/shared'
 
-import { ProfileShell } from '@/components/ProfileShell'
+import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
 import { WarrantyCard } from '@/components/WarrantyCard'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
@@ -24,7 +24,15 @@ import { useAsync } from '@/lib/useAsync'
  */
 export function WarrantiesScreen() {
   return (
-    <ProfileShell title="Warranties">
+    <ProfileShell title="Warranties"
+      signedOut={
+        <SignInPrompt
+          icon={ShieldCheck}
+          title="Your warranties"
+          description="Every completed repair carries a service warranty. Sign in to see what is still covered."
+        />
+      }
+    >
       {(user) => <WarrantyList uid={user.uid} />}
     </ProfileShell>
   )

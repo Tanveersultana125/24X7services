@@ -20,7 +20,7 @@ import {
   type Review,
 } from '@app/shared'
 
-import { ProfileShell } from '@/components/ProfileShell'
+import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
 import { ReviewCard } from '@/components/ReviewCard'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
@@ -38,7 +38,15 @@ import { useAsync } from '@/lib/useAsync'
  */
 export function ReviewsScreen() {
   return (
-    <ProfileShell title="Your reviews">
+    <ProfileShell title="Your reviews"
+      signedOut={
+        <SignInPrompt
+          icon={Star}
+          title="What you told us"
+          description="What you told us about a finished job, and what we did about it. Sign in to see yours."
+        />
+      }
+    >
       {(user) => <ReviewList uid={user.uid} />}
     </ProfileShell>
   )

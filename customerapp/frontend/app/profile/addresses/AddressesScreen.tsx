@@ -8,7 +8,7 @@ import {
   getDocs,
   setDoc,
 } from 'firebase/firestore'
-import { MapPinOff, Plus } from 'lucide-react'
+import { MapPin, MapPinOff, Plus } from 'lucide-react'
 import {
   addressInputSchema,
   addressSchema,
@@ -19,7 +19,7 @@ import {
   type AddressLabel,
 } from '@app/shared'
 
-import { ProfileShell } from '@/components/ProfileShell'
+import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
 import { AddressCard } from '@/components/AddressCard'
 import { BottomSheet } from '@/components/BottomSheet'
 import { ConfirmModal } from '@/components/Modal'
@@ -54,7 +54,15 @@ const LABELS: ReadonlyArray<{ value: AddressLabel; text: string }> = [
 
 export function AddressesScreen() {
   return (
-    <ProfileShell title="Saved addresses">
+    <ProfileShell title="Saved addresses"
+      signedOut={
+        <SignInPrompt
+          icon={MapPin}
+          title="Where we come to"
+          description="Your saved addresses live on your account. Sign in and the places we come to show up here."
+        />
+      }
+    >
       {(user) => <AddressBook uid={user.uid} />}
     </ProfileShell>
   )

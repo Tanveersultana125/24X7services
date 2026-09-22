@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 import Link from 'next/link'
 import type { Route } from 'next'
 import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore'
-import { ChevronRight, PackageOpen, Trash2 } from 'lucide-react'
+import { ChevronRight, PackageOpen, Trash2, WashingMachine } from 'lucide-react'
 import {
   COL,
   SUB,
@@ -13,7 +13,7 @@ import {
   type UserApplianceInput,
 } from '@app/shared'
 
-import { ProfileShell } from '@/components/ProfileShell'
+import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
 import { Card } from '@/components/ui/Card'
 import { ConfirmModal } from '@/components/Modal'
 import { EmptyState } from '@/components/EmptyState'
@@ -41,7 +41,15 @@ interface SavedAppliance extends UserApplianceInput {
 
 export function AppliancesScreen() {
   return (
-    <ProfileShell title="My appliances">
+    <ProfileShell title="My appliances"
+      signedOut={
+        <SignInPrompt
+          icon={WashingMachine}
+          title="Your appliances"
+          description="Save the make and model of what you own and booking a repair takes two taps. Sign in to see yours."
+        />
+      }
+    >
       {(user) => <ApplianceList uid={user.uid} />}
     </ProfileShell>
   )

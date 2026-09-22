@@ -15,7 +15,7 @@ import {
 import { Bell, ChevronRight } from 'lucide-react'
 import { COL, notificationSchema, SUB, type AppNotification } from '@app/shared'
 
-import { ProfileShell } from '@/components/ProfileShell'
+import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
 import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
@@ -39,7 +39,15 @@ import { cn } from '@/lib/cn'
  */
 export function NotificationsScreen() {
   return (
-    <ProfileShell title="Notifications">
+    <ProfileShell title="Notifications"
+      signedOut={
+        <SignInPrompt
+          icon={Bell}
+          title="Your notifications"
+          description="Everything we have sent you about a booking is kept here. Sign in to read it."
+        />
+      }
+    >
       {(user) => <NotificationList uid={user.uid} />}
     </ProfileShell>
   )

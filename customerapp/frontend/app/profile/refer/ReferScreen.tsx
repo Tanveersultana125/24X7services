@@ -11,7 +11,7 @@ import {
   referralShareText,
 } from '@app/shared'
 
-import { ProfileShell } from '@/components/ProfileShell'
+import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
 import { ErrorState } from '@/components/ErrorState'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { Button } from '@/components/ui/Button'
@@ -35,7 +35,15 @@ import { useAsync } from '@/lib/useAsync'
  * it, which is the only moment anyone needs one.
  */
 export function ReferScreen() {
-  return <ProfileShell title="Refer a friend">{() => <Refer />}</ProfileShell>
+  return <ProfileShell title="Refer a friend"
+      signedOut={
+        <SignInPrompt
+          icon={Gift}
+          title="Your referral code"
+          description="Refer a friend and you both get credits once their first job is finished. Sign in for your code."
+        />
+      }
+    >{() => <Refer />}</ProfileShell>
 }
 
 function Refer() {

@@ -58,13 +58,17 @@ import { useAsync } from '@/lib/useAsync'
  * The phone number is shown and cannot be edited, because it is the account. A
  * row that looks editable and is not is worse than one that never offered.
  *
- * Nobody is turned away at the door. This screen used to send a signed-out
- * customer straight to the login form, which answers a question they had not
- * asked: they tapped Profile to see what an account here even holds, and got a
- * phone field. So it draws itself either way — the same tiles, the same rows,
- * and one button that signs in. A row that needs an account carries them back
- * to it afterwards, which is what `next` is for. Balance already made this
- * decision, for the same reason.
+ * Nobody is turned away at the door, and that now goes for the rows as well as
+ * for this screen. It used to send a signed-out customer straight to the login
+ * form, which answers a question they had not asked: they tapped Profile to see
+ * what an account here even holds, and got a phone field. Then every row did
+ * the same thing, which made thirteen screens into one — whichever you tapped,
+ * you got the same phone field, and nothing told you what you had tapped.
+ *
+ * So a row goes to its own screen whether or not anyone is signed in, and that
+ * screen says what it holds and offers the way in. Some of them have plenty to
+ * show without an account: the plans on offer, what a membership costs, how a
+ * gift card works. `ProfileShell` is where that decision now lives.
  */
 
 /** Where a row sends someone who is not signed in yet. */
@@ -258,7 +262,7 @@ export function ProfileScreen() {
             {TILES.map((tile) => (
               <Link
                 key={tile.href}
-                href={user ? tile.href : signInTo(tile.href)}
+                href={tile.href}
                 className="flex flex-col gap-3 rounded-card border border-border p-4 hover:border-brand"
               >
                 <tile.icon className="size-6 text-ink" aria-hidden="true" />
@@ -280,7 +284,7 @@ export function ProfileScreen() {
                 className="border-b border-border last:border-b-0"
               >
                 <Link
-                  href={user ? row.href : signInTo(row.href)}
+                  href={row.href}
                   className="flex items-center gap-4 px-4 py-4 hover:bg-surface lg:px-6"
                 >
                   <row.icon
@@ -304,7 +308,7 @@ export function ProfileScreen() {
             ))}
           </ul>
 
-          <ReferCard signedIn={Boolean(user)} />
+          <ReferCard />
 
           {user ? (
             <Button
@@ -346,7 +350,7 @@ export function ProfileScreen() {
  * The figure comes from the same constant the server pays out, so the promise
  * on this card cannot drift from what lands on the balance.
  */
-function ReferCard({ signedIn }: { signedIn: boolean }) {
+function ReferCard() {
   return (
     <div className="mt-8 overflow-hidden rounded-card bg-brand-soft p-5">
       <div className="flex items-start justify-between gap-4">
@@ -376,7 +380,7 @@ function ReferCard({ signedIn }: { signedIn: boolean }) {
       </div>
 
       <Link
-        href={signedIn ? '/profile/refer' : signInTo('/profile/refer')}
+        href="/profile/refer"
         className="mt-4 inline-flex h-12 items-center justify-center rounded-pill bg-brand px-6 text-base font-semibold text-bg hover:bg-brand-deep"
       >
         Refer now

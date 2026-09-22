@@ -7,7 +7,7 @@ import { collection, getDocs, limit, orderBy, query, where } from 'firebase/fire
 import { ChevronRight, FileText } from 'lucide-react'
 import { COL, invoiceSchema, type Invoice } from '@app/shared'
 
-import { ProfileShell } from '@/components/ProfileShell'
+import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
 import { Card } from '@/components/ui/Card'
 import { ToneBadge } from '@/components/StatusBadge'
 import { EmptyState } from '@/components/EmptyState'
@@ -27,7 +27,15 @@ import { useAsync } from '@/lib/useAsync'
  */
 export function PaymentsScreen() {
   return (
-    <ProfileShell title="Invoices">
+    <ProfileShell title="Invoices"
+      signedOut={
+        <SignInPrompt
+          icon={FileText}
+          title="Your invoices"
+          description="Every bill we have issued you, with its GST breakdown, is here. Sign in to open them."
+        />
+      }
+    >
       {(user) => <InvoiceList uid={user.uid} />}
     </ProfileShell>
   )

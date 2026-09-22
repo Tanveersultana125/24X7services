@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useState } from 'react'
+import Link from 'next/link'
 import { BadgeCheck, Check, Sparkles } from 'lucide-react'
 import {
   MEMBERSHIP_BENEFITS,
@@ -11,7 +12,7 @@ import {
   type MembershipOptionId,
 } from '@app/shared'
 
-import { ProfileShell } from '@/components/ProfileShell'
+import { ProfileShell, useSignInHref } from '@/components/ProfileShell'
 import { ErrorState } from '@/components/ErrorState'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { Button } from '@/components/ui/Button'
@@ -39,14 +40,25 @@ import { cn } from '@/lib/cn'
  */
 export function MembershipScreen() {
   return (
-    <ProfileShell title="Membership">
+    <ProfileShell
+      title="Membership"
+      // What Plus is and what it costs are public. Only "are you a member"
+      // needs an account, so signed out the pitch stands and the button that
+      // would buy it becomes the way in.
+      signedOut={<Plus uid={null} />}
+    >
       {(user) => <Plus uid={user.uid} />}
     </ProfileShell>
   )
 }
 
-function Plus({ uid }: { uid: string }) {
-  const load = useCallback(() => fetchMembership(uid), [uid])
+function Plus({ uid }: { uid: string | null }) {
+  // Null means nobody is signed in. There is no membership to fetch and no
+  // error in that — it is simply not a member.
+  const load = useCallback(
+    () => (uid ? fetchMembership(uid) : Promise.resolve(null)),
+    [uid]
+  )
   const membership = useAsync(load)
 
   if (membership.status === 'loading') {
@@ -98,7 +110,10 @@ function Plus({ uid }: { uid: string }) {
 
       <div aria-hidden="true" className="-mx-4 my-6 h-2 bg-surface" />
 
-      <Buy active={active} onBought={membership.reload} />
+      <Buy
+        active={active}
+        onBought={uid ? membership.reload : undefined}
+      />
 
       <p className="mt-6 pb-6 text-xs text-muted">
         24X7 Plus does not renew on its own. We will not charge you again unless
@@ -176,10 +191,18 @@ function PitchCard({ lapsed }: { lapsed: boolean }) {
  * Two lengths, with what the yearly one saves stated as a number rather than as
  * a badge saying "best value" — the customer can check a number.
  */
-function Buy({ active, onBought }: { active: boolean; onBought: () => void }) {
+function Buy({
+  active,
+  onBought,
+}: {
+  active: boolean
+  /** Absent when nobody is signed in; the button becomes the way in. */
+  onBought?: () => void
+}) {
   const [chosen, setChosen] = useState<MembershipOptionId>('plus-yearly')
   const [busy, setBusy] = useState(false)
   const toast = useToast()
+  const signIn = useSignInHref()
 
   const option =
     MEMBERSHIP_OPTIONS.find((each) => each.id === chosen) ?? MEMBERSHIP_OPTIONS[0]
@@ -194,7 +217,7 @@ function Buy({ active, onBought }: { active: boolean; onBought: () => void }) {
           active ? 'Membership extended.' : 'You are a 24X7 Plus member.',
           { tone: 'success' }
         )
-        onBought()
+        onBought?.()
       }
       // Cancelled: the customer closed the payment sheet. Nothing to announce.
     } catch {
@@ -253,14 +276,23 @@ function Buy({ active, onBought }: { active: boolean; onBought: () => void }) {
         })}
       </div>
 
-      <Button
-        className="mt-4"
-        fullWidth
-        loading={busy}
-        onClick={() => void pay()}
-      >
-        {active ? 'Extend for' : 'Join for'} {formatPaise(option?.price ?? 0)}
-      </Button>
+      {onBought ? (
+        <Button
+          className="mt-4"
+          fullWidth
+          loading={busy}
+          onClick={() => void pay()}
+        >
+          {active ? 'Extend for' : 'Join for'} {formatPaise(option?.price ?? 0)}
+        </Button>
+      ) : (
+        <Link
+          href={signIn}
+          className="mt-4 flex h-12 w-full items-center justify-center rounded-pill bg-brand text-base font-semibold text-bg hover:bg-brand-deep"
+        >
+          Sign in to join
+        </Link>
+      )}
     </section>
   )
 }

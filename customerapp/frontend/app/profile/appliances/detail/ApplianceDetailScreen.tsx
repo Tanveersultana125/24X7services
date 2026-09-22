@@ -14,7 +14,7 @@ import {
   query,
   where,
 } from 'firebase/firestore'
-import { PackageOpen } from 'lucide-react'
+import { PackageOpen, WashingMachine } from 'lucide-react'
 import {
   bookingSchema,
   COL,
@@ -24,7 +24,7 @@ import {
   type UserApplianceInput,
 } from '@app/shared'
 
-import { ProfileShell } from '@/components/ProfileShell'
+import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
 import { BookingCard } from '@/components/BookingCard'
 import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/EmptyState'
@@ -48,7 +48,24 @@ export function ApplianceDetailScreen() {
   const applianceDocId = params.get('id')
 
   return (
-    <ProfileShell title="Appliance" backFallback="/profile/appliances">
+    <ProfileShell
+      title="Appliance"
+      backFallback="/profile/appliances"
+      signedOut={
+        <SignInPrompt
+          icon={WashingMachine}
+          title="This appliance"
+          description="Its details and everything we have ever done to it are on your account. Sign in to see them."
+          // The only profile screen identified by a query parameter, so it
+          // hands the way back over itself rather than losing the id.
+          next={
+            applianceDocId
+              ? `/profile/appliances/detail?id=${encodeURIComponent(applianceDocId)}`
+              : '/profile/appliances'
+          }
+        />
+      }
+    >
       {(user) => (
         <ApplianceDetail uid={user.uid} applianceDocId={applianceDocId} />
       )}

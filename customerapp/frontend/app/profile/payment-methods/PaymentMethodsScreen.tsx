@@ -19,7 +19,7 @@ import {
   type PaymentPreference,
 } from '@app/shared'
 
-import { ProfileShell } from '@/components/ProfileShell'
+import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
 import { ErrorState } from '@/components/ErrorState'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { useToast } from '@/components/Toast'
@@ -94,7 +94,15 @@ async function savePreference(
 
 export function PaymentMethodsScreen() {
   return (
-    <ProfileShell title="Payment methods">
+    <ProfileShell title="Payment methods"
+      signedOut={
+        <SignInPrompt
+          icon={CreditCard}
+          title="How you pay"
+          description="Pick which way to settle a bill comes up first at checkout. Sign in to set it."
+        />
+      }
+    >
       {(user) => <Methods uid={user.uid} />}
     </ProfileShell>
   )

@@ -4,9 +4,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { Route } from 'next'
-import { Bell, ChevronRight, ShieldAlert } from 'lucide-react'
+import { Bell, ChevronRight, Settings as SettingsIcon, ShieldAlert } from 'lucide-react'
 
-import { ProfileShell } from '@/components/ProfileShell'
+import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Field'
@@ -31,7 +31,15 @@ const LEGAL = [
 ] as const satisfies ReadonlyArray<{ href: Route; label: string }>
 
 export function SettingsScreen() {
-  return <ProfileShell title="Settings">{() => <Settings />}</ProfileShell>
+  return <ProfileShell title="Settings"
+      signedOut={
+        <SignInPrompt
+          icon={SettingsIcon}
+          title="Your settings"
+          description="Notification permissions, the legal documents, and closing your account. Sign in to change them."
+        />
+      }
+    >{() => <Settings />}</ProfileShell>
 }
 
 function Settings() {
