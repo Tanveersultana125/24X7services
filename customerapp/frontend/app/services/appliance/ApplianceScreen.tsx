@@ -345,10 +345,11 @@ export function ApplianceScreen() {
                   id={`service-${service.id}`}
                   className={cn('py-6 first:pt-0 last:pb-0', JUMP_OFFSET)}
                 >
-                  {/* Only the first card moves. Six clips down one screen is
-                      six decoders and nowhere for the eye to rest —
-                      everything moving reads the same as nothing moving.
-                      Every other card shows a still of its own clip. */}
+                  {/* `motion` only reaches a service with no photograph of
+                      its own; one that has one shows it and stays still.
+                      Where it does apply, the first card is the only one
+                      that moves — six clips down one screen is six decoders
+                      and nowhere for the eye to rest. */}
                   <ServiceCard
                     service={service}
                     image={appliance.image}

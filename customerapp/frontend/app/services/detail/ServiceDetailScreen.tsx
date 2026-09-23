@@ -36,7 +36,7 @@ import {
 import { Section } from '@/components/AppShell'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
 import { TrustPoints } from '@/components/TrustPoints'
-import { BrandDisclaimer } from '@/components/BrandCard'
+import { BrandGrid } from '@/components/BrandGrid'
 import { ServiceReviews } from '@/components/ServiceReviews'
 import { useToast } from '@/components/Toast'
 import { Button } from '@/components/ui/Button'
@@ -349,20 +349,7 @@ export function ServiceDetailScreen() {
 
             {data.data && data.data.brands.length > 0 ? (
               <Section title="Brands we service">
-                <ul className="grid grid-cols-3 gap-2">
-                  {data.data.brands.map((brand) => (
-                    <li
-                      key={brand.id}
-                      className="flex min-h-16 items-center justify-center rounded-card bg-surface px-2 text-center text-sm font-bold text-ink"
-                    >
-                      {brand.wordmark}
-                    </li>
-                  ))}
-                  <li className="flex min-h-16 items-center justify-center rounded-card bg-surface px-2 text-center text-sm text-muted">
-                    &amp; more
-                  </li>
-                </ul>
-                <BrandDisclaimer className="mt-3" />
+                <BrandGrid brands={data.data.brands} />
               </Section>
             ) : null}
 
@@ -448,11 +435,14 @@ export function ServiceDetailScreen() {
 }
 
 /**
- * The clip, playing.
+ * The picture at the top: a photograph if the service has one, otherwise its
+ * clip.
  *
- * This is the one screen where a clip is unambiguously the right thing: there
- * is exactly one service on it, so there is nothing for it to compete with —
- * which is the whole reason the appliance page lets only its first card move.
+ * The clip is unambiguously right on this screen when it is what there is —
+ * one service, nothing for it to compete with, which is the whole reason the
+ * appliance page lets only its first card move. It is still second to a
+ * photograph, because the page it opens from now shows one and arriving to a
+ * different picture reads as arriving somewhere else.
  */
 function Media({
   service,
@@ -461,9 +451,9 @@ function Media({
   service: CatalogService
   fallback?: string
 }) {
-  const still = service.poster ?? fallback
+  const still = service.photo ?? service.poster ?? fallback
 
-  if (service.video) {
+  if (service.video && !service.photo) {
     return (
       <video
         poster={still}
@@ -488,7 +478,11 @@ function Media({
         alt=""
         fill
         sizes="(min-width: 640px) 512px, 100vw"
-        className={service.poster ? 'object-cover' : 'object-contain p-6'}
+        className={
+          service.photo ?? service.poster
+            ? 'object-cover'
+            : 'object-contain p-6'
+        }
       />
     </span>
   )

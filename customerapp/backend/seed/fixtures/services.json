@@ -150,7 +150,7 @@
     "active": true,
     "video": "/services/washing-machine-installation.mp4",
     "poster": "/services/washing-machine-installation.jpg",
-    "photo": "/photos/washing-machine/3.jpg",
+    "photo": "/photos/washing-machine/4.jpg",
     "process": [
       {
         "title": "Site check",
@@ -224,7 +224,7 @@
     "active": true,
     "video": "/services/washing-machine-uninstallation.mp4",
     "poster": "/services/washing-machine-uninstallation.jpg",
-    "photo": "/photos/washing-machine/4.jpg",
+    "photo": "/photos/washing-machine/1.jpg",
     "process": [
       {
         "title": "Disconnect",
@@ -500,7 +500,7 @@
     "active": true,
     "video": "/services/ac-gas-refill.mp4",
     "poster": "/services/ac-gas-refill.jpg",
-    "photo": "/photos/air-conditioner/4.jpg",
+    "photo": "/photos/air-conditioner/1.jpg",
     "process": [
       {
         "title": "Leak check",
@@ -573,7 +573,7 @@
     "active": true,
     "video": "/services/ac-installation.mp4",
     "poster": "/services/ac-installation.jpg",
-    "photo": "/photos/air-conditioner/1.jpg",
+    "photo": "/photos/air-conditioner/2.jpg",
     "process": [
       {
         "title": "Site check",
@@ -647,7 +647,7 @@
     "active": true,
     "video": "/services/ac-uninstallation.mp4",
     "poster": "/services/ac-uninstallation.jpg",
-    "photo": "/photos/air-conditioner/2.jpg",
+    "photo": "/photos/air-conditioner/3.jpg",
     "process": [
       {
         "title": "Disconnect",
@@ -855,7 +855,7 @@
     "active": true,
     "video": "/services/refrigerator-gas-refill.mp4",
     "poster": "/services/refrigerator-gas-refill.jpg",
-    "photo": "/photos/refrigerator/3.jpg",
+    "photo": "/photos/refrigerator/4.jpg",
     "process": [
       {
         "title": "Leak check",
@@ -928,7 +928,7 @@
     "active": true,
     "video": "/services/refrigerator-installation.mp4",
     "poster": "/services/refrigerator-installation.jpg",
-    "photo": "/photos/refrigerator/4.jpg",
+    "photo": "/photos/refrigerator/5.jpg",
     "process": [
       {
         "title": "Site check",
@@ -1138,7 +1138,7 @@
     "active": true,
     "video": "/services/geyser-installation.mp4",
     "poster": "/services/geyser-installation.jpg",
-    "photo": "/photos/geyser/3.jpg",
+    "photo": "/photos/geyser/4.jpg",
     "process": [
       {
         "title": "Site check",
@@ -1212,7 +1212,7 @@
     "active": true,
     "video": "/services/geyser-uninstallation.mp4",
     "poster": "/services/geyser-uninstallation.jpg",
-    "photo": "/photos/geyser/4.jpg",
+    "photo": "/photos/geyser/5.jpg",
     "process": [
       {
         "title": "Disconnect",
@@ -1284,7 +1284,7 @@
     "active": true,
     "video": "/services/microwave-repair.mp4",
     "poster": "/services/microwave-repair.jpg",
-    "photo": "/photos/microwave/1.jpg",
+    "photo": "/photos/microwave/2.jpg",
     "process": [
       {
         "title": "Inspection",
@@ -1352,7 +1352,7 @@
     "active": true,
     "video": "/services/microwave-service.mp4",
     "poster": "/services/microwave-service.jpg",
-    "photo": "/photos/microwave/2.jpg",
+    "photo": "/photos/microwave/3.jpg",
     "process": [
       {
         "title": "Check-up",
@@ -1420,7 +1420,7 @@
     "active": true,
     "video": "/services/microwave-installation.mp4",
     "poster": "/services/microwave-installation.jpg",
-    "photo": "/photos/microwave/3.jpg",
+    "photo": "/photos/microwave/4.jpg",
     "process": [
       {
         "title": "Site check",

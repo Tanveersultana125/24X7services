@@ -164,9 +164,10 @@ export function CategoryGrid({
         {/* A grid of tiles, the shape every app of this kind uses for a
             picker like this, and the shape that was asked for.
 
-            A service shows a frame of its own clip, and falls back to the
-            appliance drawing where nobody has drawn one — which is the day
-            the pictures start repeating again, not the shape breaking. The
+            A service shows its own photograph, then a frame of its own clip,
+            and falls back to the appliance's picture where it has neither —
+            which is the day the pictures start repeating again, not the shape
+            breaking. The
             label is stripped to the part that differs either way: the sheet's
             own title already says which appliance this is, so a tile that
             repeated it would spend three lines saying "Washing Machine" to
@@ -186,12 +187,12 @@ export function CategoryGrid({
                   <span className="relative block aspect-square w-full overflow-hidden rounded-card bg-surface transition-colors duration-[var(--duration-fast)] group-hover:bg-border">
                     {open ? (
                       <Image
-                        src={service.poster ?? open.image}
+                        src={service.photo ?? service.poster ?? open.image}
                         alt=""
                         fill
                         sizes="(min-width: 640px) 110px, 30vw"
                         className={
-                          service.poster
+                          service.photo ?? service.poster
                             ? 'object-cover'
                             : 'object-contain p-3'
                         }

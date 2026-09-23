@@ -20,20 +20,21 @@ import { cn } from '@/lib/cn'
  * box with the name at body size and the picture shrunk into the corner beside
  * a button, which read as a row in a list rather than as a thing you choose.
  *
- * One card in a list moves, and it is the first one. Everything moving reads
- * the same as nothing moving — a screen of clips gives the eye nowhere to
- * rest and no card comes out ahead — and it is also six decoders on a cheap
- * phone and six downloads on a metered connection. So the list hands `motion`
- * to its first card and to nothing else, and the clip that does play waits
- * until it is on screen. A customer who has asked their system for less
- * motion gets the still like everyone below them, and the clip is never the
- * thing carrying the meaning either way.
+ * A photograph wins over a clip, wherever there is one. The clips are drawn
+ * and they say something a photograph cannot — what the service involves,
+ * written along the foot — but they are drawings, and a screen selling real
+ * work to somebody deciding whether to let a stranger into their kitchen is
+ * better off showing the thing itself.
  *
- * The still, when one is shown, is a frame *of that service's own clip*, not
- * the appliance drawing. The drawing is shared by every service on the
- * appliance, so putting it on six cards turns a list of services into a list
- * of the same thing. The drawing stays as the last fallback, for a service
- * nobody has drawn a clip for.
+ * The clip machinery stays for a service that has no photograph: one card in
+ * such a list moves, and it is the first one. Everything moving reads the
+ * same as nothing moving, and it is also six decoders on a cheap phone, so
+ * the list hands `motion` to its first card and to nothing else. A customer
+ * who has asked their system for less motion gets a still either way.
+ *
+ * Failing both, the appliance drawing. It is shared by every service on the
+ * appliance, so a list falling all the way back to it is a list of the same
+ * picture — which is why it is last and not first.
  *
  * "View details" sits at the foot, where the marketplaces put it, and it is
  * the only affordance on the card — the pill that used to sit beside the title
@@ -50,17 +51,15 @@ import { cn } from '@/lib/cn'
 export interface ServiceCardProps {
   service: CatalogService
   /**
-   * The appliance illustration. There is no photograph per service — a picture
-   * of "repair" would be a stock image of a spanner — so all the services for
-   * one appliance carry that appliance's drawing, and it is also the poster a
-   * clip shows before its first frame decodes.
+   * The appliance's own picture, as the last fallback. Every service on one
+   * appliance shares it, so it is what a list looks like when nothing better
+   * has been seeded.
    */
   image?: string
   /**
-   * Whether this card is the one allowed to play its clip. Off by default: a
-   * list that wants movement asks for it, once, on its first card. It is not
-   * a licence to play immediately either — playback still waits for the card
-   * to be on screen. See the note above.
+   * Whether this card is the one allowed to play its clip. Off by default,
+   * and ignored entirely once the service has a photograph — see the note
+   * above. Even when it applies, playback waits for the card to be on screen.
    */
   motion?: boolean
   onSelect: (service: CatalogService) => void
@@ -100,13 +99,15 @@ export function ServiceCard({
         className
       )}
     >
-      {/* The still, in the order it is worth having: this service's own
-          frame, then the appliance drawing, then nothing. A frame fills the
-          box the way the clip does; the drawing needs the room around it. */}
+      {/* In the order each is worth having: the photograph, then a frame of
+          this service's own clip, then the appliance's picture. The first two
+          fill the box; the third may be a drawing on a plate, which needs the
+          room around it. The clip is offered only when no photograph has
+          taken its place. */}
       <ServiceClip
-        video={service.video}
-        still={service.poster ?? image}
-        cover={Boolean(service.poster)}
+        video={service.photo ? undefined : service.video}
+        still={service.photo ?? service.poster ?? image}
+        cover={Boolean(service.photo ?? service.poster)}
         motion={motion}
         sizes="(min-width: 640px) 512px, 100vw"
         containClassName="p-6"
