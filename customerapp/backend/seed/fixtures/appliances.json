@@ -48,7 +48,7 @@
   {
     "id": "refrigerator",
     "name": "Refrigerator",
-    "image": "/appliances/refrigerator.svg",
+    "image": "/appliances/refrigerator.jpg",
     "order": 3,
     "active": true,
     "detailFields": [
