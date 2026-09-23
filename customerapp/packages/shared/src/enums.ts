@@ -21,7 +21,28 @@ export const applianceIdSchema = z.enum([
 export type ApplianceId = z.infer<typeof applianceIdSchema>
 export const APPLIANCE_IDS = applianceIdSchema.options
 
-export const brandIdSchema = z.enum(['lg', 'samsung', 'bosch', 'ifb'])
+/**
+ * The manufacturers we service.
+ *
+ * A closed list rather than free text, because a booking's brand decides
+ * whether we can take the job at all — the brand-appliance matrix is keyed on
+ * it — and "LG", "lg" and "L.G." typed by three people is three brands we do
+ * not cover. Adding one means this list, the seed, and the rule that validates
+ * a saved appliance; there is no fourth place.
+ */
+export const brandIdSchema = z.enum([
+  'lg',
+  'samsung',
+  'bosch',
+  'siemens',
+  'panasonic',
+  'hitachi',
+  'ifb',
+  'whirlpool',
+  'godrej',
+  'voltas',
+  'haier',
+])
 export type BrandId = z.infer<typeof brandIdSchema>
 export const BRAND_IDS = brandIdSchema.options
 

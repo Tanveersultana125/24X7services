@@ -155,7 +155,13 @@ for (const file of files) {
 
   const trimmed = source.replace(/viewBox="[^"]*"/, `viewBox="${viewBox}"`)
   if (trimmed === source) {
-    console.error(`  ${file}: no viewBox to replace`)
+    // Either it has no viewBox at all, or it already fits — the second is the
+    // usual case on a re-run and is not worth reporting as a problem.
+    console.log(
+      source.includes('viewBox=')
+        ? `  ${file} already fits`
+        : `  ${file}: no viewBox to trim`
+    )
     continue
   }
 

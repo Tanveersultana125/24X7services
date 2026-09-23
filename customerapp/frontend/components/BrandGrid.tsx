@@ -85,7 +85,18 @@ function BrandTile({ brand }: { brand: CatalogBrand }) {
           />
         </span>
       ) : (
-        <span className="truncate text-sm font-bold tracking-[0.08em] text-ink uppercase">
+        // Sized to the word rather than truncated. "WHIRLPOOL" at the same
+        // size as "IFB" does not fit a third of a phone, and a wordmark
+        // cut to "WHIRLP…" is worse than no logo at all — it reads as the
+        // grid being broken rather than as the brand being long.
+        <span
+          className={cn(
+            'text-center font-bold text-ink uppercase',
+            brand.wordmark.length > 8
+              ? 'text-xs tracking-[0.02em]'
+              : 'text-sm tracking-[0.08em]'
+          )}
+        >
           {brand.wordmark}
         </span>
       )}
