@@ -111,6 +111,21 @@ export const catalogServiceSchema = z.object({
    */
   poster: z.string().min(1).optional(),
   /**
+   * A photograph of the appliance this service is done to.
+   *
+   * Not a frame of the clip and not a substitute for one — the two are shown
+   * in different places. A clip is drawn at card width, where its caption can
+   * be read and where it says what the service actually involves. A rail card
+   * is 160px, where that same caption is a smudge and a photograph is the
+   * only thing that still reads.
+   *
+   * Dealt round the photographs of one appliance rather than shot per
+   * service, because there is no photograph of "installation" — it is the
+   * same machine either way. Neighbouring services get different ones, which
+   * is what stops a rail reading as the same picture six times.
+   */
+  photo: z.string().min(1).optional(),
+  /**
    * How long the visit usually takes, in minutes.
    *
    * It lets a rail card separate a twenty-minute installation from a two-hour

@@ -26,11 +26,16 @@ import { cn } from '@/lib/cn'
  * card on the appliance page says — what it looks like, what people made of
  * it, what it costs.
  *
- * Nothing moves unless the screen asks. Home is six rails of six cards; if
- * each one played, a page whose job is to let somebody find their appliance
- * would be thirty-six clips competing for the same glance. A screen that
- * wants movement gives `motion` to one rail, and that rail gives it to its
- * first card — everything else is a frame of its own clip.
+ * The picture is a photograph, not a frame of the service's clip. A clip is
+ * drawn at card width with a line of its own along the foot; at the 160px a
+ * rail card gets, that line is a smudge and the whole thing reads as a blue
+ * rectangle. The photograph is the only picture that still says "washing
+ * machine" at this size. The clips keep the appliance page, where they are
+ * full width and where what they say can be read.
+ *
+ * Nothing here moves, for the same reason: a card cannot show a photograph
+ * and play an illustrated clip over it without the picture changing under
+ * the reader a second after they look at it.
  */
 
 export interface ServiceRailItem {
@@ -38,14 +43,12 @@ export interface ServiceRailItem {
   name: string
   /** The appliance photo. These rails are never about a specific unit. */
   image?: string
-  /** A clip of the work. Optional, and most rows will never have one. */
-  video?: string
   /**
-   * A frame of that clip, shown when the card is off screen or the customer
-   * asked for less motion. Falls back to `image`, which is a drawing on a
-   * plate rather than a photograph and so is contained rather than cropped.
+   * A photograph of the appliance. Falls back to `image`, which on an
+   * appliance without one is a drawing on a plate and so is contained rather
+   * than cropped.
    */
-  poster?: string
+  photo?: string
   /** Out of five, and how many said so. Both or neither — see `ServiceScore`. */
   rating?: number
   reviewCount?: number
@@ -62,15 +65,9 @@ export interface ServiceRailItem {
 
 export function ServiceRail({
   items,
-  motion = false,
   className,
 }: {
   items: readonly ServiceRailItem[]
-  /**
-   * Let the first card play its clip. Off by default — see the note above.
-   * Even on, playback waits for the card to be on screen.
-   */
-  motion?: boolean
   className?: string
 }) {
   if (items.length === 0) return null
@@ -82,7 +79,7 @@ export function ServiceRail({
         className
       )}
     >
-      {items.map((item, index) => (
+      {items.map((item) => (
         <li key={item.id} className="flex w-40 shrink-0 snap-start flex-col">
           <Link
             href={item.href}
@@ -92,19 +89,15 @@ export function ServiceRail({
               .join(', ')}
           >
             <ServiceClip
-              video={item.video}
-              still={item.poster ?? item.image}
-              cover={Boolean(item.poster)}
-              motion={motion && index === 0}
+              still={item.photo ?? item.image}
+              cover={Boolean(item.photo)}
+              motion={false}
               sizes="160px"
               containClassName="p-5"
-              // 16:9 for a clip, which is the shape it was drawn at and the
-              // only one that keeps the line along its foot whole; square for
-              // the appliance drawing, which the rail was laid out on.
-              className={cn(
-                'rounded-card transition-colors duration-[var(--duration-fast)] group-hover:bg-border',
-                item.poster ? 'aspect-video' : 'aspect-square'
-              )}
+              // A photograph is cropped square, which is the shape the rail
+              // was laid out on. A drawing keeps that square too, with the
+              // room around it it was drawn with.
+              className="aspect-square rounded-card transition-colors duration-[var(--duration-fast)] group-hover:bg-border"
             />
             <span className="mt-2.5 block line-clamp-2 text-sm font-semibold leading-snug text-ink">
               {item.name}

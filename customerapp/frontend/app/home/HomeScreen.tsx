@@ -158,11 +158,10 @@ export function HomeScreen() {
         id: popular.id,
         name: popular.name,
         image: popular.image ?? imageFor.get(popular.applianceId),
-        // A promoted row names an appliance and a service key; the clip, the
-        // frame of it and the score all belong to the catalog entry behind
+        // A promoted row names an appliance and a service key; the
+        // photograph and the score both belong to the catalog entry behind
         // that pair, not to the promotion.
-        video: listed?.video,
-        poster: listed?.poster,
+        photo: listed?.photo,
         rating: listed?.rating,
         reviewCount: listed?.reviewCount,
         href: `/services/appliance/?a=${popular.applianceId}` as Route,
@@ -279,11 +278,7 @@ export function HomeScreen() {
               title="Most booked"
               subtitle="What people call us about most"
             >
-              {/* The one moving thing on Home, and it is the first card of
-                  the first rail. Six rails all playing is a page nobody can
-                  read; none playing on the screen that sells the work is a
-                  page with nothing alive on it. */}
-              <ServiceRail items={popularItems} motion />
+              <ServiceRail items={popularItems} />
             </Section>
           ) : null}
 
@@ -323,8 +318,7 @@ export function HomeScreen() {
                       id: service.id,
                       name: service.name,
                       image: imageFor.get(service.applianceId),
-                      video: service.video,
-                      poster: service.poster,
+                      photo: service.photo,
                       rating: service.rating,
                       reviewCount: service.reviewCount,
                       href:
