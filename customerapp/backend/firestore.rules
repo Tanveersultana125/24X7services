@@ -126,7 +126,7 @@ service cloud.firestore {
              )
           && incoming().applianceId in
                ['refrigerator', 'washing-machine', 'air-conditioner', 'microwave', 'geyser']
-          && incoming().brandId in ['lg', 'samsung', 'bosch', 'siemens', 'panasonic', 'hitachi', 'ifb', 'whirlpool', 'godrej', 'voltas', 'haier']
+          && incoming().brandId in ['lg', 'samsung', 'bosch', 'ifb']
           && (!('modelNumber' in incoming()) || incoming().modelNumber.size() <= 60)
           && (!('lastServicedAt' in incoming())
               || incoming().lastServicedAt == resource.data.get('lastServicedAt', null));

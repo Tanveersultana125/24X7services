@@ -30,19 +30,7 @@ export const APPLIANCE_IDS = applianceIdSchema.options
  * not cover. Adding one means this list, the seed, and the rule that validates
  * a saved appliance; there is no fourth place.
  */
-export const brandIdSchema = z.enum([
-  'lg',
-  'samsung',
-  'bosch',
-  'siemens',
-  'panasonic',
-  'hitachi',
-  'ifb',
-  'whirlpool',
-  'godrej',
-  'voltas',
-  'haier',
-])
+export const brandIdSchema = z.enum(['lg', 'samsung', 'bosch', 'ifb'])
 export type BrandId = z.infer<typeof brandIdSchema>
 export const BRAND_IDS = brandIdSchema.options
 

@@ -24,62 +24,10 @@
     "logo": "/brands/bosch.svg"
   },
   {
-    "id": "siemens",
-    "name": "Siemens",
-    "wordmark": "SIEMENS",
-    "active": true,
-    "order": 4,
-    "logo": "/brands/siemens.svg"
-  },
-  {
-    "id": "panasonic",
-    "name": "Panasonic",
-    "wordmark": "PANASONIC",
-    "active": true,
-    "order": 5,
-    "logo": "/brands/panasonic.svg"
-  },
-  {
-    "id": "hitachi",
-    "name": "Hitachi",
-    "wordmark": "HITACHI",
-    "active": true,
-    "order": 6,
-    "logo": "/brands/hitachi.svg"
-  },
-  {
     "id": "ifb",
     "name": "IFB",
     "wordmark": "IFB",
     "active": true,
-    "order": 7
-  },
-  {
-    "id": "whirlpool",
-    "name": "Whirlpool",
-    "wordmark": "WHIRLPOOL",
-    "active": true,
-    "order": 8
-  },
-  {
-    "id": "godrej",
-    "name": "Godrej",
-    "wordmark": "GODREJ",
-    "active": true,
-    "order": 9
-  },
-  {
-    "id": "voltas",
-    "name": "Voltas",
-    "wordmark": "VOLTAS",
-    "active": true,
-    "order": 10
-  },
-  {
-    "id": "haier",
-    "name": "Haier",
-    "wordmark": "HAIER",
-    "active": true,
-    "order": 11
+    "order": 4
   }
 ]
