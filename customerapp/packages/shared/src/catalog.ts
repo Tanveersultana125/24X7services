@@ -45,7 +45,25 @@ export type DetailField = z.infer<typeof detailFieldSchema>
 export const catalogApplianceSchema = z.object({
   id: applianceIdSchema,
   name: z.string().min(1),
+  /**
+   * The appliance on its own, for a tile. Drawn contained on a plate, so a
+   * product shot on a plain background is the shape this wants.
+   */
   image: z.string().min(1),
+  /**
+   * A wide photograph of the thing in a room, for the top of the appliance's
+   * own page.
+   *
+   * A different picture doing a different job, which is why it is a second
+   * field rather than a crop of the first. `image` answers "which appliance
+   * is this" in a 100px square; this one answers "is this my kitchen" across
+   * the full width, and a tile shot blown up to a banner is a product cut-out
+   * floating on white.
+   *
+   * Optional throughout. An appliance without one opens on its name, the way
+   * all of them did before any of them had a photograph.
+   */
+  heroImage: z.string().min(1).optional(),
   order: z.number().int().min(0),
   active: z.boolean(),
   detailFields: z.array(detailFieldSchema),

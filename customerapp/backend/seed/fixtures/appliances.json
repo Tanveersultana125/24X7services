@@ -3,6 +3,7 @@
     "id": "washing-machine",
     "name": "Washing Machine",
     "image": "/appliances/washing-machine.jpg",
+    "heroImage": "/photos/laundry-room.jpg",
     "order": 1,
     "active": true,
     "detailFields": [
@@ -26,6 +27,7 @@
     "id": "air-conditioner",
     "name": "Air Conditioner",
     "image": "/appliances/air-conditioner.jpg",
+    "heroImage": "/photos/ac-technician.jpg",
     "order": 2,
     "active": true,
     "detailFields": [
@@ -49,6 +51,7 @@
     "id": "refrigerator",
     "name": "Refrigerator",
     "image": "/appliances/refrigerator.jpg",
+    "heroImage": "/photos/hero-refrigerator.jpg",
     "order": 3,
     "active": true,
     "detailFields": [
@@ -65,6 +68,7 @@
     "id": "geyser",
     "name": "Geyser",
     "image": "/appliances/geyser.jpg",
+    "heroImage": "/photos/hero-geyser.jpg",
     "order": 4,
     "active": true,
     "detailFields": [
@@ -88,6 +92,7 @@
     "id": "microwave",
     "name": "Microwave",
     "image": "/appliances/microwave.jpg",
+    "heroImage": "/photos/hero-microwave.jpg",
     "order": 5,
     "active": true,
     "detailFields": [

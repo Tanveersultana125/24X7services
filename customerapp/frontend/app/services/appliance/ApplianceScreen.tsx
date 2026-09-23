@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { Route } from 'next'
 import { ChevronRight, ShieldCheck } from 'lucide-react'
@@ -240,6 +241,26 @@ export function ApplianceScreen() {
               had asked for yet — the promises are still here, further down,
               where a customer is actually weighing one service against
               another. */}
+          {/* A photograph of the thing in a room, before its name.
+              Full-bleed on a phone, because a band inset by the page gutter
+              reads as a picture somebody pasted in rather than the top of the
+              page. Absent for an appliance nobody has photographed, and the
+              screen opens on the name the way it always did. */}
+          {appliance.heroImage ? (
+            <span className="relative -mx-4 mt-4 block aspect-video overflow-hidden bg-surface lg:mx-0 lg:rounded-card">
+              <Image
+                src={appliance.heroImage}
+                alt=""
+                fill
+                sizes="(min-width: 1024px) 640px, 100vw"
+                // The one picture above the fold on this screen, so it is
+                // fetched with the page rather than after layout has run.
+                priority
+                className="object-cover"
+              />
+            </span>
+          ) : null}
+
           <section className="mt-6">
             <h1 className="text-2xl font-bold leading-tight text-ink">
               {appliance.name}

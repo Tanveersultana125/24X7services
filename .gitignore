@@ -46,3 +46,9 @@ next-env.d.ts
 
 # verification builds run beside the dev server
 .next-verify
+
+# Where photographs are dropped before one is chosen and put under `public/`.
+# It is a staging tray, not part of the build — nothing is served from it and
+# nothing imports it. Ignored because a whole Downloads folder once landed in
+# there by accident, 4.9 GB of it, on the way to a public repository.
+customerapp/frontend/images/
