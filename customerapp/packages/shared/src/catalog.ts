@@ -233,8 +233,21 @@ export function serviceRating(
 export const catalogBrandSchema = z.object({
   id: brandIdSchema,
   name: z.string().min(1),
-  /** Rendered as text. Logos stay off until an authorised partnership exists. */
+  /** The name set as type, used wherever there is no logo file. */
   wordmark: z.string().min(1),
+  /**
+   * The brand's own logo, as a path under `public/brands`.
+   *
+   * Optional, and the fallback is the wordmark, because a logo is somebody
+   * else's trademark and the file has to come from them — each manufacturer
+   * publishes one, with terms, under "brand assets" or "press". A logo traced
+   * by hand to fill the gap is an unauthorised reproduction that is also never
+   * quite right, which is the specific thing that makes a page look fake.
+   *
+   * Using the mark to say which appliances we service is not a claim of
+   * partnership, and the disclaimer under every grid says so out loud.
+   */
+  logo: z.string().min(1).optional(),
   active: z.boolean(),
   order: z.number().int().min(0),
 })

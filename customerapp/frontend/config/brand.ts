@@ -32,7 +32,27 @@ export const BRAND_LOGOS_ENABLED = false
  * row on Home, and the About section.
  */
 export const BRAND_DISCLAIMER =
-  'Independent service provider. Not affiliated with or endorsed by LG, Samsung, Bosch or IFB. Brand names are used only to identify appliances we service.'
+  'Independent service provider. Not affiliated with or endorsed by any appliance manufacturer. Brand names and logos are used only to identify appliances we service.'
+
+/**
+ * The same sentence, naming the brands actually on screen.
+ *
+ * The list used to be typed out here, which meant it was wrong the first time
+ * a brand was added to the catalog and right again only if somebody
+ * remembered. Built from what is being shown, it cannot drift.
+ */
+export function brandDisclaimer(names: readonly string[]): string {
+  if (names.length === 0) return BRAND_DISCLAIMER
+  const listed =
+    names.length === 1
+      ? names[0]
+      : `${names.slice(0, -1).join(', ')} or ${names[names.length - 1]}`
+  return (
+    'Independent service provider. Not affiliated with or endorsed by ' +
+    `${listed}. Brand names and logos are used only to identify appliances ` +
+    'we service.'
+  )
+}
 
 /**
  * Shown on the Appliance Details step. A third-party repair can void a

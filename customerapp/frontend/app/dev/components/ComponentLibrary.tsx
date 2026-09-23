@@ -43,6 +43,7 @@ import { ReviewCard, Stars } from '@/components/ReviewCard'
 import { WarrantyCard } from '@/components/WarrantyCard'
 import { PlanCard, PlanOfferCard } from '@/components/PlanCard'
 import { ReferCard } from '@/components/ReferCard'
+import { BrandGrid } from '@/components/BrandGrid'
 import { InvoiceView } from '@/components/InvoiceView'
 import { Modal, ConfirmModal } from '@/components/Modal'
 import { BottomSheet } from '@/components/BottomSheet'
@@ -519,6 +520,10 @@ function Discovery() {
             selected
           />
         </div>
+      </Case>
+
+      <Case label="BrandGrid — logo where there is a file, wordmark where there is not">
+        <BrandGrid brands={fx.brands} />
       </Case>
 
       <Case label="BrandCard — wordmarks, one unavailable">
