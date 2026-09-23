@@ -64,7 +64,7 @@
   {
     "id": "geyser",
     "name": "Geyser",
-    "image": "/appliances/geyser.svg",
+    "image": "/appliances/geyser.jpg",
     "order": 4,
     "active": true,
     "detailFields": [
@@ -87,7 +87,7 @@
   {
     "id": "microwave",
     "name": "Microwave",
-    "image": "/appliances/microwave.svg",
+    "image": "/appliances/microwave.jpg",
     "order": 5,
     "active": true,
     "detailFields": [
