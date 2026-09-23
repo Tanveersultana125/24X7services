@@ -89,6 +89,7 @@ export const brands: CatalogBrand[] = [
     id: 'ifb',
     name: 'IFB',
     wordmark: 'IFB',
+    logo: '/brands/ifb.png',
     active: true,
     order: 4,
   },

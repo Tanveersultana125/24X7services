@@ -1,13 +1,19 @@
 # Brand logos
 
-Three of them are here. `lg.svg`, `samsung.svg` and `bosch.svg` come from
-[simple-icons](https://simpleicons.org), whose SVG files are CC0 — the shapes
-are the manufacturers' own marks, redrawn as vectors by that project and
-released for reuse. The trademarks themselves still belong to the
-manufacturers, which is what the disclaimer under the grid is for.
+All four are here.
 
-IFB is not in that set, so it shows its wordmark. That is the fallback working
-as intended, not a gap waiting to be filled with something traced by hand.
+`lg.svg`, `samsung.svg` and `bosch.svg` are the manufacturers' own vector
+logos, in their own colours, from Wikimedia Commons — LG's maroon roundel with
+the grey wordmark, Samsung in #1428A0, Bosch's anchor device with BOSCH in red.
+`ifb.png` is the same, cropped out of the only file Commons carries for IFB:
+that one is a raster with the web address set under the wordmark, so the
+address is cropped off, the white is made transparent and the mark is trimmed
+to its own ink.
+
+IFB is the one to replace first. A raster in a vector grid is a raster, and the
+current company logo carries "Set yourself free" under the letters, which this
+file predates. If someone can get the SVG from IFB, drop it in as `ifb.svg`,
+point the fixture at it and delete the PNG.
 
 ## What goes here
 

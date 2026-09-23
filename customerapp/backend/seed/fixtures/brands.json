@@ -28,6 +28,7 @@
     "name": "IFB",
     "wordmark": "IFB",
     "active": true,
-    "order": 4
+    "order": 4,
+    "logo": "/brands/ifb.png"
   }
 ]
