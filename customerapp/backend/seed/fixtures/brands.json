@@ -1,6 +1,33 @@
 [
-  { "id": "lg", "name": "LG", "wordmark": "LG", "active": true, "order": 1 },
-  { "id": "samsung", "name": "Samsung", "wordmark": "SAMSUNG", "active": true, "order": 2 },
-  { "id": "bosch", "name": "Bosch", "wordmark": "BOSCH", "active": true, "order": 3 },
-  { "id": "ifb", "name": "IFB", "wordmark": "IFB", "active": true, "order": 4 }
+  {
+    "id": "lg",
+    "name": "LG",
+    "wordmark": "LG",
+    "active": true,
+    "order": 1,
+    "logo": "/brands/lg.svg"
+  },
+  {
+    "id": "samsung",
+    "name": "Samsung",
+    "wordmark": "SAMSUNG",
+    "active": true,
+    "order": 2,
+    "logo": "/brands/samsung.svg"
+  },
+  {
+    "id": "bosch",
+    "name": "Bosch",
+    "wordmark": "BOSCH",
+    "active": true,
+    "order": 3,
+    "logo": "/brands/bosch.svg"
+  },
+  {
+    "id": "ifb",
+    "name": "IFB",
+    "wordmark": "IFB",
+    "active": true,
+    "order": 4
+  }
 ]

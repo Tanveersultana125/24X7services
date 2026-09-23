@@ -61,9 +61,30 @@ export const service: CatalogService = {
 }
 
 export const brands: CatalogBrand[] = [
-  { id: 'lg', name: 'LG', wordmark: 'LG', active: true, order: 1 },
-  { id: 'samsung', name: 'Samsung', wordmark: 'SAMSUNG', active: true, order: 2 },
-  { id: 'bosch', name: 'Bosch', wordmark: 'BOSCH', active: true, order: 3 },
+  {
+    id: 'lg',
+    name: 'LG',
+    wordmark: 'LG',
+    logo: '/brands/lg.svg',
+    active: true,
+    order: 1,
+  },
+  {
+    id: 'samsung',
+    name: 'Samsung',
+    wordmark: 'SAMSUNG',
+    logo: '/brands/samsung.svg',
+    active: true,
+    order: 2,
+  },
+  {
+    id: 'bosch',
+    name: 'Bosch',
+    wordmark: 'BOSCH',
+    logo: '/brands/bosch.svg',
+    active: true,
+    order: 3,
+  },
   { id: 'ifb', name: 'IFB', wordmark: 'IFB', active: true, order: 4 },
 ]
 

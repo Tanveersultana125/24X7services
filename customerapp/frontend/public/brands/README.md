@@ -1,6 +1,13 @@
 # Brand logos
 
-Empty on purpose. Drop the files here and they appear.
+Three of them are here. `lg.svg`, `samsung.svg` and `bosch.svg` come from
+[simple-icons](https://simpleicons.org), whose SVG files are CC0 — the shapes
+are the manufacturers' own marks, redrawn as vectors by that project and
+released for reuse. The trademarks themselves still belong to the
+manufacturers, which is what the disclaimer under the grid is for.
+
+IFB is not in that set, so it shows its wordmark. That is the fallback working
+as intended, not a gap waiting to be filled with something traced by hand.
 
 ## What goes here
 
@@ -13,9 +20,11 @@ Then set `logo: "/brands/lg.svg"` on that brand in
 falls back to its wordmark, which is what every brand does today — nothing
 breaks while the folder is empty.
 
-## Where the files come from
+## Adding another one
 
-Each manufacturer publishes its own logo files and the terms for using them,
+Either take it from simple-icons, if it has that brand, or from the
+manufacturer. Each one publishes its own logo files and the terms for using
+them,
 usually under "brand assets", "press" or "media kit" on their corporate site.
 Download them from there. Two rules they all state in some form, and both are
 worth keeping to whether or not anybody checks:
