@@ -25,31 +25,21 @@ import { cn } from '@/lib/cn'
  */
 export function BrandGrid({
   brands,
-  /** The tile shown last, for the brands not listed. */
-  more = true,
   className,
 }: {
   brands: readonly CatalogBrand[]
-  more?: boolean
   className?: string
 }) {
   if (brands.length === 0) return null
 
   return (
     <div className={className}>
-      <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+      <ul className="grid grid-cols-4 gap-2">
         {brands.map((brand) => (
           <li key={brand.id}>
             <BrandTile brand={brand} />
           </li>
         ))}
-        {more ? (
-          <li>
-            <div className="flex h-16 items-center justify-center rounded-card bg-surface px-2 text-center text-sm text-muted">
-              &amp; more
-            </div>
-          </li>
-        ) : null}
       </ul>
 
       <p className="mt-3 text-xs leading-relaxed text-muted">

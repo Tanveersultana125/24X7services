@@ -30,6 +30,7 @@ import {
   type ServiceRailItem,
 } from '@/components/ServiceRail'
 import { BrandDisclaimer } from '@/components/BrandCard'
+import { BrandLogoRow } from '@/components/BrandLogoRow'
 import { TrustPoints } from '@/components/TrustPoints'
 import { useLocation } from '@/lib/useLocation'
 import { Card } from '@/components/ui/Card'
@@ -337,16 +338,7 @@ export function HomeScreen() {
 
           {data.brands.length > 0 ? (
             <Section title="Brands we service">
-              <ul className="flex flex-wrap gap-2">
-                {data.brands.map((brand) => (
-                  <li
-                    key={brand.id}
-                    className="rounded-card border border-border px-4 py-3 text-sm font-bold tracking-[0.08em] text-ink"
-                  >
-                    {brand.wordmark}
-                  </li>
-                ))}
-              </ul>
+              <BrandLogoRow brands={data.brands} />
               {/* Required wherever manufacturer names appear. */}
               <BrandDisclaimer className="mt-3" />
             </Section>

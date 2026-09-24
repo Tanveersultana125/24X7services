@@ -19,6 +19,7 @@ import { AppShell, Section } from '@/components/AppShell'
 import { Header } from '@/components/Header'
 import { ServiceCard } from '@/components/ServiceCard'
 import { BrandDisclaimer } from '@/components/BrandCard'
+import { BrandLogoRow } from '@/components/BrandLogoRow'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
 import { TrustPoints } from '@/components/TrustPoints'
 import { Button } from '@/components/ui/Button'
@@ -402,16 +403,7 @@ export function ApplianceScreen() {
 
           {data.data && data.data.brands.length > 0 ? (
             <Section title="Brands we take">
-              <ul className="flex flex-wrap gap-2">
-                {data.data.brands.map((brand) => (
-                  <li
-                    key={brand.id}
-                    className="rounded-card border border-border px-4 py-3 text-sm font-bold tracking-[0.08em] text-ink"
-                  >
-                    {brand.wordmark}
-                  </li>
-                ))}
-              </ul>
+              <BrandLogoRow brands={data.data.brands} />
               <BrandDisclaimer className="mt-3" />
             </Section>
           ) : null}
