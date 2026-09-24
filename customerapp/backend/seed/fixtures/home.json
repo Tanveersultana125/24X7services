@@ -55,7 +55,7 @@
       "badge": "Any hour",
       "title": "Something stopped working at 11pm?",
       "subtitle": "Support answers at any hour, and the earliest slot we have is the first one you see.",
-      "image": "/banners/chat.svg",
+      "image": "/banners/support-night.svg",
       "tone": "violet",
       "slot": "inline",
       "ctaLabel": "Talk to us",
