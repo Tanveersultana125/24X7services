@@ -1,10 +1,12 @@
 'use client'
 
-import { Bell, WalletMinimal } from 'lucide-react'
+import { Bell, LogIn, LogOut, WalletMinimal } from 'lucide-react'
 import Link from 'next/link'
 import type { Route } from 'next'
 import { LocationSelector } from '@/components/LocationSelector'
 import { SearchBar } from '@/components/SearchBar'
+import { useToast } from '@/components/Toast'
+import { signOut, useAuth } from '@/lib/auth'
 import { cn } from '@/lib/cn'
 
 /**
@@ -76,6 +78,7 @@ export function HomeHeader({
             label="Notifications"
             icon={Bell}
           />
+          <AccountTile />
         </div>
       </div>
       <div className="mx-auto max-w-lg px-4 pt-3 pb-4">
@@ -86,12 +89,60 @@ export function HomeHeader({
 }
 
 /**
+ * Sign in, or sign out, from the top of Home.
+ *
+ * Nothing until Firebase has reported whether anyone is signed in, so the tile
+ * never shows "sign in" for a beat to somebody who already is.
+ */
+function AccountTile() {
+  const { user, ready } = useAuth()
+  const toast = useToast()
+
+  if (!ready) return <span className="size-11" aria-hidden="true" />
+
+  if (!user) {
+    return (
+      <HeaderTile
+        href={`/login?next=${encodeURIComponent('/home')}` as Route}
+        label="Sign in"
+        icon={LogIn}
+      />
+    )
+  }
+
+  async function leave(): Promise<void> {
+    try {
+      await signOut()
+      toast.show('You are signed out.')
+    } catch {
+      toast.show('We could not sign you out. Please try again.', {
+        tone: 'error',
+      })
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => void leave()}
+      aria-label="Sign out"
+      className={TILE_CLASS}
+    >
+      <LogOut className="size-5" aria-hidden="true" />
+    </button>
+  )
+}
+
+const TILE_CLASS =
+  'flex size-11 items-center justify-center rounded-card bg-bg text-brand hover:bg-brand-soft'
+
+/**
  * One of the square buttons in the top right.
  *
  * A filled white tile rather than a bare icon: over a banner an outline-weight
- * glyph on its own reads as decoration, not as something to press. Two of them
- * is the ceiling — the location has to keep enough width to show an area name
- * before it truncates, and a third tile takes that below a word.
+ * glyph on its own reads as decoration, not as something to press. Three of
+ * them is the ceiling — the location has to keep enough width to show an area
+ * name before it truncates, and a fourth tile takes that below a word.
  */
 function HeaderTile({
   href,
@@ -106,7 +157,7 @@ function HeaderTile({
     <Link
       href={href}
       aria-label={label}
-      className="flex size-11 items-center justify-center rounded-card bg-bg text-brand hover:bg-brand-soft"
+      className={TILE_CLASS}
     >
       <Icon className="size-5" aria-hidden="true" />
     </Link>
