@@ -172,12 +172,17 @@
   /* A field already moves its own border to brand on focus. The outline above
      then drew a second brand-coloured box two pixels outside the first, and
      every input on every form wore a double ring. A soft halo says the same
-     thing once. */
-  input:focus-visible,
+     thing once. A search field is the exception: it sits inside a pill whose
+     border does the job, and a halo on the bare input draws a box inside it. */
+  input:not([type='search']):focus-visible,
   textarea:focus-visible,
   select:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 18%, transparent);
+  }
+
+  input[type='search']:focus-visible {
+    outline: none;
   }
 
   ::placeholder {

@@ -107,9 +107,9 @@ export function SearchBar({
         placeholder={placeholder}
         value={value ?? ''}
         onChange={(event) => onChange?.(event.target.value)}
-        // No focus halo of its own: the global one would draw a second box
-        // inside the pill, whose border already turns brand on focus.
-        className="min-h-0 flex-1 bg-transparent text-base text-ink outline-none focus-visible:shadow-none [&::-webkit-search-cancel-button]:hidden"
+        // No focus halo of its own (globals.css leaves search fields out): the
+        // pill's border already turns brand on focus.
+        className="min-h-0 flex-1 bg-transparent text-base text-ink outline-none [&::-webkit-search-cancel-button]:hidden"
       />
       {value ? (
         <button
