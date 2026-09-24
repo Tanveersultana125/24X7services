@@ -29,7 +29,7 @@ export function WarrantiesScreen() {
         <SignInPrompt
           icon={ShieldCheck}
           title="Your warranties"
-          description="Every completed repair carries a service warranty. Sign in to see what is still covered."
+          description="Every completed repair carries a service warranty. Log in to see what is still covered."
         />
       }
     >

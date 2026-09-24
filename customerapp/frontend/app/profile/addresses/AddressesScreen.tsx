@@ -59,7 +59,7 @@ export function AddressesScreen() {
         <SignInPrompt
           icon={MapPin}
           title="Where we come to"
-          description="Your saved addresses live on your account. Sign in and the places we come to show up here."
+          description="Your saved addresses live on your account. Log in and the places we come to show up here."
         />
       }
     >

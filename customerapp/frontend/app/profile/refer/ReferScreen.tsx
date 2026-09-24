@@ -49,7 +49,7 @@ export function ReferScreen() {
         <SignInPrompt
           icon={Gift}
           title="Your referral code"
-          description="Refer a friend and you both get credits once their first job is finished. Sign in for your code."
+          description="Refer a friend and you both get credits once their first job is finished. Log in for your code."
         />
       }
     >

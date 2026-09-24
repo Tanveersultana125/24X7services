@@ -107,6 +107,13 @@ export function useSignInHref(next?: string): Route {
   return `/login?next=${encodeURIComponent(here)}` as Route
 }
 
+/** One row of what a screen will hold once someone signs in. */
+export interface SignInPreviewItem {
+  icon: LucideIcon
+  title: string
+  detail: string
+}
+
 /**
  * The block a signed-out visitor sees on a profile screen.
  *
@@ -114,17 +121,25 @@ export function useSignInHref(next?: string): Route {
  * is: the screen is right, the records are simply not there yet. The title
  * names what this screen holds, so the same component reads differently on
  * every screen that uses it.
+ *
+ * `preview` shows what the screen will be once they are in — a few sample
+ * rows rather than a paragraph about them — so signing in reads as getting
+ * something, not as a hoop.
  */
 export function SignInPrompt({
   icon: Icon,
   title,
   description,
+  preview,
+  previewTitle = 'What you will find here',
   next,
   className,
 }: {
   icon: LucideIcon
   title: string
   description: string
+  preview?: readonly SignInPreviewItem[]
+  previewTitle?: string
   /** Where to come back to, when the path alone is not enough. */
   next?: string
   className?: string
@@ -132,23 +147,56 @@ export function SignInPrompt({
   const href = useSignInHref(next)
 
   return (
-    <div
-      className={cn(
-        'flex flex-col items-center justify-center gap-3 px-6 py-14 text-center',
-        className
-      )}
-    >
-      <span className="flex size-14 items-center justify-center rounded-full bg-surface">
-        <Icon className="size-6 text-muted" aria-hidden="true" />
-      </span>
-      <h2 className="text-lg font-semibold text-ink">{title}</h2>
-      <p className="max-w-xs text-sm text-muted">{description}</p>
-      <Link
-        href={href}
-        className="mt-2 inline-flex min-h-11 items-center justify-center rounded-pill bg-brand px-5 text-sm font-semibold text-bg hover:bg-brand-deep"
-      >
-        Sign in
-      </Link>
+    <div className={cn('flex flex-col gap-5 pt-6 pb-10', className)}>
+      <section className="flex flex-col items-center rounded-card bg-brand-soft px-6 py-8 text-center">
+        <span className="flex size-16 items-center justify-center rounded-full bg-bg shadow-raised ring-8 ring-bg/60">
+          <Icon className="size-7 text-brand" aria-hidden="true" />
+        </span>
+        <h2 className="mt-5 text-xl font-bold text-ink">{title}</h2>
+        <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted">
+          {description}
+        </p>
+      </section>
+
+      {preview?.length ? (
+        <section aria-label={previewTitle}>
+          <h3 className="mb-2 px-1 text-xs font-semibold tracking-wide text-muted uppercase">
+            {previewTitle}
+          </h3>
+          <ul className="overflow-hidden rounded-card border border-border">
+            {preview.map((item) => (
+              <li
+                key={item.title}
+                className="flex items-start gap-3 border-b border-border px-4 py-3.5 last:border-b-0"
+              >
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-soft">
+                  <item.icon className="size-4 text-brand" aria-hidden="true" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-sm font-semibold text-ink">
+                    {item.title}
+                  </span>
+                  <span className="mt-0.5 block text-sm text-muted">
+                    {item.detail}
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      <div className="flex flex-col items-center gap-3">
+        <Link
+          href={href}
+          className="inline-flex min-h-12 w-full items-center justify-center rounded-pill bg-brand px-5 text-base font-semibold text-bg hover:bg-brand-deep"
+        >
+          Log in with your mobile number
+        </Link>
+        <p className="text-center text-xs text-muted">
+          We send a one-time code to confirm it. No password needed.
+        </p>
+      </div>
     </div>
   )
 }

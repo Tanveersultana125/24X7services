@@ -43,7 +43,7 @@ export function ReviewsScreen() {
         <SignInPrompt
           icon={Star}
           title="What you told us"
-          description="What you told us about a finished job, and what we did about it. Sign in to see yours."
+          description="What you told us about a finished job, and what we did about it. Log in to see yours."
         />
       }
     >

@@ -46,7 +46,7 @@ export function AppliancesScreen() {
         <SignInPrompt
           icon={WashingMachine}
           title="Your appliances"
-          description="Save the make and model of what you own and booking a repair takes two taps. Sign in to see yours."
+          description="Save the make and model of what you own and booking a repair takes two taps. Log in to see yours."
         />
       }
     >

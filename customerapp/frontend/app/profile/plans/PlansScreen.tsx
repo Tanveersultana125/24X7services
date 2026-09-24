@@ -61,7 +61,7 @@ function PlansOnOffer() {
         className="py-10"
         icon={ClipboardList}
         title="Plans you hold"
-        description="A plan covers a set number of services on your appliances for a year. Sign in to see the ones you are on."
+        description="A plan covers a set number of services on your appliances for a year. Log in to see the ones you are on."
       />
 
       <Band />

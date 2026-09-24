@@ -32,7 +32,7 @@ export function PersonalScreen() {
         <SignInPrompt
           icon={UserRound}
           title="Your details"
-          description="The name a technician is handed and an invoice is made out to. Sign in to set it."
+          description="The name a technician is handed and an invoice is made out to. Log in to set it."
         />
       }
     >

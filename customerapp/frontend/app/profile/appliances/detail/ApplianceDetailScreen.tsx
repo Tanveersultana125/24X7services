@@ -55,7 +55,7 @@ export function ApplianceDetailScreen() {
         <SignInPrompt
           icon={WashingMachine}
           title="This appliance"
-          description="Its details and everything we have ever done to it are on your account. Sign in to see them."
+          description="Its details and everything we have ever done to it are on your account. Log in to see them."
           // The only profile screen identified by a query parameter, so it
           // hands the way back over itself rather than losing the id.
           next={

@@ -12,7 +12,15 @@ import {
   query,
   updateDoc,
 } from 'firebase/firestore'
-import { Bell, ChevronRight } from 'lucide-react'
+import {
+  Bell,
+  CalendarCheck,
+  ChevronRight,
+  FileCheck2,
+  ReceiptText,
+  Truck,
+  UserCheck,
+} from 'lucide-react'
 import { COL, notificationSchema, SUB, type AppNotification } from '@app/shared'
 
 import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
@@ -44,8 +52,36 @@ export function NotificationsScreen() {
       signedOut={
         <SignInPrompt
           icon={Bell}
-          title="Your notifications"
-          description="Everything we have sent you about a booking is kept here. Sign in to read it."
+          title="Stay on top of every visit"
+          description="Log in and every update about your bookings lands here, the moment it happens."
+          previewTitle="You will hear from us when"
+          preview={[
+            {
+              icon: CalendarCheck,
+              title: 'Your booking is confirmed',
+              detail: 'With the date, the two-hour window and the address.',
+            },
+            {
+              icon: UserCheck,
+              title: 'A technician is assigned',
+              detail: 'Their name, photo and rating, before they arrive.',
+            },
+            {
+              icon: Truck,
+              title: 'They are on the way',
+              detail: 'So you know when to expect the knock at the door.',
+            },
+            {
+              icon: FileCheck2,
+              title: 'A quote needs your approval',
+              detail: 'Nothing beyond the visit starts until you say yes.',
+            },
+            {
+              icon: ReceiptText,
+              title: 'The job is done',
+              detail: 'Your GST invoice and warranty, ready to download.',
+            },
+          ]}
         />
       }
     >

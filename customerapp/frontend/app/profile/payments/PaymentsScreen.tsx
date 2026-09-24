@@ -32,7 +32,7 @@ export function PaymentsScreen() {
         <SignInPrompt
           icon={FileText}
           title="Your invoices"
-          description="Every bill we have issued you, with its GST breakdown, is here. Sign in to open them."
+          description="Every bill we have issued you, with its GST breakdown, is here. Log in to open them."
         />
       }
     >
