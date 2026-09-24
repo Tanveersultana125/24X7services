@@ -10,6 +10,7 @@ import { SearchBar } from '@/components/SearchBar'
 import { useToast } from '@/components/Toast'
 import { signOut, useAuth } from '@/lib/auth'
 import { cn } from '@/lib/cn'
+import { formatPhone } from '@/lib/format'
 
 /**
  * The top of Home: where the customer is, and what they are looking for.
@@ -163,14 +164,6 @@ function AccountTile() {
       />
     </>
   )
-}
-
-/** +919876543210 as +91 98765 43210, the way the login screen shows it. */
-function formatPhone(e164: string): string {
-  const digits = e164.replace(/^\+91/, '')
-  return digits.length === 10
-    ? `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`
-    : e164
 }
 
 const PILL_CLASS =

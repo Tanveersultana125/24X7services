@@ -4,7 +4,15 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { Route } from 'next'
-import { ArrowLeft, ChevronRight, History, SearchX, X } from 'lucide-react'
+import {
+  ArrowLeft,
+  ChevronRight,
+  History,
+  SearchX,
+  Sparkles,
+  TrendingUp,
+  X,
+} from 'lucide-react'
 import type {
   CatalogAppliance,
   CatalogService,
@@ -180,10 +188,6 @@ export function SearchScreen() {
           recent={recent}
           onPick={setTerm}
           onClearRecent={forgetSearches}
-          appliances={
-            catalog.data?.appliances.map((a) => ({ id: a.id, name: a.name })) ??
-            []
-          }
         />
       ) : error !== null ? (
         <ErrorState
@@ -392,26 +396,49 @@ function HitRows({
 }
 
 /**
- * What an empty search box offers: what this person looked for before, and the
- * list of appliances, which is the shortest route to everything else.
+ * Searches that land on something every time: each one is a word the index
+ * holds, so a tap never ends on "nothing matched".
+ */
+const TRENDING = [
+  'AC service',
+  'Washing machine repair',
+  'Refrigerator repair',
+  'AC deep clean',
+  'Geyser installation',
+  'Microwave repair',
+] as const
+
+/**
+ * Problems in the words a customer would use, each one a question the
+ * assistant has a full answer for. Tapping opens the chat with it already sent.
+ */
+const ASK_PROMPTS = [
+  { emoji: '🧊', text: 'My fridge is not cooling and the food is getting warm.' },
+  { emoji: '🔊', text: 'My washing machine makes a loud noise while spinning.' },
+  { emoji: '💧', text: 'Water is dripping from my AC indoors.' },
+  { emoji: '🚿', text: 'My geyser is not heating the water.' },
+  { emoji: '⚡', text: 'My microwave runs but the food stays cold.' },
+] as const
+
+/**
+ * What an empty search box offers: what this person looked for before, what
+ * most people look for, and a way to just describe the problem instead.
  */
 function Suggestions({
   recent,
-  appliances,
   onPick,
   onClearRecent,
 }: {
   recent: readonly string[]
-  appliances: ReadonlyArray<{ id: string; name: string }>
   onPick: (term: string) => void
   onClearRecent: () => void
 }) {
   return (
-    <div className="mt-5">
+    <div className="mt-4">
       {recent.length > 0 ? (
-        <section className="mb-7">
-          <div className="mb-2 flex items-baseline justify-between gap-3">
-            <h2 className="text-sm font-semibold text-muted">Recent</h2>
+        <section className="mb-8">
+          <div className="mb-3 flex items-baseline justify-between gap-3">
+            <h2 className="text-lg font-semibold text-ink">Recent</h2>
             <button
               type="button"
               onClick={onClearRecent}
@@ -434,25 +461,61 @@ function Suggestions({
         </section>
       ) : null}
 
-      {appliances.length > 0 ? (
-        <section>
-          <h2 className="mb-2 text-sm font-semibold text-muted">
-            Browse by appliance
-          </h2>
-          <ul className="flex flex-wrap gap-2">
-            {appliances.map((appliance) => (
-              <li key={appliance.id}>
-                <Link
-                  href={`/services/appliance/?a=${appliance.id}` as Route}
-                  className="inline-flex min-h-11 items-center rounded-pill border border-border px-4 text-sm font-medium text-ink hover:border-brand"
-                >
-                  {appliance.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+      <section>
+        <h2 className="mb-4 text-lg font-semibold text-ink">
+          Trending searches
+        </h2>
+        <ul className="flex flex-wrap gap-2.5">
+          {TRENDING.map((item) => (
+            <li key={item}>
+              <button
+                type="button"
+                onClick={() => onPick(item)}
+                className="inline-flex min-h-11 items-center gap-2 rounded-card border border-border px-3.5 text-sm text-ink hover:border-brand"
+              >
+                <TrendingUp
+                  className="size-4 text-muted"
+                  aria-hidden="true"
+                />
+                {item}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* The grey rule the rest of the app uses between unrelated blocks. */}
+      <div aria-hidden="true" className="-mx-4 my-8 h-2 bg-surface lg:mx-0" />
+
+      <section>
+        <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-ink">
+          Just tell us what is wrong
+          <Sparkles className="size-5 text-[#C45CE8]" aria-hidden="true" />
+        </h2>
+        <ul className="flex flex-col items-start gap-2.5">
+          {ASK_PROMPTS.map((prompt) => (
+            <li key={prompt.text} className="max-w-full">
+              <Link
+                href={
+                  `/assistant/?q=${encodeURIComponent(prompt.text)}` as Route
+                }
+                className="inline-flex min-h-11 max-w-full items-center gap-2 rounded-card border border-border px-3.5 py-2 text-left text-sm text-ink hover:border-brand"
+              >
+                <span aria-hidden="true">{prompt.emoji}</span>
+                {prompt.text}
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        <Link
+          href={'/assistant/' as Route}
+          className="mt-7 flex min-h-14 items-center justify-center gap-2 rounded-card border border-border px-4 text-center text-base font-semibold text-ink hover:border-brand"
+        >
+          Something else? Ask our assistant
+          <Sparkles className="size-5 text-[#C45CE8]" aria-hidden="true" />
+        </Link>
+      </section>
     </div>
   )
 }

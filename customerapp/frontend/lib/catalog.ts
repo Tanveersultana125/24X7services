@@ -19,6 +19,7 @@ import {
   catalogIssueSchema,
   catalogServiceSchema,
   COL,
+  diagnosisRuleSchema,
   DOC,
   popularServiceSchema,
   serviceAreaSchema,
@@ -30,6 +31,7 @@ import {
   type CatalogBrand,
   type CatalogIssue,
   type CatalogService,
+  type DiagnosisRule,
   type PopularService,
   type ServiceArea,
   type ServiceKey,
@@ -245,6 +247,19 @@ export function fetchIssuesFor(
     ),
     catalogIssueSchema
   )
+}
+
+/**
+ * What usually causes one problem, and what to try first. The rule is keyed by
+ * the issue it explains, so a single read answers it.
+ */
+export async function fetchDiagnosisRule(
+  issueId: string
+): Promise<DiagnosisRule | null> {
+  const snap = await getDoc(doc(db(), COL.diagnosisRules, issueId))
+  if (!snap.exists()) return null
+  const parsed = diagnosisRuleSchema.safeParse({ id: snap.id, ...snap.data() })
+  return parsed.success ? parsed.data : null
 }
 
 // ---------------------------------------------------------------------------
