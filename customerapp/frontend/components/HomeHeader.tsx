@@ -1,9 +1,11 @@
 'use client'
 
 import { Bell, LogIn, LogOut, WalletMinimal } from 'lucide-react'
+import { useState } from 'react'
 import Link from 'next/link'
 import type { Route } from 'next'
 import { LocationSelector } from '@/components/LocationSelector'
+import { ConfirmModal } from '@/components/Modal'
 import { SearchBar } from '@/components/SearchBar'
 import { useToast } from '@/components/Toast'
 import { signOut, useAuth } from '@/lib/auth'
@@ -89,49 +91,90 @@ export function HomeHeader({
 }
 
 /**
- * Sign in, or sign out, from the top of Home.
+ * Log in, or log out, from the top of Home.
  *
- * Nothing until Firebase has reported whether anyone is signed in, so the tile
- * never shows "sign in" for a beat to somebody who already is.
+ * A labelled button rather than a bare glyph: the log-in and log-out arrows
+ * are mirror images of each other, and on their own nobody can tell which one
+ * they are looking at. Logging out asks first, with the number it is leaving,
+ * because it is one tap from the top of the most-used screen.
+ *
+ * Nothing until Firebase has reported whether anyone is signed in, so the
+ * button never says "Login" for a beat to somebody who already is.
  */
 function AccountTile() {
   const { user, ready } = useAuth()
   const toast = useToast()
+  const [confirming, setConfirming] = useState(false)
+  const [leaving, setLeaving] = useState(false)
 
-  if (!ready) return <span className="size-11" aria-hidden="true" />
+  if (!ready) return <span className="h-11 w-20" aria-hidden="true" />
 
   if (!user) {
     return (
-      <HeaderTile
+      <Link
         href={`/login?next=${encodeURIComponent('/home')}` as Route}
-        label="Sign in"
-        icon={LogIn}
-      />
+        className={PILL_CLASS}
+      >
+        <LogIn className="size-4" aria-hidden="true" />
+        Login
+      </Link>
     )
   }
 
   async function leave(): Promise<void> {
+    setLeaving(true)
     try {
       await signOut()
-      toast.show('You are signed out.')
+      setConfirming(false)
+      toast.show('You have been logged out.')
     } catch {
-      toast.show('We could not sign you out. Please try again.', {
+      toast.show('We could not log you out. Please try again.', {
         tone: 'error',
       })
+    } finally {
+      setLeaving(false)
     }
   }
 
   return (
-    <button
-      type="button"
-      onClick={() => void leave()}
-      aria-label="Sign out"
-      className={TILE_CLASS}
-    >
-      <LogOut className="size-5" aria-hidden="true" />
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={() => setConfirming(true)}
+        className={PILL_CLASS}
+      >
+        <LogOut className="size-4" aria-hidden="true" />
+        Logout
+      </button>
+      <ConfirmModal
+        open={confirming}
+        onClose={() => setConfirming(false)}
+        onConfirm={() => void leave()}
+        loading={leaving}
+        destructive
+        title="Log out of 24X7?"
+        description={
+          user.phoneNumber
+            ? `You are logged in as ${formatPhone(user.phoneNumber)}. Your bookings stay saved to this number.`
+            : 'Your bookings stay saved to your account.'
+        }
+        confirmLabel="Log out"
+        cancelLabel="Stay logged in"
+      />
+    </>
   )
 }
+
+/** +919876543210 as +91 98765 43210, the way the login screen shows it. */
+function formatPhone(e164: string): string {
+  const digits = e164.replace(/^\+91/, '')
+  return digits.length === 10
+    ? `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`
+    : e164
+}
+
+const PILL_CLASS =
+  'flex h-11 items-center gap-1.5 rounded-card bg-bg px-3 text-sm font-semibold text-brand hover:bg-brand-soft'
 
 const TILE_CLASS =
   'flex size-11 items-center justify-center rounded-card bg-bg text-brand hover:bg-brand-soft'
@@ -140,9 +183,9 @@ const TILE_CLASS =
  * One of the square buttons in the top right.
  *
  * A filled white tile rather than a bare icon: over a banner an outline-weight
- * glyph on its own reads as decoration, not as something to press. Three of
- * them is the ceiling — the location has to keep enough width to show an area
- * name before it truncates, and a fourth tile takes that below a word.
+ * glyph on its own reads as decoration, not as something to press. Two of them
+ * and the Login button is the ceiling — the location has to keep enough width
+ * to show an area name before it truncates.
  */
 function HeaderTile({
   href,
