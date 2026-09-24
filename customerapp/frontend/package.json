@@ -5,6 +5,8 @@
   "//dev": "Pinned to 3310. `next dev` silently walks to the next free port when its own is taken, which leaves the browser on a URL served by the wrong app \u2014 so the port is fixed rather than negotiated. It was 3300 until another project on this machine took that; 3200 is the marketing site. If 3310 is ever taken too, move it again and change it here, not on the command line.",
   "scripts": {
     "dev": "next dev -p 3310",
+    "//prebuild": "@app/shared resolves to its compiled dist/, which is gitignored. A fresh clone (Vercel) has no dist/ until this runs, and every import of it fails as module-not-found.",
+    "prebuild": "npm --prefix ../packages/shared run build",
     "build": "next build",
     "start": "npx serve out -l 3310",
     "typecheck": "next typegen && tsc --noEmit",
