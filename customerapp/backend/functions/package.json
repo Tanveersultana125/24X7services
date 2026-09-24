@@ -9,6 +9,7 @@
     "watch": "npm run build -- --watch",
     "typecheck": "tsc --noEmit && tsc --noEmit -p ../tsconfig.tools.json",
     "seed": "tsx ../seed/seed.ts",
+    "demo:bundle": "tsx ../seed/demoBundle.ts",
     "simulate": "tsx ../scripts/simulateTechnician.ts",
     "test:rules": "vitest run --config ../test/vitest.config.ts",
     "deploy": "npm run build && firebase deploy --only functions --config ../firebase.json"

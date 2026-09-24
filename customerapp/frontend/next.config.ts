@@ -13,6 +13,23 @@ const { version } = JSON.parse(
 ) as { version: string }
 
 /**
+ * Whether this build is the backend-free demo (lib/demo.ts).
+ *
+ * An explicit NEXT_PUBLIC_DEMO_MODE always wins. Left unset, a Vercel build
+ * with no Firebase key becomes the demo — that is a shared preview link with no
+ * project behind it, and without this it opens on a crash
+ * (`auth/invalid-api-key`) rather than on the app. Anywhere else a missing key
+ * still fails loudly, as lib/firebase.ts intends.
+ */
+function demoMode(): string {
+  const explicit = process.env.NEXT_PUBLIC_DEMO_MODE
+  if (explicit) return explicit
+  const onVercel = Boolean(process.env.VERCEL)
+  const hasKey = Boolean(process.env.NEXT_PUBLIC_FIREBASE_API_KEY)
+  return String(onVercel && !hasKey)
+}
+
+/**
  * The app ships two ways from one build: a PWA on the web, and a Capacitor
  * WebView on Android. Both serve plain files, so this config exists mostly to
  * keep anything that needs a Node server out of the output.
@@ -40,6 +57,7 @@ const nextConfig: NextConfig = {
   // Inlined at build time, which is the only way a static export can carry it.
   env: {
     NEXT_PUBLIC_APP_VERSION: version,
+    NEXT_PUBLIC_DEMO_MODE: demoMode(),
   },
 
   turbopack: {

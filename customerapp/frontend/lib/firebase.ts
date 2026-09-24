@@ -5,6 +5,7 @@ import { getAuth, connectAuthEmulator, type Auth } from 'firebase/auth'
 import {
   initializeFirestore,
   connectFirestoreEmulator,
+  memoryLocalCache,
   persistentLocalCache,
   persistentMultipleTabManager,
   type Firestore,
@@ -32,8 +33,19 @@ import {
 
 export const FUNCTIONS_REGION = 'asia-south1'
 
+/**
+ * A build with no backend at all, for sharing a link: Firestore is answered
+ * from a bundle of the seed catalog (lib/demo.ts) and nothing reaches Google.
+ * It wins over the emulators, so a demo build can never go looking for a
+ * localhost that is not there.
+ */
+export const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === 'true'
+
 export const usingEmulators =
-  process.env.NEXT_PUBLIC_USE_EMULATORS === 'true'
+  !demoMode && process.env.NEXT_PUBLIC_USE_EMULATORS === 'true'
+
+/** The placeholders below stand in whenever no real project is behind the app. */
+const noRealProject = usingEmulators || demoMode
 
 /**
  * Stand-ins for the fields the SDK insists on having.
@@ -56,7 +68,9 @@ const EMULATOR_PLACEHOLDERS = {
   messagingSenderId: '0',
 }
 
-const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+const projectId =
+  process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
+  (demoMode ? 'demo-customerapp' : undefined)
 
 /**
  * Exported because the messaging worker needs it too, and that worker is a
@@ -66,20 +80,20 @@ const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
 export const firebaseConfig = {
   apiKey:
     process.env.NEXT_PUBLIC_FIREBASE_API_KEY ||
-    (usingEmulators ? EMULATOR_PLACEHOLDERS.apiKey : undefined),
+    (noRealProject ? EMULATOR_PLACEHOLDERS.apiKey : undefined),
   authDomain:
     process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ||
-    (usingEmulators ? `${projectId}.firebaseapp.com` : undefined),
+    (noRealProject ? `${projectId}.firebaseapp.com` : undefined),
   projectId,
   storageBucket:
     process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ||
-    (usingEmulators ? `${projectId}.appspot.com` : undefined),
+    (noRealProject ? `${projectId}.appspot.com` : undefined),
   messagingSenderId:
     process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ||
-    (usingEmulators ? EMULATOR_PLACEHOLDERS.messagingSenderId : undefined),
+    (noRealProject ? EMULATOR_PLACEHOLDERS.messagingSenderId : undefined),
   appId:
     process.env.NEXT_PUBLIC_FIREBASE_APP_ID ||
-    (usingEmulators ? EMULATOR_PLACEHOLDERS.appId : undefined),
+    (noRealProject ? EMULATOR_PLACEHOLDERS.appId : undefined),
 }
 
 const config = firebaseConfig
@@ -192,9 +206,13 @@ export function auth(): Auth {
 export function db(): Firestore {
   if (!dbInstance) {
     dbInstance = initializeFirestore(firebaseApp(), {
-      localCache: persistentLocalCache({
-        tabManager: persistentMultipleTabManager(),
-      }),
+      // The demo's cache is refilled from the bundle on every load, so it is
+      // kept in memory rather than left in IndexedDB to go stale.
+      localCache: demoMode
+        ? memoryLocalCache()
+        : persistentLocalCache({
+            tabManager: persistentMultipleTabManager(),
+          }),
     })
     if (usingEmulators) {
       connectFirestoreEmulator(dbInstance, EMULATOR_HOST, 8080)

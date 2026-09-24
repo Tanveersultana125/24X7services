@@ -19,6 +19,7 @@
     "lint": "npm -w frontend run lint",
     "emulators": "npm -w functions run build && firebase emulators:start --project demo-customerapp --config backend/firebase.json --import backend/.emulator-data --export-on-exit backend/.emulator-data",
     "seed": "firebase emulators:exec --only firestore --project demo-customerapp --config backend/firebase.json \"npm -w functions run seed\"",
+    "demo:bundle": "firebase emulators:exec --only firestore --project demo-customerapp --config backend/firebase.json \"npm -w functions run seed && npm -w functions run demo:bundle\"",
     "simulate": "npm -w functions run simulate --",
     "test:rules": "firebase emulators:exec --only firestore --project demo-customerapp --config backend/firebase.json \"npm -w functions run test:rules\"",
     "deploy:functions": "npm -w functions run deploy",

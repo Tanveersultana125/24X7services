@@ -7,7 +7,8 @@ import {
   type CallableName,
   type CallableResult,
 } from '@app/shared'
-import { functions } from './firebase'
+import { demoMode, functions } from './firebase'
+import { demoCall } from './demo'
 
 /**
  * The typed way to call a Cloud Function.
@@ -24,8 +25,12 @@ export async function callFn<N extends CallableName>(
   input: CallableInput<N>
 ): Promise<CallableResult<N>> {
   const spec = CALLABLES[name]
+  const parsed = spec.input.parse(input) as CallableInput<N>
+  if (demoMode) {
+    return spec.result.parse(await demoCall(name, parsed)) as CallableResult<N>
+  }
   const fn = httpsCallable<unknown, unknown>(functions(), name)
-  const response = await fn(spec.input.parse(input))
+  const response = await fn(parsed)
   return spec.result.parse(response.data) as CallableResult<N>
 }
 

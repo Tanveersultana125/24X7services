@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { brand } from '@/config/brand'
 import { AppChrome } from '@/components/AppChrome'
+import { DemoGate } from '@/components/DemoGate'
 import { ServiceWorker } from '@/components/ServiceWorker'
 import { ToastProvider } from '@/components/Toast'
 import './globals.css'
@@ -52,8 +53,10 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <body className="min-h-dvh bg-bg text-ink antialiased">
         <ToastProvider>
-          <AppChrome />
-          {children}
+          <DemoGate>
+            <AppChrome />
+            {children}
+          </DemoGate>
         </ToastProvider>
         <ServiceWorker />
       </body>
