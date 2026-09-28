@@ -50,6 +50,13 @@ export function PromotionalBanner({
   const [active, setActive] = useState(0)
   const [autoplay, setAutoplay] = useState(true)
 
+  // With more than one banner, the first is repeated after the last, so the
+  // rail only ever moves forward: 1, 2, 3, then on into the copy of 1, which
+  // is swapped for the real one without any motion once the rail comes to
+  // rest there. Scrolling straight back to the start would run the whole rail
+  // backwards past every slide in between.
+  const looping = banners.length > 1
+
   const scrollTo = useCallback((index: number) => {
     const rail = railRef.current
     const slide = rail?.children[index]
@@ -58,7 +65,8 @@ export function PromotionalBanner({
   }, [])
 
   // Track which slide is in view rather than assuming, since the customer can
-  // scroll the rail themselves and land between two.
+  // scroll the rail themselves and land between two. The copy counts as the
+  // first slide, so the dots move on to the first as it slides in.
   useEffect(() => {
     const rail = railRef.current
     if (!rail) return
@@ -68,7 +76,7 @@ export function PromotionalBanner({
         for (const entry of entries) {
           if (!entry.isIntersecting) continue
           const index = Array.prototype.indexOf.call(rail.children, entry.target)
-          if (index >= 0) setActive(index)
+          if (index >= 0) setActive(index % banners.length)
         }
       },
       { root: rail, threshold: 0.6 }
@@ -78,8 +86,34 @@ export function PromotionalBanner({
     return () => observer.disconnect()
   }, [banners.length])
 
+  // Resting on the copy — by autoplay or by a swipe — means resting on the
+  // first slide, so jump there with no animation. The two look identical, so
+  // nothing on screen changes.
   useEffect(() => {
-    if (!autoplay || banners.length < 2) return
+    const rail = railRef.current
+    if (!rail || !looping) return
+
+    let settle: ReturnType<typeof setTimeout> | undefined
+    function onScroll(): void {
+      clearTimeout(settle)
+      settle = setTimeout(() => {
+        const copy = rail?.children[banners.length]
+        if (!rail || !(copy instanceof HTMLElement)) return
+        if (rail.scrollLeft >= copy.offsetLeft - 2) {
+          rail.scrollTo({ left: 0, behavior: 'instant' })
+        }
+      }, 120)
+    }
+
+    rail.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      clearTimeout(settle)
+      rail.removeEventListener('scroll', onScroll)
+    }
+  }, [banners.length, looping])
+
+  useEffect(() => {
+    if (!autoplay || !looping) return
     const reduced =
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -87,13 +121,13 @@ export function PromotionalBanner({
 
     const timer = setInterval(() => {
       setActive((current) => {
-        const next = (current + 1) % banners.length
-        scrollTo(next)
-        return next
+        // From the last slide, on into the copy rather than back to the start.
+        scrollTo(current + 1)
+        return (current + 1) % banners.length
       })
     }, intervalMs)
     return () => clearInterval(timer)
-  }, [autoplay, banners.length, intervalMs, scrollTo])
+  }, [autoplay, banners.length, intervalMs, looping, scrollTo])
 
   const stopAutoplay = useCallback(() => setAutoplay(false), [])
 
@@ -131,6 +165,20 @@ export function PromotionalBanner({
             />
           </article>
         ))}
+        {looping && banners[0] ? (
+          // The copy of the first slide. Hidden from assistive tech and out of
+          // the tab order: it is there for the motion, not as a fourth offer.
+          <article aria-hidden="true" inert className="w-full shrink-0 snap-start">
+            <BannerCard
+              banner={banners[0]}
+              className={cn(
+                'rounded-none lg:rounded-card',
+                HOME_HEADER_CLEARANCE,
+                'min-h-[22rem] lg:min-h-56 lg:pt-5'
+              )}
+            />
+          </article>
+        ) : null}
       </div>
 
       {banners.length > 1 ? (
