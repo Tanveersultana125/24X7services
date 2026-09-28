@@ -6,13 +6,11 @@ import Link from 'next/link'
 import type { Route } from 'next'
 import { ChevronRight, MapPinOff, ShieldCheck } from 'lucide-react'
 import type {
-  ApplianceId,
   Banner,
   CatalogAppliance,
   CatalogBrand,
   CatalogService,
   PopularService,
-  ServiceKey,
 } from '@app/shared'
 
 import { AppShell, Section } from '@/components/AppShell'
@@ -36,7 +34,7 @@ import { useLocation } from '@/lib/useLocation'
 import { Card } from '@/components/ui/Card'
 import { ErrorState } from '@/components/ErrorState'
 import { CategoryGridSkeleton, HomeSkeleton } from '@/components/SkeletonLoader'
-import { startDraft } from '@/lib/bookingDraft'
+import { CartBar } from '@/components/CartBar'
 import {
   fetchAllServices,
   fetchAppliances,
@@ -120,26 +118,6 @@ export function HomeScreen() {
     if (ready && !location) router.replace('/location')
   }, [ready, location, router])
 
-  /**
-   * Starting a booking is starting a new draft, not adding to whatever was left
-   * half-filled before — a different appliance is a different job.
-   *
-   * Seeded here rather than passed as query parameters into the first step, so
-   * that step never renders against a draft that has not been written yet.
-   */
-  const startBooking = useCallback(
-    (applianceId: ApplianceId, serviceKey: ServiceKey) => {
-      startDraft({
-        applianceId,
-        serviceKey,
-        issueIds: [],
-        techPreference: 'any',
-      })
-      router.push('/book/brand')
-    },
-    [router]
-  )
-
   const data = home.data
   const imageFor = new Map(
     data?.appliances.map((appliance) => [appliance.id, appliance.image]) ?? []
@@ -169,7 +147,8 @@ export function HomeScreen() {
         note: durationNote(listed?.durationMinutes),
         priceLabel: 'Visit from',
         price: popular.fromPrice,
-        onBook: () => startBooking(popular.applianceId, popular.serviceKey),
+        applianceId: popular.applianceId,
+        serviceKey: popular.serviceKey,
       }
     }) ?? []
 
@@ -327,8 +306,8 @@ export function HomeScreen() {
                       note: durationNote(service.durationMinutes),
                       priceLabel: 'Visit fee',
                       price: service.visitFee,
-                      onBook: () =>
-                        startBooking(service.applianceId, service.serviceKey),
+                      applianceId: service.applianceId,
+                      serviceKey: service.serviceKey,
                     }))}
                   />
                 </Section>
@@ -355,6 +334,7 @@ export function HomeScreen() {
       ) : home.status === 'loading' ? (
         <HomeSkeleton />
       ) : null}
+      <CartBar services={data?.services ?? []} />
     </AppShell>
   )
 }

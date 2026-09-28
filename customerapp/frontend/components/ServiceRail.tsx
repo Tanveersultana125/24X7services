@@ -2,10 +2,13 @@
 
 import Link from 'next/link'
 import type { Route } from 'next'
+import type { ApplianceId, ServiceKey } from '@app/shared'
 import { formatPaise } from '@/lib/format'
 import { ServiceClip } from '@/components/ServiceClip'
 import { ServiceScore, scoreLabel } from '@/components/ServiceScore'
 import { cn } from '@/lib/cn'
+import { Check } from 'lucide-react'
+import { addToCart, inCart, removeFromCart, useCart } from '@/lib/cart'
 
 /**
  * A sideways row of bookable things: what people book most, and then one row
@@ -18,7 +21,7 @@ import { cn } from '@/lib/cn'
  *
  * Each card carries two separate targets, side by side rather than nested: the
  * picture and the name open the appliance, where the full description and the
- * warranty live, and the button starts the booking. Nesting the second inside
+ * warranty live, and the button puts it in the cart. Nesting the second inside
  * the first is the usual way this is built and it leaves a screen reader with
  * one control that does two things.
  *
@@ -60,7 +63,9 @@ export interface ServiceRailItem {
   priceLabel: string
   /** Paise. Formatted here so no caller has to remember to. */
   price: number
-  onBook: () => void
+  /** What "Add" puts in the cart. */
+  applianceId: ApplianceId
+  serviceKey: ServiceKey
 }
 
 export function ServiceRail({
@@ -126,18 +131,46 @@ export function ServiceRail({
                 {formatPaise(item.price)}
               </span>
             </span>
-            <button
-              type="button"
-              onClick={item.onBook}
-              aria-label={`Book ${item.name}`}
-              className="inline-flex h-11 shrink-0 items-center rounded-pill border border-brand px-3.5 text-sm font-semibold text-brand transition-colors duration-[var(--duration-fast)] hover:bg-brand hover:text-bg"
-            >
-              Book
-            </button>
+            <AddButton item={item} />
           </div>
         </li>
       ))}
     </ul>
+  )
+}
+
+/**
+ * "Add", and once added, "Added" — tapped again, it takes the service back
+ * out. The count and the way to the cart are CartBar's, under the page.
+ */
+function AddButton({ item }: { item: ServiceRailItem }) {
+  const cart = useCart()
+  const entry = { applianceId: item.applianceId, serviceKey: item.serviceKey }
+  const added = inCart(cart, entry)
+  return (
+    <button
+      type="button"
+      onClick={() => (added ? removeFromCart(entry) : addToCart(entry))}
+      aria-pressed={added}
+      aria-label={
+        added ? `Remove ${item.name} from cart` : `Add ${item.name} to cart`
+      }
+      className={cn(
+        'inline-flex h-11 shrink-0 items-center gap-1 rounded-pill border border-brand px-3.5 text-sm font-semibold transition-colors duration-[var(--duration-fast)]',
+        added
+          ? 'bg-brand-soft text-brand'
+          : 'text-brand hover:bg-brand hover:text-bg'
+      )}
+    >
+      {added ? (
+        <>
+          <Check className="size-4" aria-hidden="true" />
+          Added
+        </>
+      ) : (
+        'Add'
+      )}
+    </button>
   )
 }
 
