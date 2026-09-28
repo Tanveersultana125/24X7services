@@ -3,6 +3,7 @@
 import { useEffect, useRef, useSyncExternalStore } from 'react'
 import Image from 'next/image'
 import { cn } from '@/lib/cn'
+import { isProductShot } from '@/lib/photoFit'
 
 /**
  * A short clip of the work, or a still of it, in a box the caller shapes.
@@ -99,7 +100,14 @@ export function ServiceClip({
           sizes={sizes}
           priority={priority}
           className={
-            cover ? 'object-cover' : cn('object-contain', containClassName)
+            !cover
+              ? cn('object-contain', containClassName)
+              : isProductShot(still)
+                ? // Whole, with room to breathe; see `isProductShot`. The
+                  // brightness lifts a sweep shot at 247 up to true white, so
+                  // multiplying it leaves no faint grey box behind.
+                  'object-contain p-[8%] mix-blend-multiply brightness-[1.035]'
+                : 'object-cover'
           }
         />
       ) : null}
