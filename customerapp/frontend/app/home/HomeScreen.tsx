@@ -9,6 +9,7 @@ import type {
   Banner,
   CatalogAppliance,
   CatalogBrand,
+  CatalogIssue,
   CatalogService,
   PopularService,
 } from '@app/shared'
@@ -35,7 +36,9 @@ import { Card } from '@/components/ui/Card'
 import { ErrorState } from '@/components/ErrorState'
 import { CategoryGridSkeleton, HomeSkeleton } from '@/components/SkeletonLoader'
 import { CartBar } from '@/components/CartBar'
+import { ServiceSheet, serviceOptions } from '@/components/ServiceSheet'
 import {
+  fetchAllIssues,
   fetchAllServices,
   fetchAppliances,
   fetchBanners,
@@ -80,6 +83,7 @@ interface HomeData {
   appliances: CatalogAppliance[]
   services: CatalogService[]
   brands: CatalogBrand[]
+  issues: CatalogIssue[]
 }
 
 /** How many appliance rows run before an inline banner is dropped between. */
@@ -93,17 +97,23 @@ export function HomeScreen() {
     // One round trip's worth of latency rather than five, and a single failure
     // takes the whole screen to the error state instead of leaving it half
     // built with no way to retry the part that failed.
-    const [banners, popular, appliances, services, brands] = await Promise.all([
-      fetchBanners(),
-      fetchPopularServices(),
-      fetchAppliances(),
-      fetchAllServices(),
-      fetchBrands(),
-    ])
-    return { banners, popular, appliances, services, brands }
+    const [banners, popular, appliances, services, brands, issues] =
+      await Promise.all([
+        fetchBanners(),
+        fetchPopularServices(),
+        fetchAppliances(),
+        fetchAllServices(),
+        fetchBrands(),
+        fetchAllIssues(),
+      ])
+    return { banners, popular, appliances, services, brands, issues }
   }, [])
 
   const home = useAsync(load)
+
+  // The service whose options sheet is open — a repair, where "Add" means
+  // picking the problem first.
+  const [sheetId, setSheetId] = useState<string | null>(null)
 
   // The header paints nothing while the hero is behind it. Once the hero has
   // gone past, there is white page under it and it has to become a bar.
@@ -122,6 +132,9 @@ export function HomeScreen() {
   const imageFor = new Map(
     data?.appliances.map((appliance) => [appliance.id, appliance.image]) ?? []
   )
+
+  const sheetService =
+    data?.services.find((service) => service.id === sheetId) ?? null
 
   const heroBanners = data?.banners.filter((b) => b.slot === 'hero') ?? []
   const inlineBanners = data?.banners.filter((b) => b.slot === 'inline') ?? []
@@ -149,6 +162,8 @@ export function HomeScreen() {
         price: popular.fromPrice,
         applianceId: popular.applianceId,
         serviceKey: popular.serviceKey,
+        options: listed ? serviceOptions(listed, data.issues).length : 0,
+        onOptions: listed ? () => setSheetId(listed.id) : undefined,
       }
     }) ?? []
 
@@ -308,6 +323,8 @@ export function HomeScreen() {
                       price: service.visitFee,
                       applianceId: service.applianceId,
                       serviceKey: service.serviceKey,
+                      options: serviceOptions(service, data.issues).length,
+                      onOptions: () => setSheetId(service.id),
                     }))}
                   />
                 </Section>
@@ -334,6 +351,15 @@ export function HomeScreen() {
       ) : home.status === 'loading' ? (
         <HomeSkeleton />
       ) : null}
+      <ServiceSheet
+        service={sheetService}
+        appliance={data?.appliances.find(
+          (appliance) => appliance.id === sheetService?.applianceId
+        )}
+        services={data?.services ?? []}
+        issues={data?.issues ?? []}
+        onClose={() => setSheetId(null)}
+      />
       <CartBar services={data?.services ?? []} />
     </AppShell>
   )

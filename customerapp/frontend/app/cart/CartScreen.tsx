@@ -1,25 +1,33 @@
-'use client'
+"use client";
 
-import { useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import type { Route } from 'next'
-import { ShoppingCart, Trash2 } from 'lucide-react'
-import type { CatalogAppliance, CatalogService } from '@app/shared'
+import { useCallback } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import type { Route } from "next";
+import { ShoppingCart, Trash2 } from "lucide-react";
+import type {
+  CatalogAppliance,
+  CatalogIssue,
+  CatalogService,
+} from "@app/shared";
 
-import { AppShell } from '@/components/AppShell'
-import { Header } from '@/components/Header'
-import { ServiceClip } from '@/components/ServiceClip'
-import { ServiceScore } from '@/components/ServiceScore'
-import { Button } from '@/components/ui/Button'
-import { EmptyState } from '@/components/EmptyState'
-import { ErrorState } from '@/components/ErrorState'
-import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
-import { fetchAllServices, fetchAppliances } from '@/lib/catalog'
-import { removeFromCart, useCart, type CartItem } from '@/lib/cart'
-import { startDraft } from '@/lib/bookingDraft'
-import { formatPaise } from '@/lib/format'
-import { useAsync } from '@/lib/useAsync'
+import { AppShell } from "@/components/AppShell";
+import { Header } from "@/components/Header";
+import { ServiceClip } from "@/components/ServiceClip";
+import { ServiceScore } from "@/components/ServiceScore";
+import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/EmptyState";
+import { ErrorState } from "@/components/ErrorState";
+import { Skeleton, SkeletonGroup } from "@/components/SkeletonLoader";
+import {
+  fetchAllIssues,
+  fetchAllServices,
+  fetchAppliances,
+} from "@/lib/catalog";
+import { removeService, useCart } from "@/lib/cart";
+import { startDraft } from "@/lib/bookingDraft";
+import { formatPaise } from "@/lib/format";
+import { useAsync } from "@/lib/useAsync";
 
 /**
  * The services a customer set aside, each with its own way to book.
@@ -32,43 +40,60 @@ import { useAsync } from '@/lib/useAsync'
  * Prices come from the catalog, not the cart, so what is shown is today's fee.
  * An item whose service has since been withdrawn is dropped from view rather
  * than offered for a booking that would be refused.
+ *
+ * A repair added for two problems is one row and one visit: the technician
+ * who comes for "not cooling" can look at the dripping too, and the booking
+ * starts with both problems already picked.
  */
+
+interface Row {
+  service: CatalogService;
+  issues: CatalogIssue[];
+}
+
 export function CartScreen() {
-  const router = useRouter()
-  const cart = useCart()
+  const router = useRouter();
+  const cart = useCart();
 
   const load = useCallback(async () => {
-    const [appliances, services] = await Promise.all([
+    const [appliances, services, issues] = await Promise.all([
       fetchAppliances(),
       fetchAllServices(),
-    ])
-    return { appliances, services }
-  }, [])
-  const catalog = useAsync(load)
+      fetchAllIssues(),
+    ]);
+    return { appliances, services, issues };
+  }, []);
+  const catalog = useAsync(load);
 
-  const rows = (catalog.data?.services ?? [])
-    .map((service) => ({
-      service,
-      index: cart.findIndex(
-        (item) =>
-          item.applianceId === service.applianceId &&
-          item.serviceKey === service.serviceKey
-      ),
-    }))
-    .filter((row) => row.index !== -1)
-    .sort((a, b) => a.index - b.index)
-    .map((row) => row.service)
+  // One row per service, in the order each was first added, carrying every
+  // problem it was added for.
+  const rows: Row[] = [];
+  for (const item of cart) {
+    const service = catalog.data?.services.find(
+      (each) =>
+        each.applianceId === item.applianceId &&
+        each.serviceKey === item.serviceKey,
+    );
+    if (!service) continue;
+    let row = rows.find((each) => each.service.id === service.id);
+    if (!row) {
+      row = { service, issues: [] };
+      rows.push(row);
+    }
+    const issue = catalog.data?.issues.find((each) => each.id === item.issueId);
+    if (issue) row.issues.push(issue);
+  }
 
-  const total = rows.reduce((sum, service) => sum + service.visitFee, 0)
+  const total = rows.reduce((sum, row) => sum + row.service.visitFee, 0);
 
-  function book(item: CartItem): void {
+  function book(row: Row): void {
     startDraft({
-      applianceId: item.applianceId,
-      serviceKey: item.serviceKey,
-      issueIds: [],
-      techPreference: 'any',
-    })
-    router.push('/book/brand')
+      applianceId: row.service.applianceId,
+      serviceKey: row.service.serviceKey,
+      issueIds: row.issues.map((issue) => issue.id),
+      techPreference: "any",
+    });
+    router.push("/book/brand");
   }
 
   return (
@@ -80,15 +105,18 @@ export function CartScreen() {
           icon={ShoppingCart}
           title="Your cart is empty"
           description="Add a service from search or the services list, and it waits here until you book it."
-          action={{ label: 'Browse services', href: '/services' }}
+          action={{ label: "Browse services", href: "/services" }}
         />
-      ) : catalog.status === 'loading' ? (
+      ) : catalog.status === "loading" ? (
         <SkeletonGroup label="Loading" className="mt-5 flex flex-col gap-4">
           {cart.map((item) => (
-            <Skeleton key={`${item.applianceId}-${item.serviceKey}`} className="h-24" />
+            <Skeleton
+              key={`${item.applianceId}-${item.serviceKey}-${item.issueId ?? ""}`}
+              className="h-24"
+            />
           ))}
         </SkeletonGroup>
-      ) : catalog.status === 'error' ? (
+      ) : catalog.status === "error" ? (
         <ErrorState onRetry={catalog.reload} retrying={catalog.refreshing} />
       ) : (
         <div className="mt-5">
@@ -97,12 +125,12 @@ export function CartScreen() {
           </p>
 
           <ul className="mt-2 divide-y divide-border">
-            {rows.map((service) => (
-              <li key={service.id}>
+            {rows.map((row) => (
+              <li key={row.service.id}>
                 <CartRow
-                  service={service}
+                  row={row}
                   appliance={catalog.data?.appliances.find(
-                    (appliance) => appliance.id === service.applianceId
+                    (appliance) => appliance.id === row.service.applianceId,
                   )}
                   onBook={book}
                 />
@@ -112,7 +140,8 @@ export function CartScreen() {
 
           <div className="mt-4 flex items-baseline justify-between border-t border-border pt-4">
             <span className="text-sm text-muted">
-              Visit fees, {rows.length} {rows.length === 1 ? 'service' : 'services'}
+              Visit fees, {rows.length}{" "}
+              {rows.length === 1 ? "service" : "services"}
             </span>
             <span className="text-base font-bold text-ink">
               {formatPaise(total)}
@@ -132,23 +161,20 @@ export function CartScreen() {
         </div>
       )}
     </AppShell>
-  )
+  );
 }
 
 function CartRow({
-  service,
+  row,
   appliance,
   onBook,
 }: {
-  service: CatalogService
-  appliance?: CatalogAppliance
-  onBook: (item: CartItem) => void
+  row: Row;
+  appliance?: CatalogAppliance;
+  onBook: (row: Row) => void;
 }) {
-  const item = {
-    applianceId: service.applianceId,
-    serviceKey: service.serviceKey,
-  }
-  const still = service.photo ?? service.poster ?? appliance?.image
+  const { service, issues } = row;
+  const still = service.photo ?? service.poster ?? appliance?.image;
 
   return (
     <div className="flex items-start gap-4 py-4">
@@ -177,6 +203,11 @@ function CartRow({
         <p className="text-base font-medium leading-snug text-ink">
           {service.name}
         </p>
+        {issues.length > 0 ? (
+          <p className="mt-0.5 text-sm text-muted">
+            For: {issues.map((issue) => issue.label).join(", ")}
+          </p>
+        ) : null}
         <ServiceScore
           rating={service.rating}
           reviewCount={service.reviewCount}
@@ -184,18 +215,18 @@ function CartRow({
           className="mt-1"
         />
         <p className="mt-1 text-sm text-ink">
-          {formatPaise(service.visitFee)}{' '}
+          {formatPaise(service.visitFee)}{" "}
           <span className="text-muted">visit fee</span>
         </p>
 
         <div className="mt-3 flex items-center gap-2">
-          <Button size="sm" onClick={() => onBook(item)}>
+          <Button size="sm" onClick={() => onBook(row)}>
             Book
           </Button>
           <Button
             size="sm"
             variant="ghost"
-            onClick={() => removeFromCart(item)}
+            onClick={() => removeService(service)}
             aria-label={`Remove ${service.name} from cart`}
             iconLeft={<Trash2 className="size-4" aria-hidden="true" />}
           >
@@ -204,5 +235,5 @@ function CartRow({
         </div>
       </div>
     </div>
-  )
+  );
 }

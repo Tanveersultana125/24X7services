@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import type {
   CatalogAppliance,
+  CatalogIssue,
   CatalogService,
   SearchHit,
 } from '@app/shared'
@@ -31,14 +32,25 @@ import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
-import { fetchAllServices, fetchAppliances } from '@/lib/catalog'
+import {
+  fetchAllIssues,
+  fetchAllServices,
+  fetchAppliances,
+} from '@/lib/catalog'
+import { ServiceSheet, serviceOptions } from '@/components/ServiceSheet'
 import { callFn, friendlyError } from '@/lib/callables'
 import {
   forgetSearches,
   rememberSearch,
   useRecentSearches,
 } from '@/lib/recentSearches'
-import { addToCart, inCart, removeFromCart, useCart } from '@/lib/cart'
+import {
+  addToCart,
+  countForService,
+  inCart,
+  removeFromCart,
+  useCart,
+} from '@/lib/cart'
 import { CartBar } from '@/components/CartBar'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/cn'
@@ -98,16 +110,21 @@ export function SearchScreen() {
     async (): Promise<{
       appliances: CatalogAppliance[]
       services: CatalogService[]
+      issues: CatalogIssue[]
     }> => {
-      const [appliances, services] = await Promise.all([
+      const [appliances, services, issues] = await Promise.all([
         fetchAppliances(),
         fetchAllServices(),
+        fetchAllIssues(),
       ])
-      return { appliances, services }
+      return { appliances, services, issues }
     },
     []
   )
   const catalog = useAsync(loadCatalog)
+
+  // The repair whose options sheet is open.
+  const [sheetId, setSheetId] = useState<string | null>(null)
 
   // Every request gets a number, and only the newest one is allowed to write.
   const requestId = useRef(0)
@@ -141,6 +158,9 @@ export function SearchScreen() {
   // What a hit joins to. Keyed the way a hit names itself, so the lookup is
   // the hit's own fields rather than a string the two sides have to agree on.
   const services = catalog.data?.services ?? []
+  const issues = catalog.data?.issues ?? []
+  const sheetService =
+    services.find((service) => service.id === sheetId) ?? null
   const serviceFor = new Map(
     services.map((service) => [
       `${service.applianceId}/${service.serviceKey}`,
@@ -207,10 +227,21 @@ export function SearchScreen() {
           hits={hits}
           applianceFor={applianceFor}
           serviceFor={serviceFor}
+          issues={issues}
           onOpen={open}
+          onOptions={setSheetId}
         />
       )}
 
+      <ServiceSheet
+        service={sheetService}
+        appliance={
+          sheetService ? applianceFor.get(sheetService.applianceId) : undefined
+        }
+        services={services}
+        issues={issues}
+        onClose={() => setSheetId(null)}
+      />
       <CartBar services={services} />
     </AppShell>
   )
@@ -237,12 +268,16 @@ function Results({
   hits,
   applianceFor,
   serviceFor,
+  issues,
   onOpen,
+  onOptions,
 }: {
   hits: readonly SearchHit[]
   applianceFor: ReadonlyMap<string, CatalogAppliance>
   serviceFor: ReadonlyMap<string, CatalogService>
+  issues: readonly CatalogIssue[]
   onOpen: (href: string) => void
+  onOptions: (serviceId: string) => void
 }) {
   const appliances = [...new Set(hits.map((hit) => hit.applianceId))]
     .map((id) => applianceFor.get(id))
@@ -307,7 +342,9 @@ function Results({
               <ServiceRow
                 service={service}
                 image={applianceFor.get(service.applianceId)?.image}
+                options={serviceOptions(service, issues).length}
                 onOpen={onOpen}
+                onOptions={() => onOptions(service.id)}
               />
             </li>
           ))}
@@ -343,23 +380,35 @@ function Results({
  *
  * Two controls, side by side rather than one inside the other: the row opens
  * the service, and "Add" puts it in the cart without leaving the list. Tapped
- * again, it takes it back out.
+ * again, it takes it back out. A repair has options — the problem it is for —
+ * so its "Add" says how many and opens them instead (ServiceSheet).
  */
 function ServiceRow({
   service,
   image,
+  options,
   onOpen,
+  onOptions,
 }: {
   service: CatalogService
   image?: string
+  options: number
   onOpen: (href: string) => void
+  onOptions: () => void
 }) {
   const cart = useCart()
   const item = {
     applianceId: service.applianceId,
     serviceKey: service.serviceKey,
   }
-  const added = inCart(cart, item)
+  const added =
+    options > 0 ? countForService(cart, item) > 0 : inCart(cart, item)
+
+  function press(): void {
+    if (options > 0) onOptions()
+    else if (added) removeFromCart(item)
+    else addToCart(item)
+  }
   const still = service.photo ?? service.poster ?? image
 
   return (
@@ -408,15 +457,18 @@ function ServiceRow({
       </button>
       <button
         type="button"
-        onClick={() => (added ? removeFromCart(item) : addToCart(item))}
-        aria-pressed={added}
+        onClick={press}
+        aria-pressed={options > 0 ? undefined : added}
+        aria-haspopup={options > 0 ? 'dialog' : undefined}
         aria-label={
-          added
-            ? `Remove ${service.name} from cart`
-            : `Add ${service.name} to cart`
+          options > 0
+            ? `Add ${service.name}, ${options} options`
+            : added
+              ? `Remove ${service.name} from cart`
+              : `Add ${service.name} to cart`
         }
         className={cn(
-          'inline-flex min-h-11 w-24 shrink-0 items-center justify-center gap-1 rounded-card border text-sm font-semibold transition-colors duration-[var(--duration-fast)]',
+          'relative inline-flex min-h-11 w-24 shrink-0 items-center justify-center gap-1 rounded-card border text-sm font-semibold transition-colors duration-[var(--duration-fast)]',
           added
             ? 'border-brand bg-brand-soft text-brand'
             : 'border-border bg-bg text-brand hover:border-brand'
@@ -430,6 +482,14 @@ function ServiceRow({
         ) : (
           'Add'
         )}
+        {options > 0 ? (
+          <span
+            aria-hidden="true"
+            className="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap bg-bg px-1 text-[11px] font-normal leading-none text-muted"
+          >
+            {options} options
+          </span>
+        ) : null}
       </button>
     </div>
   )

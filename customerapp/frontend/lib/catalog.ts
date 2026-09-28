@@ -250,6 +250,17 @@ export function fetchIssuesFor(
 }
 
 /**
+ * Every appliance's problems in one read, for screens that list services from
+ * several appliances and show each repair's options.
+ */
+export function fetchAllIssues(): Promise<CatalogIssue[]> {
+  return readAll(
+    query(collection(db(), COL.catalogIssues), orderBy('order')),
+    catalogIssueSchema
+  )
+}
+
+/**
  * What usually causes one problem, and what to try first. The rule is keyed by
  * the issue it explains, so a single read answers it.
  */

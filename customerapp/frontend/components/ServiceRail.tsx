@@ -7,7 +7,13 @@ import { formatPaise } from '@/lib/format'
 import { ServiceClip } from '@/components/ServiceClip'
 import { ServiceScore, scoreLabel } from '@/components/ServiceScore'
 import { cn } from '@/lib/cn'
-import { addToCart, inCart, removeFromCart, useCart } from '@/lib/cart'
+import {
+  addToCart,
+  countForService,
+  inCart,
+  removeFromCart,
+  useCart,
+} from '@/lib/cart'
 import { useRailScroll } from '@/lib/useRailScroll'
 import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -67,6 +73,13 @@ export interface ServiceRailItem {
   /** What "Add" puts in the cart. */
   applianceId: ApplianceId
   serviceKey: ServiceKey
+  /**
+   * How many options the service has — the problems a repair is booked for.
+   * With any, "Add" says so underneath and opens them (`onOptions`) instead
+   * of adding the service outright.
+   */
+  options?: number
+  onOptions?: () => void
 }
 
 export function ServiceRail({
@@ -181,25 +194,43 @@ function RailArrow({
 
 /**
  * "Add", and once added, "Added" — tapped again, it takes the service back
- * out. The count and the way to the cart are CartBar's, under the page.
+ * out. A service with options says how many under the label, the way the
+ * marketplaces do, and opens them instead: which problem a repair is for is
+ * part of what is being added. The count and the way to the cart are
+ * CartBar's, under the page.
  */
 function AddButton({ item }: { item: ServiceRailItem }) {
   const cart = useCart()
   const entry = { applianceId: item.applianceId, serviceKey: item.serviceKey }
-  const added = inCart(cart, entry)
+  const withOptions = Boolean(item.options && item.onOptions)
+  const added = withOptions
+    ? countForService(cart, entry) > 0
+    : inCart(cart, entry)
+
+  function press(): void {
+    if (withOptions) item.onOptions?.()
+    else if (added) removeFromCart(entry)
+    else addToCart(entry)
+  }
+
   return (
     <button
       type="button"
-      onClick={() => (added ? removeFromCart(entry) : addToCart(entry))}
-      aria-pressed={added}
+      onClick={press}
+      aria-pressed={withOptions ? undefined : added}
+      aria-haspopup={withOptions ? 'dialog' : undefined}
       aria-label={
-        added ? `Remove ${item.name} from cart` : `Add ${item.name} to cart`
+        withOptions
+          ? `Add ${item.name}, ${item.options} options`
+          : added
+            ? `Remove ${item.name} from cart`
+            : `Add ${item.name} to cart`
       }
       className={cn(
-        'inline-flex h-11 shrink-0 items-center gap-1 rounded-pill border border-brand px-3.5 text-sm font-semibold transition-colors duration-[var(--duration-fast)]',
+        'relative inline-flex h-11 w-[5.5rem] shrink-0 items-center justify-center gap-1 rounded-card border text-sm font-semibold transition-colors duration-[var(--duration-fast)]',
         added
-          ? 'bg-brand-soft text-brand'
-          : 'text-brand hover:bg-brand hover:text-bg'
+          ? 'border-brand bg-brand-soft text-brand'
+          : 'border-border bg-bg text-brand hover:border-brand'
       )}
     >
       {added ? (
@@ -210,6 +241,16 @@ function AddButton({ item }: { item: ServiceRailItem }) {
       ) : (
         'Add'
       )}
+      {withOptions ? (
+        // Sits across the bottom edge, on the page colour, so it reads as a
+        // caption of the button rather than a second line crammed inside it.
+        <span
+          aria-hidden="true"
+          className="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap bg-bg px-1 text-[11px] font-normal leading-none text-muted"
+        >
+          {item.options} options
+        </span>
+      ) : null}
     </button>
   )
 }
