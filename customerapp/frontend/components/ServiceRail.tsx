@@ -141,8 +141,11 @@ export function ServiceRail({
             ) : null}
 
             {/* Pushed to the bottom so the prices line up across cards whose
-                names ran to one line and cards whose names ran to two. */}
-            <div className="mt-auto flex items-end justify-between gap-2 pt-2">
+                names ran to one line and cards whose names ran to two. The
+                bottom padding is room for the "6 options" caption hanging
+                across the foot of Add: a sideways-scrolling list clips what
+                spills out of it downwards too. */}
+            <div className="mt-auto flex items-end justify-between gap-2 pt-2 pb-2.5">
               <span className="min-w-0">
                 <span className="block text-[11px] leading-none text-muted">
                   {item.priceLabel}
