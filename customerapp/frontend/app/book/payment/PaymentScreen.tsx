@@ -16,6 +16,7 @@ import { callFn, friendlyError } from '@/lib/callables'
 import { CHECKOUT_IS_SIMULATED, CheckoutDismissed, openCheckout } from '@/lib/checkout'
 import { useAuth } from '@/lib/auth'
 import { clearDraft, useBookingDraft } from '@/lib/bookingDraft'
+import { removeFromCart } from '@/lib/cart'
 
 /**
  * Taking the money, or not taking it yet.
@@ -55,7 +56,13 @@ export function PaymentScreen() {
 
   function finish(bookingId: string): void {
     // The draft has become a booking; keeping it would offer the customer the
-    // same job again next time they open the app.
+    // same job again next time they open the app. The same goes for the cart.
+    if (draft.applianceId && draft.serviceKey) {
+      removeFromCart({
+        applianceId: draft.applianceId,
+        serviceKey: draft.serviceKey,
+      })
+    }
     clearDraft()
     router.replace(`/book/confirmed?b=${bookingId}` as Route)
   }

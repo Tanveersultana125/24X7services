@@ -7,6 +7,7 @@ import Link from 'next/link'
 import type { Route } from 'next'
 import {
   ArrowLeft,
+  Check,
   ChevronRight,
   History,
   SearchX,
@@ -37,6 +38,8 @@ import {
   rememberSearch,
   useRecentSearches,
 } from '@/lib/recentSearches'
+import { addToCart, inCart, removeFromCart, useCart } from '@/lib/cart'
+import { CartBar } from '@/components/CartBar'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/cn'
 
@@ -207,6 +210,8 @@ export function SearchScreen() {
           onOpen={open}
         />
       )}
+
+      <CartBar services={services} />
     </AppShell>
   )
 }
@@ -333,12 +338,12 @@ function Results({
 
 /**
  * A service as one row: the picture on the left, the name, score and fee in
- * the middle, and the way in on the right — the shape the marketplaces give a
+ * the middle, and "Add" on the right — the shape the marketplaces give a
  * search result, because it is a list somebody compares down.
  *
- * The button is drawn, not real. The whole row is the control, and a second
- * target inside it would be two things to tab to for one action — the same
- * reason ServiceCard draws its "View details".
+ * Two controls, side by side rather than one inside the other: the row opens
+ * the service, and "Add" puts it in the cart without leaving the list. Tapped
+ * again, it takes it back out.
  */
 function ServiceRow({
   service,
@@ -349,25 +354,33 @@ function ServiceRow({
   image?: string
   onOpen: (href: string) => void
 }) {
+  const cart = useCart()
+  const item = {
+    applianceId: service.applianceId,
+    serviceKey: service.serviceKey,
+  }
+  const added = inCart(cart, item)
   const still = service.photo ?? service.poster ?? image
+
   return (
-    <button
-      type="button"
-      onClick={() =>
-        onOpen(
-          `/services/detail/?a=${service.applianceId}&s=${service.serviceKey}`
-        )
-      }
-      aria-label={[
-        service.name,
-        scoreLabel(service.rating, service.reviewCount),
-        `visit fee ${formatPaise(service.visitFee)}`,
-      ]
-        .filter(Boolean)
-        .join(', ')}
-      className="group flex w-full items-start gap-4 py-4 text-left"
-    >
-      {still ? (
+    <div className="flex items-start gap-3 py-4">
+      <button
+        type="button"
+        onClick={() =>
+          onOpen(
+            `/services/detail/?a=${service.applianceId}&s=${service.serviceKey}`
+          )
+        }
+        aria-label={[
+          service.name,
+          scoreLabel(service.rating, service.reviewCount),
+          `visit fee ${formatPaise(service.visitFee)}`,
+        ]
+          .filter(Boolean)
+          .join(', ')}
+        className="flex min-w-0 flex-1 items-start gap-4 text-left"
+      >
+        {still ? (
         <ServiceClip
           still={still}
           cover={Boolean(service.photo ?? service.poster)}
@@ -392,13 +405,33 @@ function ServiceRow({
           <span className="text-muted">visit fee</span>
         </span>
       </span>
-      <span
-        aria-hidden="true"
-        className="inline-flex min-h-10 shrink-0 items-center rounded-card border border-border px-5 text-sm font-semibold text-brand transition-colors duration-[var(--duration-fast)] group-hover:border-brand"
+      </button>
+      <button
+        type="button"
+        onClick={() => (added ? removeFromCart(item) : addToCart(item))}
+        aria-pressed={added}
+        aria-label={
+          added
+            ? `Remove ${service.name} from cart`
+            : `Add ${service.name} to cart`
+        }
+        className={cn(
+          'inline-flex min-h-11 w-24 shrink-0 items-center justify-center gap-1 rounded-card border text-sm font-semibold transition-colors duration-[var(--duration-fast)]',
+          added
+            ? 'border-brand bg-brand-soft text-brand'
+            : 'border-border bg-bg text-brand hover:border-brand'
+        )}
       >
-        Book
-      </span>
-    </button>
+        {added ? (
+          <>
+            <Check className="size-4" aria-hidden="true" />
+            Added
+          </>
+        ) : (
+          'Add'
+        )}
+      </button>
+    </div>
   )
 }
 
