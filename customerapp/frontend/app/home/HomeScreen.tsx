@@ -18,7 +18,6 @@ import { AppShell, Section } from '@/components/AppShell'
 import {
   HomeHeader,
   HOME_HEADER_CLEARANCE,
-  HOME_HEADER_HEIGHT,
 } from '@/components/HomeHeader'
 import { SearchBar } from '@/components/SearchBar'
 import { PromotionalBanner, BannerCard } from '@/components/PromotionalBanner'
@@ -115,10 +114,10 @@ export function HomeScreen() {
   // picking the problem first.
   const [sheetId, setSheetId] = useState<string | null>(null)
 
-  // The header paints nothing while the hero is behind it. Once the hero has
-  // gone past, there is white page under it and it has to become a bar.
-  const heroRef = useRef<HTMLDivElement>(null)
-  const pastHero = useScrolledPast(heroRef, HOME_HEADER_HEIGHT)
+  // The header floats on the hero only while the page is at the top. The
+  // moment it moves, the header folds down to a white bar with just the
+  // search field, so its text never lands on the banner's text.
+  const scrolled = useScrolled(SCROLL_THRESHOLD)
 
   useStaleLocationCheck(location, setLocation)
 
@@ -184,7 +183,7 @@ export function HomeScreen() {
     <AppShell
       mobileHeader={
         <HomeHeader
-          solid={pastHero}
+          compact={scrolled}
           area={location?.area}
           detail={
             location ? `${location.city} ${location.pincode}` : undefined
@@ -206,7 +205,7 @@ export function HomeScreen() {
       {/* Always something here, on every path. The header floats on this and
           is transparent until it scrolls past it, so a screen that reaches the
           error state with nothing behind the header is white on white. */}
-      <div ref={heroRef}>
+      <div>
         {data && heroBanners.length > 0 ? (
           <PromotionalBanner banners={heroBanners} />
         ) : (
@@ -394,33 +393,28 @@ function HeroBackdrop({ full }: { full: boolean }) {
   )
 }
 
+/** How far the page scrolls before the header folds to just the search bar. */
+const SCROLL_THRESHOLD = 8
+
 /**
- * Whether the element has scrolled up past a band `offset` pixels deep at the
- * top of the viewport.
+ * Whether the page has left the top.
  *
- * An observer rather than a scroll handler: this fires twice in a session, when
- * the hero leaves and when it comes back, instead of on every frame of every
- * scroll to compute the same boolean.
+ * A passive listener that sets state only when the answer flips, so a long
+ * scroll costs two renders — one each way — and not one per frame.
  */
-function useScrolledPast(
-  ref: React.RefObject<HTMLElement | null>,
-  offset: number
-): boolean {
-  const [past, setPast] = useState(false)
+function useScrolled(threshold: number): boolean {
+  const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
-    const element = ref.current
-    if (!element) return
+    function check(): void {
+      setScrolled(window.scrollY > threshold)
+    }
+    check()
+    window.addEventListener('scroll', check, { passive: true })
+    return () => window.removeEventListener('scroll', check)
+  }, [threshold])
 
-    const observer = new IntersectionObserver(
-      ([entry]) => setPast(entry !== undefined && !entry.isIntersecting),
-      { rootMargin: `-${offset}px 0px 0px 0px` }
-    )
-    observer.observe(element)
-    return () => observer.disconnect()
-  }, [ref, offset])
-
-  return past
+  return scrolled
 }
 
 /** Past this many, the line stops listing and says "and more". */
