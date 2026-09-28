@@ -166,7 +166,7 @@ export function SearchScreen() {
 
   return (
     <AppShell>
-      <div className="sticky top-0 z-20 -mx-4 flex items-center gap-1 bg-bg px-2 pb-3 pt-[calc(var(--safe-top)+0.5rem)] lg:top-16 lg:mx-0 lg:px-0 lg:pt-5">
+      <div className="sticky top-0 z-20 -mx-4 flex items-center gap-1 border-b border-border bg-bg px-2 pb-3 pt-[calc(var(--safe-top)+0.5rem)] lg:top-16 lg:mx-0 lg:px-0 lg:pt-5">
         <button
           type="button"
           onClick={() => router.back()}
