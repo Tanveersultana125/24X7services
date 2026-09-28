@@ -1,7 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import Link from 'next/link'
 import type { Route } from 'next'
 import {
@@ -21,19 +22,15 @@ import type {
 
 import { AppShell } from '@/components/AppShell'
 import { SearchBar } from '@/components/SearchBar'
-import { ServiceCard } from '@/components/ServiceCard'
 import { ServiceClip } from '@/components/ServiceClip'
-import { ServiceScore } from '@/components/ServiceScore'
+import { ServiceScore, scoreLabel } from '@/components/ServiceScore'
+import { formatPaise } from '@/lib/format'
 import { Chip } from '@/components/ui/Chip'
 import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
-import {
-  fetchAllServices,
-  fetchAppliances,
-  summaryByAppliance,
-} from '@/lib/catalog'
+import { fetchAllServices, fetchAppliances } from '@/lib/catalog'
 import { callFn, friendlyError } from '@/lib/callables'
 import {
   forgetSearches,
@@ -75,12 +72,6 @@ import { cn } from '@/lib/cn'
 /** Long enough for a prefix to mean something, short enough to feel instant. */
 const MIN_QUERY = 2
 const DEBOUNCE_MS = 250
-
-const GROUPS = [
-  { kind: 'appliance', title: 'Appliances' },
-  { kind: 'service', title: 'Services' },
-  { kind: 'issue', title: 'Problems' },
-] as const satisfies ReadonlyArray<{ kind: SearchHit['kind']; title: string }>
 
 export function SearchScreen() {
   const router = useRouter()
@@ -156,7 +147,6 @@ export function SearchScreen() {
   const applianceFor = new Map(
     catalog.data?.appliances.map((appliance) => [appliance.id, appliance]) ?? []
   )
-  const applianceSummaries = summaryByAppliance(services)
 
   /** A result the customer actually opened is worth remembering. */
   function open(href: string): void {
@@ -210,106 +200,12 @@ export function SearchScreen() {
           action={{ label: 'See all services', href: '/services' }}
         />
       ) : (
-        <div className="mt-4">
-          {GROUPS.map((group) => {
-            const groupHits = hits.filter((hit) => hit.kind === group.kind)
-            if (groupHits.length === 0) return null
-
-            // Services answer the search outright, so they are shown the way
-            // the appliance page shows them — a rule between them rather than
-            // a box around each, which at this height would be two lines
-            // doing one job.
-            if (group.kind === 'service') {
-              const cards = groupHits
-                .map((hit) => ({
-                  hit,
-                  service:
-                    hit.serviceKey === undefined
-                      ? undefined
-                      : serviceFor.get(`${hit.applianceId}/${hit.serviceKey}`),
-                }))
-                .filter(
-                  (row): row is { hit: SearchHit; service: CatalogService } =>
-                    row.service !== undefined
-                )
-
-              // Everything that joined to nothing — a withdrawn service still
-              // in the index — falls back to the row it has always been.
-              const rows = groupHits.filter(
-                (hit) => !cards.some((card) => card.hit === hit)
-              )
-
-              return (
-                <section key={group.kind} className="mb-6 last:mb-0">
-                  <h2 className="mb-2 text-sm font-semibold text-muted">
-                    {group.title}
-                  </h2>
-                  {cards.length > 0 ? (
-                    <div className="flex flex-col divide-y divide-border">
-                      {cards.map(({ hit, service }, index) => (
-                        <div
-                          key={`${hit.applianceId}-${service.serviceKey}`}
-                          className="py-5 first:pt-0 last:pb-0"
-                        >
-                          {/* The top result moves and the rest are stills,
-                              the same rule the appliance page follows. */}
-                          <ServiceCard
-                            service={service}
-                            image={applianceFor.get(hit.applianceId)?.image}
-                            motion={index === 0}
-                            onSelect={() =>
-                              open(
-                                `/services/detail/?a=${service.applianceId}&s=${service.serviceKey}`
-                              )
-                            }
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  ) : null}
-                  {rows.length > 0 ? (
-                    <HitRows
-                      hits={rows}
-                      className={cards.length > 0 ? 'mt-4' : undefined}
-                      onOpen={open}
-                    />
-                  ) : null}
-                </section>
-              )
-            }
-
-            return (
-              <section key={group.kind} className="mb-6 last:mb-0">
-                <h2 className="mb-2 text-sm font-semibold text-muted">
-                  {group.title}
-                </h2>
-                <HitRows
-                  hits={groupHits}
-                  onOpen={open}
-                  thumbFor={
-                    group.kind === 'appliance'
-                      ? (hit) => {
-                          const summary = applianceSummaries.get(
-                            hit.applianceId
-                          )
-                          return {
-                            // The drawing, not a frame of the clip: at 48px a
-                            // crop of a captioned clip is a blue smudge, and
-                            // the drawing is the one picture that still reads
-                            // at that size.
-                            still: applianceFor.get(hit.applianceId)?.image,
-                            cover: false,
-                            rating: summary?.rating,
-                            reviewCount: summary?.reviewCount,
-                          }
-                        }
-                      : undefined
-                  }
-                />
-              </section>
-            )
-          })}
-        </div>
+        <Results
+          hits={hits}
+          applianceFor={applianceFor}
+          serviceFor={serviceFor}
+          onOpen={open}
+        />
       )}
     </AppShell>
   )
@@ -317,35 +213,214 @@ export function SearchScreen() {
 
 // ---------------------------------------------------------------------------
 
+/** The grey band the rest of the app uses between unrelated blocks. */
+function Band() {
+  return <div aria-hidden="true" className="-mx-4 my-8 h-2 bg-surface lg:mx-0" />
+}
+
+/**
+ * What a search found, in the order a customer reads it: the appliances it
+ * touches as a row of tiles, then the services themselves as rows they can
+ * compare, then any problem that matched in their own words.
+ *
+ * The tiles are every appliance the hits belong to, not only the appliance
+ * hits. "AC service" matches no appliance by name, but it is plainly about
+ * the air conditioner, and a tile for it is the quickest way to everything
+ * else we do for one.
+ */
+function Results({
+  hits,
+  applianceFor,
+  serviceFor,
+  onOpen,
+}: {
+  hits: readonly SearchHit[]
+  applianceFor: ReadonlyMap<string, CatalogAppliance>
+  serviceFor: ReadonlyMap<string, CatalogService>
+  onOpen: (href: string) => void
+}) {
+  const appliances = [...new Set(hits.map((hit) => hit.applianceId))]
+    .map((id) => applianceFor.get(id))
+    .filter((appliance) => appliance !== undefined)
+
+  const serviceHits = hits.filter((hit) => hit.kind === 'service')
+  const services = serviceHits
+    .map((hit) =>
+      hit.serviceKey === undefined
+        ? undefined
+        : serviceFor.get(`${hit.applianceId}/${hit.serviceKey}`)
+    )
+    .filter((service) => service !== undefined)
+
+  // A withdrawn service still in the index joins to nothing, and a problem
+  // has no picture or price: both stay plain rows.
+  const rows = [
+    ...serviceHits.filter(
+      (hit) =>
+        hit.serviceKey === undefined ||
+        !serviceFor.has(`${hit.applianceId}/${hit.serviceKey}`)
+    ),
+    ...hits.filter((hit) => hit.kind === 'issue'),
+  ]
+
+  const blocks = [
+    appliances.length > 0 ? (
+      <section key="categories">
+        <h2 className="mb-4 text-lg font-semibold text-ink">Categories</h2>
+        <ul className="grid grid-cols-4 gap-x-3 gap-y-5 sm:grid-cols-5 lg:grid-cols-6">
+          {appliances.map((appliance) => (
+            <li key={appliance.id}>
+              <button
+                type="button"
+                onClick={() => onOpen(`/services/appliance/?a=${appliance.id}`)}
+                className="group flex w-full min-w-0 flex-col items-center gap-2"
+              >
+                <span className="relative block aspect-square w-full overflow-hidden rounded-card bg-surface transition-colors duration-[var(--duration-fast)] group-hover:bg-border">
+                  <Image
+                    src={appliance.image}
+                    alt=""
+                    fill
+                    sizes="(min-width: 1024px) 120px, 22vw"
+                    className="object-contain p-3"
+                  />
+                </span>
+                <span className="text-center text-sm leading-tight text-ink">
+                  {appliance.name}
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ) : null,
+    services.length > 0 ? (
+      <section key="services">
+        <h2 className="mb-2 text-lg font-semibold text-ink">Services</h2>
+        <ul>
+          {services.map((service) => (
+            <li key={service.id}>
+              <ServiceRow
+                service={service}
+                image={applianceFor.get(service.applianceId)?.image}
+                onOpen={onOpen}
+              />
+            </li>
+          ))}
+        </ul>
+      </section>
+    ) : null,
+    rows.length > 0 ? (
+      <section key="problems">
+        <h2 className="mb-3 text-lg font-semibold text-ink">
+          {rows.some((hit) => hit.kind === 'issue') ? 'Problems' : 'More'}
+        </h2>
+        <HitRows hits={rows} onOpen={onOpen} />
+      </section>
+    ) : null,
+  ].filter((block) => block !== null)
+
+  return (
+    <div className="mt-6">
+      {blocks.map((block, index) => (
+        <Fragment key={block.key}>
+          {index > 0 ? <Band /> : null}
+          {block}
+        </Fragment>
+      ))}
+    </div>
+  )
+}
+
+/**
+ * A service as one row: the picture on the left, the name, score and fee in
+ * the middle, and the way in on the right — the shape the marketplaces give a
+ * search result, because it is a list somebody compares down.
+ *
+ * The button is drawn, not real. The whole row is the control, and a second
+ * target inside it would be two things to tab to for one action — the same
+ * reason ServiceCard draws its "View details".
+ */
+function ServiceRow({
+  service,
+  image,
+  onOpen,
+}: {
+  service: CatalogService
+  image?: string
+  onOpen: (href: string) => void
+}) {
+  const still = service.photo ?? service.poster ?? image
+  return (
+    <button
+      type="button"
+      onClick={() =>
+        onOpen(
+          `/services/detail/?a=${service.applianceId}&s=${service.serviceKey}`
+        )
+      }
+      aria-label={[
+        service.name,
+        scoreLabel(service.rating, service.reviewCount),
+        `visit fee ${formatPaise(service.visitFee)}`,
+      ]
+        .filter(Boolean)
+        .join(', ')}
+      className="group flex w-full items-start gap-4 py-4 text-left"
+    >
+      {still ? (
+        <ServiceClip
+          still={still}
+          cover={Boolean(service.photo ?? service.poster)}
+          motion={false}
+          sizes="80px"
+          containClassName="p-2"
+          className="size-20 shrink-0 rounded-card"
+        />
+      ) : null}
+      <span className="min-w-0 flex-1">
+        <span className="block text-base font-medium leading-snug text-ink">
+          {service.name}
+        </span>
+        <ServiceScore
+          rating={service.rating}
+          reviewCount={service.reviewCount}
+          variant="compact"
+          className="mt-1"
+        />
+        <span className="mt-1 block text-sm text-ink">
+          {formatPaise(service.visitFee)}{' '}
+          <span className="text-muted">visit fee</span>
+        </span>
+      </span>
+      <span
+        aria-hidden="true"
+        className="inline-flex min-h-10 shrink-0 items-center rounded-card border border-border px-5 text-sm font-semibold text-brand transition-colors duration-[var(--duration-fast)] group-hover:border-brand"
+      >
+        Book
+      </span>
+    </button>
+  )
+}
+
 /**
  * Hits as a list of rows: a label, what it belongs to, and a chevron.
  *
- * The shape for a hit that is not a thing you buy — an appliance, a symptom —
- * and the fallback for a service the catalog no longer has. The picture, where
- * there is one, is a still rather than a clip: a screen of moving thumbnails
- * is a list nobody can read, and these rows exist to be scanned past.
+ * The shape for a hit that is not a thing you buy — a symptom — and the
+ * fallback for a service the catalog no longer has.
  */
 function HitRows({
   hits,
   onOpen,
-  thumbFor,
   className,
 }: {
   hits: readonly SearchHit[]
   onOpen: (href: string) => void
-  thumbFor?: (hit: SearchHit) => {
-    still?: string
-    cover: boolean
-    rating?: number
-    reviewCount?: number
-  }
   className?: string
 }) {
   return (
     <Card className={cn('overflow-hidden', className)}>
       <ul>
         {hits.map((hit) => {
-          const thumb = thumbFor?.(hit)
           return (
             <li
               key={`${hit.kind}-${hit.label}-${hit.href}`}
@@ -356,16 +431,6 @@ function HitRows({
                 onClick={() => onOpen(hit.href)}
                 className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-surface"
               >
-                {thumb?.still ? (
-                  <ServiceClip
-                    still={thumb.still}
-                    cover={thumb.cover}
-                    motion={false}
-                    sizes="48px"
-                    containClassName="p-1.5"
-                    className="size-12 shrink-0 rounded-card"
-                  />
-                ) : null}
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-base font-medium text-ink">
                     {hit.label}
@@ -375,12 +440,6 @@ function HitRows({
                       {hit.sublabel}
                     </span>
                   ) : null}
-                  <ServiceScore
-                    rating={thumb?.rating}
-                    reviewCount={thumb?.reviewCount}
-                    variant="compact"
-                    className="mt-0.5"
-                  />
                 </span>
                 <ChevronRight
                   className="size-4 shrink-0 text-muted"
