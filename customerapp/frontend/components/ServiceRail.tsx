@@ -7,8 +7,9 @@ import { formatPaise } from '@/lib/format'
 import { ServiceClip } from '@/components/ServiceClip'
 import { ServiceScore, scoreLabel } from '@/components/ServiceScore'
 import { cn } from '@/lib/cn'
-import { Check } from 'lucide-react'
 import { addToCart, inCart, removeFromCart, useCart } from '@/lib/cart'
+import { useRailScroll } from '@/lib/useRailScroll'
+import { Check, ChevronLeft, ChevronRight } from 'lucide-react'
 
 /**
  * A sideways row of bookable things: what people book most, and then one row
@@ -75,67 +76,106 @@ export function ServiceRail({
   items: readonly ServiceRailItem[]
   className?: string
 }) {
+  const { ref, canPrev, canNext, page, railProps } =
+    useRailScroll<HTMLUListElement>(items.length)
+
   if (items.length === 0) return null
 
   return (
-    <ul
+    <div className="relative">
+      <ul
+        ref={ref}
+        {...railProps}
+        className={cn(
+          'no-scrollbar -mx-4 -my-1 flex snap-x gap-3 overflow-x-auto scroll-px-4 px-4 py-1 lg:mx-0 lg:px-0',
+          className
+        )}
+      >
+        {items.map((item) => (
+          <li key={item.id} className="flex w-40 shrink-0 snap-start flex-col">
+            <Link
+              href={item.href}
+              className="group block"
+              aria-label={[item.name, scoreLabel(item.rating, item.reviewCount)]
+                .filter(Boolean)
+                .join(', ')}
+            >
+              <ServiceClip
+                still={item.photo ?? item.image}
+                cover={Boolean(item.photo)}
+                motion={false}
+                sizes="160px"
+                containClassName="p-5"
+                // A photograph is cropped square, which is the shape the rail
+                // was laid out on. A drawing keeps that square too, with the
+                // room around it it was drawn with.
+                className="aspect-square rounded-card transition-colors duration-[var(--duration-fast)] group-hover:bg-border"
+              />
+              <span className="mt-2.5 block line-clamp-2 text-sm font-semibold leading-snug text-ink">
+                {item.name}
+              </span>
+            </Link>
+
+            <ServiceScore
+              rating={item.rating}
+              reviewCount={item.reviewCount}
+              variant="compact"
+              className="mt-1"
+            />
+
+            {item.note ? (
+              <p className="mt-1 text-xs text-muted">{item.note}</p>
+            ) : null}
+
+            {/* Pushed to the bottom so the prices line up across cards whose
+                names ran to one line and cards whose names ran to two. */}
+            <div className="mt-auto flex items-end justify-between gap-2 pt-2">
+              <span className="min-w-0">
+                <span className="block text-[11px] leading-none text-muted">
+                  {item.priceLabel}
+                </span>
+                <span className="mt-1 block text-sm font-bold text-ink">
+                  {formatPaise(item.price)}
+                </span>
+              </span>
+              <AddButton item={item} />
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      {/* Arrows for a mouse only: a finger already swipes, and an arrow
+          sitting on a phone's card covers the photograph for nothing. Centred
+          on the 160px picture, not the card, so they never land on a price. */}
+      <RailArrow direction={-1} visible={canPrev} onClick={() => page(-1)} />
+      <RailArrow direction={1} visible={canNext} onClick={() => page(1)} />
+    </div>
+  )
+}
+
+function RailArrow({
+  direction,
+  visible,
+  onClick,
+}: {
+  direction: 1 | -1
+  visible: boolean
+  onClick: () => void
+}) {
+  if (!visible) return null
+  const Icon = direction === 1 ? ChevronRight : ChevronLeft
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={direction === 1 ? 'Show more' : 'Show previous'}
       className={cn(
-        'no-scrollbar -mx-4 -my-1 flex snap-x gap-3 overflow-x-auto scroll-px-4 px-4 py-1 lg:mx-0 lg:px-0',
-        className
+        'absolute top-[3.75rem] z-10 hidden size-10 items-center justify-center rounded-full border border-border bg-bg text-ink shadow-md transition-colors duration-[var(--duration-fast)] hover:bg-brand-soft pointer-fine:flex',
+        direction === 1 ? '-right-2 lg:-right-5' : '-left-2 lg:-left-5'
       )}
     >
-      {items.map((item) => (
-        <li key={item.id} className="flex w-40 shrink-0 snap-start flex-col">
-          <Link
-            href={item.href}
-            className="group block"
-            aria-label={[item.name, scoreLabel(item.rating, item.reviewCount)]
-              .filter(Boolean)
-              .join(', ')}
-          >
-            <ServiceClip
-              still={item.photo ?? item.image}
-              cover={Boolean(item.photo)}
-              motion={false}
-              sizes="160px"
-              containClassName="p-5"
-              // A photograph is cropped square, which is the shape the rail
-              // was laid out on. A drawing keeps that square too, with the
-              // room around it it was drawn with.
-              className="aspect-square rounded-card transition-colors duration-[var(--duration-fast)] group-hover:bg-border"
-            />
-            <span className="mt-2.5 block line-clamp-2 text-sm font-semibold leading-snug text-ink">
-              {item.name}
-            </span>
-          </Link>
-
-          <ServiceScore
-            rating={item.rating}
-            reviewCount={item.reviewCount}
-            variant="compact"
-            className="mt-1"
-          />
-
-          {item.note ? (
-            <p className="mt-1 text-xs text-muted">{item.note}</p>
-          ) : null}
-
-          {/* Pushed to the bottom so the prices line up across cards whose
-              names ran to one line and cards whose names ran to two. */}
-          <div className="mt-auto flex items-end justify-between gap-2 pt-2">
-            <span className="min-w-0">
-              <span className="block text-[11px] leading-none text-muted">
-                {item.priceLabel}
-              </span>
-              <span className="mt-1 block text-sm font-bold text-ink">
-                {formatPaise(item.price)}
-              </span>
-            </span>
-            <AddButton item={item} />
-          </div>
-        </li>
-      ))}
-    </ul>
+      <Icon className="size-5" aria-hidden="true" />
+    </button>
   )
 }
 
