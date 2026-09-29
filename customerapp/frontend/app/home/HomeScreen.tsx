@@ -36,7 +36,7 @@ import {
   Skeleton,
 } from '@/components/SkeletonLoader'
 import { CartBar } from '@/components/CartBar'
-import { VideoRail } from '@/components/VideoRail'
+import { VideoRail, type ReelItem } from '@/components/VideoRail'
 import { ServiceSheet, serviceOptions } from '@/components/ServiceSheet'
 import {
   fetchAllIssues,
@@ -48,6 +48,7 @@ import {
 } from '@/lib/catalog'
 import { callFn } from '@/lib/callables'
 import { LOCATION_STALE_MS, locationLabel } from '@/lib/location'
+import { formatPaise } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
 
 /**
@@ -179,12 +180,27 @@ export function HomeScreen() {
       }))
       .filter((row) => row.services.length > 0) ?? []
 
-  // The clips row: one service from each appliance, then a second from each,
-  // and so on — so the first few cards are five different machines rather
-  // than every job on the washing machine.
-  const clipServices = interleave(
-    rows.map((row) => row.services.filter((service) => service.reel))
-  ).slice(0, MAX_CLIPS)
+  // The reels under the hero: one per appliance that has a photograph of
+  // itself in a room, opening on the repair where there is one, since that is
+  // what most people arrive needing.
+  const reels: ReelItem[] = rows.flatMap((row) => {
+    const photo = row.appliance.heroImage
+    const service =
+      row.services.find((each) => each.serviceKey === 'repair') ??
+      row.services[0]
+    if (!photo || !service) return []
+    return [
+      {
+        id: service.id,
+        photo,
+        tag: `From ${formatPaise(service.visitFee)}`,
+        title: service.name,
+        href: `/services/appliance/?a=${service.applianceId}&s=${
+          service.serviceKey
+        }` as Route,
+      },
+    ]
+  })
 
   return (
     <AppShell
@@ -218,6 +234,15 @@ export function HomeScreen() {
           <Skeleton className="h-52 rounded-card lg:hidden" />
         ) : null}
       </div>
+
+      {reels.length > 0 ? (
+        <Section
+          title="Handpicked for your home"
+          subtitle="Our most trusted services"
+        >
+          <VideoRail items={reels} />
+        </Section>
+      ) : null}
 
       {location && !location.serviceable ? (
         <UnserviceableNotice
@@ -282,14 +307,6 @@ export function HomeScreen() {
             </Section>
           ) : null}
 
-          {clipServices.length > 0 ? (
-            <Section
-              title="See how we work"
-              subtitle="Short clips of each job, start to finish"
-            >
-              <VideoRail services={clipServices} />
-            </Section>
-          ) : null}
 
           {rows.map((row, index) => {
             // Dropped after every second row, and only while there are banners
@@ -380,22 +397,6 @@ export function HomeScreen() {
 }
 
 // ---------------------------------------------------------------------------
-
-/** Enough clips to swipe through, not so many the row never ends. */
-const MAX_CLIPS = 8
-
-/** The first of every list, then the second of every list, and so on. */
-function interleave<T>(lists: readonly (readonly T[])[]): T[] {
-  const out: T[] = []
-  const longest = Math.max(0, ...lists.map((list) => list.length))
-  for (let i = 0; i < longest; i++) {
-    for (const list of lists) {
-      const item = list[i]
-      if (item !== undefined) out.push(item)
-    }
-  }
-  return out
-}
 
 /** How far the page scrolls before the search field grows its shadow. */
 const SCROLL_THRESHOLD = 8

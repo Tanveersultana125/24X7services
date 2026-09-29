@@ -1,40 +1,53 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import type { Route } from 'next'
-import { ChevronLeft, ChevronRight, Play } from 'lucide-react'
-import type { CatalogService } from '@app/shared'
-import { ServiceClip } from '@/components/ServiceClip'
-import { formatPaise } from '@/lib/format'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useRailScroll } from '@/lib/useRailScroll'
 import { cn } from '@/lib/cn'
 
 /**
- * A row of the service reels, playing, on Home — the job shown rather than
- * described, the way the marketplaces open their pages with video.
+ * Home's row of tall reel cards, straight under the hero — the shape the
+ * marketplaces open with: a real room, moving, with a tag and a title laid
+ * over its foot, and nothing written underneath.
  *
- * Tall 9:16 cards, and nothing under them: each reel carries its own caption,
- * drawn into the clip, so a name and a price below it would only say the same
- * thing twice. Two and a slice of a third on a phone, so it reads as something
- * to swipe; five across on a desktop.
+ * There is no footage of this business's work yet, so each card is a
+ * photograph of the appliance where it lives — the technician at the AC, the
+ * geyser on the bathroom wall — drifting slowly in and across so it reads as
+ * a shot rather than a still. The drawn clips were tried here first and read
+ * as cartoons next to everything else on the page. The day real footage
+ * exists, it goes in `video` and plays instead of the drift.
  *
- * Each clip plays only while it is actually on screen (`ServiceClip` watches
- * for that), so the ones scrolled off to the side cost nothing. Anyone who has
- * asked for less motion gets the poster frame instead.
+ * The words are HTML over the picture, not burned into it: crisp at any size,
+ * readable by a screen reader, and changed without re-rendering anything.
  */
+
+export interface ReelItem {
+  id: string
+  /** The room: a photograph of the appliance in use, never a product cut-out. */
+  photo: string
+  /** Real footage, when there is some; plays in place of the drift. */
+  video?: string
+  /** The pill: what it is, or what is new about it. */
+  tag: string
+  title: string
+  href: Route
+}
+
+const DRIFTS = ['reel-drift-a', 'reel-drift-b', 'reel-drift-c', 'reel-drift-d']
+
 export function VideoRail({
-  services,
+  items,
   className,
 }: {
-  /** In the order to show them; only those with a reel are drawn. */
-  services: readonly CatalogService[]
+  items: readonly ReelItem[]
   className?: string
 }) {
-  const clips = services.filter((service) => service.reel)
   const { ref, canPrev, canNext, page, railProps } =
-    useRailScroll<HTMLUListElement>(clips.length)
+    useRailScroll<HTMLUListElement>(items.length)
 
-  if (clips.length === 0) return null
+  if (items.length === 0) return null
 
   return (
     <div className={cn('relative', className)}>
@@ -43,33 +56,58 @@ export function VideoRail({
         {...railProps}
         className="no-scrollbar -mx-4 -my-1 flex snap-x gap-3 overflow-x-auto scroll-px-4 px-4 py-1 lg:mx-0 lg:gap-4 lg:px-0"
       >
-        {clips.map((service) => (
+        {items.map((item, index) => (
           <li
-            key={service.id}
-            className="w-[40%] shrink-0 snap-start sm:w-44 lg:w-[calc((100%-4rem)/5)]"
+            key={item.id}
+            className="w-[42%] shrink-0 snap-start sm:w-44 lg:w-[calc((100%-4rem)/5)]"
           >
             <Link
-              href={
-                `/services/appliance/?a=${service.applianceId}&s=${service.serviceKey}` as Route
-              }
-              // The caption is drawn into the clip, where a screen reader
-              // cannot reach it; this is what it hears instead.
-              aria-label={`${service.name}, visit from ${formatPaise(service.visitFee)}`}
-              className="group relative block"
+              href={item.href}
+              aria-label={`${item.title}, ${item.tag}`}
+              className="group relative block aspect-[9/16] overflow-hidden rounded-card bg-ink"
             >
-              <ServiceClip
-                video={service.reel}
-                still={service.reelPoster}
-                sizes="(min-width: 1024px) 190px, 40vw"
-                className="aspect-[9/16] w-full rounded-card transition-transform duration-[var(--duration-base)] group-hover:scale-[1.02]"
-              />
-              {/* Says it is a video before it has started moving, and on a
-                  phone that will never autoplay it. */}
+              {item.video ? (
+                <video
+                  src={item.video}
+                  poster={item.photo}
+                  muted
+                  loop
+                  playsInline
+                  autoPlay
+                  preload="metadata"
+                  aria-hidden="true"
+                  className="absolute inset-0 size-full object-cover"
+                />
+              ) : (
+                <Image
+                  src={item.photo}
+                  alt=""
+                  fill
+                  sizes="(min-width: 1024px) 190px, 42vw"
+                  className="object-cover will-change-transform"
+                  style={{
+                    animation: `${DRIFTS[index % DRIFTS.length]} ${11 + (index % 3) * 2}s ease-in-out ${-index * 1.7}s infinite alternate`,
+                  }}
+                />
+              )}
+
+              {/* Dark enough at the foot to carry white text over a bright
+                  kitchen, clear by the middle so the room still shows. */}
               <span
                 aria-hidden="true"
-                className="absolute top-2.5 right-2.5 flex size-7 items-center justify-center rounded-full bg-ink/45 text-bg"
+                className="absolute inset-x-0 bottom-0 h-3/5 bg-linear-to-t from-ink/85 via-ink/35 to-transparent"
+              />
+
+              <span
+                aria-hidden="true"
+                className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-2 p-3"
               >
-                <Play className="size-3.5 fill-current" />
+                <span className="rounded-pill border border-bg/40 bg-bg/20 px-2.5 py-1 text-[11px] font-semibold text-bg backdrop-blur-sm">
+                  {item.tag}
+                </span>
+                <span className="text-base leading-tight font-bold text-bg">
+                  {item.title}
+                </span>
               </span>
             </Link>
           </li>
@@ -98,7 +136,7 @@ function RailArrow({
     <button
       type="button"
       onClick={onClick}
-      aria-label={direction === 1 ? 'Show more videos' : 'Show previous videos'}
+      aria-label={direction === 1 ? 'Show more' : 'Show previous'}
       className={cn(
         'absolute top-[calc(50%-1.25rem)] z-10 hidden size-10 items-center justify-center rounded-full border border-border bg-bg text-ink shadow-md transition-colors duration-[var(--duration-fast)] hover:bg-brand-soft pointer-fine:flex',
         direction === 1 ? '-right-2 lg:-right-5' : '-left-2 lg:-left-5'

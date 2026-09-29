@@ -240,3 +240,39 @@
     background-position: 200% 0;
   }
 }
+
+/* Home's reel cards: a photograph drifting slowly in and across, so a still
+   room reads as footage. Four directions, picked per card, so a row of them
+   never moves in step. Reduced motion stops it via the block above. */
+@keyframes reel-drift-a {
+  from {
+    transform: scale(1.04) translate(0, 0);
+  }
+  to {
+    transform: scale(1.18) translate(-4%, -3%);
+  }
+}
+@keyframes reel-drift-b {
+  from {
+    transform: scale(1.18) translate(4%, 0);
+  }
+  to {
+    transform: scale(1.04) translate(-2%, -2%);
+  }
+}
+@keyframes reel-drift-c {
+  from {
+    transform: scale(1.06) translate(3%, 3%);
+  }
+  to {
+    transform: scale(1.2) translate(-3%, 0);
+  }
+}
+@keyframes reel-drift-d {
+  from {
+    transform: scale(1.2) translate(-3%, -3%);
+  }
+  to {
+    transform: scale(1.05) translate(2%, 2%);
+  }
+}
