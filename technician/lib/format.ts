@@ -1,4 +1,4 @@
-import { LABOUR_RATE } from './catalog'
+import { APPLIANCE_LABEL, BRAND_LABEL, LABOUR_RATE } from './catalog'
 import { stepIndex } from './status'
 import type { Job } from './types'
 
@@ -97,4 +97,24 @@ export function driveProgress(job: Job, now: number): number {
   if (job.status !== 'on_the_way' || !job.log.on_the_way) return 0
   const elapsed = (now - new Date(job.log.on_the_way).getTime()) / (job.etaMin * 60_000)
   return Math.min(Math.max(elapsed, 0.04), 0.94)
+}
+
+/** Whether a job matches what the technician typed: every word must hit something. */
+export function matchesQuery(job: Job, q: string): boolean {
+  const words = q.toLowerCase().split(/\s+/).filter(Boolean)
+  if (!words.length) return true
+  const hay = [
+    job.id,
+    job.customer.name,
+    job.customer.phone.replace(/\s/g, ''),
+    job.customer.area,
+    job.customer.address,
+    BRAND_LABEL[job.brand],
+    APPLIANCE_LABEL[job.appliance],
+    job.service,
+    job.issue,
+  ]
+    .join(' ')
+    .toLowerCase()
+  return words.every((w) => hay.includes(w))
 }

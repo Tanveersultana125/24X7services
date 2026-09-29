@@ -1,14 +1,15 @@
 'use client'
 
 import Link from 'next/link'
-import { Bell, ChevronRight, Locate, MessageCircle, Navigation, Phone, PowerOff, Siren, Star } from 'lucide-react'
+import { useState } from 'react'
+import { Bell, ChevronRight, Locate, Search, SearchX, X, MessageCircle, Navigation, Phone, PowerOff, Siren, Star } from 'lucide-react'
 import { ApplianceGlyph, BrandTag } from '@/components/glyphs'
 import { JobCard } from '@/components/JobCard'
 import { FlowBar } from '@/components/Timeline'
 import { Avatar, Card, Empty, PriorityBadge, SectionTitle, StatusChip, Toggle } from '@/components/ui'
 import { applianceTitle, inr } from '@/lib/catalog'
 import { cn } from '@/lib/cn'
-import { ago, directionsHref, earned, isToday, telHref, time } from '@/lib/format'
+import { ago, directionsHref, earned, isToday, matchesQuery, telHref, time } from '@/lib/format'
 import { jobHref, stepHref } from '@/lib/routes'
 import { IN_PROGRESS, NEXT_ACTION } from '@/lib/status'
 import { useStore, useTick } from '@/lib/store'
@@ -18,6 +19,7 @@ export default function HomePage() {
   const store = useStore()
   useTick(30_000)
   const { jobs, tech, online } = store
+  const [query, setQuery] = useState('')
 
   const requests = jobs
     .filter((j) => j.status === 'request')
@@ -103,10 +105,36 @@ export default function HomePage() {
               </p>
             </Link>
           </div>
+
+          <label className="relative mt-4 block">
+            <span className="sr-only">Search jobs</span>
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 size-[18px] -translate-y-1/2 text-faint" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search customer, area, job ID, appliance…"
+              className="h-12 w-full rounded-xl border-0 bg-card pl-11 pr-11 text-[15px] font-medium text-ink shadow-card placeholder:text-faint focus:shadow-[0_0_0_3px_rgba(255,255,255,0.35)] [&::-webkit-search-cancel-button]:hidden"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                aria-label="Clear search"
+                className="absolute right-1.5 top-1/2 grid size-9 -translate-y-1/2 place-items-center rounded-lg text-muted hover:bg-canvas hover:text-ink"
+              >
+                <X className="size-4" />
+              </button>
+            )}
+          </label>
         </div>
       </header>
 
       <main className="mx-auto w-full max-w-5xl space-y-6 px-4 pb-28 pt-4 lg:px-8 lg:pb-16 lg:pt-6">
+        {query.trim() ? (
+          <SearchResults jobs={jobs.filter((j) => j.status !== 'rejected' && matchesQuery(j, query))} query={query.trim()} />
+        ) : (
+          <>
         {/* Today's pipeline */}
         <div className="grid grid-cols-4 gap-2">
           {(
@@ -197,6 +225,8 @@ export default function HomePage() {
             )}
           </section>
         </div>
+          </>
+        )}
       </main>
     </>
   )
@@ -318,5 +348,26 @@ function RequestCard({ job }: { job: Job }) {
         </button>
       </div>
     </Card>
+  )
+}
+
+/** Everything the technician has on record that matches, newest work first. */
+function SearchResults({ jobs, query }: { jobs: Job[]; query: string }) {
+  const sorted = [...jobs].sort(
+    (a, b) => Number(b.status === 'request') - Number(a.status === 'request') || b.scheduledAt.localeCompare(a.scheduledAt)
+  )
+  return (
+    <section>
+      <SectionTitle count={sorted.length}>Results for &ldquo;{query}&rdquo;</SectionTitle>
+      {sorted.length ? (
+        <div className="grid gap-3 lg:grid-cols-2">
+          {sorted.slice(0, 30).map((j) => (
+            <JobCard key={j.id} job={j} />
+          ))}
+        </div>
+      ) : (
+        <Empty icon={<SearchX className="size-5" />} title="No jobs found" body="Try a customer name, area, job ID, brand or appliance." />
+      )}
+    </section>
   )
 }

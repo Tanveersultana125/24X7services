@@ -6,8 +6,7 @@ import { BriefcaseBusiness, History, Search } from 'lucide-react'
 import { ActiveFilters, FilterButton, NO_FILTERS, applyFilters, type FilterState } from '@/components/Filters'
 import { JobCard } from '@/components/JobCard'
 import { Empty, FilterChip, Page, ScreenHeader, SectionTitle } from '@/components/ui'
-import { APPLIANCE_LABEL, BRAND_LABEL } from '@/lib/catalog'
-import { isToday } from '@/lib/format'
+import { isToday, matchesQuery } from '@/lib/format'
 import { STATUS_FILTERS, inFilter, type StatusFilter } from '@/lib/status'
 import { useStore } from '@/lib/store'
 
@@ -25,11 +24,7 @@ export default function JobsPage() {
 
   const shown = applyFilters(board, filters)
     .filter((j) => status === 'all' || inFilter(j.status, status))
-    .filter((j) => {
-      if (!q.trim()) return true
-      const hay = `${j.id} ${j.customer.name} ${j.customer.area} ${BRAND_LABEL[j.brand]} ${APPLIANCE_LABEL[j.appliance]} ${j.issue}`.toLowerCase()
-      return hay.includes(q.toLowerCase())
-    })
+    .filter((j) => matchesQuery(j, q))
     .sort((a, b) => Number(b.status === 'request') - Number(a.status === 'request') || a.scheduledAt.localeCompare(b.scheduledAt))
 
   const count = (k: StatusFilter) => board.filter((j) => inFilter(j.status, k)).length
