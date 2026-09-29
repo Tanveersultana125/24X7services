@@ -2,10 +2,9 @@
 
 import type { CatalogService } from '@app/shared'
 import { formatPaise } from '@/lib/format'
-import { CardButton } from '@/components/ui/Card'
 import { ServiceClip } from '@/components/ServiceClip'
 import { ServiceScore, scoreLabel } from '@/components/ServiceScore'
-import { durationNote } from '@/components/ServiceRail'
+import { AddButton, durationNote } from '@/components/ServiceRail'
 import { cn } from '@/lib/cn'
 
 /**
@@ -36,16 +35,16 @@ import { cn } from '@/lib/cn'
  * appliance, so a list falling all the way back to it is a list of the same
  * picture — which is why it is last and not first.
  *
- * "View details" sits at the foot, where the marketplaces put it, and it is
- * the only affordance on the card — the pill that used to sit beside the title
- * opened the same page, and two controls for one action is one of them
- * lying about being a choice.
+ * Two things to press, as on the Home rails: "Add", beside the name and the
+ * price, puts the service in the cart (or, for a repair, opens its problems
+ * first); anywhere else on the card opens the service's page. "View details"
+ * at the foot is drawn as a link but is not one — it labels the second target
+ * rather than being a third.
  *
- * It is drawn as a link but is not one. The whole card is the control, and a
- * real link inside it would be a second target nested in the first: two things
- * to tab to, one of which a screen reader cannot describe without repeating
- * the other. Drawn this way, the affordance is where a customer expects it and
- * there is still only one thing to press.
+ * The card is not a button with Add inside it, because a button inside a
+ * button is invalid and a screen reader cannot say where one ends. It is a
+ * plain box with the open-the-page button stretched across it underneath, and
+ * Add stacked above that.
  */
 
 export interface ServiceCardProps {
@@ -63,6 +62,9 @@ export interface ServiceCardProps {
    */
   motion?: boolean
   onSelect: (service: CatalogService) => void
+  /** How many problems a repair is booked for; with any, Add opens them. */
+  options?: number
+  onOptions?: () => void
   selected?: boolean
   className?: string
 }
@@ -72,33 +74,33 @@ export function ServiceCard({
   image,
   motion = false,
   onSelect,
+  options,
+  onOptions,
   selected = false,
   className,
 }: ServiceCardProps) {
   const duration = durationNote(service.durationMinutes)
 
+  // Not a box. The page puts a rule between services, which is enough of a
+  // boundary once each one is this tall — a border as well would be two lines
+  // doing one job.
   return (
-    <CardButton
-      onClick={() => onSelect(service)}
-      selected={selected}
-      ariaLabel={[
-        service.name,
-        scoreLabel(service.rating, service.reviewCount),
-        `visit fee ${formatPaise(service.visitFee)}`,
-        'See what it covers.',
-      ]
-        .filter(Boolean)
-        .join(', ')}
-      // Not a box. The page puts a rule between services, which is enough of a
-      // boundary once each one is this tall — a border as well would be two
-      // lines doing one job.
-      className={cn(
-        'group w-full rounded-none border-0 bg-transparent p-0 text-left',
-        'hover:border-transparent',
-        selected && 'ring-0',
-        className
-      )}
-    >
+    <div className={cn('group relative isolate w-full text-left', className)}>
+      <button
+        type="button"
+        onClick={() => onSelect(service)}
+        aria-pressed={selected}
+        aria-label={[
+          service.name,
+          scoreLabel(service.rating, service.reviewCount),
+          `visit fee ${formatPaise(service.visitFee)}`,
+          'See what it covers.',
+        ]
+          .filter(Boolean)
+          .join(', ')}
+        className="absolute inset-0 z-10 rounded-card"
+      />
+
       {/* In the order each is worth having: the photograph, then a frame of
           this service's own clip, then the appliance's picture. The first two
           fill the box; the third may be a drawing on a plate, which needs the
@@ -114,17 +116,35 @@ export function ServiceCard({
         className="aspect-video w-full rounded-card"
       />
 
-      <h3 className="mt-4 text-xl font-bold leading-snug text-ink">
-        {service.name}
-      </h3>
+      <div className="mt-4 flex items-start gap-3">
+        <div className="min-w-0 flex-1">
+          <h3 className="text-xl font-bold leading-snug text-ink">
+            {service.name}
+          </h3>
 
-      {/* What other people made of it, before what it costs — which is the
-          order somebody weighs the two in. */}
-      <ServiceScore
-        rating={service.rating}
-        reviewCount={service.reviewCount}
-        className="mt-1.5"
-      />
+          {/* What other people made of it, before what it costs — which is
+              the order somebody weighs the two in. */}
+          <ServiceScore
+            rating={service.rating}
+            reviewCount={service.reviewCount}
+            className="mt-1.5"
+          />
+        </div>
+
+        {/* Above the stretched button, so a tap here adds rather than opens.
+            The bottom padding is room for the "6 options" caption. */}
+        <div className="relative z-20 shrink-0 pb-2.5">
+          <AddButton
+            item={{
+              name: service.name,
+              applianceId: service.applianceId,
+              serviceKey: service.serviceKey,
+              options,
+              onOptions,
+            }}
+          />
+        </div>
+      </div>
 
       {/* The two numbers a customer weighs, on one line, in the order they
           weigh them. The fee is the only figure being committed to here, which
@@ -167,7 +187,7 @@ export function ServiceCard({
       >
         View details
       </span>
-    </CardButton>
+    </div>
   )
 }
 

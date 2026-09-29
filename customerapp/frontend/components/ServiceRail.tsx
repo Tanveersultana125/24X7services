@@ -201,8 +201,18 @@ function RailArrow({
  * marketplaces do, and opens them instead: which problem a repair is for is
  * part of what is being added. The count and the way to the cart are
  * CartBar's, under the page.
+ *
+ * Shared with the service cards on the appliance page, so "Add" is the same
+ * button, with the same states, wherever a service is listed.
  */
-function AddButton({ item }: { item: ServiceRailItem }) {
+export function AddButton({
+  item,
+}: {
+  item: Pick<
+    ServiceRailItem,
+    'name' | 'applianceId' | 'serviceKey' | 'options' | 'onOptions'
+  >
+}) {
   const cart = useCart()
   const entry = { applianceId: item.applianceId, serviceKey: item.serviceKey }
   const withOptions = Boolean(item.options && item.onOptions)

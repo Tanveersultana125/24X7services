@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { Route } from 'next'
@@ -18,6 +18,8 @@ import {
 import { AppShell, Section } from '@/components/AppShell'
 import { Header } from '@/components/Header'
 import { ServiceCard } from '@/components/ServiceCard'
+import { ServiceSheet, serviceOptions } from '@/components/ServiceSheet'
+import { CartBar } from '@/components/CartBar'
 import { BrandDisclaimer } from '@/components/BrandCard'
 import { BrandLogoRow } from '@/components/BrandLogoRow'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
@@ -30,6 +32,7 @@ import { ErrorState } from '@/components/ErrorState'
 import { ServiceListSkeleton } from '@/components/SkeletonLoader'
 import { MANUFACTURER_WARRANTY_NOTICE } from '@/config/brand'
 import { startDraft } from '@/lib/bookingDraft'
+import { useCart } from '@/lib/cart'
 import {
   fetchAppliance,
   fetchBrands,
@@ -117,6 +120,14 @@ export function ApplianceScreen() {
   const data = useAsync(load)
   const appliance = data.data?.appliance ?? null
   const services = data.data?.services ?? []
+  const issues = data.data?.issues ?? []
+  const cart = useCart()
+
+  // The service whose options sheet is open — a repair, where "Add" means
+  // picking the problem first.
+  const [sheetId, setSheetId] = useState<string | null>(null)
+  const sheetService =
+    services.find((service) => service.id === sheetId) ?? null
 
   // The service a symptom implies. Tapping "Not draining water" should start a
   // repair, not make the customer choose between repair and installation first.
@@ -356,6 +367,8 @@ export function ApplianceScreen() {
                     image={appliance.image}
                     motion={index === 0}
                     onSelect={() => openService(service.serviceKey)}
+                    options={serviceOptions(service, issues).length}
+                    onOptions={() => setSheetId(service.id)}
                   />
                 </div>
               ))}
@@ -418,7 +431,10 @@ export function ApplianceScreen() {
             </div>
           </Section>
 
-          {headline ? (
+          {/* Once anything is in the cart, the bar at the foot is the cart's:
+              two bars pinned to the same place would sit on top of each
+              other. */}
+          {headline && cart.length === 0 ? (
             <>
               <StickySpacer aboveBottomNav />
               <StickyCTA
@@ -445,6 +461,14 @@ export function ApplianceScreen() {
           ) : null}
         </>
       )}
+      <ServiceSheet
+        service={sheetService}
+        appliance={appliance ?? undefined}
+        services={services}
+        issues={issues}
+        onClose={() => setSheetId(null)}
+      />
+      <CartBar services={services} />
     </AppShell>
   )
 }
