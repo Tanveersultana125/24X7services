@@ -48,7 +48,6 @@ import {
 } from '@/lib/catalog'
 import { callFn } from '@/lib/callables'
 import { LOCATION_STALE_MS, locationLabel } from '@/lib/location'
-import { formatPaise } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
 
 /**
@@ -193,7 +192,6 @@ export function HomeScreen() {
       {
         id: service.id,
         photo,
-        tag: `From ${formatPaise(service.visitFee)}`,
         title: service.name,
         href: `/services/appliance/?a=${service.applianceId}&s=${
           service.serviceKey

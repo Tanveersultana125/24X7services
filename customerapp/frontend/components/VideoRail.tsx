@@ -15,7 +15,9 @@ import { cn } from '@/lib/cn'
  * There is no footage of this business's work yet, so each card is a
  * photograph of the appliance where it lives — the technician at the AC, the
  * geyser on the bathroom wall — drifting slowly in and across so it reads as
- * a shot rather than a still. The drawn clips were tried here first and read
+ * a shot rather than a still. The name of the service is the only thing
+ * written on it — no price; the card is there to draw the eye, and the price
+ * is one tap away. The drawn clips were tried here first and read
  * as cartoons next to everything else on the page. The day real footage
  * exists, it goes in `video` and plays instead of the drift.
  *
@@ -29,8 +31,8 @@ export interface ReelItem {
   photo: string
   /** Real footage, when there is some; plays in place of the drift. */
   video?: string
-  /** The pill: what it is, or what is new about it. */
-  tag: string
+  /** An optional pill over the title — "New", say. Never a price. */
+  tag?: string
   title: string
   href: Route
 }
@@ -63,7 +65,7 @@ export function VideoRail({
           >
             <Link
               href={item.href}
-              aria-label={`${item.title}, ${item.tag}`}
+              aria-label={item.tag ? `${item.title}, ${item.tag}` : item.title}
               className="group relative block aspect-[9/16] overflow-hidden rounded-card bg-ink"
             >
               {item.video ? (
@@ -102,9 +104,11 @@ export function VideoRail({
                 aria-hidden="true"
                 className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-2 p-3"
               >
-                <span className="rounded-pill border border-bg/40 bg-bg/20 px-2.5 py-1 text-[11px] font-semibold text-bg backdrop-blur-sm">
-                  {item.tag}
-                </span>
+                {item.tag ? (
+                  <span className="rounded-pill border border-bg/40 bg-bg/20 px-2.5 py-1 text-[11px] font-semibold text-bg backdrop-blur-sm">
+                    {item.tag}
+                  </span>
+                ) : null}
                 <span className="text-base leading-tight font-bold text-bg">
                   {item.title}
                 </span>
