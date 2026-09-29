@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import type { Route } from 'next'
+import { useRouter } from 'next/navigation'
 import { useRef } from 'react'
-import { Award, BadgeCheck, Camera, ChevronRight, Headset, History, Mail, MapPin, Phone, Settings, ShieldCheck, Star } from 'lucide-react'
+import { Award, BadgeCheck, Camera, ChevronRight, Headset, History, LogOut, Mail, MapPin, Phone, Settings, ShieldCheck, Star } from 'lucide-react'
 import { ApplianceGlyph } from '@/components/glyphs'
 import { Avatar, Card, Page, ScreenHeader, SectionTitle, Toggle } from '@/components/ui'
 import { APPLIANCES, APPLIANCE_LABEL, BRAND_LABEL } from '@/lib/catalog'
@@ -11,7 +12,8 @@ import { cn } from '@/lib/cn'
 import { useStore } from '@/lib/store'
 
 export default function ProfilePage() {
-  const { tech, online, setOnline, updateTech, jobs } = useStore()
+  const { tech, online, setOnline, updateTech, jobs, signOut } = useStore()
+  const router = useRouter()
   const file = useRef<HTMLInputElement>(null)
   const closedHere = jobs.filter((j) => j.status === 'closed').length
 
@@ -152,6 +154,18 @@ export default function ProfilePage() {
             </Link>
           ))}
         </Card>
+
+        <button
+          type="button"
+          onClick={() => {
+            setOnline(false)
+            signOut()
+            router.replace('/login')
+          }}
+          className="flex h-14 w-full items-center justify-center gap-2 rounded-xl border-2 border-danger/30 bg-card text-base font-extrabold text-danger hover:bg-danger-soft"
+        >
+          <LogOut className="size-5" /> Logout
+        </button>
       </Page>
     </>
   )

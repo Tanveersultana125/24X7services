@@ -16,14 +16,9 @@ import type { Bill, Confirmation, Diagnosis, FlowStep, Job, Notice, PartLine, Ph
  * read and write is guarded and the app simply runs from the seed instead.
  */
 
-const KEY = 'technician.state.v1'
-
-/**
- * Sign-in is switched off while the inside of the app is being built: the
- * app opens straight on Home as if the technician had already logged in.
- * The login screen still exists — flip this to true to put it back in front.
- */
-export const REQUIRE_LOGIN = false
+// v2: the demo now starts signed in. A v1 save from when it started signed
+// out would otherwise drop everyone on the login screen.
+const KEY = 'technician.state.v2'
 
 interface Persisted {
   signedIn: boolean
@@ -38,7 +33,8 @@ interface Persisted {
 
 function fresh(): Persisted {
   return {
-    signedIn: false,
+    // Opens straight on Home; Logout (Settings, Profile) shows the login screen.
+    signedIn: true,
     online: true,
     jobs: seedJobs(),
     notices: seedNotices(),
@@ -158,7 +154,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const now = () => new Date().toISOString()
     return {
       ...state,
-      signedIn: REQUIRE_LOGIN ? state.signedIn : true,
       ready,
       signIn: () => setState((s) => ({ ...s, signedIn: true })),
       signOut: () => setState((s) => ({ ...s, signedIn: false })),

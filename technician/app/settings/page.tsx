@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Bell, ChevronRight, Clock, Headset, KeyRound, Languages, Landmark, LogOut, Power, Radar, RotateCcw, Smartphone, UserRound } from 'lucide-react'
 import { Button, Card, Field, Page, ScreenHeader, SectionTitle, Segmented, Sheet, Toggle, inputClass } from '@/components/ui'
-import { REQUIRE_LOGIN, useStore } from '@/lib/store'
+import { useStore } from '@/lib/store'
 import type { Settings } from '@/lib/types'
 
 export default function SettingsPage() {
@@ -122,7 +122,6 @@ export default function SettingsPage() {
               </Card>
             </section>
 
-            {REQUIRE_LOGIN && (
             <button
               type="button"
               onClick={() => setSheet('logout')}
@@ -130,7 +129,6 @@ export default function SettingsPage() {
             >
               <LogOut className="size-5" /> Logout
             </button>
-            )}
             <p className="text-center text-xs font-semibold text-faint">24X7 Technician Partner · v0.1.0</p>
           </div>
         </div>
