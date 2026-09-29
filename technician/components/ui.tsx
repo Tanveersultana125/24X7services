@@ -4,6 +4,7 @@ import Link from 'next/link'
 import type { Route } from 'next'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { ArrowLeft, Flame, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { MenuButton } from './menu'
@@ -351,8 +352,11 @@ export function Sheet({
     return () => document.removeEventListener('keydown', onKey)
   }, [open, onClose])
   if (!open) return null
-  return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center" role="dialog" aria-modal="true">
+  // Portalled to body: a Sheet opened from inside a transformed parent (the
+  // phone menu drawer slides in with a transform) would otherwise be pinned
+  // to that parent instead of the screen.
+  return createPortal(
+    <div className="fixed inset-0 z-[75] flex items-end justify-center sm:items-center" role="dialog" aria-modal="true">
       <button type="button" aria-label="Close" className="absolute inset-0 bg-ink/50" onClick={onClose} />
       <div className="animate-slide-up relative max-h-[88dvh] w-full overflow-y-auto rounded-t-2xl bg-card pb-[var(--safe-bottom)] sm:max-w-lg sm:rounded-2xl">
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-card px-4 py-3">
@@ -363,7 +367,8 @@ export function Sheet({
         </div>
         <div className="p-4">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 

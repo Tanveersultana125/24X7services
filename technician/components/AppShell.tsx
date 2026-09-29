@@ -26,6 +26,7 @@ import { Avatar } from './ui'
 import { IncomingRequest } from './IncomingRequest'
 import { Logo } from './Logo'
 import { MenuContext } from './menu'
+import { TechnicianSheet } from './TechnicianSheet'
 
 const TABS = [
   { href: '/home', label: 'Home', icon: House },
@@ -138,16 +139,17 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
   const store = useStore()
   const emergencies = store.jobs.filter((j) => j.status === 'request' && j.priority === 'emergency').length
   const unread = store.notices.filter((n) => !n.read).length
+  const [details, setDetails] = useState(false)
   return (
     <>
         <div className="flex h-16 items-center border-b border-line px-5">
           <Logo />
         </div>
-        <Link
-          href="/profile"
-          onClick={onNavigate}
-          aria-label="View technician profile"
-          className="group flex items-center gap-3 border-b border-line px-5 py-4 transition-colors hover:bg-canvas"
+        <button
+          type="button"
+          onClick={() => setDetails(true)}
+          aria-label="Show technician details"
+          className="group flex w-full items-center gap-3 border-b border-line px-5 py-4 text-left transition-colors hover:bg-canvas"
         >
           <span className="relative">
             <Avatar name={store.tech.name} photo={store.tech.photo} size={40} />
@@ -162,7 +164,8 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
             </span>
           </span>
           <ChevronRight className="size-4 shrink-0 text-faint transition-transform group-hover:translate-x-0.5" aria-hidden />
-        </Link>
+        </button>
+        <TechnicianSheet open={details} onClose={() => setDetails(false)} onProfile={onNavigate} />
         <nav aria-label="Primary" className="flex-1 overflow-y-auto p-3">
           <ul className="space-y-0.5">
             {SIDE.map(({ href, label, icon: Icon }) => {
