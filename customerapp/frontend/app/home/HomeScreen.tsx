@@ -235,15 +235,6 @@ export function HomeScreen() {
         ) : null}
       </div>
 
-      {reels.length > 0 ? (
-        <Section
-          title="Handpicked for your home"
-          subtitle="Our most trusted services"
-        >
-          <VideoRail items={reels} />
-        </Section>
-      ) : null}
-
       {location && !location.serviceable ? (
         <UnserviceableNotice
           area={locationLabel(location)}
@@ -320,6 +311,19 @@ export function HomeScreen() {
 
             return (
               <div key={row.appliance.id}>
+                {/* Halfway down the rows rather than at the top: a break in a
+                    long run of near-identical rails, at a row no inline
+                    banner lands on. */}
+                {index === Math.min(REELS_AT_ROW, rows.length - 1) &&
+                reels.length > 0 ? (
+                  <Section
+                    title="Handpicked for your home"
+                    subtitle="Our most trusted services"
+                  >
+                    <VideoRail items={reels} />
+                  </Section>
+                ) : null}
+
                 {banner ? (
                   <Section className="mt-8">
                     <BannerCard banner={banner} />
@@ -397,6 +401,12 @@ export function HomeScreen() {
 }
 
 // ---------------------------------------------------------------------------
+
+/**
+ * The appliance row the reels go in front of — the middle of the page, or the
+ * last row on a catalog too short to have one there.
+ */
+const REELS_AT_ROW = 3
 
 /** How far the page scrolls before the search field grows its shadow. */
 const SCROLL_THRESHOLD = 8
