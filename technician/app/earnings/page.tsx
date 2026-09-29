@@ -47,7 +47,7 @@ export default function EarningsPage() {
 
   return (
     <>
-      <ScreenHeader title="Earnings" subtitle="Service revenue & payouts" />
+      <ScreenHeader back="/home" title="Earnings" subtitle="Service revenue & payouts" />
       <Page className="space-y-5">
         <Segmented
           value={range}

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { ChevronRight, Clock, Crosshair, Navigation, Phone, Route as RouteIcon } from 'lucide-react'
+import { ArrowLeft, ChevronRight, Clock, Crosshair, Navigation, Phone, Route as RouteIcon } from 'lucide-react'
 import { ApplianceGlyph, BrandTag } from '@/components/glyphs'
 import { ServiceMap, type MapPin } from '@/components/ServiceMap'
 import { PriorityBadge, StatusChip } from '@/components/ui'
@@ -41,7 +41,10 @@ export default function MapPage() {
 
       {/* Top overlay */}
       <div className="pointer-events-none absolute inset-x-0 top-0 p-3 pt-[calc(var(--safe-top)+0.75rem)] lg:p-6">
-        <div className="pointer-events-auto mx-auto flex max-w-3xl items-center gap-2 rounded-2xl border border-line bg-card/95 p-2 pl-3 shadow-float backdrop-blur">
+        <div className="pointer-events-auto mx-auto flex max-w-3xl items-center gap-2 rounded-2xl border border-line bg-card/95 p-2 shadow-float backdrop-blur">
+          <Link href="/home" aria-label="Back" className="grid size-10 shrink-0 place-items-center rounded-xl text-ink hover:bg-canvas">
+            <ArrowLeft className="size-5" />
+          </Link>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-extrabold">Service area map</p>
             <p className="truncate text-xs font-semibold text-muted">{tech.area}</p>

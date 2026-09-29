@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { ChevronRight, Clock, MapPin, Navigation, Timer } from 'lucide-react'
-import { applianceTitle, inr } from '@/lib/catalog'
+import { Clock, MapPin, Navigation, Timer } from 'lucide-react'
+import { applianceTitle } from '@/lib/catalog'
 import { cn } from '@/lib/cn'
 import { duration, time } from '@/lib/format'
 import { jobHref } from '@/lib/routes'
@@ -42,9 +42,8 @@ export function JobCard({ job, compact }: { job: Job; compact?: boolean }) {
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
               <BrandTag brand={job.brand} />
-              <span className="truncate text-[11px] font-bold text-faint">
-                {job.id} · {job.service}
-              </span>
+              {job.priority !== 'normal' && <PriorityBadge priority={job.priority} className="h-5 px-1.5 text-[9.5px]" />}
+              <span className="truncate text-[11px] font-semibold text-faint">{job.service}</span>
             </div>
             <h3 className="mt-1 truncate text-[15.5px] font-extrabold leading-snug tracking-tight">
               {applianceTitle(job.brand, job.appliance)}
@@ -58,7 +57,7 @@ export function JobCard({ job, compact }: { job: Job; compact?: boolean }) {
         </div>
 
         {!compact && (
-          <div className="mt-3 flex items-center gap-x-3 gap-y-1 border-t border-dashed border-line pt-3 text-[12.5px] font-semibold text-muted">
+          <div className="mt-3 flex items-center gap-x-3 border-t border-line pt-2.5 text-[12px] font-semibold text-muted">
             <span className="flex min-w-0 items-center gap-1">
               <MapPin className="size-3.5 shrink-0" aria-hidden />
               <span className="truncate">
@@ -69,21 +68,9 @@ export function JobCard({ job, compact }: { job: Job; compact?: boolean }) {
               <Navigation className="size-3.5" aria-hidden />
               <span className="num">{job.distanceKm} km</span>
             </span>
-            <span className="hidden shrink-0 items-center gap-1 sm:flex">
+            <span className="flex shrink-0 items-center gap-1">
               <Timer className="size-3.5" aria-hidden />
               {duration(job.durationMin)}
-            </span>
-          </div>
-        )}
-        {!compact && (
-          <div className="mt-2.5 flex items-center gap-2">
-            <PriorityBadge priority={job.priority} />
-            {job.status === 'request' && (
-              <span className="num text-xs font-bold text-ink-2">Est. {inr(job.estFee)}</span>
-            )}
-            <span className="ml-auto flex items-center gap-0.5 text-xs font-bold text-brand">
-              {job.status === 'request' ? 'Review request' : 'Open job'}
-              <ChevronRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
             </span>
           </div>
         )}

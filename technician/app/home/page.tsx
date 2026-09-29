@@ -43,77 +43,91 @@ export default function HomePage() {
     <>
       {/* Header */}
       <header className="bg-brand-ink pt-[var(--safe-top)] text-white">
-        <div className="mx-auto max-w-5xl px-4 pb-20 pt-4 lg:px-8 lg:pb-24 lg:pt-6">
+        <div className="mx-auto max-w-5xl px-4 pb-4 pt-3 lg:px-8 lg:pb-6 lg:pt-6">
           <div className="flex items-center gap-3">
-            <Link href="/profile" className="relative">
-              <Avatar name={tech.name} photo={tech.photo} size={48} className="ring-2 ring-white/20" />
-              <span className={cn('absolute -bottom-0.5 -right-0.5 size-3.5 rounded-full border-2 border-brand-ink', online ? 'bg-[#22c55e]' : 'bg-faint')} />
+            <Link href="/profile" className="relative shrink-0">
+              <Avatar name={tech.name} photo={tech.photo} size={42} className="ring-2 ring-white/15" />
+              <span className={cn('absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-brand-ink', online ? 'bg-[#22c55e]' : 'bg-faint')} />
             </Link>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold text-white/60">{greeting},</p>
-              <p className="truncate text-[17px] font-extrabold leading-tight">{tech.name}</p>
-              <p className="num text-[11px] font-bold tracking-wider text-white/50">{tech.id}</p>
+              <p className="truncate text-[15px] font-extrabold leading-tight">{tech.name}</p>
+              <p className="num mt-0.5 truncate text-[11.5px] font-semibold text-white/55">
+                {tech.id} · {greeting}
+              </p>
             </div>
-            <Link href="/notifications" aria-label={`Notifications, ${unread} unread`} className="relative grid size-11 place-items-center rounded-full bg-white/10 hover:bg-white/15">
-              <Bell className="size-5" />
+            <Link href="/notifications" aria-label={`Notifications, ${unread} unread`} className="relative grid size-10 shrink-0 place-items-center rounded-full bg-white/10 hover:bg-white/15">
+              <Bell className="size-[18px]" />
               {unread > 0 && (
-                <span className="num absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-danger px-1 text-[10.5px] font-extrabold ring-2 ring-brand-ink">
+                <span className="num absolute -right-1 -top-1 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-danger px-1 text-[10px] font-extrabold ring-2 ring-brand-ink">
                   {unread}
                 </span>
               )}
             </Link>
           </div>
 
-          <div className="mt-4 flex items-center gap-3 rounded-2xl bg-white/[0.07] p-3 ring-1 ring-white/10">
+          <div
+            className={cn(
+              'mt-3.5 flex items-center gap-3 rounded-xl px-3 py-2.5 ring-1 transition-colors',
+              online ? 'bg-[#22c55e]/[0.12] ring-[#22c55e]/25' : 'bg-white/[0.06] ring-white/10'
+            )}
+          >
+            <span className={cn('size-2 shrink-0 rounded-full', online ? 'animate-blink bg-[#4ade80]' : 'bg-white/40')} />
             <div className="min-w-0 flex-1">
-              <p className={cn('flex items-center gap-2 text-sm font-extrabold', online ? 'text-[#4ade80]' : 'text-white/60')}>
-                <span className={cn('size-2 rounded-full', online ? 'animate-blink bg-[#4ade80]' : 'bg-white/40')} />
-                {online ? 'ONLINE' : 'OFFLINE'}
+              <p className={cn('text-[13px] font-extrabold leading-tight', online ? 'text-[#86efac]' : 'text-white/70')}>
+                {online ? 'Online · receiving jobs' : 'Offline · not receiving jobs'}
               </p>
-              <p className="mt-0.5 flex items-center gap-1 truncate text-xs font-semibold text-white/60">
-                <Locate className="size-3.5 shrink-0" /> {tech.area}
+              <p className="mt-0.5 flex items-center gap-1 truncate text-[11.5px] font-medium text-white/55">
+                <Locate className="size-3 shrink-0" /> {tech.area}
               </p>
             </div>
-            <Toggle checked={online} onChange={store.setOnline} label="Availability" tone="success" size="lg" />
+            <Toggle checked={online} onChange={store.setOnline} label="Availability" tone="success" />
+          </div>
+
+          <div className="mt-4 grid grid-cols-3 divide-x divide-white/10">
+            <Link href="/earnings" className="pr-3">
+              <p className="text-[11px] font-semibold text-white/55">Earned today</p>
+              <p className="num mt-0.5 text-[19px] font-extrabold leading-tight tracking-tight">{inr(stats.earnings)}</p>
+            </Link>
+            <Link href="/profile" className="px-3">
+              <p className="text-[11px] font-semibold text-white/55">Rating</p>
+              <p className="num mt-0.5 flex items-center gap-1 text-[19px] font-extrabold leading-tight tracking-tight">
+                {tech.rating.toFixed(2)}
+                <Star className="size-3.5 fill-[#fbbf24] text-[#fbbf24]" />
+              </p>
+            </Link>
+            <Link href="/history" className="pl-3">
+              <p className="text-[11px] font-semibold text-white/55">Completed</p>
+              <p className="num mt-0.5 text-[19px] font-extrabold leading-tight tracking-tight">
+                {stats.done}
+                <span className="text-[13px] font-bold text-white/45"> / {stats.today}</span>
+              </p>
+            </Link>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto -mt-14 w-full max-w-5xl space-y-6 px-4 pb-28 lg:-mt-16 lg:px-8 lg:pb-16">
-        {/* Stats */}
-        <Card className="overflow-hidden">
-          <div className="grid grid-cols-2 divide-x divide-line border-b border-line">
-            <div className="p-4">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-faint">Earnings today</p>
-              <p className="num mt-1 text-[26px] font-extrabold leading-none tracking-tight">{inr(stats.earnings)}</p>
-              <Link href="/earnings" className="mt-1.5 inline-flex items-center text-xs font-bold text-brand">
-                Wallet <ChevronRight className="size-3.5" />
-              </Link>
-            </div>
-            <div className="p-4">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-faint">Customer rating</p>
-              <p className="num mt-1 flex items-center gap-1.5 text-[26px] font-extrabold leading-none tracking-tight">
-                {tech.rating.toFixed(2)}
-                <Star className="size-5 fill-warning text-warning" />
-              </p>
-              <p className="num mt-1.5 text-xs font-semibold text-muted">{tech.ratingCount.toLocaleString('en-IN')} ratings</p>
-            </div>
-          </div>
-          <dl className="grid grid-cols-5 divide-x divide-line">
-            {[
-              ['Today', stats.today, 'text-ink'],
-              ['Pending', stats.pending, 'text-warning'],
-              ['Accepted', stats.accepted, 'text-brand'],
-              ['Active', stats.progress, 'text-violet'],
-              ['Done', stats.done, 'text-success'],
-            ].map(([label, value, color]) => (
-              <div key={label as string} className="px-1 py-3 text-center">
-                <dd className={cn('num text-xl font-extrabold leading-none', color as string)}>{value}</dd>
-                <dt className="mt-1.5 text-[10.5px] font-bold uppercase tracking-wide text-muted">{label}</dt>
-              </div>
-            ))}
-          </dl>
-        </Card>
+      <main className="mx-auto w-full max-w-5xl space-y-6 px-4 pb-28 pt-4 lg:px-8 lg:pb-16 lg:pt-6">
+        {/* Today's pipeline */}
+        <div className="grid grid-cols-4 gap-2">
+          {(
+            [
+              ['Pending', stats.pending, 'bg-warning'],
+              ['Accepted', stats.accepted, 'bg-brand'],
+              ['Active', stats.progress, 'bg-violet'],
+              ['Done', stats.done, 'bg-success'],
+            ] as const
+          ).map(([label, value, bar]) => (
+            <Link
+              key={label}
+              href="/jobs"
+              className="relative overflow-hidden rounded-xl border border-line bg-card px-2.5 pb-2.5 pt-3 shadow-card"
+            >
+              <span className={cn('absolute inset-x-0 top-0 h-[3px]', bar)} />
+              <p className="num text-[22px] font-extrabold leading-none">{value}</p>
+              <p className="mt-1.5 truncate text-[11.5px] font-semibold text-muted">{label}</p>
+            </Link>
+          ))}
+        </div>
 
         {!online && (
           <div className="flex items-center gap-3 rounded-card border border-line-strong bg-card p-4">

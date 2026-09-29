@@ -18,6 +18,13 @@ import type { Bill, Confirmation, Diagnosis, FlowStep, Job, Notice, PartLine, Ph
 
 const KEY = 'technician.state.v1'
 
+/**
+ * Sign-in is switched off while the inside of the app is being built: the
+ * app opens straight on Home as if the technician had already logged in.
+ * The login screen still exists — flip this to true to put it back in front.
+ */
+export const REQUIRE_LOGIN = false
+
 interface Persisted {
   signedIn: boolean
   online: boolean
@@ -151,6 +158,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const now = () => new Date().toISOString()
     return {
       ...state,
+      signedIn: REQUIRE_LOGIN ? state.signedIn : true,
       ready,
       signIn: () => setState((s) => ({ ...s, signedIn: true })),
       signOut: () => setState((s) => ({ ...s, signedIn: false })),

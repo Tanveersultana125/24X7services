@@ -37,6 +37,7 @@ export default function JobsPage() {
   return (
     <>
       <ScreenHeader
+        back="/home"
         title="Jobs"
         subtitle={`${board.length} on today’s board`}
         right={

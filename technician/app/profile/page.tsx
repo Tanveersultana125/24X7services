@@ -18,6 +18,7 @@ export default function ProfilePage() {
   return (
     <>
       <ScreenHeader
+        back="/home"
         title="Profile"
         right={
           <Link href="/settings" aria-label="Settings" className="grid size-11 place-items-center rounded-full hover:bg-canvas">
