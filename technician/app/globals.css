@@ -86,6 +86,13 @@
     --safe-top: env(safe-area-inset-top, 0px);
   }
 
+  /* A phone should never scroll sideways. Grids are set up not to overflow;
+     this only stops a stray long word from dragging the whole page wider. */
+  html,
+  body {
+    overflow-x: clip;
+  }
+
   body {
     background-color: var(--color-canvas);
     color: var(--color-ink);

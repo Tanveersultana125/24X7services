@@ -19,7 +19,7 @@ export default function SettingsPage() {
     <>
       <ScreenHeader back="/profile" title="Settings" />
       <Page className="space-y-5">
-        <div className="grid gap-5 lg:grid-cols-2 lg:items-start">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:items-start">
           <div className="space-y-5">
             <section>
               <SectionTitle>Availability</SectionTitle>

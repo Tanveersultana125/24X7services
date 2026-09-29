@@ -71,7 +71,7 @@ export default function JobsPage() {
         <section>
           <SectionTitle count={shown.length}>{status === 'all' ? 'Today’s board' : STATUS_FILTERS.find((s) => s.key === status)!.label}</SectionTitle>
           {shown.length ? (
-            <div className="grid gap-3 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
               {shown.map((j) => (
                 <JobCard key={j.id} job={j} />
               ))}

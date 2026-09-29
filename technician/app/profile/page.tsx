@@ -101,7 +101,7 @@ export default function ProfilePage() {
           <Toggle checked={online} onChange={setOnline} label="Availability" tone="success" size="lg" />
         </Card>
 
-        <div className="grid gap-5 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <section>
             <SectionTitle>Contact & area</SectionTitle>
             <Card className="divide-y divide-line">

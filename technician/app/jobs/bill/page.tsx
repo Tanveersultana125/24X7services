@@ -48,7 +48,7 @@ function BillForm({ job }: { job: Job }) {
     <>
       <ScreenHeader back={stepHref('detail', job.id)} title="Service bill" subtitle={`${job.id} · ${job.customer.name}`} />
       <Page className="space-y-5">
-        <div className="grid gap-5 lg:grid-cols-[1.15fr_1fr] lg:items-start">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-start">
           {/* The document */}
           <Card className="overflow-hidden">
             <div className="flex items-start justify-between gap-3 border-b border-line bg-canvas/60 p-4">

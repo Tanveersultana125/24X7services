@@ -44,7 +44,7 @@ export default function EmergencyPage() {
         {mine.length > 0 && (
           <section>
             <SectionTitle count={mine.length}>Your emergency jobs</SectionTitle>
-            <div className="grid gap-3 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
               {mine.map((j) => (
                 <EmergencyCard key={j.id} job={j} />
               ))}
@@ -55,7 +55,7 @@ export default function EmergencyPage() {
         <section>
           <SectionTitle count={open.length}>Waiting for a technician</SectionTitle>
           {open.length ? (
-            <div className="grid gap-3 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
               {open.map((j) => (
                 <EmergencyCard key={j.id} job={j} />
               ))}

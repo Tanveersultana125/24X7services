@@ -174,7 +174,7 @@ export default function HomePage() {
           </div>
         )}
 
-        <div className="grid gap-6 lg:grid-cols-[1.25fr_1fr] lg:items-start">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:items-start">
           <div className="space-y-6">
             {current && <CurrentJob job={current} />}
 
@@ -362,7 +362,7 @@ function SearchResults({ jobs, query }: { jobs: Job[]; query: string }) {
     <section>
       <SectionTitle count={sorted.length}>Results for &ldquo;{query}&rdquo;</SectionTitle>
       {sorted.length ? (
-        <div className="grid gap-3 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
           {sorted.slice(0, 30).map((j) => (
             <JobCard key={j.id} job={j} />
           ))}

@@ -59,7 +59,7 @@ export default function EarningsPage() {
           ]}
         />
 
-        <div className="grid gap-4 lg:grid-cols-[1fr_1.3fr]">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
           <Card className="overflow-hidden">
             <div className="bg-brand-ink p-5 text-white">
               <p className="text-xs font-bold uppercase tracking-wider text-white/60">Service revenue</p>
@@ -89,7 +89,7 @@ export default function EarningsPage() {
           </Card>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <section>
             <SectionTitle>By appliance</SectionTitle>
             <Card className="divide-y divide-line">

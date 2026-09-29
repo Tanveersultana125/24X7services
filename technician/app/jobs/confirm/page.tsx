@@ -46,7 +46,7 @@ function ConfirmForm({ job }: { job: Job }) {
     <>
       <ScreenHeader back={stepHref('detail', job.id)} title="Customer confirmation" subtitle={`${job.id} · hand the phone to ${job.customer.name.split(' ')[0]}`} />
       <Page className="space-y-5">
-        <div className="grid gap-5 lg:grid-cols-2 lg:items-start">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:items-start">
           <div className="space-y-5">
             <section>
               <SectionTitle>Repair summary</SectionTitle>
