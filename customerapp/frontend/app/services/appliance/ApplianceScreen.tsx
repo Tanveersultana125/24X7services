@@ -17,6 +17,7 @@ import {
 
 import { AppShell, Section } from '@/components/AppShell'
 import { Header } from '@/components/Header'
+import { CartButton } from '@/components/CartButton'
 import { ServiceCard } from '@/components/ServiceCard'
 import { ServiceSheet, serviceOptions } from '@/components/ServiceSheet'
 import { CartBar } from '@/components/CartBar'
@@ -223,6 +224,7 @@ export function ApplianceScreen() {
           title={appliance?.name ?? 'Services'}
           showBack
           backFallback="/services"
+          right={<CartButton className="mr-2 size-11" />}
         />
       }
     >

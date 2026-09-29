@@ -5,6 +5,7 @@ import type { CatalogAppliance, CatalogService } from '@app/shared'
 
 import { AppShell, Section } from '@/components/AppShell'
 import { Header } from '@/components/Header'
+import { CartButton } from '@/components/CartButton'
 import { ApplianceCard } from '@/components/ApplianceCard'
 import { TrustPoints } from '@/components/TrustPoints'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
@@ -62,7 +63,12 @@ export function ServicesScreen() {
     // only way back to where they were is to work out that Home is a tab.
     <AppShell
       mobileHeader={
-        <Header title="All services" showBack backFallback="/home" />
+        <Header
+          title="All services"
+          showBack
+          backFallback="/home"
+          right={<CartButton className="mr-2 size-11" />}
+        />
       }
     >
       <Section

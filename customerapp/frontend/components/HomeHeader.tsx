@@ -5,6 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import type { Route } from "next";
 import { LocationSelector } from "@/components/LocationSelector";
+import { CartButton } from "@/components/CartButton";
 import { ConfirmModal } from "@/components/Modal";
 import { SearchBar } from "@/components/SearchBar";
 import { useToast } from "@/components/Toast";
@@ -91,8 +92,11 @@ export function HomeHeader({
             "shadow-[0_1px_0_var(--color-border),0_6px_16px_-10px_rgb(23_21_15/0.25)]",
         )}
       >
-        <div className="mx-auto max-w-lg px-4 pt-3 pb-3">
-          <SearchBar readOnly onOpen={onSearch} />
+        {/* The cart beside the search, so it stays in reach once the location
+            row has scrolled away. */}
+        <div className="mx-auto flex max-w-lg items-center gap-2 px-4 pt-3 pb-3">
+          <SearchBar readOnly onOpen={onSearch} className="min-w-0 flex-1" />
+          <CartButton />
         </div>
       </div>
     </>
