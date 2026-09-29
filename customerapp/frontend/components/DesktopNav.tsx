@@ -4,6 +4,7 @@ import Link from 'next/link'
 import type { Route } from 'next'
 import { usePathname } from 'next/navigation'
 import { Bell } from 'lucide-react'
+import { CartButton } from '@/components/CartButton'
 import { brand } from '@/config/brand'
 import { cn } from '@/lib/cn'
 
@@ -40,7 +41,7 @@ export function DesktopNav({
         className
       )}
     >
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-8 px-6">
+      <div className="mx-auto flex h-16 max-w-5xl items-center gap-8 px-6">
         <Link
           href="/home"
           className="text-xl font-extrabold tracking-tight text-brand"
@@ -97,6 +98,8 @@ export function DesktopNav({
               />
             ) : null}
           </Link>
+
+          <CartButton className="size-10" />
         </div>
       </div>
     </header>

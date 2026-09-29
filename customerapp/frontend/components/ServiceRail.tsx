@@ -105,7 +105,12 @@ export function ServiceRail({
         )}
       >
         {items.map((item) => (
-          <li key={item.id} className="flex w-40 shrink-0 snap-start flex-col">
+          <li
+            key={item.id}
+            // Five across the desktop column, so a row fills it rather than
+            // stopping two-thirds of the way over.
+            className="flex w-40 shrink-0 snap-start flex-col lg:w-[calc((100%-3rem)/5)]"
+          >
             <Link
               href={item.href}
               className="group block"
@@ -117,7 +122,7 @@ export function ServiceRail({
                 still={item.photo ?? item.image}
                 cover={Boolean(item.photo)}
                 motion={false}
-                sizes="160px"
+                sizes="(min-width: 1024px) 190px, 160px"
                 containClassName="p-5"
                 // A photograph is cropped square, which is the shape the rail
                 // was laid out on. A drawing keeps that square too, with the
@@ -186,7 +191,7 @@ function RailArrow({
       onClick={onClick}
       aria-label={direction === 1 ? 'Show more' : 'Show previous'}
       className={cn(
-        'absolute top-[3.75rem] z-10 hidden size-10 items-center justify-center rounded-full border border-border bg-bg text-ink shadow-md transition-colors duration-[var(--duration-fast)] hover:bg-brand-soft pointer-fine:flex',
+        'absolute top-[3.75rem] z-10 lg:top-[4.55rem] hidden size-10 items-center justify-center rounded-full border border-border bg-bg text-ink shadow-md transition-colors duration-[var(--duration-fast)] hover:bg-brand-soft pointer-fine:flex',
         direction === 1 ? '-right-2 lg:-right-5' : '-left-2 lg:-left-5'
       )}
     >

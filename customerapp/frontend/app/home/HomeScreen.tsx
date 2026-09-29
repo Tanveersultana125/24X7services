@@ -203,7 +203,7 @@ export function HomeScreen() {
 
       {/* The banner's own height while it loads, so the page does not jump
           when it lands; nothing at all once there is genuinely no banner. */}
-      <div className="mt-1 lg:mt-0">
+      <div className="mt-1 lg:mt-5">
         {data && heroBanners.length > 0 ? (
           <PromotionalBanner banners={heroBanners} />
         ) : home.status === 'loading' ? (

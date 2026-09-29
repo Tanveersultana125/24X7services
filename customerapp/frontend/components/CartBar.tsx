@@ -32,6 +32,7 @@ export function CartBar({
       <StickySpacer aboveBottomNav />
       <StickyCTA
         aboveBottomNav
+        wide
         detail={
           <p aria-live="polite">
             <span className="block text-base font-semibold text-ink">

@@ -17,6 +17,11 @@ export interface StickyCTAProps {
   children: React.ReactNode
   /** True on screens with a bottom nav underneath. */
   aboveBottomNav?: boolean
+  /**
+   * Line up with a tab screen's full desktop column (AppShell) rather than the
+   * narrower booking column. Phone width is the same either way.
+   */
+  wide?: boolean
   className?: string
 }
 
@@ -24,6 +29,7 @@ export function StickyCTA({
   detail,
   children,
   aboveBottomNav = false,
+  wide = false,
   className,
 }: StickyCTAProps) {
   return (
@@ -35,7 +41,12 @@ export function StickyCTA({
         className
       )}
     >
-      <div className="mx-auto flex max-w-lg items-center gap-3 lg:max-w-2xl">
+      <div
+        className={cn(
+          'mx-auto flex max-w-lg items-center gap-3',
+          wide ? 'lg:max-w-5xl lg:px-6' : 'lg:max-w-2xl'
+        )}
+      >
         {detail ? <div className="min-w-0 flex-1">{detail}</div> : null}
         <div className={cn(detail ? 'shrink-0' : 'w-full')}>{children}</div>
       </div>

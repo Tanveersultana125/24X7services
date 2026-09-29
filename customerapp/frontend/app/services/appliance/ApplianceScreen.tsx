@@ -261,7 +261,7 @@ export function ApplianceScreen() {
               page. Absent for an appliance nobody has photographed, and the
               screen opens on the name the way it always did. */}
           {appliance.heroImage ? (
-            <span className="relative -mx-4 mt-4 block aspect-video overflow-hidden bg-surface lg:mx-0 lg:rounded-card">
+            <span className="relative -mx-4 mt-4 block aspect-video overflow-hidden bg-surface lg:mx-0 lg:mt-6 lg:aspect-[3/1] lg:rounded-card">
               <Image
                 src={appliance.heroImage}
                 alt=""
@@ -352,12 +352,14 @@ export function ApplianceScreen() {
             {/* A rule between services rather than a box around each: the
                 cards are tall enough now that a border as well would be two
                 lines doing one job. */}
-            <div className="flex flex-col divide-y divide-border">
+            {/* Two columns from a laptop up: one full-width card per service
+                makes each picture the size of the screen. */}
+            <div className="flex flex-col divide-y divide-border lg:grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-10 lg:divide-y-0">
               {services.map((service, index) => (
                 <div
                   key={service.id}
                   id={`service-${service.id}`}
-                  className={cn('py-6 first:pt-0 last:pb-0', JUMP_OFFSET)}
+                  className={cn('py-6 first:pt-0 last:pb-0 lg:py-0', JUMP_OFFSET)}
                 >
                   {/* `motion` only reaches a service with no photograph of
                       its own; one that has one shows it and stays still.
@@ -441,6 +443,7 @@ export function ApplianceScreen() {
               <StickySpacer aboveBottomNav />
               <StickyCTA
                 aboveBottomNav
+                wide
                 detail={
                   <>
                     <p className="truncate text-sm font-semibold text-ink">
