@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { ArrowLeft, ChevronRight, Clock, Crosshair, Navigation, Phone, Route as RouteIcon } from 'lucide-react'
 import { ApplianceGlyph, BrandTag } from '@/components/glyphs'
+import { MenuButton } from '@/components/menu'
 import { ServiceMap, type MapPin } from '@/components/ServiceMap'
 import { PriorityBadge, StatusChip } from '@/components/ui'
 import { applianceTitle } from '@/lib/catalog'
@@ -54,6 +55,7 @@ export default function MapPage() {
             <Legend color="bg-danger" label="Emergency" />
             <Legend color="bg-faint" label="Requests" />
           </div>
+          <MenuButton />
           <button type="button" onClick={() => setPicked(active?.id ?? null)} aria-label="Centre on current job" className="grid size-10 place-items-center rounded-xl bg-brand-soft text-brand">
             <Crosshair className="size-5" />
           </button>

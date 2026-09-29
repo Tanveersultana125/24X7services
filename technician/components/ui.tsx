@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { ArrowLeft, Flame, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
+import { MenuButton } from './menu'
 import { STATUS, type Tone } from '@/lib/status'
 import type { JobStatus, Priority } from '@/lib/types'
 
@@ -305,7 +306,10 @@ export function ScreenHeader({
           <h1 className="truncate text-[17px] font-extrabold tracking-tight lg:text-xl">{title}</h1>
           {subtitle && <p className="truncate text-xs font-medium text-muted">{subtitle}</p>}
         </div>
-        {right && <div className="flex items-center gap-1 pr-1">{right}</div>}
+        <div className="flex items-center gap-1 pr-1">
+          {right}
+          <MenuButton />
+        </div>
       </div>
     </header>
   )

@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { Bell, ChevronRight, Locate, Search, SearchX, X, MessageCircle, Navigation, Phone, PowerOff, Siren, Star } from 'lucide-react'
 import { ApplianceGlyph, BrandTag } from '@/components/glyphs'
 import { JobCard } from '@/components/JobCard'
+import { MenuButton } from '@/components/menu'
 import { FlowBar } from '@/components/Timeline'
 import { Avatar, Card, Empty, PriorityBadge, SectionTitle, StatusChip, Toggle } from '@/components/ui'
 import { applianceTitle, inr } from '@/lib/catalog'
@@ -57,6 +58,7 @@ export default function HomePage() {
                 {tech.id} · {greeting}
               </p>
             </div>
+            <MenuButton inverted className="order-first" />
             <Link href="/notifications" aria-label={`Notifications, ${unread} unread`} className="relative grid size-10 shrink-0 place-items-center rounded-full bg-white/10 hover:bg-white/15">
               <Bell className="size-[18px]" />
               {unread > 0 && (

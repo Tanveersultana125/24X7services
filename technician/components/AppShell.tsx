@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import type { Route } from 'next'
 import { usePathname, useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Bell,
   BriefcaseBusiness,
@@ -15,12 +15,14 @@ import {
   Siren,
   UserRound,
   Wallet,
+  X,
 } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { useStore } from '@/lib/store'
 import { Avatar } from './ui'
 import { IncomingRequest } from './IncomingRequest'
 import { Logo } from './Logo'
+import { MenuContext } from './menu'
 
 const TABS = [
   { href: '/home', label: 'Home', icon: House },
@@ -56,6 +58,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const store = useStore()
   const bare = pathname === '/' || pathname.startsWith('/login')
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     if (store.ready && !store.signedIn && !bare) router.replace('/login')
@@ -66,12 +69,73 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (!store.signedIn) return <Splash />
 
   const current = section(pathname)
-  const emergencies = store.jobs.filter((j) => j.status === 'request' && j.priority === 'emergency').length
-  const unread = store.notices.filter((n) => !n.read).length
-
   return (
+    <MenuContext.Provider value={setMenuOpen}>
     <div className="lg:flex">
       <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-line bg-card lg:flex">
+        <SidebarBody />
+      </aside>
+
+      {menuOpen && (
+        <div className="fixed inset-0 z-[65] lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
+          <button type="button" aria-label="Close menu" className="absolute inset-0 bg-ink/50" onClick={() => setMenuOpen(false)} />
+          <aside className="animate-drawer absolute inset-y-0 left-0 flex w-[82%] max-w-[300px] flex-col bg-card pt-[var(--safe-top)] pb-[var(--safe-bottom)] shadow-float">
+            <button
+              type="button"
+              aria-label="Close menu"
+              onClick={() => setMenuOpen(false)}
+              className="absolute right-2 top-[calc(var(--safe-top)+0.75rem)] z-10 grid size-10 place-items-center rounded-full text-muted hover:bg-canvas"
+            >
+              <X className="size-5" />
+            </button>
+            <SidebarBody onNavigate={() => setMenuOpen(false)} />
+          </aside>
+        </div>
+      )}
+
+      <div className="min-w-0 flex-1">{children}</div>
+
+      <nav
+        aria-label="Primary"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-card pb-[var(--safe-bottom)] lg:hidden"
+      >
+        <ul className="mx-auto flex max-w-lg">
+          {TABS.map(({ href, label, icon: Icon }) => {
+            const active = current === href
+            return (
+              <li key={href} className="flex-1">
+                <Link
+                  href={href}
+                  aria-current={active ? 'page' : undefined}
+                  className={cn(
+                    'relative flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-bold',
+                    active ? 'text-brand' : 'text-faint'
+                  )}
+                >
+                  {active && <span className="absolute inset-x-5 top-0 h-[3px] rounded-b-full bg-brand" />}
+                  <Icon className="size-[22px]" strokeWidth={active ? 2.3 : 1.8} aria-hidden />
+                  {label}
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+      </nav>
+
+      <IncomingRequest />
+    </div>
+    </MenuContext.Provider>
+  )
+}
+
+/** Logo, technician, every destination and the availability switch. */
+function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
+  const pathname = usePathname()
+  const store = useStore()
+  const emergencies = store.jobs.filter((j) => j.status === 'request' && j.priority === 'emergency').length
+  const unread = store.notices.filter((n) => !n.read).length
+  return (
+    <>
         <div className="flex h-16 items-center border-b border-line px-5">
           <Logo />
         </div>
@@ -91,6 +155,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <li key={href}>
                   <Link
                     href={href}
+                    onClick={onNavigate}
                     aria-current={active ? 'page' : undefined}
                     className={cn(
                       'flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-semibold transition-colors',
@@ -128,39 +193,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {store.online ? 'Online · receiving jobs' : 'Offline'}
           </button>
         </div>
-      </aside>
-
-      <div className="min-w-0 flex-1">{children}</div>
-
-      <nav
-        aria-label="Primary"
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-card pb-[var(--safe-bottom)] lg:hidden"
-      >
-        <ul className="mx-auto flex max-w-lg">
-          {TABS.map(({ href, label, icon: Icon }) => {
-            const active = current === href
-            return (
-              <li key={href} className="flex-1">
-                <Link
-                  href={href}
-                  aria-current={active ? 'page' : undefined}
-                  className={cn(
-                    'relative flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-bold',
-                    active ? 'text-brand' : 'text-faint'
-                  )}
-                >
-                  {active && <span className="absolute inset-x-5 top-0 h-[3px] rounded-b-full bg-brand" />}
-                  <Icon className="size-[22px]" strokeWidth={active ? 2.3 : 1.8} aria-hidden />
-                  {label}
-                </Link>
-              </li>
-            )
-          })}
-        </ul>
-      </nav>
-
-      <IncomingRequest />
-    </div>
+    </>
   )
 }
 

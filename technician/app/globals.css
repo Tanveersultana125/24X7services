@@ -214,3 +214,16 @@
 .animate-loader {
   animation: loader 1.1s var(--ease-out-soft) infinite;
 }
+
+@keyframes drawer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-drawer {
+  animation: drawer 240ms var(--ease-out-soft) both;
+}
