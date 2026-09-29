@@ -23,20 +23,42 @@ import { cn } from '@/lib/cn'
  *
  * Ten at a time. A service with two hundred reviews is two hundred rows
  * between the customer and the button that books it.
+ *
+ * Shown even with nothing in it, so the section is always where a customer
+ * looks for it, and always carries the way to add one (`action`).
  */
 
 const PAGE = 10
 
 export function ServiceReviews({
   reviews,
+  serviceNames,
+  action,
   className,
 }: {
   reviews: readonly ServiceReview[]
+  /**
+   * The name of each service, on a page that pools the reviews of several —
+   * every row then says which service it is about.
+   */
+  serviceNames?: ReadonlyMap<ServiceReview['serviceKey'], string>
+  /** Under the heading: the way to write one. */
+  action?: React.ReactNode
   className?: string
 }) {
   const [shown, setShown] = useState(PAGE)
 
-  if (reviews.length === 0) return null
+  if (reviews.length === 0) {
+    return (
+      <section className={cn('mt-8', className)}>
+        <h2 className="text-xl font-bold text-ink">Customer reviews</h2>
+        <p className="mt-2 text-sm text-muted">
+          No reviews yet. Every review here comes from a finished job.
+        </p>
+        {action ? <div className="mt-3">{action}</div> : null}
+      </section>
+    )
+  }
 
   const total = reviews.length
   const sum = reviews.reduce((all, review) => all + review.rating, 0)
@@ -50,7 +72,8 @@ export function ServiceReviews({
 
   return (
     <section className={cn('mt-8', className)}>
-      <h2 className="text-xl font-bold text-ink">What customers said</h2>
+      <h2 className="text-xl font-bold text-ink">Customer reviews</h2>
+      {action ? <div className="mt-2">{action}</div> : null}
 
       <div className="mt-3 flex items-start gap-5">
         <div className="shrink-0 text-center">
@@ -100,6 +123,12 @@ export function ServiceReviews({
               <Score rating={review.rating} />
             </div>
             <p className="mt-0.5 text-xs text-muted">
+              {serviceNames?.get(review.serviceKey) ? (
+                <>
+                  {serviceNames.get(review.serviceKey)}
+                  <span className="text-border"> · </span>
+                </>
+              ) : null}
               {relativeTime(review.createdAt)}
             </p>
             {review.text ? (

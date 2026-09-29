@@ -38,6 +38,7 @@ import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
 import { TrustPoints } from '@/components/TrustPoints'
 import { BrandGrid } from '@/components/BrandGrid'
 import { ServiceReviews } from '@/components/ServiceReviews'
+import { WriteReviewButton } from '@/components/WriteReviewButton'
 import { useToast } from '@/components/Toast'
 import { Button } from '@/components/ui/Button'
 import { StickyCTA, StickySpacer } from '@/components/StickyCTA'
@@ -400,7 +401,15 @@ export function ServiceDetailScreen() {
               </Section>
             ) : null}
 
-            <ServiceReviews reviews={data.data?.reviews ?? []} />
+            <ServiceReviews
+              reviews={data.data?.reviews ?? []}
+              action={
+                <WriteReviewButton
+                  applianceId={service.applianceId}
+                  serviceKey={service.serviceKey}
+                />
+              }
+            />
 
             <Section title="Every booking, whatever we are fixing">
               <TrustPoints />

@@ -13,12 +13,15 @@ import {
   type CatalogBrand,
   type CatalogIssue,
   type CatalogService,
+  type ServiceReview,
 } from '@app/shared'
 
 import { AppShell, Section } from '@/components/AppShell'
 import { Header } from '@/components/Header'
 import { CartButton } from '@/components/CartButton'
 import { ServiceCard } from '@/components/ServiceCard'
+import { ServiceReviews } from '@/components/ServiceReviews'
+import { WriteReviewButton } from '@/components/WriteReviewButton'
 import { ServiceSheet, serviceOptions } from '@/components/ServiceSheet'
 import { CartBar } from '@/components/CartBar'
 import { BrandDisclaimer } from '@/components/BrandCard'
@@ -39,6 +42,7 @@ import {
   fetchBrands,
   fetchBusinessConfig,
   fetchIssuesFor,
+  fetchServiceReviews,
   fetchServicesFor,
 } from '@/lib/catalog'
 import { formatPaise } from '@/lib/format'
@@ -79,6 +83,7 @@ interface ApplianceData {
   services: CatalogService[]
   issues: CatalogIssue[]
   brands: CatalogBrand[]
+  reviews: ServiceReview[]
 }
 
 /**
@@ -104,6 +109,7 @@ export function ApplianceScreen() {
         services: [],
         issues: [],
         brands: [],
+        reviews: [],
       }
     }
     const [appliance, config, services, issues, brands] = await Promise.all([
@@ -115,13 +121,29 @@ export function ApplianceScreen() {
       fetchIssuesFor(applianceId),
       fetchBrands(),
     ])
-    return { appliance, config, services, issues, brands }
+    // Every service's reviews, pooled and newest first. A failed read leaves
+    // the section empty rather than taking the price list down with it.
+    const reviews = (
+      await Promise.all(
+        services.map((service) =>
+          fetchServiceReviews(applianceId, service.serviceKey).catch(
+            () => [] as ServiceReview[]
+          )
+        )
+      )
+    )
+      .flat()
+      .sort((a, b) => b.createdAt - a.createdAt)
+    return { appliance, config, services, issues, brands, reviews }
   }, [applianceId])
 
   const data = useAsync(load)
   const appliance = data.data?.appliance ?? null
   const services = data.data?.services ?? []
   const issues = data.data?.issues ?? []
+  const serviceNames = new Map(
+    services.map((service) => [service.serviceKey, service.name])
+  )
   const cart = useCart()
 
   // The service whose options sheet is open — a repair, where "Add" means
@@ -378,6 +400,12 @@ export function ApplianceScreen() {
               ))}
             </div>
           </Section>
+
+          <ServiceReviews
+            reviews={data.data?.reviews ?? []}
+            serviceNames={serviceNames}
+            action={<WriteReviewButton applianceId={appliance.id} />}
+          />
 
           {data.data && data.data.issues.length > 0 ? (
             <Section
