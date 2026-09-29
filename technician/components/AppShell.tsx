@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import {
   Bell,
+  ChevronRight,
   BriefcaseBusiness,
   Headset,
   History,
@@ -14,6 +15,7 @@ import {
   Map as MapIcon,
   Settings,
   Siren,
+  Star,
   UserRound,
   Wallet,
   X,
@@ -141,13 +143,26 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
         <div className="flex h-16 items-center border-b border-line px-5">
           <Logo />
         </div>
-        <div className="flex items-center gap-3 border-b border-line px-5 py-4">
-          <Avatar name={store.tech.name} photo={store.tech.photo} size={40} />
-          <div className="min-w-0">
-            <p className="truncate text-sm font-extrabold">{store.tech.name}</p>
-            <p className="num text-xs font-semibold text-muted">{store.tech.id}</p>
-          </div>
-        </div>
+        <Link
+          href="/profile"
+          onClick={onNavigate}
+          aria-label="View technician profile"
+          className="group flex items-center gap-3 border-b border-line px-5 py-4 transition-colors hover:bg-canvas"
+        >
+          <span className="relative">
+            <Avatar name={store.tech.name} photo={store.tech.photo} size={40} />
+            <span className={cn('absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-card', store.online ? 'bg-success' : 'bg-faint')} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-extrabold">{store.tech.name}</span>
+            <span className="num block text-xs font-semibold text-muted">{store.tech.id}</span>
+            <span className="mt-0.5 flex items-center gap-1 text-[11px] font-bold text-muted">
+              <Star className="size-3 fill-warning text-warning" aria-hidden />
+              {store.tech.rating.toFixed(2)} · {store.tech.experienceYears} yrs exp.
+            </span>
+          </span>
+          <ChevronRight className="size-4 shrink-0 text-faint transition-transform group-hover:translate-x-0.5" aria-hidden />
+        </Link>
         <nav aria-label="Primary" className="flex-1 overflow-y-auto p-3">
           <ul className="space-y-0.5">
             {SIDE.map(({ href, label, icon: Icon }) => {
