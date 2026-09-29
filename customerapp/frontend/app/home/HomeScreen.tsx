@@ -179,19 +179,20 @@ export function HomeScreen() {
       }))
       .filter((row) => row.services.length > 0) ?? []
 
-  // The reels under the hero: one per appliance that has a photograph of
-  // itself in a room, opening on the repair where there is one, since that is
-  // what most people arrive needing.
+  // The reels: one per appliance, opening on the repair where there is one,
+  // since that is what most people arrive needing. Its footage where it has
+  // some; otherwise the appliance's photograph of itself in a room.
   const reels: ReelItem[] = rows.flatMap((row) => {
-    const photo = row.appliance.heroImage
     const service =
       row.services.find((each) => each.serviceKey === 'repair') ??
       row.services[0]
-    if (!photo || !service) return []
+    const photo = service?.reelPoster ?? row.appliance.heroImage
+    if (!service || !photo) return []
     return [
       {
         id: service.id,
         photo,
+        video: service.reel,
         title: service.name,
         href: `/services/appliance/?a=${service.applianceId}&s=${
           service.serviceKey

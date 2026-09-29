@@ -111,11 +111,9 @@ export const catalogServiceSchema = z.object({
    */
   poster: z.string().min(1).optional(),
   /**
-   * The same clip drawn tall (9:16), for Home's row of reel cards, and its
-   * first frame. A wide clip cropped to a tall card loses either its caption
-   * or the machine, so the reel is its own render
-   * (`make_service_clips.py --portrait`). Only services with one appear in
-   * that row.
+   * Real footage, tall (9:16), for Home's row of reel cards, and its first
+   * frame. One per appliance, on the service that row opens on; seeded under
+   * `public/reels/` (see the CREDITS file there for where each came from).
    */
   reel: z.string().min(1).optional(),
   reelPoster: z.string().min(1).optional(),

@@ -14,8 +14,8 @@
     "active": true,
     "video": "/services/washing-machine-repair.mp4",
     "poster": "/services/washing-machine-repair.jpg",
-    "reel": "/services/washing-machine-repair-reel.mp4",
-    "reelPoster": "/services/washing-machine-repair-reel.jpg",
+    "reel": "/reels/washing-machine.mp4",
+    "reelPoster": "/reels/washing-machine.jpg",
     "photo": "/photos/washing-machine/1.jpg",
     "process": [
       {
@@ -84,8 +84,6 @@
     "active": true,
     "video": "/services/washing-machine-service.mp4",
     "poster": "/services/washing-machine-service.jpg",
-    "reel": "/services/washing-machine-service-reel.mp4",
-    "reelPoster": "/services/washing-machine-service-reel.jpg",
     "photo": "/photos/washing-machine/2.jpg",
     "process": [
       {
@@ -154,8 +152,6 @@
     "active": true,
     "video": "/services/washing-machine-installation.mp4",
     "poster": "/services/washing-machine-installation.jpg",
-    "reel": "/services/washing-machine-installation-reel.mp4",
-    "reelPoster": "/services/washing-machine-installation-reel.jpg",
     "photo": "/photos/washing-machine/4.jpg",
     "process": [
       {
@@ -230,8 +226,6 @@
     "active": true,
     "video": "/services/washing-machine-uninstallation.mp4",
     "poster": "/services/washing-machine-uninstallation.jpg",
-    "reel": "/services/washing-machine-uninstallation-reel.mp4",
-    "reelPoster": "/services/washing-machine-uninstallation-reel.jpg",
     "photo": "/photos/washing-machine/1.jpg",
     "process": [
       {
@@ -304,8 +298,6 @@
     "active": true,
     "video": "/services/ac-service.mp4",
     "poster": "/services/ac-service.jpg",
-    "reel": "/services/ac-service-reel.mp4",
-    "reelPoster": "/services/ac-service-reel.jpg",
     "photo": "/photos/air-conditioner/1.jpg",
     "process": [
       {
@@ -374,8 +366,8 @@
     "active": true,
     "video": "/services/ac-repair.mp4",
     "poster": "/services/ac-repair.jpg",
-    "reel": "/services/ac-repair-reel.mp4",
-    "reelPoster": "/services/ac-repair-reel.jpg",
+    "reel": "/reels/air-conditioner.mp4",
+    "reelPoster": "/reels/air-conditioner.jpg",
     "photo": "/photos/air-conditioner/2.jpg",
     "process": [
       {
@@ -444,8 +436,6 @@
     "active": true,
     "video": "/services/ac-deep-clean.mp4",
     "poster": "/services/ac-deep-clean.jpg",
-    "reel": "/services/ac-deep-clean-reel.mp4",
-    "reelPoster": "/services/ac-deep-clean-reel.jpg",
     "photo": "/photos/air-conditioner/3.jpg",
     "process": [
       {
@@ -514,8 +504,6 @@
     "active": true,
     "video": "/services/ac-gas-refill.mp4",
     "poster": "/services/ac-gas-refill.jpg",
-    "reel": "/services/ac-gas-refill-reel.mp4",
-    "reelPoster": "/services/ac-gas-refill-reel.jpg",
     "photo": "/photos/air-conditioner/1.jpg",
     "process": [
       {
@@ -589,8 +577,6 @@
     "active": true,
     "video": "/services/ac-installation.mp4",
     "poster": "/services/ac-installation.jpg",
-    "reel": "/services/ac-installation-reel.mp4",
-    "reelPoster": "/services/ac-installation-reel.jpg",
     "photo": "/photos/air-conditioner/2.jpg",
     "process": [
       {
@@ -665,8 +651,6 @@
     "active": true,
     "video": "/services/ac-uninstallation.mp4",
     "poster": "/services/ac-uninstallation.jpg",
-    "reel": "/services/ac-uninstallation-reel.mp4",
-    "reelPoster": "/services/ac-uninstallation-reel.jpg",
     "photo": "/photos/air-conditioner/3.jpg",
     "process": [
       {
@@ -739,8 +723,8 @@
     "active": true,
     "video": "/services/refrigerator-repair.mp4",
     "poster": "/services/refrigerator-repair.jpg",
-    "reel": "/services/refrigerator-repair-reel.mp4",
-    "reelPoster": "/services/refrigerator-repair-reel.jpg",
+    "reel": "/reels/refrigerator.mp4",
+    "reelPoster": "/reels/refrigerator.jpg",
     "photo": "/photos/refrigerator/1.jpg",
     "process": [
       {
@@ -809,8 +793,6 @@
     "active": true,
     "video": "/services/refrigerator-service.mp4",
     "poster": "/services/refrigerator-service.jpg",
-    "reel": "/services/refrigerator-service-reel.mp4",
-    "reelPoster": "/services/refrigerator-service-reel.jpg",
     "photo": "/photos/refrigerator/2.jpg",
     "process": [
       {
@@ -879,8 +861,6 @@
     "active": true,
     "video": "/services/refrigerator-gas-refill.mp4",
     "poster": "/services/refrigerator-gas-refill.jpg",
-    "reel": "/services/refrigerator-gas-refill-reel.mp4",
-    "reelPoster": "/services/refrigerator-gas-refill-reel.jpg",
     "photo": "/photos/refrigerator/4.jpg",
     "process": [
       {
@@ -954,8 +934,6 @@
     "active": true,
     "video": "/services/refrigerator-installation.mp4",
     "poster": "/services/refrigerator-installation.jpg",
-    "reel": "/services/refrigerator-installation-reel.mp4",
-    "reelPoster": "/services/refrigerator-installation-reel.jpg",
     "photo": "/photos/refrigerator/5.jpg",
     "process": [
       {
@@ -1030,8 +1008,6 @@
     "active": true,
     "video": "/services/geyser-service.mp4",
     "poster": "/services/geyser-service.jpg",
-    "reel": "/services/geyser-service-reel.mp4",
-    "reelPoster": "/services/geyser-service-reel.jpg",
     "photo": "/photos/geyser/1.jpg",
     "process": [
       {
@@ -1100,8 +1076,8 @@
     "active": true,
     "video": "/services/geyser-repair.mp4",
     "poster": "/services/geyser-repair.jpg",
-    "reel": "/services/geyser-repair-reel.mp4",
-    "reelPoster": "/services/geyser-repair-reel.jpg",
+    "reel": "/reels/geyser.mp4",
+    "reelPoster": "/reels/geyser.jpg",
     "photo": "/photos/geyser/2.jpg",
     "process": [
       {
@@ -1170,8 +1146,6 @@
     "active": true,
     "video": "/services/geyser-installation.mp4",
     "poster": "/services/geyser-installation.jpg",
-    "reel": "/services/geyser-installation-reel.mp4",
-    "reelPoster": "/services/geyser-installation-reel.jpg",
     "photo": "/photos/geyser/4.jpg",
     "process": [
       {
@@ -1246,8 +1220,6 @@
     "active": true,
     "video": "/services/geyser-uninstallation.mp4",
     "poster": "/services/geyser-uninstallation.jpg",
-    "reel": "/services/geyser-uninstallation-reel.mp4",
-    "reelPoster": "/services/geyser-uninstallation-reel.jpg",
     "photo": "/photos/geyser/5.jpg",
     "process": [
       {
@@ -1320,8 +1292,8 @@
     "active": true,
     "video": "/services/microwave-repair.mp4",
     "poster": "/services/microwave-repair.jpg",
-    "reel": "/services/microwave-repair-reel.mp4",
-    "reelPoster": "/services/microwave-repair-reel.jpg",
+    "reel": "/reels/microwave.mp4",
+    "reelPoster": "/reels/microwave.jpg",
     "photo": "/photos/microwave/2.jpg",
     "process": [
       {
@@ -1390,8 +1362,6 @@
     "active": true,
     "video": "/services/microwave-service.mp4",
     "poster": "/services/microwave-service.jpg",
-    "reel": "/services/microwave-service-reel.mp4",
-    "reelPoster": "/services/microwave-service-reel.jpg",
     "photo": "/photos/microwave/3.jpg",
     "process": [
       {
@@ -1460,8 +1430,6 @@
     "active": true,
     "video": "/services/microwave-installation.mp4",
     "poster": "/services/microwave-installation.jpg",
-    "reel": "/services/microwave-installation-reel.mp4",
-    "reelPoster": "/services/microwave-installation-reel.jpg",
     "photo": "/photos/microwave/4.jpg",
     "process": [
       {

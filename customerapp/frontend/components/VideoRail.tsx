@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { ServiceClip } from '@/components/ServiceClip'
 import Link from 'next/link'
 import type { Route } from 'next'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
@@ -8,18 +9,18 @@ import { useRailScroll } from '@/lib/useRailScroll'
 import { cn } from '@/lib/cn'
 
 /**
- * Home's row of tall reel cards, straight under the hero — the shape the
- * marketplaces open with: a real room, moving, with a tag and a title laid
- * over its foot, and nothing written underneath.
+ * Home's row of tall reel cards, midway down the page — the shape the
+ * marketplaces use: a real room, moving, with a title laid over its foot and
+ * nothing written underneath. The service name is the only text; no price —
+ * the card is there to draw the eye, and the price is one tap away.
  *
- * There is no footage of this business's work yet, so each card is a
- * photograph of the appliance where it lives — the technician at the AC, the
- * geyser on the bathroom wall — drifting slowly in and across so it reads as
- * a shot rather than a still. The name of the service is the only thing
- * written on it — no price; the card is there to draw the eye, and the price
- * is one tap away. The drawn clips were tried here first and read
- * as cartoons next to everything else on the page. The day real footage
- * exists, it goes in `video` and plays instead of the drift.
+ * Each card plays real footage of the appliance at home — muted, looping, and
+ * only while it is on screen, like every clip in the app. The footage is
+ * stock (see `public/reels/CREDITS.md`) until this business shoots its own;
+ * swapping it is a file and a seed path. A card without a clip falls back to
+ * a photograph of the appliance in a room, drifting slowly in and across so
+ * it still reads as a shot. The drawn clips were tried here first and read
+ * as cartoons next to everything else on the page.
  *
  * The words are HTML over the picture, not burned into it: crisp at any size,
  * readable by a screen reader, and changed without re-rendering anything.
@@ -69,16 +70,11 @@ export function VideoRail({
               className="group relative block aspect-[9/16] overflow-hidden rounded-card bg-ink"
             >
               {item.video ? (
-                <video
-                  src={item.video}
-                  poster={item.photo}
-                  muted
-                  loop
-                  playsInline
-                  autoPlay
-                  preload="metadata"
-                  aria-hidden="true"
-                  className="absolute inset-0 size-full object-cover"
+                <ServiceClip
+                  video={item.video}
+                  still={item.photo}
+                  sizes="(min-width: 1024px) 190px, 42vw"
+                  className="absolute inset-0 size-full"
                 />
               ) : (
                 <Image
