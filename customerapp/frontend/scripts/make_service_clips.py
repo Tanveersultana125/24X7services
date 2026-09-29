@@ -8,6 +8,13 @@ reach the bundled font:
     (cd out && python -m http.server 3399)
     python scripts/make_service_clips.py            # all of them
     python scripts/make_service_clips.py ac-service # or just one, while tuning
+    python scripts/make_service_clips.py --portrait # the 9:16 reels for Home
+
+`--portrait` draws the same scenes on a tall 360x640 frame — the appliance
+up top, the instrument under it, the caption across the foot — and writes
+`<name>-reel.mp4` and a first-frame `<name>-reel.jpg` beside the wide ones.
+Home's clip row is a row of tall cards, and a wide clip cropped to one cuts
+off either the words or the machine.
 
 It needs two things that are deliberately not project dependencies — this
 runs when somebody changes a clip, not on every install:
@@ -59,7 +66,13 @@ ART_DIR = os.path.join(FRONTEND, 'public', 'appliances')
 OUT_DIR = os.path.join(FRONTEND, 'public', 'services')
 WORK = os.path.join(FRONTEND, '.clip-frames')
 
-W, H = 640, 360          # 16:9, plenty for a card that is never full width
+# Read before anything else is laid out: every position below depends on it.
+PORTRAIT = '--portrait' in sys.argv
+
+if PORTRAIT:
+    W, H = 360, 640      # 9:16, a reel card
+else:
+    W, H = 640, 360      # 16:9, plenty for a card that is never full width
 FPS = 25
 SECONDS = 4
 FRAMES = FPS * SECONDS
@@ -68,8 +81,26 @@ ROWS = 20                # frames per filmstrip, so no image is absurdly tall
 # Where the appliance sits in the frame, so an effect can aim at it rather than
 # at the middle of nowhere. Kept in frame pixels; the CSS below places the
 # drawing to match.
-ART_CX, ART_CY = 442.0, 158.0
-ART_RX, ART_RY = 152.0, 138.0
+if PORTRAIT:
+    ART_CX, ART_CY = 180.0, 222.0
+    ART_RX, ART_RY = 148.0, 134.0
+else:
+    ART_CX, ART_CY = 442.0, 158.0
+    ART_RX, ART_RY = 152.0, 138.0
+
+# Where the instruments go (the diagnostic panel, the gauge, the spirit level),
+# and the line the caption starts at, which nothing may be drawn across. Beside
+# the machine on a wide frame; under it on a tall one.
+if PORTRAIT:
+    PANEL = (85.0, 382.0, 190.0, 88.0)
+    GAUGE = (92.0, 432.0, 46.0)
+    LEVEL = (104.0, 396.0, 152.0, 32.0)
+    CAPTION_TOP = 486.0
+else:
+    PANEL = (40.0, 126.0, 190.0, 88.0)
+    GAUGE = (112.0, 164.0, 52.0)
+    LEVEL = (52.0, 182.0, 152.0, 32.0)
+    CAPTION_TOP = 272.0
 
 # The drawing's own accent, used for the one soft blob that tints the scene
 # towards the appliance being sold. The base gradient stays brand for all of
@@ -134,6 +165,16 @@ CLIPS = [
     ('microwave-installation', 'microwave', 'install',
      'Fitted and first heat', 'Placement · Power · Test'),
 ]
+
+
+# The caption's box. Across the whole foot of a tall frame; the left of a wide
+# one, clear of the machine.
+if PORTRAIT:
+    CAPTION_LEFT, CAPTION_BOTTOM, CAPTION_MAX, SCRIM = 24, 30, 'calc(100% - 48px)', 40
+else:
+    CAPTION_LEFT, CAPTION_BOTTOM, CAPTION_MAX, SCRIM = 32, 26, '62%', 52
+
+SUFFIX = '-reel' if PORTRAIT else ''
 
 
 # ---------------------------------------------------------------------------
@@ -354,8 +395,9 @@ def fx_wash(sc) -> str:
             'stroke-width="2.2" stroke-linecap="round" opacity="%.2f"/>'
             % (x - s, y, x + s, y, x, y - s, x, y + s, a))
 
-    band = ('<rect x="%.1f" y="-30" width="76" height="420" fill="url(#shine)" '
-            'opacity=".38" transform="skewX(-14)"/>' % (-120 + 900 * t))
+    band = ('<rect x="%.1f" y="-30" width="76" height="%d" fill="url(#shine)" '
+            'opacity=".38" transform="skewX(-14)"/>'
+            % (-120 - 0.25 * H + (W + 0.25 * H + 260) * t, H + 60))
     # A second, tighter pass that stays on the machine, so the clean reads as
     # something happening to the unit rather than a light crossing the room.
     wipe = sc.stuck(
@@ -371,7 +413,7 @@ def fx_repair(sc) -> str:
     calm = ease(min(1.0, t / 0.78))
     colour = '#d64545' if calm < 0.45 else ('#d9821b' if calm < 0.8 else '#0b9a63')
 
-    px, py, pw, ph = 40.0, 126.0, 190.0, 88.0
+    px, py, pw, ph = PANEL
     mid = py + ph / 2 + 10
     pts = []
     for i in range(34):
@@ -400,7 +442,7 @@ def fx_repair(sc) -> str:
 def fx_gas(sc) -> str:
     """A gauge filling, and charge travelling up the line into the unit."""
     t = sc.t
-    gx, gy, gr = 112.0, 164.0, 52.0
+    gx, gy, gr = GAUGE
     # The needle sweeps up and back — a triangle in `t`, so it returns cleanly.
     fill = 1 - abs(2 * t - 1)
     a0, a1 = math.radians(150), math.radians(390)
@@ -455,12 +497,15 @@ def fx_install(sc) -> str:
     t = sc.t
     a = 0.26 + 0.26 * abs(wave(t))
     guides = (
-        '<line x1="%.1f" y1="18" x2="%.1f" y2="330" stroke="#fff" stroke-width="1.5" '
-        'stroke-dasharray="7 9" stroke-dashoffset="%.1f" opacity="%.2f"/>'
-        '<line x1="%.1f" y1="%.1f" x2="628" y2="%.1f" stroke="#fff" '
+        '<line x1="%.1f" y1="18" x2="%.1f" y2="%.1f" stroke="#fff" '
         'stroke-width="1.5" stroke-dasharray="7 9" stroke-dashoffset="%.1f" '
         'opacity="%.2f"/>'
-        % (sc.cx, sc.cx, -32 * t, a, max(176.0, sc.bx - 90), sc.cy, sc.cy, 32 * t, a)
+        '<line x1="%.1f" y1="%.1f" x2="%.1f" y2="%.1f" stroke="#fff" '
+        'stroke-width="1.5" stroke-dasharray="7 9" stroke-dashoffset="%.1f" '
+        'opacity="%.2f"/>'
+        % (sc.cx, sc.cx, (LEVEL[1] - 12) if PORTRAIT else 330.0, -32 * t, a,
+           12.0 if PORTRAIT else max(176.0, sc.bx - 90), sc.cy, W - 12.0,
+           sc.cy, 32 * t, a)
     )
 
     # What the unit is being fixed to. A wall bracket over a washing machine
@@ -480,7 +525,7 @@ def fx_install(sc) -> str:
                         + nut(sc.bx1 - inset, hy, 12.0, -2 * t))
 
     # A spirit level that stops wandering as the clip runs on.
-    lx, ly, lw, lh = 52.0, 182.0, 152.0, 32.0
+    lx, ly, lw, lh = LEVEL
     off = (1 - ease(min(1.0, t / 0.85))) * 40 * wave(t * 3)
     bubble_x = lx + lw / 2 + max(-lw / 2 + 16, min(lw / 2 - 16, off))
     level = panel(lx, ly, lw, lh, (
@@ -503,7 +548,7 @@ def fx_uninstall(sc) -> str:
     w = sc.bw + 2 * pad
     # Stopped short of the caption. A packing box that runs under the words is
     # a line through them, not a box around the unit.
-    h = min(sc.bh + 2 * pad, 272.0 - y)
+    h = min(sc.bh + 2 * pad, CAPTION_TOP - y)
     peri = 2 * (w + h)
     ghost = ('<rect x="%.1f" y="%.1f" width="%.1f" height="%.1f" rx="16" fill="none" '
              'stroke="#fff" stroke-width="1.4" opacity=".18"/>' % (x, y, w, h))
@@ -519,7 +564,7 @@ def fx_uninstall(sc) -> str:
     if sc.wall:
         # The hoist it comes down on, breathing rather than travelling: a hook
         # that actually descended would have nowhere to be on the next loop.
-        hx = max(112.0, sc.bx - 120)
+        hx = max(28.0, sc.bx - 40) if PORTRAIT else max(112.0, sc.bx - 120)
         hook_y = 150.0 + 14 * (0.5 + 0.5 * wave(t))
         lift = ('<line x1="%.1f" y1="24" x2="%.1f" y2="%.1f" stroke="#fff" '
                 'stroke-width="2" opacity=".45"/>'
@@ -633,13 +678,14 @@ def strip_html(clip, art: str, start: int, count: int) -> str:
   .fx {{ position:absolute; inset:0; width:{W}px; height:{H}px }}
   /* The reason a caption stays readable over whatever the clip is doing. */
   .scrim {{
-    position:absolute; left:0; right:0; bottom:0; height:52%;
+    position:absolute; left:0; right:0; bottom:0; height:{SCRIM}%;
     background:linear-gradient(180deg,rgba(6,9,30,0) 0%,rgba(6,9,30,.55) 62%,rgba(6,9,30,.78) 100%);
   }}
-  .caption {{ position:absolute; left:32px; bottom:26px; max-width:62% }}
+  .caption {{ position:absolute; left:{CAPTION_LEFT}px; bottom:{CAPTION_BOTTOM}px; max-width:{CAPTION_MAX} }}
   .head {{
     color:#fff; font-size:27px; line-height:1.18; font-weight:800;
     letter-spacing:-.3px; text-shadow:0 2px 12px rgba(6,9,30,.5);
+    text-wrap:balance;
   }}
   .sub {{
     margin-top:7px; color:rgba(255,255,255,.78); font-size:14px; font-weight:600;
@@ -664,7 +710,7 @@ def main(argv) -> int:
               file=sys.stderr)
         return 1
 
-    wanted = set(argv[1:])
+    wanted = set(a for a in argv[1:] if not a.startswith('--'))
     clips = [c for c in CLIPS if not wanted or c[0] in wanted]
     unknown = wanted - {c[0] for c in CLIPS}
     if unknown:
@@ -708,7 +754,7 @@ def main(argv) -> int:
                     os.path.join(frames_dir, f'f{index:04d}.png'))
                 index += 1
 
-        mp4 = os.path.join(OUT_DIR, f'{name}.mp4')
+        mp4 = os.path.join(OUT_DIR, f'{name}{SUFFIX}.mp4')
         subprocess.run([
             FFMPEG, '-y', '-framerate', str(FPS),
             '-i', os.path.join(frames_dir, 'f%04d.png'),
@@ -722,8 +768,13 @@ def main(argv) -> int:
             '-movflags', '+faststart',
             mp4,
         ], check=True, capture_output=True)
-        print(f'{name}.mp4  {os.path.getsize(mp4) // 1024} KB  {index} frames',
-              flush=True)
+        if PORTRAIT:
+            # The reel's poster is its own first frame, so the still a card
+            # shows before the clip starts is exactly where the clip starts.
+            Image.open(os.path.join(frames_dir, 'f0000.png')).save(
+                os.path.join(OUT_DIR, f'{name}{SUFFIX}.jpg'), quality=82)
+        print(f'{name}{SUFFIX}.mp4  {os.path.getsize(mp4) // 1024} KB  '
+              f'{index} frames', flush=True)
 
     if os.path.exists(page):
         os.remove(page)

@@ -183,7 +183,7 @@ export function HomeScreen() {
   // and so on — so the first few cards are five different machines rather
   // than every job on the washing machine.
   const clipServices = interleave(
-    rows.map((row) => row.services.filter((service) => service.video))
+    rows.map((row) => row.services.filter((service) => service.reel))
   ).slice(0, MAX_CLIPS)
 
   return (
