@@ -20,13 +20,6 @@ import type { Bill, Confirmation, Diagnosis, FlowStep, Job, Notice, PartLine, Ph
 // out would otherwise drop everyone on the login screen.
 const KEY = 'technician.state.v2'
 
-/**
- * Sign-in is parked until the user asks for it: while false the app acts as
- * permanently signed in, /login bounces to Home, and Logout is hidden. The
- * login screen and its flows are all still here — set true to bring them back.
- */
-export const AUTH_ENABLED = false
-
 interface Persisted {
   signedIn: boolean
   online: boolean
@@ -59,8 +52,10 @@ function load(): Persisted {
       const saved = JSON.parse(raw) as Persisted
       // The demo day is rebuilt each morning so "today" never goes stale,
       // but who is signed in and how they set the app up carries over.
-      if (saved.seededOn === new Date().toDateString()) return saved
-      return { ...fresh(), signedIn: saved.signedIn, tech: saved.tech, settings: saved.settings }
+      // Every launch opens signed in, so the app never strands anyone on the
+      // login screen; Logout still ends the session until the next reload.
+      if (saved.seededOn === new Date().toDateString()) return { ...saved, signedIn: true }
+      return { ...fresh(), tech: saved.tech, settings: saved.settings }
     }
   } catch {
     /* storage unavailable — run from the seed */
@@ -161,7 +156,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const now = () => new Date().toISOString()
     return {
       ...state,
-      signedIn: AUTH_ENABLED ? state.signedIn : true,
       ready,
       signIn: () => setState((s) => ({ ...s, signedIn: true })),
       signOut: () => setState((s) => ({ ...s, signedIn: false })),

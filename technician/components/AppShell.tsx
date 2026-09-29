@@ -10,6 +10,7 @@ import {
   Headset,
   History,
   House,
+  LogOut,
   Map as MapIcon,
   Settings,
   Siren,
@@ -131,6 +132,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 /** Logo, technician, every destination and the availability switch. */
 function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
+  const router = useRouter()
   const store = useStore()
   const emergencies = store.jobs.filter((j) => j.status === 'request' && j.priority === 'emergency').length
   const unread = store.notices.filter((n) => !n.read).length
@@ -191,6 +193,19 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
           >
             <span className={cn('size-2.5 rounded-full', store.online ? 'bg-success animate-blink' : 'bg-faint')} />
             {store.online ? 'Online · receiving jobs' : 'Offline'}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              onNavigate?.()
+              store.setOnline(false)
+              store.signOut()
+              router.replace('/login')
+            }}
+            className="mt-2 flex h-11 w-full items-center gap-2.5 rounded-xl px-3 text-left text-sm font-bold text-danger hover:bg-danger-soft"
+          >
+            <LogOut className="size-[18px]" aria-hidden />
+            Logout
           </button>
         </div>
     </>
