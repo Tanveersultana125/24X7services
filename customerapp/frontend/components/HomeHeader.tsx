@@ -15,27 +15,27 @@ import { formatPhone } from "@/lib/format";
 /**
  * The top of Home: where the customer is, and what they are looking for.
  *
- * It paints nothing. On a phone it floats over the banner, which runs from the
- * very top of the screen up behind it, so the whole coloured block at the top
- * is one element rather than a bar with a card under it. That is the only
- * arrangement with no seam in it: give the header its own fill and the line
- * where that fill stops is visible the moment a banner is seeded in a shade
- * the header is not.
+ * Two pieces, both on solid white, the way every app of this kind does it.
+ * The location row sits in the page and scrolls away with it; the search field
+ * under it is sticky, so it rides up with the finger and then stays pinned at
+ * the top. Nothing animates and nothing waits for a scroll threshold — the
+ * header moves exactly as far as the page does, which is what makes it feel
+ * smooth, and because both pieces are opaque, the banner and the rails below
+ * pass underneath without a single word showing through.
  *
- * Which means it is only legible while the page is at the top, with the hero
- * behind it. The moment the page moves, `compact` folds it down to a white
- * bar holding only the search field: the location row slides away, and
- * nothing transparent is left to sit over the banner's own words as they
- * scroll up underneath. Search is the one thing worth keeping in reach; the
- * location and the account are a scroll back to the top away.
+ * It used to float, transparent, over the hero banner, and fold itself down
+ * once the page moved. Every scroll then ran the banner's headline up under
+ * the location and the search field for the length of the fold — text over
+ * text, on the most-seen screen in the app.
  *
- * Fixed rather than sticky, because sticky takes up its own row and would push
- * the banner down out from under it.
+ * A fragment rather than a wrapper: sticky only holds inside its parent, and
+ * the parent here is the shell's full-height column, so the search field stays
+ * pinned for the whole page rather than for the height of a wrapper.
  */
 export function HomeHeader({
   area,
   detail,
-  compact = false,
+  raised = false,
   onChangeLocation,
   onSearch,
 }: {
@@ -43,72 +43,59 @@ export function HomeHeader({
   area?: string;
   /** City and pincode, on the line under it. */
   detail?: string;
-  /** Set once the page has scrolled: just the search field, on white. */
-  compact?: boolean;
+  /** Set once the page has scrolled: a hairline and shadow under the search. */
+  raised?: boolean;
   onChangeLocation: () => void;
   onSearch: () => void;
 }) {
   return (
-    <div
-      className={cn(
-        "fixed inset-x-0 top-0 z-30 pt-[var(--safe-top)] lg:hidden",
-        "transition-[background-color,box-shadow] duration-[var(--duration-base)] ease-[var(--ease-out-soft)]",
-        // Over the artwork, a fade that is strongest at the very top and gone
-        // by the search field — enough to hold the white text on a light patch
-        // of somebody's banner, not enough to draw an edge anywhere.
-        compact
-          ? "bg-bg shadow-[0_1px_0_var(--color-border),0_6px_16px_-10px_rgb(23_21_15/0.25)]"
-          : "bg-linear-to-b from-ink/30 to-transparent",
-      )}
-    >
-      {/* The location row, folded to nothing rather than removed, so it
-          slides up instead of vanishing. Out of the tab order while folded. */}
+    <>
+      {/* The status bar's own strip, so the pinned search field never slides
+          under the clock. Zero tall on anything without a notch. */}
       <div
-        aria-hidden={compact || undefined}
-        inert={compact}
-        className={cn(
-          "grid transition-[grid-template-rows,opacity] duration-[var(--duration-base)] ease-[var(--ease-out-soft)]",
-          compact ? "grid-rows-[0fr] opacity-0" : "grid-rows-[1fr] opacity-100",
-        )}
-      >
-        <div className="min-h-0 overflow-hidden">
-          <div className="mx-auto flex max-w-lg items-start gap-2 px-4 pt-2">
-            <LocationSelector
-              className="min-w-0 flex-1"
-              area={area}
-              detail={detail}
-              onDark
-              onClick={onChangeLocation}
+        aria-hidden="true"
+        className="fixed inset-x-0 top-0 z-40 h-[var(--safe-top)] bg-bg lg:hidden"
+      />
+      <div className="bg-bg pt-[var(--safe-top)] lg:hidden">
+        <div className="mx-auto flex max-w-lg items-start gap-2 px-4 pt-2">
+          <LocationSelector
+            className="min-w-0 flex-1"
+            area={area}
+            detail={detail}
+            onClick={onChangeLocation}
+          />
+          <div className="flex shrink-0 gap-2">
+            {/* The wallet glyph every app of this shape puts in this corner,
+                opening the balance: credits we issued, plus whatever the
+                customer has added. Closed loop — it buys our own services and
+                nothing else — which is the condition on it being here at all. */}
+            <HeaderTile
+              href="/profile/wallet"
+              label="Balance"
+              icon={WalletMinimal}
             />
-            <div className="flex shrink-0 gap-2">
-              {/* The wallet glyph every app of this shape puts in this corner,
-              opening the balance: credits we issued, plus whatever the
-              customer has added. Closed loop — it buys our own services and
-              nothing else — which is the condition on it being here at all. */}
-              <HeaderTile
-                href="/profile/wallet"
-                label="Balance"
-                icon={WalletMinimal}
-              />
-              <HeaderTile
-                href="/profile/notifications"
-                label="Notifications"
-                icon={Bell}
-              />
-              <AccountTile />
-            </div>
+            <HeaderTile
+              href="/profile/notifications"
+              label="Notifications"
+              icon={Bell}
+            />
+            <AccountTile />
           </div>
         </div>
       </div>
       <div
         className={cn(
-          "mx-auto max-w-lg px-4 transition-[padding] duration-[var(--duration-base)] ease-[var(--ease-out-soft)]",
-          compact ? "pt-2 pb-2.5" : "pt-3 pb-4",
+          "sticky top-[var(--safe-top)] z-30 bg-bg lg:hidden",
+          "transition-shadow duration-[var(--duration-base)] ease-[var(--ease-out-soft)]",
+          raised &&
+            "shadow-[0_1px_0_var(--color-border),0_6px_16px_-10px_rgb(23_21_15/0.25)]",
         )}
       >
-        <SearchBar readOnly onDark={!compact} onOpen={onSearch} />
+        <div className="mx-auto max-w-lg px-4 pt-3 pb-3">
+          <SearchBar readOnly onOpen={onSearch} />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -188,16 +175,16 @@ function AccountTile() {
 }
 
 const PILL_CLASS =
-  "flex h-11 items-center gap-1.5 rounded-card bg-bg px-3 text-sm font-semibold text-brand hover:bg-brand-soft";
+  "flex h-11 items-center gap-1.5 rounded-card border border-border bg-bg px-3 text-sm font-semibold text-brand hover:bg-brand-soft";
 
 const TILE_CLASS =
-  "flex size-11 items-center justify-center rounded-card bg-bg text-brand hover:bg-brand-soft";
+  "flex size-11 items-center justify-center rounded-card border border-border bg-bg text-brand hover:bg-brand-soft";
 
 /**
  * One of the square buttons in the top right.
  *
- * A filled white tile rather than a bare icon: over a banner an outline-weight
- * glyph on its own reads as decoration, not as something to press. Two of them
+ * An outlined tile rather than a bare icon: an outline-weight glyph on its own
+ * reads as decoration, not as something to press. Two of them
  * and the Login button is the ceiling — the location has to keep enough width
  * to show an area name before it truncates.
  */
@@ -216,16 +203,3 @@ function HeaderTile({
     </Link>
   );
 }
-
-/**
- * The height the header occupies, as a Tailwind padding utility.
- *
- * The banner starts at the top of the screen and the header floats on it, so
- * the banner's own words have to begin below this or they end up underneath
- * the search field. Exported so the one number lives next to the markup that sets
- * it rather than being guessed at from the other side of the app.
- */
-export const HOME_HEADER_CLEARANCE = "pt-[calc(var(--safe-top)+8.5rem)]";
-
-/** The same height in pixels, for the scroll observer that flips `solid`. */
-export const HOME_HEADER_HEIGHT = 136;

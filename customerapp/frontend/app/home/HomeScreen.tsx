@@ -15,10 +15,7 @@ import type {
 } from '@app/shared'
 
 import { AppShell, Section } from '@/components/AppShell'
-import {
-  HomeHeader,
-  HOME_HEADER_CLEARANCE,
-} from '@/components/HomeHeader'
+import { HomeHeader } from '@/components/HomeHeader'
 import { SearchBar } from '@/components/SearchBar'
 import { PromotionalBanner, BannerCard } from '@/components/PromotionalBanner'
 import { CategoryGrid } from '@/components/CategoryGrid'
@@ -33,7 +30,11 @@ import { TrustPoints } from '@/components/TrustPoints'
 import { useLocation } from '@/lib/useLocation'
 import { Card } from '@/components/ui/Card'
 import { ErrorState } from '@/components/ErrorState'
-import { CategoryGridSkeleton, HomeSkeleton } from '@/components/SkeletonLoader'
+import {
+  CategoryGridSkeleton,
+  HomeSkeleton,
+  Skeleton,
+} from '@/components/SkeletonLoader'
 import { CartBar } from '@/components/CartBar'
 import { ServiceSheet, serviceOptions } from '@/components/ServiceSheet'
 import {
@@ -47,7 +48,6 @@ import {
 import { callFn } from '@/lib/callables'
 import { LOCATION_STALE_MS, locationLabel } from '@/lib/location'
 import { useAsync } from '@/lib/useAsync'
-import { cn } from '@/lib/cn'
 
 /**
  * Home.
@@ -114,9 +114,8 @@ export function HomeScreen() {
   // picking the problem first.
   const [sheetId, setSheetId] = useState<string | null>(null)
 
-  // The header floats on the hero only while the page is at the top. The
-  // moment it moves, the header folds down to a white bar with just the
-  // search field, so its text never lands on the banner's text.
+  // Once the page leaves the top, the pinned search field grows a shadow so
+  // it reads as sitting above what scrolls under it.
   const scrolled = useScrolled(SCROLL_THRESHOLD)
 
   useStaleLocationCheck(location, setLocation)
@@ -183,7 +182,7 @@ export function HomeScreen() {
     <AppShell
       mobileHeader={
         <HomeHeader
-          compact={scrolled}
+          raised={scrolled}
           area={location?.area}
           detail={
             location ? `${location.city} ${location.pincode}` : undefined
@@ -202,15 +201,14 @@ export function HomeScreen() {
         />
       </div>
 
-      {/* Always something here, on every path. The header floats on this and
-          is transparent until it scrolls past it, so a screen that reaches the
-          error state with nothing behind the header is white on white. */}
-      <div>
+      {/* The banner's own height while it loads, so the page does not jump
+          when it lands; nothing at all once there is genuinely no banner. */}
+      <div className="mt-1 lg:mt-0">
         {data && heroBanners.length > 0 ? (
           <PromotionalBanner banners={heroBanners} />
-        ) : (
-          <HeroBackdrop full={home.status === 'loading'} />
-        )}
+        ) : home.status === 'loading' ? (
+          <Skeleton className="h-52 rounded-card lg:hidden" />
+        ) : null}
       </div>
 
       {location && !location.serviceable ? (
@@ -366,34 +364,7 @@ export function HomeScreen() {
 
 // ---------------------------------------------------------------------------
 
-/**
- * What the header floats on when there is no banner to float on: while the
- * catalog is still arriving, when it failed, and when nobody has seeded a hero
- * banner at all.
- *
- * The offer paints the top of this screen itself — it starts at the status bar
- * and the header sits on its upper third — so on those three paths there is no
- * offer and therefore nothing behind the location and the search field. This
- * is that nothing, in the app's own colour.
- *
- * `full` matches the banner's height so the swap from loading to loaded does
- * not jump the page. Once the answer is in and there is genuinely no banner it
- * shrinks to just the height the header needs: a 350px empty blue block is not
- * a design, it is a hole.
- */
-function HeroBackdrop({ full }: { full: boolean }) {
-  return (
-    <div
-      aria-hidden="true"
-      className={cn(
-        '-mx-4 bg-brand-deep lg:hidden',
-        full ? 'h-[22rem]' : HOME_HEADER_CLEARANCE
-      )}
-    />
-  )
-}
-
-/** How far the page scrolls before the header folds to just the search bar. */
+/** How far the page scrolls before the search field grows its shadow. */
 const SCROLL_THRESHOLD = 8
 
 /**

@@ -5,7 +5,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { Route } from 'next'
 import type { Banner, BannerTone } from '@app/shared'
-import { HOME_HEADER_CLEARANCE } from '@/components/HomeHeader'
 import { cn } from '@/lib/cn'
 
 /**
@@ -18,17 +17,11 @@ import { cn } from '@/lib/cn'
  * back — a rail that keeps moving while someone is reading it is worse than one
  * that never moved.
  *
- * One at a time. On a phone it runs edge to edge with square corners and
- * starts at the very top of the screen, with the header floating over its
- * upper third — so the whole coloured block at the top of Home is painted by
- * this one element and there is no seam anywhere in it. That is the shape
- * every app of this kind uses, and the reason they all use it is that the
- * alternatives show their joins: an offer inset as a card wears its margin
- * more loudly than its message, and an offer butted up under a coloured header
- * draws a line across the screen exactly where the two colours stop agreeing.
- *
- * From a laptop's width up it goes back to being an ordinary card, because a
- * banner stretched across a desktop window is not a banner, it is a stripe.
+ * One at a time, as a rounded card inset under the header on every screen
+ * size. It used to run edge to edge from the very top of the phone with the
+ * header floating over its upper third, which put the header's words over the
+ * banner's words the moment the page moved. Under a solid header it cannot:
+ * the two never share a pixel.
  *
  * The dots stay inside the artwork rather than under it: below it they push
  * everything down by the height of their own tap targets, and that gap reads
@@ -137,14 +130,14 @@ export function PromotionalBanner({
     <section
       aria-roledescription="carousel"
       aria-label="Offers and announcements"
-      className={cn('relative -mx-4 lg:mx-0', className)}
+      className={cn('relative', className)}
       onPointerDown={stopAutoplay}
       onKeyDown={stopAutoplay}
       onFocus={stopAutoplay}
     >
       <div
         ref={railRef}
-        className="no-scrollbar -my-1 flex snap-x snap-mandatory overflow-x-auto scroll-smooth py-1 lg:gap-3"
+        className="no-scrollbar -my-1 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth py-1"
       >
         {banners.map((banner, index) => (
           <article
@@ -153,30 +146,14 @@ export function PromotionalBanner({
             aria-label={`${index + 1} of ${banners.length}`}
             className="w-full shrink-0 snap-start"
           >
-            <BannerCard
-              banner={banner}
-              priority={index === 0}
-              className={cn(
-                'rounded-none lg:rounded-card',
-                // Room at the top for the header that floats on this.
-                HOME_HEADER_CLEARANCE,
-                'min-h-[22rem] lg:min-h-56 lg:pt-5'
-              )}
-            />
+            <BannerCard banner={banner} priority={index === 0} />
           </article>
         ))}
         {looping && banners[0] ? (
           // The copy of the first slide. Hidden from assistive tech and out of
           // the tab order: it is there for the motion, not as a fourth offer.
           <article aria-hidden="true" inert className="w-full shrink-0 snap-start">
-            <BannerCard
-              banner={banners[0]}
-              className={cn(
-                'rounded-none lg:rounded-card',
-                HOME_HEADER_CLEARANCE,
-                'min-h-[22rem] lg:min-h-56 lg:pt-5'
-              )}
-            />
+            <BannerCard banner={banners[0]} />
           </article>
         ) : null}
       </div>
