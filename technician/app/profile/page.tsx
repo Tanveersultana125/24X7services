@@ -9,7 +9,7 @@ import { ApplianceGlyph } from '@/components/glyphs'
 import { Avatar, Card, Page, ScreenHeader, SectionTitle, Toggle } from '@/components/ui'
 import { APPLIANCES, APPLIANCE_LABEL, BRAND_LABEL } from '@/lib/catalog'
 import { cn } from '@/lib/cn'
-import { useStore } from '@/lib/store'
+import { AUTH_ENABLED, useStore } from '@/lib/store'
 
 export default function ProfilePage() {
   const { tech, online, setOnline, updateTech, jobs, signOut } = useStore()
@@ -155,6 +155,7 @@ export default function ProfilePage() {
           ))}
         </Card>
 
+        {AUTH_ENABLED && (
         <button
           type="button"
           onClick={() => {
@@ -166,6 +167,7 @@ export default function ProfilePage() {
         >
           <LogOut className="size-5" /> Logout
         </button>
+        )}
       </Page>
     </>
   )

@@ -20,6 +20,13 @@ import type { Bill, Confirmation, Diagnosis, FlowStep, Job, Notice, PartLine, Ph
 // out would otherwise drop everyone on the login screen.
 const KEY = 'technician.state.v2'
 
+/**
+ * Sign-in is parked until the user asks for it: while false the app acts as
+ * permanently signed in, /login bounces to Home, and Logout is hidden. The
+ * login screen and its flows are all still here — set true to bring them back.
+ */
+export const AUTH_ENABLED = false
+
 interface Persisted {
   signedIn: boolean
   online: boolean
@@ -154,6 +161,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const now = () => new Date().toISOString()
     return {
       ...state,
+      signedIn: AUTH_ENABLED ? state.signedIn : true,
       ready,
       signIn: () => setState((s) => ({ ...s, signedIn: true })),
       signOut: () => setState((s) => ({ ...s, signedIn: false })),
