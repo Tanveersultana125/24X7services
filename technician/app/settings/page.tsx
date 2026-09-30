@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Bell, CircleCheck, ChevronRight, Clock, Download, Headset, KeyRound, Languages, Landmark, LogOut, Power, QrCode as QrIcon, Radar, RotateCcw, Share2, Smartphone, UserRound } from 'lucide-react'
+import { Bell, CircleCheck, ChevronRight, Clock, Download, Headset, KeyRound, Languages, Landmark, LogOut, Power, QrCode as QrIcon, Radar, RotateCcw, Share2, Siren, Smartphone, UserRound, Volume2 } from 'lucide-react'
 import { TimeField } from '@/components/TimeField'
 import { QrCode, downloadQr, upiLink } from '@/components/UpiQr'
 import { Avatar, Button, Card, Field, Page, ScreenHeader, SectionTitle, Segmented, Sheet, Toggle, inputClass } from '@/components/ui'
@@ -16,6 +16,15 @@ import { useStore, useTick } from '@/lib/store'
 import type { Settings } from '@/lib/types'
 
 type SheetName = 'payment' | 'scanner' | 'account' | 'password' | 'devices' | 'logout'
+
+/** Each switch says in its own row what it is doing right now. */
+const NOTIFY_ROWS: { key: keyof Settings['notify']; title: string; on: string; off: string }[] = [
+  { key: 'requests', title: 'New service requests', on: 'Pop-up for each new job in your shift', off: 'New jobs wait quietly in Jobs' },
+  { key: 'emergency', title: 'Emergency requests', on: 'Full-screen alert, even off shift', off: 'Emergencies wait quietly in Jobs' },
+  { key: 'schedule', title: 'Schedule changes & cancellations', on: 'Notified when a job moves or is cancelled', off: 'No schedule notifications' },
+  { key: 'payments', title: 'Payments & ratings', on: 'Notified for every payment and rating', off: 'No payment or rating notifications' },
+  { key: 'sound', title: 'Alert sound', on: 'A chime plays with every alert', off: 'Alerts arrive silently' },
+]
 
 const NOTIFY_LABEL: Record<keyof Settings['notify'], string> = {
   requests: 'New request alerts',
@@ -34,7 +43,7 @@ export default function SettingsPage() {
   const [sheet, setSheet] = useState<null | SheetName>(null)
   const [toast, setToast] = useState<string | null>(null)
   const notify = (k: keyof Settings['notify'], v: boolean) => {
-    updateSettings({ notify: { ...s.notify, [k]: v } })
+    updateSettings((cur) => ({ notify: { ...cur.notify, [k]: v } }))
     if (k === 'sound' && v) chime()
     flash(`${NOTIFY_LABEL[k]} ${v ? 'on' : 'off'}`)
   }
@@ -130,21 +139,11 @@ export default function SettingsPage() {
             <section>
               <SectionTitle>{t('Notifications')}</SectionTitle>
               <Card className="divide-y divide-line">
-                <Line icon={<Bell className="size-4" />} title={t('New service requests')}>
-                  <Toggle checked={s.notify.requests} onChange={(v) => notify('requests', v)} label="New requests" />
-                </Line>
-                <Line icon={<Bell className="size-4" />} title={t('Emergency requests')} sub={t('Full-screen alert with sound')}>
-                  <Toggle checked={s.notify.emergency} onChange={(v) => notify('emergency', v)} label="Emergency" />
-                </Line>
-                <Line icon={<Bell className="size-4" />} title={t('Schedule changes & cancellations')}>
-                  <Toggle checked={s.notify.schedule} onChange={(v) => notify('schedule', v)} label="Schedule" />
-                </Line>
-                <Line icon={<Bell className="size-4" />} title={t('Payments & ratings')}>
-                  <Toggle checked={s.notify.payments} onChange={(v) => notify('payments', v)} label="Payments" />
-                </Line>
-                <Line icon={<Bell className="size-4" />} title={t('Alert sound')}>
-                  <Toggle checked={s.notify.sound} onChange={(v) => notify('sound', v)} label="Sound" />
-                </Line>
+                {NOTIFY_ROWS.map((r) => (
+                  <NotifyLine key={r.key} icon={r.key === 'sound' ? <Volume2 className="size-4" /> : r.key === 'emergency' ? <Siren className="size-4" /> : <Bell className="size-4" />} title={t(r.title)} on={s.notify[r.key]} onText={t(r.on)} offText={t(r.off)}>
+                    <Toggle checked={s.notify[r.key]} onChange={(v) => notify(r.key, v)} label={r.title} />
+                  </NotifyLine>
+                ))}
               </Card>
             </section>
 
@@ -436,6 +435,22 @@ function PasswordSheet({ open, onClose, onSave }: { open: boolean; onClose: () =
         </Button>
       </div>
     </Sheet>
+  )
+}
+
+function NotifyLine({ icon, title, on, onText, offText, children }: { icon: React.ReactNode; title: string; on: boolean; onText: string; offText: string; children: React.ReactNode }) {
+  const t = useT()
+  return (
+    <div className="flex items-center gap-3 p-4">
+      <span className={cn('grid size-9 shrink-0 place-items-center rounded-lg transition-colors', on ? 'bg-brand-soft text-brand' : 'bg-canvas text-faint')}>{icon}</span>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-extrabold">{title}</p>
+        <p className="mt-0.5 text-xs font-medium text-muted">
+          <span className={cn('font-extrabold', on ? 'text-success' : 'text-faint')}>{on ? `● ${t('On')}` : `○ ${t('Off')}`}</span> · {on ? onText : offText}
+        </p>
+      </div>
+      {children}
+    </div>
   )
 }
 

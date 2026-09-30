@@ -99,7 +99,8 @@ interface Store extends Persisted {
   markRead: (noticeId: string) => void
   markAllRead: () => void
   updateTech: (patch: Partial<Technician>) => void
-  updateSettings: (patch: Partial<Settings>) => void
+  /** A patch, or a function of the latest settings when it builds on them. */
+  updateSettings: (patch: Partial<Settings> | ((s: Settings) => Partial<Settings>)) => void
   resetDemo: () => void
 }
 
@@ -229,7 +230,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setState((s) => ({ ...s, notices: s.notices.map((n) => (n.id === nid ? { ...n, read: true } : n)) })),
       markAllRead: () => setState((s) => ({ ...s, notices: s.notices.map((n) => ({ ...n, read: true })) })),
       updateTech: (patch) => setState((s) => ({ ...s, tech: { ...s.tech, ...patch } })),
-      updateSettings: (patch) => setState((s) => ({ ...s, settings: { ...s.settings, ...patch } })),
+      updateSettings: (patch) =>
+        setState((s) => ({ ...s, settings: { ...s.settings, ...(typeof patch === 'function' ? patch(s.settings) : patch) } })),
       resetDemo: () => setState({ ...fresh(), signedIn: true }),
     }
   }, [state, ready, patchJob, notify])
