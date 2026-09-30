@@ -23,6 +23,7 @@ import { AppShell, Section } from '@/components/AppShell'
 import { Header } from '@/components/Header'
 import { CartButton } from '@/components/CartButton'
 import { ServiceRow } from '@/components/ServiceRow'
+import { ReviewsSheet } from '@/components/ReviewsSheet'
 import { OfferBanner } from '@/components/OfferBanner'
 import { AddButton, durationNote } from '@/components/ServiceRail'
 import { ServiceReviews } from '@/components/ServiceReviews'
@@ -272,6 +273,13 @@ export function ApplianceScreen() {
     plans.find((each) => each.applianceIds.length === 1) ?? plans[0] ?? null
 
   const earliest = useEarliestSlot()
+  const [reviewsOpen, setReviewsOpen] = useState(false)
+  const reviewNames = new Map(
+    services.map((service) => [
+      service.serviceKey,
+      tileLabels.get(service.id) ?? service.name,
+    ])
+  )
   const warrantyFor = (service: CatalogService): number =>
     service.warrantyDays ?? data.data?.config?.defaultWarrantyDays ?? 0
   const cart = useCart()
@@ -453,11 +461,14 @@ export function ApplianceScreen() {
                 </h1>
 
                 {/* The score of every service here, weighted by how many people
-                    gave one, as on the All services tile. It links to the reviews
-                    it summarises, the way a dotted underline promises. */}
+                    gave one, as on the All services tile. It opens the reviews
+                    it summarises in a panel, the way a dotted underline
+                    promises. */}
                 {score?.rating !== undefined && score.reviewCount !== undefined ? (
-                  <a
-                    href="#reviews"
+                  <button
+                    type="button"
+                    onClick={() => setReviewsOpen(true)}
+                    aria-haspopup="dialog"
                     className="mt-1.5 inline-flex items-center gap-1.5 text-sm text-ink underline decoration-muted decoration-dotted underline-offset-4"
                   >
                     <Star
@@ -466,7 +477,7 @@ export function ApplianceScreen() {
                     />
                     <span className="font-semibold">{score.rating.toFixed(2)}</span>
                     <span>({countNote(score.reviewCount)} reviews)</span>
-                  </a>
+                  </button>
                 ) : null}
               </div>
               <EarliestSlot label={earliest} className="mt-1" />
@@ -830,6 +841,15 @@ export function ApplianceScreen() {
         onClose={() => setSheetId(null)}
       />
       <CartBar services={services} />
+      <ReviewsSheet
+        open={reviewsOpen}
+        onClose={() => setReviewsOpen(false)}
+        title={`${appliance?.name ?? 'Service'} reviews`}
+        rating={score?.rating}
+        ratingCount={score?.reviewCount}
+        reviews={data.data?.reviews ?? []}
+        serviceNames={reviewNames}
+      />
     </AppShell>
   )
 }
