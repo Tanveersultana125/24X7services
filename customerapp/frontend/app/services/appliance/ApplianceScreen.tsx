@@ -89,10 +89,38 @@ interface ApplianceData {
 /**
  * How far down a jump from the service row has to stop.
  *
- * The mobile header and the row itself are both stuck to the top, so a browser
- * left to itself parks the heading underneath them. These are their heights.
+ * The mobile header is stuck to the top, so a browser left to itself parks the
+ * heading underneath it. This is its height and a little air.
  */
-const JUMP_OFFSET = 'scroll-mt-[calc(7.75rem+var(--safe-top))] lg:scroll-mt-[8.5rem]'
+const JUMP_OFFSET = 'scroll-mt-[calc(4.5rem+var(--safe-top))] lg:scroll-mt-20'
+
+/**
+ * What each picture in the service row is called: the service's name without
+ * the words every service here starts with.
+ *
+ * Under an 88px picture "Washing Machine Installation" is three lines of which
+ * the first two say what the page's own heading already says. The shared words
+ * are found rather than listed, because the catalog calls the appliance "Air
+ * Conditioner" and its services "AC …" — no appliance name would strip them.
+ */
+function shortLabels(services: readonly CatalogService[]): Map<string, string> {
+  const words = services.map((service) => service.name.split(' '))
+  let shared = 0
+  while (
+    words.length > 1 &&
+    words.every(
+      (w) => w.length > shared + 1 && w[shared] === words[0]?.[shared]
+    )
+  ) {
+    shared += 1
+  }
+  return new Map(
+    services.map((service, index) => [
+      service.id,
+      (words[index] ?? []).slice(shared).join(' ') || service.name,
+    ])
+  )
+}
 
 export function ApplianceScreen() {
   const router = useRouter()
@@ -144,6 +172,7 @@ export function ApplianceScreen() {
   const serviceNames = new Map(
     services.map((service) => [service.serviceKey, service.name])
   )
+  const tileLabels = shortLabels(services)
   const cart = useCart()
 
   // The service whose options sheet is open — a repair, where "Add" means
@@ -344,25 +373,45 @@ export function ApplianceScreen() {
             ) : null}
           </section>
 
-          {/* The jump row. Worth its space once there are enough services that
-              the last one is off the bottom of the screen; below that it is a
-              table of contents for a list you can already see. */}
-          {services.length >= 3 ? (
+          {/* The jump row, as pictures: each service's photograph with what
+              it is under it, the way the big marketplaces open an appliance.
+              A row of names in pills said the same thing, but a customer
+              scanning for "the one where they clean it" finds a picture of
+              somebody cleaning it faster than the word. Worth its space from
+              two services up; one is already the list. */}
+          {services.length >= 2 ? (
             <nav
               aria-label="Services on this appliance"
-              className="sticky top-[calc(3.5rem+var(--safe-top))] z-20 -mx-4 mt-6 border-b border-border bg-bg px-4 py-2 lg:top-16 lg:mx-0 lg:px-0"
+              className="-mx-4 mt-6 border-y border-border px-4 py-5 lg:mx-0 lg:rounded-card lg:border-x"
             >
-              <ul className="no-scrollbar -my-1 flex gap-2 overflow-x-auto py-1">
-                {services.map((service) => (
-                  <li key={service.id}>
-                    <a
-                      href={`#service-${service.id}`}
-                      className="inline-flex min-h-11 items-center rounded-pill border border-border bg-bg px-4 text-sm font-medium whitespace-nowrap text-ink transition-colors duration-[var(--duration-fast)] hover:border-brand"
-                    >
-                      {service.name}
-                    </a>
-                  </li>
-                ))}
+              <ul className="no-scrollbar -my-1 grid auto-cols-[5.5rem] grid-flow-col gap-3 overflow-x-auto py-1 sm:auto-cols-[6.5rem]">
+                {services.map((service) => {
+                  const picture =
+                    service.photo ?? service.poster ?? appliance.image
+                  return (
+                    <li key={service.id}>
+                      <a
+                        href={`#service-${service.id}`}
+                        className="group block touch-manipulation"
+                      >
+                        <span className="relative block aspect-square overflow-hidden rounded-card bg-plate transition-transform duration-[var(--duration-fast)] group-active:scale-[0.97]">
+                          {picture ? (
+                            <Image
+                              src={picture}
+                              alt=""
+                              fill
+                              sizes="(min-width: 640px) 104px, 88px"
+                              className="object-cover"
+                            />
+                          ) : null}
+                        </span>
+                        <span className="mt-2 line-clamp-2 block text-center text-xs leading-snug text-ink group-hover:text-brand">
+                          {tileLabels.get(service.id) ?? service.name}
+                        </span>
+                      </a>
+                    </li>
+                  )
+                })}
               </ul>
             </nav>
           ) : null}

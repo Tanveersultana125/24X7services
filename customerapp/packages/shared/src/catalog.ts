@@ -351,6 +351,12 @@ export const bannerSchema = z.object({
   subtitle: z.string().optional(),
   /** A subject on a transparent ground — never a full-bleed background. */
   image: z.string().optional(),
+  /**
+   * A photograph of a technician at work, 16:9, with clear ground on its left
+   * for the words. When set it fills the card and the tone and `image` go
+   * unused — the card is the photograph, the way the big marketplaces do it.
+   */
+  photo: z.string().optional(),
   /** A small pill in the corner of the card: "New", "Trending". */
   badge: z.string().optional(),
   slot: bannerSlotSchema.default('hero'),

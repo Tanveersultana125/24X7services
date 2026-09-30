@@ -248,7 +248,14 @@ export function BannerCard({
   priority?: boolean
   className?: string
 }) {
-  const body = (
+  const body = banner.photo ? (
+    <PhotoBody
+      banner={banner}
+      photo={banner.photo}
+      priority={priority}
+      className={className}
+    />
+  ) : (
     <div
       className={cn(
         'flex h-full min-h-52 gap-5 overflow-hidden rounded-card bg-linear-to-br p-5 text-white sm:min-h-56',
@@ -303,5 +310,82 @@ export function BannerCard({
     </Link>
   ) : (
     body
+  )
+}
+
+/**
+ * A banner that is a photograph: the words on the left, a technician at work
+ * on the right.
+ *
+ * Two columns again, for the reason `BannerCard` gives. Laid full-bleed behind
+ * the words, the photograph's subject landed wherever `object-cover` put it,
+ * and on a phone-shaped card that was under the headline — a face with a
+ * sentence across it. Confined to the right-hand column it is cropped to the
+ * technician and cannot reach the text. The column's inner edge fades into the
+ * card, so the photograph reads as the room the card is in rather than a
+ * picture pasted beside it.
+ *
+ * `plate` and `night` rather than `bg` and `ink`: the photograph is a light
+ * room in either theme, so the card stays light and its words stay dark.
+ */
+function PhotoBody({
+  banner,
+  photo,
+  priority,
+  className,
+}: {
+  banner: Banner
+  photo: string
+  priority: boolean
+  className?: string
+}) {
+  return (
+    <div
+      className={cn(
+        'relative flex h-full min-h-52 overflow-hidden rounded-card bg-plate p-5 sm:min-h-56',
+        className
+      )}
+    >
+      <div className="absolute inset-y-0 right-0 w-[46%]">
+        <Image
+          src={photo}
+          alt=""
+          fill
+          sizes="(min-width: 1024px) 340px, 46vw"
+          priority={priority}
+          // The technician stands a little right of centre in every one of
+          // these shots, with the appliance beyond them.
+          className="object-cover object-[68%_center]"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-y-0 left-0 w-1/4 bg-linear-to-r from-plate to-transparent"
+        />
+      </div>
+
+      <div className="relative flex w-[54%] min-w-0 flex-col justify-between gap-4 pr-2">
+        <div>
+          {banner.badge ? (
+            <span className="mb-2.5 inline-flex items-center rounded-pill bg-royal px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] uppercase text-white">
+              {banner.badge}
+            </span>
+          ) : null}
+          <h3 className="text-xl font-bold leading-snug text-night">
+            {banner.title}
+          </h3>
+          {banner.subtitle ? (
+            <p className="mt-1.5 line-clamp-3 text-sm text-night/70">
+              {banner.subtitle}
+            </p>
+          ) : null}
+        </div>
+
+        {banner.ctaLabel ? (
+          <span className="inline-flex w-fit items-center rounded-pill bg-royal px-4 py-2 text-sm font-semibold text-white">
+            {banner.ctaLabel}
+          </span>
+        ) : null}
+      </div>
+    </div>
   )
 }

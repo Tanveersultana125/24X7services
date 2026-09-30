@@ -96,11 +96,15 @@ export function ServicesScreen() {
                   key={appliance.id}
                   appliance={appliance}
                   serviceCount={countFor(appliance.id)}
-                  // One tile moves, and it is the first. Five clips in a grid
-                  // is a page that twitches; the rest are frames of their own.
-                  motion={index === 0}
-                  video={summary?.video}
-                  poster={summary?.poster}
+                  // The photograph of a technician on this appliance, when
+                  // there is one, and then nothing moves: a grid of people at
+                  // work reads as the service, where a drawing reads as a
+                  // diagram of it. The clip is the fallback for an appliance
+                  // nobody has photographed, and only the first tile plays —
+                  // five clips in a grid is a page that twitches.
+                  motion={!appliance.heroImage && index === 0}
+                  video={appliance.heroImage ? undefined : summary?.video}
+                  poster={appliance.heroImage ?? summary?.poster}
                   rating={summary?.rating}
                   reviewCount={summary?.reviewCount}
                   // The tiles on screen before any scrolling.
