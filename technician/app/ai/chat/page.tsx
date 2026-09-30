@@ -90,7 +90,11 @@ function AiChat() {
   const [text, setText] = useState('')
   const [thinking, setThinking] = useState(false)
   const [savedNotes, setSavedNotes] = useState<Set<string>>(new Set())
-  const endRef = useRef<HTMLDivElement>(null)
+  const dockRef = useRef<HTMLDivElement>(null)
+  // Room to leave under the last message: everything from the top of the
+  // pinned composer to the bottom of the screen, bottom nav included. Measured,
+  // because the chips and hint wrap differently on every phone width.
+  const [dockSpace, setDockSpace] = useState(240)
   const fileRef = useRef<HTMLInputElement>(null)
 
   const push = (msgs: AiMessage[], title?: string) =>
@@ -184,8 +188,22 @@ function AiChat() {
   }
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-  }, [thread.messages.length, thinking])
+    const el = dockRef.current
+    if (!el) return
+    const measure = () => setDockSpace(Math.max(0, window.innerHeight - el.getBoundingClientRect().top))
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    window.addEventListener('resize', measure)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', measure)
+    }
+  }, [])
+
+  useEffect(() => {
+    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' })
+  }, [thread.messages.length, thinking, dockSpace])
 
   return (
     <>
@@ -214,7 +232,7 @@ function AiChat() {
         </div>
       </div>
 
-      <main className="mx-auto w-full max-w-3xl px-4 pb-[calc(12rem+var(--safe-bottom))] pt-4 lg:pb-44">
+      <main className="mx-auto w-full max-w-3xl px-4 pt-4" style={{ paddingBottom: dockSpace + 16 }}>
         <ol className="space-y-4">
           {thread.messages.map((m) =>
             m.role === 'ai' ? (
@@ -265,11 +283,10 @@ function AiChat() {
             </li>
           )}
         </ol>
-        <div ref={endRef} className="scroll-mb-52 lg:scroll-mb-44" />
       </main>
 
       {/* Quick actions + composer, pinned above the bottom nav. */}
-      <div className="fixed inset-x-0 bottom-[calc(64px+var(--safe-bottom))] z-30 border-t border-line bg-card/95 backdrop-blur lg:bottom-0 lg:left-64">
+      <div ref={dockRef} className="fixed inset-x-0 bottom-[calc(64px+var(--safe-bottom))] z-30 border-t border-line bg-card/95 backdrop-blur lg:bottom-0 lg:left-64">
         <div className="mx-auto max-w-3xl">
           <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 pb-1 pt-2.5">
             {QUICK.map((q) => (
@@ -317,8 +334,8 @@ function AiChat() {
                   }
                 }}
                 rows={1}
-                placeholder={ctx.appliance ? 'Ask about causes, codes…' : 'Which appliance and what’s wrong?'}
-                className="block max-h-32 min-h-11 w-full resize-none rounded-xl border border-line-strong bg-card px-3.5 py-2.5 pr-9 text-[15px] focus:border-brand"
+                placeholder={ctx.appliance ? 'Ask a question…' : 'Appliance and problem…'}
+                className="no-scrollbar block max-h-32 min-h-11 w-full resize-none rounded-xl border border-line-strong bg-card px-3.5 py-2.5 pr-9 text-[15px] focus:border-brand"
               />
               {text && (
                 <button type="button" onClick={() => setText('')} aria-label="Clear" className="absolute right-2 top-2.5 grid size-6 place-items-center rounded-full text-faint hover:text-ink">
@@ -330,7 +347,7 @@ function AiChat() {
               <ArrowUp className="size-5" />
             </button>
           </form>
-          <p className="px-4 pb-2 text-center text-[10.5px] font-medium text-faint">AI suggestions are guidance — confirm with your own checks and the model’s service manual.</p>
+          <p className="px-4 pb-2 text-center text-[10.5px] font-medium text-faint">AI guidance — confirm with your own checks.</p>
         </div>
       </div>
     </>
