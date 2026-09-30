@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { Bell, CircleCheck, ChevronRight, Clock, Download, Headset, KeyRound, Languages, Landmark, LogOut, Power, QrCode as QrIcon, Radar, RotateCcw, Share2, Smartphone, UserRound } from 'lucide-react'
 import { TimeField } from '@/components/TimeField'
 import { QrCode, downloadQr, upiLink } from '@/components/UpiQr'
-import { Button, Card, Field, Page, ScreenHeader, SectionTitle, Segmented, Sheet, Toggle, inputClass } from '@/components/ui'
+import { Avatar, Button, Card, Field, Page, ScreenHeader, SectionTitle, Segmented, Sheet, Toggle, inputClass } from '@/components/ui'
 import { chime } from '@/lib/chime'
 import { cn } from '@/lib/cn'
 import { ago } from '@/lib/format'
@@ -313,32 +313,43 @@ function ScannerSheet({ open, onClose, onEdit, flash }: { open: boolean; onClose
 
   return (
     <Sheet open={open} onClose={onClose} title="My payment scanner">
-      <div className="mx-auto max-w-xs overflow-hidden rounded-2xl border border-line bg-card shadow-card">
-        <div className="bg-brand-ink px-5 py-4 text-center text-white">
-          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/60">Scan &amp; pay with any UPI app</p>
-          <p className="mt-1 text-lg font-extrabold tracking-tight">{tech.name}</p>
-          <p className="num text-xs font-semibold text-white/70">24X7 Technician · {tech.id}</p>
+      <div className="mx-auto max-w-sm overflow-hidden rounded-2xl border border-line bg-card">
+        <div className="flex items-center gap-3 bg-brand-ink px-4 py-3 text-white">
+          <Avatar name={tech.name} photo={tech.photo} size={36} className="ring-2 ring-white/20" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[15px] font-extrabold leading-tight">{tech.name}</p>
+            <p className="num truncate text-[11px] font-semibold text-white/60">Technician ID · {tech.id}</p>
+          </div>
+          <span className="rounded-md bg-white/10 px-2 py-1 text-[10px] font-extrabold tracking-[0.14em]">UPI</span>
         </div>
-        <div className="p-5">
-          <QrCode text={link} className="mx-auto aspect-square w-full max-w-[240px]" label={`UPI QR for ${settings.upi}`} />
-          <p className="num mt-3 text-center text-sm font-extrabold">{settings.upi}</p>
-          <p className="mt-1 text-center text-[11px] font-semibold text-muted">GPay · PhonePe · Paytm · BHIM</p>
+
+        <div className="px-6 pb-3 pt-5">
+          <QrCode text={link} className="mx-auto aspect-square w-full max-w-[216px]" label={`UPI QR for ${settings.upi}`} />
+          <p className="mt-3 text-center text-[11px] font-semibold text-muted">Scan with GPay, PhonePe, Paytm or any UPI app</p>
+        </div>
+
+        <div className="flex items-center gap-3 border-t border-line px-4 py-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10.5px] font-bold uppercase tracking-wider text-faint">UPI ID</p>
+            <p className="num truncate text-sm font-extrabold">{settings.upi}</p>
+          </div>
+          <button type="button" onClick={onEdit} className="h-9 shrink-0 rounded-lg px-3 text-sm font-bold text-brand hover:bg-brand-soft">
+            Change
+          </button>
         </div>
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-2.5">
+      <div className="mx-auto mt-4 grid max-w-sm grid-cols-2 gap-2.5">
         <Button
           variant="secondary"
-          size="lg"
           onClick={async () => {
             await downloadQr(link, file)
             flash('Scanner saved as PNG')
           }}
         >
-          <Download className="size-5" /> Download
+          <Download className="size-4" /> Download
         </Button>
         <Button
-          size="lg"
           onClick={async () => {
             try {
               if (navigator.share) {
@@ -352,12 +363,9 @@ function ScannerSheet({ open, onClose, onEdit, flash }: { open: boolean; onClose
             }
           }}
         >
-          <Share2 className="size-5" /> Share
+          <Share2 className="size-4" /> Share
         </Button>
       </div>
-      <button type="button" onClick={onEdit} className="mt-3 w-full py-2 text-center text-sm font-bold text-brand">
-        Change UPI ID
-      </button>
     </Sheet>
   )
 }
