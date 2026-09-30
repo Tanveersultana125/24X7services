@@ -134,6 +134,15 @@ export interface Notice {
   jobId?: string
 }
 
+export interface Review {
+  id: string
+  name: string
+  rating: number
+  at: string
+  text: string
+  appliance: string
+}
+
 export interface Technician {
   name: string
   id: string
@@ -145,15 +154,28 @@ export interface Technician {
   experienceYears: number
   rating: number
   ratingCount: number
+  /** Lifetime count of 5★, 4★, 3★, 2★, 1★ ratings — sums to ratingCount. */
+  ratingBreakdown: [number, number, number, number, number]
   completedJobs: number
   joined: string
   brands: Brand[]
   appliances: string[]
 }
 
+export type DayKey = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun'
+
+export interface DayHours {
+  on: boolean
+  start: string
+  end: string
+}
+
 export interface Settings {
-  shiftStart: string
-  shiftEnd: string
+  /** Weekly working hours, "HH:mm" 24-hour. */
+  schedule: Record<DayKey, DayHours>
+  breakTime: DayHours
+  /** Let emergency requests through outside working hours and breaks. */
+  emergencyAnyTime: boolean
   radiusKm: number
   language: 'English' | 'हिन्दी' | 'తెలుగు' | 'اردو'
   notify: {

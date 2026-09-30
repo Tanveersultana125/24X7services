@@ -32,7 +32,18 @@ function display(v: string) {
  * desktop dropdown on Chrome that spills off a phone-width screen and ignores
  * the app's type and colours.
  */
-export function TimeField({ label: title, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+export function TimeField({
+  label: title,
+  value,
+  onChange,
+  compact,
+}: {
+  label: string
+  value: string
+  onChange: (v: string) => void
+  /** A small button with no visible label, for rows of times. */
+  compact?: boolean
+}) {
   const [open, setOpen] = useState(false)
   const [draft, setDraft] = useState<Parts>(() => parse(value))
   // A minute saved off the 5-minute grid gets its own row. Keyed to the saved
@@ -42,17 +53,22 @@ export function TimeField({ label: title, value, onChange }: { label: string; va
 
   return (
     <div>
-      <span className="mb-1.5 block text-sm font-bold text-ink-2">{title}</span>
+      {!compact && <span className="mb-1.5 block text-sm font-bold text-ink-2">{title}</span>}
       <button
         type="button"
+        aria-label={compact ? `${title}: ${display(value)}` : undefined}
         onClick={() => {
           setDraft(parse(value))
           setOpen(true)
         }}
-        className={cn(inputClass, 'num flex items-center justify-between text-left font-bold')}
+        className={
+          compact
+            ? 'num flex h-10 w-full items-center justify-center whitespace-nowrap rounded-lg border border-line-strong bg-card px-2 text-[13.5px] font-bold text-ink hover:border-brand'
+            : cn(inputClass, 'num flex items-center justify-between text-left font-bold')
+        }
       >
         {display(value)}
-        <Clock className="size-4 text-muted" />
+        {!compact && <Clock className="size-4 text-muted" />}
       </button>
 
       <Sheet open={open} onClose={() => setOpen(false)} title={title}>

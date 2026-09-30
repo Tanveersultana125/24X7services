@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { Bell, ChevronRight, Locate, Search, SearchX, X, MessageCircle, Navigation, Phone, PowerOff, Siren, Star } from 'lucide-react'
+import { Bell, ChevronRight, Search, SearchX, X, MessageCircle, Navigation, Phone, PowerOff, Siren, Star } from 'lucide-react'
 import type { Route } from 'next'
 import { AiMark, CallMark } from '@/components/ai/AiMark'
+import { useAvailability } from '@/components/Availability'
 import { ApplianceGlyph } from '@/components/glyphs'
 import { JobCard } from '@/components/JobCard'
 import { MenuButton } from '@/components/menu'
@@ -22,6 +23,7 @@ export default function HomePage() {
   const store = useStore()
   useTick(30_000)
   const { jobs, tech, online } = store
+  const avail = useAvailability()
   const [query, setQuery] = useState('')
 
   const requests = jobs
@@ -76,22 +78,41 @@ export default function HomePage() {
             </Link>
           </div>
 
+          {/* Your availability: status, today's hours, radius — one tap to switch. */}
           <div
             className={cn(
-              'mt-3.5 flex items-center gap-3 rounded-xl px-3 py-2.5 ring-1 transition-colors',
-              online ? 'bg-[#22c55e]/[0.12] ring-[#22c55e]/25' : 'bg-white/[0.06] ring-white/10'
+              'mt-3.5 rounded-xl ring-1 transition-colors',
+              avail.state === 'online' ? 'bg-[#22c55e]/[0.12] ring-[#22c55e]/25' : avail.state === 'offline' ? 'bg-white/[0.06] ring-white/10' : 'bg-[#f59e0b]/[0.12] ring-[#f59e0b]/25'
             )}
           >
-            <span className={cn('size-2 shrink-0 rounded-full', online ? 'animate-blink bg-[#4ade80]' : 'bg-white/40')} />
-            <div className="min-w-0 flex-1">
-              <p className={cn('text-[13px] font-extrabold leading-tight', online ? 'text-[#86efac]' : 'text-white/70')}>
-                {online ? 'Online · receiving jobs' : 'Offline · not receiving jobs'}
-              </p>
-              <p className="mt-0.5 flex items-center gap-1 truncate text-[11.5px] font-medium text-white/55">
-                <Locate className="size-3 shrink-0" /> {tech.area}
-              </p>
+            <div className="flex items-center gap-3 px-3 pb-2 pt-2.5">
+              <span
+                className={cn(
+                  'size-2 shrink-0 rounded-full',
+                  avail.state === 'online' ? 'animate-blink bg-[#4ade80]' : avail.state === 'offline' ? 'bg-white/40' : 'bg-[#fbbf24]'
+                )}
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.14em] text-white/45">Your availability</p>
+                <p
+                  className={cn(
+                    'truncate text-[13px] font-extrabold leading-tight',
+                    avail.state === 'online' ? 'text-[#86efac]' : avail.state === 'offline' ? 'text-white/70' : 'text-[#fcd34d]'
+                  )}
+                >
+                  {avail.headline.toUpperCase()} · <span className="font-semibold normal-case">{avail.detail}</span>
+                </p>
+              </div>
+              <Toggle checked={online} onChange={store.setOnline} label="Availability" tone="success" />
             </div>
-            <Toggle checked={online} onChange={store.setOnline} label="Availability" tone="success" />
+            <div className="flex items-center gap-3 border-t border-white/10 px-3 py-2 text-[11.5px] font-semibold text-white/60">
+              <span className="num min-w-0 truncate">
+                Today {avail.today} · {store.settings.radiusKm} km radius
+              </span>
+              <Link href={'/settings#availability' as Route} className="ml-auto shrink-0 font-extrabold text-white/85 hover:text-white">
+                Manage
+              </Link>
+            </div>
           </div>
 
           <div className="mt-4 grid grid-cols-3 divide-x divide-white/10">

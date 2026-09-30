@@ -62,9 +62,10 @@ function load(): Persisted {
       // login screen; Logout still ends the session until the next reload.
       // Settings added since the save was written fall back to their defaults.
       const settings = { ...DEFAULT_SETTINGS, ...saved.settings }
+      const tech = { ...TECHNICIAN, ...saved.tech }
       if (saved.seededOn === new Date().toDateString())
-        return { ...saved, settings, signedIn: true, aiThreads: saved.aiThreads ?? [], aiCalls: saved.aiCalls ?? [] }
-      return { ...fresh(), tech: saved.tech, settings }
+        return { ...saved, settings, tech, signedIn: true, aiThreads: saved.aiThreads ?? [], aiCalls: saved.aiCalls ?? [] }
+      return { ...fresh(), tech, settings }
     }
   } catch {
     /* storage unavailable — run from the seed */

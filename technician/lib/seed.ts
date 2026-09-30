@@ -1,5 +1,5 @@
 import { APPLIANCES, BRANDS, LABOUR_RATE, type Appliance, type Brand } from './catalog'
-import type { Customer, Job, Notice, ServiceType, Settings, Technician } from './types'
+import type { Customer, Job, Notice, Review, ServiceType, Settings, Technician } from './types'
 
 /**
  * Demo data. There is no dispatch backend yet, so the app boots on a realistic
@@ -365,6 +365,8 @@ export const TECHNICIAN: Technician = {
   experienceYears: 8,
   rating: 4.86,
   ratingCount: 1284,
+  // 6,236 stars over 1,284 ratings = 4.86.
+  ratingBreakdown: [1156, 90, 26, 6, 6],
   completedJobs: 2317,
   joined: 'March 2019',
   brands: ['samsung', 'lg', 'bosch', 'ibm'],
@@ -372,8 +374,17 @@ export const TECHNICIAN: Technician = {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  shiftStart: '08:00',
-  shiftEnd: '20:00',
+  schedule: {
+    mon: { on: true, start: '09:00', end: '20:00' },
+    tue: { on: true, start: '09:00', end: '20:00' },
+    wed: { on: true, start: '09:00', end: '20:00' },
+    thu: { on: true, start: '09:00', end: '20:00' },
+    fri: { on: true, start: '09:00', end: '20:00' },
+    sat: { on: true, start: '10:00', end: '18:00' },
+    sun: { on: false, start: '10:00', end: '18:00' },
+  },
+  breakTime: { on: true, start: '13:00', end: '14:00' },
+  emergencyAnyTime: true,
   radiusKm: 10,
   language: 'English',
   notify: { requests: true, emergency: true, schedule: true, payments: true, sound: true },
@@ -386,3 +397,21 @@ export const DEFAULT_SETTINGS: Settings = {
 
 /** Demo credentials shown on the login screen. */
 export const DEMO_OTP = '482913'
+
+/**
+ * Reviews left before this device's history begins. Short and specific, the
+ * way customers actually write them — a few are lukewarm.
+ */
+export function seedReviews(): Review[] {
+  const d = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString()
+  return [
+    { id: 'rv1', name: 'Anjali Verma', rating: 5, at: d(1), appliance: 'LG Refrigerator', text: 'Explained everything clearly. Fridge cooling perfectly now.' },
+    { id: 'rv2', name: 'Suresh Babu', rating: 5, at: d(3), appliance: 'Samsung AC', text: 'Arrived on time and cleaned the outdoor unit properly. Cooling is much better.' },
+    { id: 'rv3', name: 'Farah Siddiqui', rating: 4, at: d(5), appliance: 'Bosch Washing Machine', text: 'Fixed the drain issue quickly. Had to wait a day for the pump, but I was kept informed.' },
+    { id: 'rv4', name: 'Karthik Reddy', rating: 5, at: d(8), appliance: 'IBM Geyser', text: 'Found the earth leakage and replaced the element. Very safety-conscious.' },
+    { id: 'rv5', name: 'Lakshmi Prasad', rating: 5, at: d(12), appliance: 'LG Washing Machine', text: 'Polite, wore shoe covers, and showed me the old part before replacing it.' },
+    { id: 'rv6', name: 'Rohan Mehta', rating: 3, at: d(16), appliance: 'Samsung Oven', text: 'Repair worked, but the visit was about 40 minutes late.' },
+    { id: 'rv7', name: 'Divya Nair', rating: 5, at: d(21), appliance: 'Bosch Oven', text: 'Heating element replaced in under an hour. Bill matched the quote.' },
+    { id: 'rv8', name: 'Imran Khan', rating: 4, at: d(27), appliance: 'LG AC', text: 'Good work on the gas top-up. Could have called before arriving.' },
+  ]
+}

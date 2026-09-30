@@ -26,6 +26,7 @@ import { LANG_CODE, useT } from '@/lib/i18n'
 import { recordPath } from '@/lib/nav'
 import { useStore } from '@/lib/store'
 import { Avatar, Toggle } from './ui'
+import { AvailabilityToast } from './Availability'
 import { IncomingRequest } from './IncomingRequest'
 import { Logo } from './Logo'
 import { MenuContext } from './menu'
@@ -141,6 +142,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </nav>
 
       <IncomingRequest />
+      <AvailabilityToast />
     </div>
     </MenuContext.Provider>
   )

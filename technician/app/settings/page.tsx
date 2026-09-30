@@ -3,15 +3,14 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Bell, CircleCheck, ChevronRight, Clock, Download, Headset, KeyRound, Languages, Landmark, LogOut, Power, QrCode as QrIcon, Radar, RotateCcw, Share2, Siren, Smartphone, UserRound, Volume2 } from 'lucide-react'
-import { TimeField } from '@/components/TimeField'
+import { Bell, CircleCheck, ChevronRight, Download, Headset, KeyRound, Languages, Landmark, LogOut, QrCode as QrIcon, RotateCcw, Share2, Siren, Smartphone, UserRound, Volume2 } from 'lucide-react'
+import { AvailabilitySettings } from '@/components/Availability'
 import { QrCode, downloadQr, upiLink } from '@/components/UpiQr'
 import { Avatar, Button, Card, Field, Page, ScreenHeader, SectionTitle, Segmented, Sheet, Toggle, inputClass } from '@/components/ui'
 import { chime } from '@/lib/chime'
 import { cn } from '@/lib/cn'
 import { ago } from '@/lib/format'
 import { useT } from '@/lib/i18n'
-import { inShift, shiftHours } from '@/lib/shift'
 import { useStore, useTick } from '@/lib/store'
 import type { Settings } from '@/lib/types'
 
@@ -52,10 +51,6 @@ export default function SettingsPage() {
     setTimeout(() => setToast(null), 2500)
   }
 
-  const onShift = inShift(s, new Date(now))
-  // store.jobs already drops requests outside the radius, so this count moves
-  // with the slider.
-  const waiting = store.jobs.filter((j) => j.status === 'request').length
   const passwordAge = Math.floor((now - new Date(s.passwordChangedAt).getTime()) / 86_400_000)
 
   return (
@@ -64,56 +59,7 @@ export default function SettingsPage() {
       <Page className="space-y-5">
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:items-start">
           <div className="space-y-5">
-            <section>
-              <SectionTitle>{t('Availability')}</SectionTitle>
-              <Card className="divide-y divide-line">
-                <Line icon={<Power className="size-4" />} title={t('Online for new requests')} sub={t(store.online ? 'Dispatch can send you jobs' : 'You won’t receive requests')}>
-                  <Toggle checked={store.online} onChange={store.setOnline} label="Online" tone="success" />
-                </Line>
-                <div className="p-4">
-                  <div className="mb-3 flex items-center justify-between gap-2">
-                    <p className="flex items-center gap-2 text-sm font-extrabold">
-                      <Clock className="size-4 text-ink-2" /> {t('Working hours')}
-                    </p>
-                    <span dir="auto" className={cn('num rounded-pill px-2.5 py-1 text-[11px] font-extrabold', onShift ? 'bg-success-soft text-success' : 'bg-canvas text-muted')}>
-                      {t(onShift ? 'On shift now · {h} h' : 'Off shift now · {h} h', { h: shiftHours(s) })}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <TimeField label={t('Shift starts')} value={s.shiftStart} onChange={(v) => updateSettings({ shiftStart: v })} />
-                    <TimeField label={t('Shift ends')} value={s.shiftEnd} onChange={(v) => updateSettings({ shiftEnd: v })} />
-                  </div>
-                  <p dir="auto" className="mt-2 text-xs font-medium text-muted">{t('Emergency requests can still reach you outside these hours if you stay online.')}</p>
-                </div>
-                <div className="p-4">
-                  <div className="mb-2 flex items-baseline justify-between">
-                    <p className="flex items-center gap-2 text-sm font-extrabold">
-                      <Radar className="size-4 text-ink-2" /> {t('Service radius')}
-                    </p>
-                    <span className="num text-sm font-extrabold text-brand">{s.radiusKm} km</span>
-                  </div>
-                  <input
-                    type="range"
-                    min={3}
-                    max={25}
-                    value={s.radiusKm}
-                    onChange={(e) => updateSettings({ radiusKm: Number(e.target.value) })}
-                    className="h-11 w-full accent-[#2547d0]"
-                    aria-label="Service radius in kilometres"
-                  />
-                  <div className="num flex justify-between text-[11px] font-semibold text-faint">
-                    <span>3 km</span>
-                    <span>25 km</span>
-                  </div>
-                  <p dir="auto" className="num mt-2 text-xs font-medium text-muted">
-                    {t(
-                      waiting === 0 ? 'No waiting requests within {km} km' : waiting === 1 ? '{n} waiting request within {km} km' : '{n} waiting requests within {km} km',
-                      { n: waiting, km: s.radiusKm }
-                    )}
-                  </p>
-                </div>
-              </Card>
-            </section>
+            <AvailabilitySettings />
 
             <section>
               <SectionTitle>{t('Language')}</SectionTitle>

@@ -10,7 +10,7 @@ import { ago, time } from '@/lib/format'
 import { jobHref, stepHref } from '@/lib/routes'
 import type { Job } from '@/lib/types'
 import { chime } from '@/lib/chime'
-import { inShift } from '@/lib/shift'
+import { mayAlert } from '@/lib/availability'
 import { useStore, useTick } from '@/lib/store'
 import { ApplianceGlyph, BrandTag } from './glyphs'
 import { PriorityBadge } from './ui'
@@ -72,12 +72,13 @@ export function IncomingRequest() {
     jobs.filter((j) => j.status === 'request').sort(byUrgency).slice(1).forEach((j) => remember(j.id))
   }, [jobs])
 
-  // Settings decide what may interrupt: emergencies on their own switch (and
-  // at any hour, as the Working hours note promises); everything else needs
-  // the requests switch and falls inside the shift. Held-back requests still
-  // wait in Jobs.
-  const onShift = inShift(settings, new Date(now))
-  const interrupts = (j: Job) => (j.priority === 'emergency' ? settings.notify.emergency : settings.notify.requests && onShift)
+  // Settings decide what may interrupt: each kind needs its notification
+  // switch, and availability (online, working hours, not on break) — with
+  // emergencies allowed through at any hour if the technician chose that.
+  // Held-back requests still wait in Jobs.
+  const at = new Date(now)
+  const interrupts = (j: Job) =>
+    j.priority === 'emergency' ? settings.notify.emergency && mayAlert(settings, online, true, at) : settings.notify.requests && mayAlert(settings, online, false, at)
   const pending = jobs.filter((j) => j.status === 'request' && !shown.has(j.id) && interrupts(j)).sort(byUrgency)
   const job = online && !pathname.startsWith('/request') ? pending[0] : undefined
   if (!job) return null

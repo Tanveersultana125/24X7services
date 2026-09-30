@@ -5,15 +5,15 @@ import type { Route } from 'next'
 import { useRouter } from 'next/navigation'
 import { useRef } from 'react'
 import { Award, BadgeCheck, Camera, ChevronRight, Headset, History, LogOut, Mail, MapPin, Phone, Settings, ShieldCheck, Star } from 'lucide-react'
+import { AvailabilitySummary } from '@/components/Availability'
 import { ApplianceGlyph } from '@/components/glyphs'
-import { Avatar, Card, Page, ScreenHeader, SectionTitle, Toggle } from '@/components/ui'
-import { APPLIANCES, APPLIANCE_LABEL, BRAND_LABEL, applianceTitle } from '@/lib/catalog'
-import { cn } from '@/lib/cn'
-import { shortDate, thisMonth } from '@/lib/format'
+import { PerformanceSection, ReviewsSection } from '@/components/Performance'
+import { Avatar, Card, Page, ScreenHeader, SectionTitle } from '@/components/ui'
+import { APPLIANCES, APPLIANCE_LABEL, BRAND_LABEL } from '@/lib/catalog'
 import { useStore } from '@/lib/store'
 
 export default function ProfilePage() {
-  const { tech, online, setOnline, updateTech, jobs, signOut } = useStore()
+  const { tech, setOnline, updateTech, jobs, signOut } = useStore()
   const router = useRouter()
   const file = useRef<HTMLInputElement>(null)
   const closedHere = jobs.filter((j) => j.status === 'closed').length
@@ -94,13 +94,10 @@ export default function ProfilePage() {
           </dl>
         </Card>
 
-        <Card className="flex items-center justify-between p-4">
-          <div>
-            <p className="text-sm font-extrabold">Availability</p>
-            <p className={cn('text-xs font-bold', online ? 'text-success' : 'text-muted')}>{online ? 'ONLINE — receiving requests' : 'OFFLINE'}</p>
-          </div>
-          <Toggle checked={online} onChange={setOnline} label="Availability" tone="success" size="lg" />
-        </Card>
+        <section>
+          <SectionTitle>Availability & schedule</SectionTitle>
+          <AvailabilitySummary />
+        </section>
 
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <section>
@@ -114,7 +111,7 @@ export default function ProfilePage() {
           </section>
 
           <section>
-            <SectionTitle>Certified for</SectionTitle>
+            <SectionTitle>Supported services</SectionTitle>
             <Card className="p-4">
               <p className="text-[11px] font-bold uppercase tracking-wider text-faint">Brands</p>
               <div className="mt-2 flex flex-wrap gap-2">
@@ -140,9 +137,9 @@ export default function ProfilePage() {
           </section>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-          <Performance />
-          <Reviews />
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:items-start">
+          <PerformanceSection />
+          <ReviewsSection />
         </div>
 
         <Card className="divide-y divide-line">
@@ -185,75 +182,5 @@ function Row({ icon, label, value }: { icon: React.ReactNode; label: string; val
         <p className="num truncate text-sm font-bold">{value}</p>
       </div>
     </div>
-  )
-}
-
-/**
- * This month at a glance, worked out from the jobs on the device: how much
- * was finished, how punctual the arrivals were, how often offers were taken.
- */
-function Performance() {
-  const { jobs, tech } = useStore()
-  const month = jobs.filter((j) => thisMonth(j.scheduledAt))
-  const done = month.filter((j) => j.status === 'closed')
-  const arrived = month.filter((j) => j.log.arrived)
-  const onTime = arrived.filter((j) => new Date(j.log.arrived!).getTime() <= new Date(j.scheduledAt).getTime() + 15 * 60_000)
-  const decided = jobs.filter((j) => j.log.accepted || j.status === 'rejected')
-  const accepted = decided.filter((j) => j.status !== 'rejected')
-  const rated = done.filter((j) => j.confirmation?.rating)
-  const avg = rated.length ? rated.reduce((s, j) => s + j.confirmation!.rating, 0) / rated.length : tech.rating
-  const pct = (a: number, b: number) => (b ? `${Math.round((a / b) * 100)}%` : '—')
-  const tiles: [string, string][] = [
-    ['Jobs this month', String(done.length)],
-    ['Avg rating', avg.toFixed(2)],
-    ['On-time arrival', pct(onTime.length, arrived.length)],
-    ['Acceptance rate', pct(accepted.length, decided.length)],
-  ]
-  return (
-    <section>
-      <SectionTitle>Performance</SectionTitle>
-      <Card className="grid grid-cols-2 gap-px overflow-hidden bg-line">
-        {tiles.map(([label, value]) => (
-          <div key={label} className="bg-card p-4">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-faint">{label}</p>
-            <p className="num mt-1 text-xl font-extrabold">{value}</p>
-          </div>
-        ))}
-      </Card>
-    </section>
-  )
-}
-
-function Reviews() {
-  const { jobs, tech } = useStore()
-  const reviews = jobs
-    .filter((j) => j.confirmation?.review?.trim())
-    .sort((a, b) => (b.confirmation!.at ?? b.scheduledAt).localeCompare(a.confirmation!.at ?? a.scheduledAt))
-    .slice(0, 3)
-  return (
-    <section>
-      <SectionTitle action={<span className="num text-xs font-bold text-muted">★ {tech.rating.toFixed(2)} · {tech.ratingCount.toLocaleString('en-IN')} ratings</span>}>
-        Customer reviews
-      </SectionTitle>
-      <Card className="divide-y divide-line">
-        {reviews.length === 0 ? (
-          <p className="p-4 text-sm font-medium text-muted">Reviews customers leave at sign-off appear here.</p>
-        ) : (
-          reviews.map((j) => (
-            <figure key={j.id} className="p-4">
-              <div className="flex items-center gap-0.5" aria-label={`${j.confirmation!.rating} out of 5`}>
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <Star key={n} className={cn('size-3.5', n <= j.confirmation!.rating ? 'fill-warning text-warning' : 'text-line-strong')} aria-hidden />
-                ))}
-              </div>
-              <blockquote className="mt-1.5 text-sm font-semibold text-ink">&ldquo;{j.confirmation!.review}&rdquo;</blockquote>
-              <figcaption className="mt-1 text-xs font-medium text-muted">
-                {j.customer.name} · {applianceTitle(j.brand, j.appliance)} · {shortDate(j.confirmation!.at ?? j.scheduledAt)}
-              </figcaption>
-            </figure>
-          ))
-        )}
-      </Card>
-    </section>
   )
 }
