@@ -81,6 +81,8 @@ export interface ServiceSheetProps {
   /** Every service in the catalog. */
   services: readonly CatalogService[];
   issues: readonly CatalogIssue[];
+  /** The kind of machine already chosen on the page, picked in advance here. */
+  initialKind?: string | null;
   onClose: () => void;
 }
 
@@ -88,6 +90,7 @@ export function ServiceSheet({
   service,
   appliance,
   issues,
+  initialKind,
   onClose,
 }: ServiceSheetProps) {
   const titleId = useId();
@@ -122,6 +125,7 @@ export function ServiceSheet({
             service={service}
             appliance={appliance}
             issues={issues}
+            initialKind={initialKind}
             onClose={onClose}
           />
         </>
@@ -142,6 +146,7 @@ export function ServiceDetails({
   service,
   appliance,
   issues,
+  initialKind,
   onClose,
 }: {
   /** In the sheet it scrolls inside the panel; on a page, with the page. */
@@ -150,6 +155,8 @@ export function ServiceDetails({
   service: CatalogService;
   appliance?: CatalogAppliance;
   issues: readonly CatalogIssue[];
+  /** The kind of machine already chosen, if any: that step starts answered. */
+  initialKind?: string | null;
   /** Closes the sheet on the way to another page; nothing to close on a page. */
   onClose?: () => void;
 }) {
@@ -177,7 +184,9 @@ export function ServiceDetails({
   const kinds = kindField?.options ?? [];
 
   const [issueId, setIssueId] = useState<string | null>(null);
-  const [kind, setKind] = useState<string | null>(null);
+  const [kind, setKind] = useState<string | null>(
+    initialKind && kinds.includes(initialKind) ? initialKind : null,
+  );
   const needsIssue = options.length > 0;
   const needsKind = kinds.length > 0;
   const [openStep, setOpenStep] = useState<1 | 2>(needsIssue ? 1 : 2);

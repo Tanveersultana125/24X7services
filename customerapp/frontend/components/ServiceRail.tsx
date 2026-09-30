@@ -250,10 +250,17 @@ export function AddButton({
   item: Pick<
     ServiceRailItem,
     'name' | 'applianceId' | 'serviceKey' | 'options' | 'onOptions'
-  >
+  > & {
+    /** The kind of machine already chosen on the page, carried into the cart. */
+    applianceType?: string
+  }
 }) {
   const cart = useCart()
-  const entry = { applianceId: item.applianceId, serviceKey: item.serviceKey }
+  const entry = {
+    applianceId: item.applianceId,
+    serviceKey: item.serviceKey,
+    ...(item.applianceType ? { applianceType: item.applianceType } : {}),
+  }
   const withOptions = Boolean(item.options && item.onOptions)
   const added = withOptions
     ? countForService(cart, entry) > 0

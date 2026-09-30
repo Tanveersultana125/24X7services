@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { Route } from 'next'
-import { ChevronRight, ShieldCheck, Star } from 'lucide-react'
+import { Check, ChevronRight, ShieldCheck, Star } from 'lucide-react'
 import {
   applianceIdSchema,
   type ApplianceId,
@@ -24,6 +24,7 @@ import { Header } from '@/components/Header'
 import { CartButton } from '@/components/CartButton'
 import { ServiceRow } from '@/components/ServiceRow'
 import { SectionMenu } from '@/components/SectionMenu'
+import { typeLabel, typePhoto } from '@/lib/applianceTypes'
 import { ReviewsSheet } from '@/components/ReviewsSheet'
 import { OfferBanner } from '@/components/OfferBanner'
 import { AddButton, durationNote } from '@/components/ServiceRail'
@@ -286,6 +287,15 @@ export function ApplianceScreen() {
   // The service whose options sheet is open — a repair, where "Add" means
   // picking the problem first.
   const [sheetId, setSheetId] = useState<string | null>(null)
+
+  // Which kind of machine is the customer's — front-load, split — once they
+  // have said, from the Menu or the chips over the list. Every Add on the page
+  // and the service sheet carry it, and the booking opens with it chosen.
+  const [kind, setKind] = useState<string | null>(null)
+  const kindField = appliance?.detailFields.find(
+    (field) => field.kind === 'select' && field.key === 'type'
+  )
+  const kinds = kindField?.options ?? []
   const sheetService =
     services.find((service) => service.id === sheetId) ?? null
 
@@ -579,6 +589,36 @@ export function ApplianceScreen() {
               while its rows scroll past, so a customer halfway down still
               knows which kind of visit they are reading about. A group of two
               or more opens on a card for its first service. */}
+          {kindField && kinds.length > 1 ? (
+            <div className="mt-6" role="group" aria-label={kindField.label}>
+              <p className="text-sm font-semibold text-ink">
+                Your {kindField.label.toLowerCase()}
+              </p>
+              <div className="no-scrollbar -mx-4 mt-2 flex gap-2 overflow-x-auto px-4 pb-1">
+                {kinds.map((each) => {
+                  const on = kind === each
+                  return (
+                    <button
+                      key={each}
+                      type="button"
+                      onClick={() => setKind(on ? null : each)}
+                      aria-pressed={on}
+                      className={cn(
+                        'inline-flex h-10 shrink-0 items-center gap-1.5 rounded-pill border px-4 text-sm transition-colors duration-[var(--duration-fast)]',
+                        on
+                          ? 'border-brand bg-brand-soft font-semibold text-brand'
+                          : 'border-border text-ink hover:border-muted'
+                      )}
+                    >
+                      {on ? <Check className="size-4" aria-hidden="true" /> : null}
+                      {typeLabel(each)}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          ) : null}
+
           {plan ? (
             <section
               id="annual-plan"
@@ -718,6 +758,7 @@ export function ApplianceScreen() {
                             serviceKey: service.serviceKey,
                             options: serviceOptions(service, issues).length,
                             onOptions: () => setSheetId(service.id),
+                            ...(kind ? { applianceType: kind } : {}),
                           }}
                         />
                       }
@@ -805,12 +846,21 @@ export function ApplianceScreen() {
         appliance={appliance ?? undefined}
         services={services}
         issues={issues}
+        initialKind={kind}
         onClose={() => setSheetId(null)}
       />
       <CartBar services={services} />
       {appliance && data.status === 'ready' ? (
         <SectionMenu
           aboveBar={cart.length > 0}
+          types={kinds.map((each) => ({
+            key: each,
+            label: typeLabel(each),
+            photo: typePhoto(appliance.id, each) ?? appliance.image,
+          }))}
+          typeTitle={kindField?.label}
+          chosenType={kind}
+          onType={setKind}
           items={[
             ...(plan
               ? [
