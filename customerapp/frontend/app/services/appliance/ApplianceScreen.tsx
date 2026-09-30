@@ -486,6 +486,10 @@ export function ApplianceScreen() {
                   <ServiceCard
                     service={service}
                     image={appliance.image}
+                    // The appliance itself, as this list has always shown it.
+                    // The technician photographs are the row of tiles above;
+                    // the same picture twice down one screen says nothing new.
+                    photo={service.productPhoto ?? service.photo}
                     motion={index === 0}
                     onSelect={() => openService(service.serviceKey)}
                     options={serviceOptions(service, issues).length}

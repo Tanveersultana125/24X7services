@@ -56,6 +56,11 @@ export interface ServiceCardProps {
    */
   image?: string
   /**
+   * A photograph to show instead of the service's own, for a screen that
+   * wants a different picture of it than every other screen does.
+   */
+  photo?: string
+  /**
    * Whether this card is the one allowed to play its clip. Off by default,
    * and ignored entirely once the service has a photograph — see the note
    * above. Even when it applies, playback waits for the card to be on screen.
@@ -72,6 +77,7 @@ export interface ServiceCardProps {
 export function ServiceCard({
   service,
   image,
+  photo = service.photo,
   motion = false,
   onSelect,
   options,
@@ -107,9 +113,9 @@ export function ServiceCard({
           room around it. The clip is offered only when no photograph has
           taken its place. */}
       <ServiceClip
-        video={service.photo ? undefined : service.video}
-        still={service.photo ?? service.poster ?? image}
-        cover={Boolean(service.photo ?? service.poster)}
+        video={photo ? undefined : service.video}
+        still={photo ?? service.poster ?? image}
+        cover={Boolean(photo ?? service.poster)}
         motion={motion}
         sizes="(min-width: 640px) 512px, 100vw"
         containClassName="p-6"
