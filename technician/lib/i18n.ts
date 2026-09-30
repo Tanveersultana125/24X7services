@@ -12,6 +12,7 @@ type Lang = Settings['language']
  */
 const DICT: Record<Exclude<Lang, 'English'>, Record<string, string>> = {
   हिन्दी: {
+    'AI Assist': 'AI असिस्ट',
     'On': 'चालू',
     'Off': 'बंद',
     'Pop-up for each new job in your shift': 'शिफ़्ट में हर नए जॉब का पॉप-अप',
@@ -71,6 +72,7 @@ const DICT: Record<Exclude<Lang, 'English'>, Record<string, string>> = {
     '{n} waiting requests within {km} km': '{km} km के अंदर {n} रिक्वेस्ट इंतज़ार में',
   },
   తెలుగు: {
+    'AI Assist': 'AI అసిస్ట్',
     'On': 'ఆన్',
     'Off': 'ఆఫ్',
     'Pop-up for each new job in your shift': 'షిఫ్ట్\u200cలో ప్రతి కొత్త జాబ్\u200cకు పాప్-అప్',
@@ -130,6 +132,7 @@ const DICT: Record<Exclude<Lang, 'English'>, Record<string, string>> = {
     '{n} waiting requests within {km} km': '{km} km లోపు {n} రిక్వెస్ట్‌లు వేచి ఉన్నాయి',
   },
   اردو: {
+    'AI Assist': 'AI اسسٹ',
     'On': 'آن',
     'Off': 'آف',
     'Pop-up for each new job in your shift': 'شفٹ میں ہر نئی جاب کا پاپ اپ',

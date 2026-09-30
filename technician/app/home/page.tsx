@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { Bell, ChevronRight, Locate, Search, SearchX, X, MessageCircle, Navigation, Phone, PowerOff, Siren, Star } from 'lucide-react'
+import type { Route } from 'next'
+import { AiMark, CallMark } from '@/components/ai/AiMark'
 import { ApplianceGlyph } from '@/components/glyphs'
 import { JobCard } from '@/components/JobCard'
 import { MenuButton } from '@/components/menu'
@@ -174,6 +176,8 @@ export default function HomePage() {
           </div>
         )}
 
+        <AiAssistCard job={current} />
+
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:items-start">
           <div className="space-y-6">
             {current && <CurrentJob job={current} />}
@@ -315,5 +319,35 @@ function SearchResults({ jobs, query }: { jobs: Job[]; query: string }) {
         <Empty icon={<SearchX className="size-5" />} title="No jobs found" body="Try a customer name, area, job ID, brand or appliance." />
       )}
     </section>
+  )
+}
+
+/**
+ * The way into AI Assist from the dashboard. With a job in hand both buttons
+ * open straight on it, so the technician never retypes the appliance.
+ */
+function AiAssistCard({ job }: { job?: Job }) {
+  return (
+    <Card className="flex flex-wrap items-center gap-3 p-4">
+      <Link href="/ai" className="flex min-w-0 flex-1 basis-60 items-center gap-3">
+        <AiMark size={44} />
+        <span className="min-w-0">
+          <span className="flex items-center gap-1 text-[15px] font-extrabold">
+            AI Assistant <ChevronRight className="size-4 text-faint" />
+          </span>
+          <span className="block truncate text-xs font-medium text-muted">
+            {job ? `Ready for ${applianceTitle(job.brand, job.appliance)} · ${job.issue}` : 'Diagnose faults, find parts, run customer calls'}
+          </span>
+        </span>
+      </Link>
+      <div className="grid w-full grid-cols-2 gap-2 sm:w-auto">
+        <Link href={(job ? `/ai/chat/?id=${job.id}` : '/ai/chat') as Route} className="flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-ink px-4 text-sm font-extrabold text-white hover:bg-brand">
+          <AiMark size={18} className="bg-transparent" /> Ask AI
+        </Link>
+        <Link href={(job ? `/ai/call/?id=${job.id}` : '/ai') as Route} className="flex h-11 items-center justify-center gap-2 rounded-xl border-2 border-line-strong px-4 text-sm font-extrabold hover:border-ink-2">
+          <CallMark size={18} className="bg-transparent text-success" /> AI Call
+        </Link>
+      </div>
+    </Card>
   )
 }

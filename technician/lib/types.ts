@@ -108,6 +108,8 @@ export interface Job {
   cancelReason?: string
   /** Final amount for closed jobs that pre-date this session. */
   amount?: number
+  /** Written with the AI assistant and saved by the technician. */
+  serviceNotes?: { diagnosis: string; action: string; recommendation: string; savedAt: string }
 }
 
 export type NotificationKind =

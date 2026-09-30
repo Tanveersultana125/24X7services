@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { DEFAULT_SETTINGS, TECHNICIAN, lateRequest, seedJobs, seedNotices } from './seed'
 import { LABOUR_RATE, applianceTitle, inr } from './catalog'
 import { billTotal } from './format'
+import type { AiThread, CallRecord } from './ai/types'
 import type { Bill, Confirmation, Diagnosis, FlowStep, Job, Notice, NotificationKind, PartLine, Photo, Settings, Technician } from './types'
 
 /**
@@ -29,6 +30,9 @@ interface Persisted {
   settings: Settings
   lateDelivered: boolean
   seededOn: string
+  /** AI assistant conversations and calls, each tied to a job when it has one. */
+  aiThreads: AiThread[]
+  aiCalls: CallRecord[]
 }
 
 function fresh(): Persisted {
@@ -42,6 +46,8 @@ function fresh(): Persisted {
     settings: DEFAULT_SETTINGS,
     lateDelivered: false,
     seededOn: new Date().toDateString(),
+    aiThreads: [],
+    aiCalls: [],
   }
 }
 
@@ -56,7 +62,8 @@ function load(): Persisted {
       // login screen; Logout still ends the session until the next reload.
       // Settings added since the save was written fall back to their defaults.
       const settings = { ...DEFAULT_SETTINGS, ...saved.settings }
-      if (saved.seededOn === new Date().toDateString()) return { ...saved, settings, signedIn: true }
+      if (saved.seededOn === new Date().toDateString())
+        return { ...saved, settings, signedIn: true, aiThreads: saved.aiThreads ?? [], aiCalls: saved.aiCalls ?? [] }
       return { ...fresh(), tech: saved.tech, settings }
     }
   } catch {
@@ -98,6 +105,9 @@ interface Store extends Persisted {
   confirm: (id: string, c: Confirmation) => void
   markRead: (noticeId: string) => void
   markAllRead: () => void
+  saveThread: (thread: AiThread) => void
+  saveCall: (call: CallRecord) => void
+  saveServiceNotes: (jobId: string, notes: { diagnosis: string; action: string; recommendation: string }) => void
   updateTech: (patch: Partial<Technician>) => void
   /** A patch, or a function of the latest settings when it builds on them. */
   updateSettings: (patch: Partial<Settings> | ((s: Settings) => Partial<Settings>)) => void
@@ -229,6 +239,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       markRead: (nid) =>
         setState((s) => ({ ...s, notices: s.notices.map((n) => (n.id === nid ? { ...n, read: true } : n)) })),
       markAllRead: () => setState((s) => ({ ...s, notices: s.notices.map((n) => ({ ...n, read: true })) })),
+      saveThread: (thread) =>
+        setState((s) => ({ ...s, aiThreads: [thread, ...s.aiThreads.filter((t) => t.id !== thread.id)] })),
+      saveCall: (call) => setState((s) => ({ ...s, aiCalls: [call, ...s.aiCalls.filter((c) => c.id !== call.id)] })),
+      saveServiceNotes: (jobId, notes) => patchJob(jobId, (j) => ({ ...j, serviceNotes: { ...notes, savedAt: now() } })),
       updateTech: (patch) => setState((s) => ({ ...s, tech: { ...s.tech, ...patch } })),
       updateSettings: (patch) =>
         setState((s) => ({ ...s, settings: { ...s.settings, ...(typeof patch === 'function' ? patch(s.settings) : patch) } })),

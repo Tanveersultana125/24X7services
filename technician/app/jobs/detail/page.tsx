@@ -9,22 +9,27 @@ import {
   ChevronRight,
   ClipboardCheck,
   MessageCircle,
+  MessageSquareText,
+  NotebookPen,
   Navigation,
   Package,
   PenLine,
   Phone,
+  PhoneCall,
   Receipt,
   Stethoscope,
   TriangleAlert,
 } from 'lucide-react'
+import { AiMark, CallMark } from '@/components/ai/AiMark'
 import { CustomerBlock, JobNotFound, JobSummary, ServiceSummary, useJobParam } from '@/components/JobParts'
 import { ServiceMap } from '@/components/ServiceMap'
 import { FlowBar, Timeline } from '@/components/Timeline'
 import { ActionDock, Card, Page, ScreenHeader, SectionTitle } from '@/components/ui'
 import { applianceTitle, inr } from '@/lib/catalog'
 import { cn } from '@/lib/cn'
-import { billTotal, directionsHref, driveProgress, telHref, time } from '@/lib/format'
+import { ago, billTotal, directionsHref, driveProgress, telHref, time } from '@/lib/format'
 import { stepHref } from '@/lib/routes'
+import { PURPOSE_LABEL, RESULT_LABEL } from '@/lib/ai/call'
 import { NEXT_ACTION, STATUS, stepIndex } from '@/lib/status'
 import { useStore, useTick } from '@/lib/store'
 import type { FlowStep, Job } from '@/lib/types'
@@ -197,16 +202,16 @@ function JobDetail() {
               <section>
                 <SectionTitle>Customer</SectionTitle>
                 <CustomerBlock job={job} />
-                <div className="mt-2 grid grid-cols-2 gap-2">
-                  <a href={telHref(job.customer.phone)} className="flex h-12 items-center justify-center gap-2 rounded-xl border border-line-strong bg-card text-sm font-extrabold">
-                    <Phone className="size-4 text-success" /> Call
-                  </a>
-                  <a href={`sms:${job.customer.phone.replace(/\s/g, '')}`} className="flex h-12 items-center justify-center gap-2 rounded-xl border border-line-strong bg-card text-sm font-extrabold">
-                    <MessageCircle className="size-4 text-brand" /> Chat
-                  </a>
+                <div className="mt-2 grid grid-cols-4 gap-2">
+                  <QuickAction href={telHref(job.customer.phone)} icon={<Phone className="size-5" />} label="Call Customer" tone="text-success" />
+                  <QuickAction href={`sms:${job.customer.phone.replace(/\s/g, '')}`} icon={<MessageCircle className="size-5" />} label="Chat Customer" tone="text-brand" />
+                  <QuickAction href={`/ai/chat/?id=${job.id}`} icon={<AiMark size={22} />} label="Ask AI" internal />
+                  <QuickAction href={`/ai/call/?id=${job.id}${job.status === 'closed' || job.status === 'confirmation' ? '&purpose=followup' : ''}`} icon={<CallMark size={22} />} label="AI Call" internal />
                 </div>
               </section>
             )}
+
+            {!cancelled && <AiAssistance job={job} />}
 
             {!cancelled && (
               <section>
@@ -284,5 +289,120 @@ function JobDetail() {
         )}
       </Page>
     </>
+  )
+}
+
+function QuickAction({ href, icon, label, tone, internal }: { href: string; icon: React.ReactNode; label: string; tone?: string; internal?: boolean }) {
+  const cls = 'flex min-h-[4.5rem] flex-col items-center justify-center gap-1.5 rounded-xl border border-line-strong bg-card px-1 text-center text-[11.5px] font-extrabold leading-tight hover:border-ink-2'
+  const inner = (
+    <>
+      <span className={tone}>{icon}</span>
+      {label}
+    </>
+  )
+  return internal ? (
+    <Link href={href as Route} className={cls}>
+      {inner}
+    </Link>
+  ) : (
+    <a href={href} className={cls}>
+      {inner}
+    </a>
+  )
+}
+
+/**
+ * Everything the AI helped with on this job: saved service notes, the
+ * conversations to reopen, and call summaries.
+ */
+function AiAssistance({ job }: { job: Job }) {
+  const { aiThreads, aiCalls } = useStore()
+  const threads = aiThreads.filter((t) => t.jobId === job.id)
+  const calls = aiCalls.filter((c) => c.jobId === job.id)
+  const done = job.status === 'closed' || job.status === 'confirmation'
+  const notes = job.serviceNotes
+
+  return (
+    <section>
+      <SectionTitle count={threads.length + calls.length || undefined}>AI assistance</SectionTitle>
+      <Card className="divide-y divide-line">
+        <div className="grid grid-cols-2 gap-2 p-3">
+          <Link href={`/ai/chat/?id=${job.id}&q=parts` as Route} className="flex h-11 items-center justify-center gap-1.5 rounded-xl bg-canvas text-[13px] font-extrabold text-ink-2 hover:bg-brand-soft hover:text-brand">
+            <Package className="size-4" /> Find Required Parts
+          </Link>
+          <Link href={`/ai/chat/?id=${job.id}&q=notes` as Route} className="flex h-11 items-center justify-center gap-1.5 rounded-xl bg-canvas text-[13px] font-extrabold text-ink-2 hover:bg-brand-soft hover:text-brand">
+            <NotebookPen className="size-4" /> Service Notes
+          </Link>
+          {done && (
+            <Link href={`/ai/call/?id=${job.id}&purpose=followup` as Route} className="col-span-2 flex h-11 items-center justify-center gap-1.5 rounded-xl bg-success-soft text-[13px] font-extrabold text-success">
+              <PhoneCall className="size-4" /> AI Follow-up Call
+            </Link>
+          )}
+        </div>
+
+        {notes && (
+          <div className="p-4">
+            <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-faint">Service notes · saved {time(notes.savedAt)}</p>
+            <dl className="mt-1.5 space-y-1.5 text-sm">
+              <div>
+                <dt className="inline font-extrabold">Diagnosis: </dt>
+                <dd className="inline font-medium text-ink-2">{notes.diagnosis}</dd>
+              </div>
+              <div>
+                <dt className="inline font-extrabold">Action taken: </dt>
+                <dd className="inline font-medium text-ink-2">{notes.action}</dd>
+              </div>
+              <div>
+                <dt className="inline font-extrabold">Recommendation: </dt>
+                <dd className="inline font-medium text-ink-2">{notes.recommendation}</dd>
+              </div>
+            </dl>
+          </div>
+        )}
+
+        {threads.map((t) => (
+          <Link key={t.id} href={`/ai/chat/?id=${job.id}&t=${t.id}` as Route} className="flex items-center gap-3 p-3 hover:bg-canvas">
+            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-brand">
+              <MessageSquareText className="size-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-extrabold">{t.title}</span>
+              <span className="block text-xs font-medium text-muted">
+                AI chat · {t.messages.filter((m) => m.role === 'tech').length} questions · {ago(t.updatedAt)}
+              </span>
+            </span>
+            <ChevronRight className="size-4 text-faint" />
+          </Link>
+        ))}
+
+        {calls.map((c) => (
+          <div key={c.id} className="flex items-start gap-3 p-3">
+            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-success-soft text-success">
+              <PhoneCall className="size-5" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="flex items-center gap-2">
+                <span className="truncate text-sm font-extrabold">{PURPOSE_LABEL[c.purpose]}</span>
+                <span
+                  className={cn(
+                    'shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-extrabold uppercase',
+                    c.result === 'escalated' ? 'bg-danger-soft text-danger' : c.result === 'reschedule_requested' || c.result === 'follow_up' ? 'bg-warning-soft text-warning' : 'bg-success-soft text-success'
+                  )}
+                >
+                  {RESULT_LABEL[c.result]}
+                </span>
+              </span>
+              <span className="block text-xs font-medium text-ink-2">{c.summary.result}</span>
+              {c.summary.request && <span className="block text-xs font-medium text-muted">Request: {c.summary.request}</span>}
+              <span className="block text-[11px] font-semibold text-faint">AI call · {ago(c.at)}</span>
+            </span>
+          </div>
+        ))}
+
+        {!notes && threads.length === 0 && calls.length === 0 && (
+          <p className="p-4 text-sm font-medium text-muted">Ask AI for diagnosis help or run an AI call — conversations and call summaries are kept here.</p>
+        )}
+      </Card>
+    </section>
   )
 }

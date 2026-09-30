@@ -15,6 +15,7 @@ import {
   Map as MapIcon,
   Settings,
   Siren,
+  Sparkles,
   Star,
   UserRound,
   Wallet,
@@ -42,6 +43,7 @@ const SIDE = [
   { href: '/home', label: 'Dashboard', icon: House },
   { href: '/jobs', label: 'Jobs', icon: BriefcaseBusiness },
   { href: '/emergency', label: 'Emergency', icon: Siren },
+  { href: '/ai', label: 'AI Assist', icon: Sparkles },
   { href: '/map', label: 'Map', icon: MapIcon },
   { href: '/earnings', label: 'Earnings', icon: Wallet },
   { href: '/history', label: 'Job history', icon: History },
@@ -55,7 +57,7 @@ const SIDE = [
 function section(pathname: string): string {
   if (pathname.startsWith('/jobs') || pathname.startsWith('/request') || pathname.startsWith('/history')) return '/jobs'
   if (pathname.startsWith('/settings') || pathname.startsWith('/support')) return '/profile'
-  if (pathname.startsWith('/emergency') || pathname.startsWith('/notifications')) return '/home'
+  if (pathname.startsWith('/emergency') || pathname.startsWith('/notifications') || pathname.startsWith('/ai')) return '/home'
   return '/' + (pathname.split('/')[1] ?? '')
 }
 
