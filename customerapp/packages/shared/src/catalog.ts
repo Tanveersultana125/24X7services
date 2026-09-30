@@ -133,11 +133,10 @@ export const catalogServiceSchema = z.object({
    */
   photo: z.string().min(1).optional(),
   /**
-   * A photograph of the appliance itself, with nobody in it — what the
-   * service list on an appliance page shows, under a row of `photo` tiles of
-   * technicians at work.
+   * A technician doing this job, square. Only the row of tiles at the top of
+   * an appliance page shows it; every other screen keeps `photo`.
    */
-  productPhoto: z.string().min(1).optional(),
+  technicianPhoto: z.string().min(1).optional(),
   /**
    * How long the visit usually takes, in minutes.
    *

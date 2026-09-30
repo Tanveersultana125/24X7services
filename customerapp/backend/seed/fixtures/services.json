@@ -16,8 +16,8 @@
     "poster": "/services/washing-machine-repair.jpg",
     "reel": "/reels/washing-machine.mp4",
     "reelPoster": "/reels/washing-machine.jpg",
-    "photo": "/photos/technician/washing-machine-repair.jpg",
-    "productPhoto": "/photos/washing-machine/1.jpg",
+    "technicianPhoto": "/photos/technician/washing-machine-repair.jpg",
+    "photo": "/photos/washing-machine/1.jpg",
     "process": [
       {
         "title": "Inspection",
@@ -85,8 +85,8 @@
     "active": true,
     "video": "/services/washing-machine-service.mp4",
     "poster": "/services/washing-machine-service.jpg",
-    "photo": "/photos/technician/washing-machine-service.jpg",
-    "productPhoto": "/photos/washing-machine/2.jpg",
+    "technicianPhoto": "/photos/technician/washing-machine-service.jpg",
+    "photo": "/photos/washing-machine/2.jpg",
     "process": [
       {
         "title": "Check-up",
@@ -154,8 +154,8 @@
     "active": true,
     "video": "/services/washing-machine-installation.mp4",
     "poster": "/services/washing-machine-installation.jpg",
-    "photo": "/photos/technician/washing-machine-installation.jpg",
-    "productPhoto": "/photos/washing-machine/4.jpg",
+    "technicianPhoto": "/photos/technician/washing-machine-installation.jpg",
+    "photo": "/photos/washing-machine/4.jpg",
     "process": [
       {
         "title": "Site check",
@@ -229,8 +229,8 @@
     "active": true,
     "video": "/services/washing-machine-uninstallation.mp4",
     "poster": "/services/washing-machine-uninstallation.jpg",
-    "photo": "/photos/technician/washing-machine-uninstallation.jpg",
-    "productPhoto": "/photos/washing-machine/1.jpg",
+    "technicianPhoto": "/photos/technician/washing-machine-uninstallation.jpg",
+    "photo": "/photos/washing-machine/1.jpg",
     "process": [
       {
         "title": "Disconnect",
@@ -302,8 +302,8 @@
     "active": true,
     "video": "/services/ac-service.mp4",
     "poster": "/services/ac-service.jpg",
-    "photo": "/photos/technician/ac-service.jpg",
-    "productPhoto": "/photos/air-conditioner/1.jpg",
+    "technicianPhoto": "/photos/technician/ac-service.jpg",
+    "photo": "/photos/air-conditioner/1.jpg",
     "process": [
       {
         "title": "Check-up",
@@ -373,8 +373,8 @@
     "poster": "/services/ac-repair.jpg",
     "reel": "/reels/air-conditioner.mp4",
     "reelPoster": "/reels/air-conditioner.jpg",
-    "photo": "/photos/technician/ac-repair.jpg",
-    "productPhoto": "/photos/air-conditioner/2.jpg",
+    "technicianPhoto": "/photos/technician/ac-repair.jpg",
+    "photo": "/photos/air-conditioner/2.jpg",
     "process": [
       {
         "title": "Inspection",
@@ -442,8 +442,8 @@
     "active": true,
     "video": "/services/ac-deep-clean.mp4",
     "poster": "/services/ac-deep-clean.jpg",
-    "photo": "/photos/technician/ac-deep-clean.jpg",
-    "productPhoto": "/photos/air-conditioner/3.jpg",
+    "technicianPhoto": "/photos/technician/ac-deep-clean.jpg",
+    "photo": "/photos/air-conditioner/3.jpg",
     "process": [
       {
         "title": "Cover up",
@@ -511,8 +511,8 @@
     "active": true,
     "video": "/services/ac-gas-refill.mp4",
     "poster": "/services/ac-gas-refill.jpg",
-    "photo": "/photos/technician/ac-gas-refill.jpg",
-    "productPhoto": "/photos/air-conditioner/1.jpg",
+    "technicianPhoto": "/photos/technician/ac-gas-refill.jpg",
+    "photo": "/photos/air-conditioner/1.jpg",
     "process": [
       {
         "title": "Leak check",
@@ -585,8 +585,8 @@
     "active": true,
     "video": "/services/ac-installation.mp4",
     "poster": "/services/ac-installation.jpg",
-    "photo": "/photos/technician/ac-installation.jpg",
-    "productPhoto": "/photos/air-conditioner/2.jpg",
+    "technicianPhoto": "/photos/technician/ac-installation.jpg",
+    "photo": "/photos/air-conditioner/2.jpg",
     "process": [
       {
         "title": "Site check",
@@ -660,8 +660,8 @@
     "active": true,
     "video": "/services/ac-uninstallation.mp4",
     "poster": "/services/ac-uninstallation.jpg",
-    "photo": "/photos/technician/ac-uninstallation.jpg",
-    "productPhoto": "/photos/air-conditioner/3.jpg",
+    "technicianPhoto": "/photos/technician/ac-uninstallation.jpg",
+    "photo": "/photos/air-conditioner/3.jpg",
     "process": [
       {
         "title": "Disconnect",
@@ -735,8 +735,8 @@
     "poster": "/services/refrigerator-repair.jpg",
     "reel": "/reels/refrigerator.mp4",
     "reelPoster": "/reels/refrigerator.jpg",
-    "photo": "/photos/technician/refrigerator-repair.jpg",
-    "productPhoto": "/photos/refrigerator/1.jpg",
+    "technicianPhoto": "/photos/technician/refrigerator-repair.jpg",
+    "photo": "/photos/refrigerator/1.jpg",
     "process": [
       {
         "title": "Inspection",
@@ -804,8 +804,8 @@
     "active": true,
     "video": "/services/refrigerator-service.mp4",
     "poster": "/services/refrigerator-service.jpg",
-    "photo": "/photos/technician/refrigerator-service.jpg",
-    "productPhoto": "/photos/refrigerator/2.jpg",
+    "technicianPhoto": "/photos/technician/refrigerator-service.jpg",
+    "photo": "/photos/refrigerator/2.jpg",
     "process": [
       {
         "title": "Check-up",
@@ -873,8 +873,8 @@
     "active": true,
     "video": "/services/refrigerator-gas-refill.mp4",
     "poster": "/services/refrigerator-gas-refill.jpg",
-    "photo": "/photos/technician/refrigerator-gas-refill.jpg",
-    "productPhoto": "/photos/refrigerator/4.jpg",
+    "technicianPhoto": "/photos/technician/refrigerator-gas-refill.jpg",
+    "photo": "/photos/refrigerator/4.jpg",
     "process": [
       {
         "title": "Leak check",
@@ -947,8 +947,8 @@
     "active": true,
     "video": "/services/refrigerator-installation.mp4",
     "poster": "/services/refrigerator-installation.jpg",
-    "photo": "/photos/technician/refrigerator-installation.jpg",
-    "productPhoto": "/photos/refrigerator/5.jpg",
+    "technicianPhoto": "/photos/technician/refrigerator-installation.jpg",
+    "photo": "/photos/refrigerator/5.jpg",
     "process": [
       {
         "title": "Site check",
@@ -1022,8 +1022,8 @@
     "active": true,
     "video": "/services/geyser-service.mp4",
     "poster": "/services/geyser-service.jpg",
-    "photo": "/photos/technician/geyser-service.jpg",
-    "productPhoto": "/photos/geyser/1.jpg",
+    "technicianPhoto": "/photos/technician/geyser-service.jpg",
+    "photo": "/photos/geyser/1.jpg",
     "process": [
       {
         "title": "Check-up",
@@ -1093,8 +1093,8 @@
     "poster": "/services/geyser-repair.jpg",
     "reel": "/reels/geyser.mp4",
     "reelPoster": "/reels/geyser.jpg",
-    "photo": "/photos/technician/geyser-repair.jpg",
-    "productPhoto": "/photos/geyser/2.jpg",
+    "technicianPhoto": "/photos/technician/geyser-repair.jpg",
+    "photo": "/photos/geyser/2.jpg",
     "process": [
       {
         "title": "Inspection",
@@ -1162,8 +1162,8 @@
     "active": true,
     "video": "/services/geyser-installation.mp4",
     "poster": "/services/geyser-installation.jpg",
-    "photo": "/photos/technician/geyser-installation.jpg",
-    "productPhoto": "/photos/geyser/4.jpg",
+    "technicianPhoto": "/photos/technician/geyser-installation.jpg",
+    "photo": "/photos/geyser/4.jpg",
     "process": [
       {
         "title": "Site check",
@@ -1237,8 +1237,8 @@
     "active": true,
     "video": "/services/geyser-uninstallation.mp4",
     "poster": "/services/geyser-uninstallation.jpg",
-    "photo": "/photos/technician/geyser-uninstallation.jpg",
-    "productPhoto": "/photos/geyser/5.jpg",
+    "technicianPhoto": "/photos/technician/geyser-uninstallation.jpg",
+    "photo": "/photos/geyser/5.jpg",
     "process": [
       {
         "title": "Disconnect",
@@ -1312,8 +1312,8 @@
     "poster": "/services/microwave-repair.jpg",
     "reel": "/reels/microwave.mp4",
     "reelPoster": "/reels/microwave.jpg",
-    "photo": "/photos/technician/microwave-repair.jpg",
-    "productPhoto": "/photos/microwave/2.jpg",
+    "technicianPhoto": "/photos/technician/microwave-repair.jpg",
+    "photo": "/photos/microwave/2.jpg",
     "process": [
       {
         "title": "Inspection",
@@ -1381,8 +1381,8 @@
     "active": true,
     "video": "/services/microwave-service.mp4",
     "poster": "/services/microwave-service.jpg",
-    "photo": "/photos/technician/microwave-service.jpg",
-    "productPhoto": "/photos/microwave/3.jpg",
+    "technicianPhoto": "/photos/technician/microwave-service.jpg",
+    "photo": "/photos/microwave/3.jpg",
     "process": [
       {
         "title": "Check-up",
@@ -1450,8 +1450,8 @@
     "active": true,
     "video": "/services/microwave-installation.mp4",
     "poster": "/services/microwave-installation.jpg",
-    "photo": "/photos/technician/microwave-installation.jpg",
-    "productPhoto": "/photos/microwave/4.jpg",
+    "technicianPhoto": "/photos/technician/microwave-installation.jpg",
+    "photo": "/photos/microwave/4.jpg",
     "process": [
       {
         "title": "Site check",

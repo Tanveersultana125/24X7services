@@ -433,7 +433,10 @@ export function ApplianceScreen() {
               <ul className="no-scrollbar -my-1 grid auto-cols-[5.5rem] grid-flow-col gap-3 overflow-x-auto py-1 sm:auto-cols-[6.5rem]">
                 {services.map((service) => {
                   const picture =
-                    service.photo ?? service.poster ?? appliance.image
+                    service.technicianPhoto ??
+                    service.photo ??
+                    service.poster ??
+                    appliance.image
                   return (
                     <li key={service.id}>
                       <a
@@ -486,10 +489,6 @@ export function ApplianceScreen() {
                   <ServiceCard
                     service={service}
                     image={appliance.image}
-                    // The appliance itself, as this list has always shown it.
-                    // The technician photographs are the row of tiles above;
-                    // the same picture twice down one screen says nothing new.
-                    photo={service.productPhoto ?? service.photo}
                     motion={index === 0}
                     onSelect={() => openService(service.serviceKey)}
                     options={serviceOptions(service, issues).length}
