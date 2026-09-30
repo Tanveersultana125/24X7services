@@ -35,10 +35,8 @@ import { BrandDisclaimer } from '@/components/BrandCard'
 import { BrandLogoRow } from '@/components/BrandLogoRow'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
 import { TrustPoints } from '@/components/TrustPoints'
-import { Button } from '@/components/ui/Button'
 import { Chip, Tag } from '@/components/ui/Chip'
 import { Card } from '@/components/ui/Card'
-import { StickyCTA, StickySpacer } from '@/components/StickyCTA'
 import { ErrorState } from '@/components/ErrorState'
 import { ServiceListSkeleton } from '@/components/SkeletonLoader'
 import { MANUFACTURER_WARRANTY_NOTICE } from '@/config/brand'
@@ -296,12 +294,10 @@ export function ApplianceScreen() {
   const repairService =
     services.find((service) => service.serviceKey === 'repair') ?? null
 
-  // What the bottom bar books, and what the price at the top is "from". When
-  // the customer arrived on one service in particular, that is the one the bar
-  // offers — anything else asks them to pick again what they just picked.
+  // The service the customer arrived on, when they arrived on one: the page
+  // opens scrolled to it.
   const requested =
     services.find((service) => service.serviceKey === openAt) ?? null
-  const headline = requested ?? repairService ?? services[0] ?? null
   const cheapestFee = services.length
     ? Math.min(...services.map((service) => service.visitFee))
     : null
@@ -799,35 +795,9 @@ export function ApplianceScreen() {
             </div>
           </Section>
 
-          {/* Once anything is in the cart, the bar at the foot is the cart's:
-              two bars pinned to the same place would sit on top of each
-              other. */}
-          {headline && cart.length === 0 ? (
-            <>
-              <StickySpacer aboveBottomNav />
-              <StickyCTA
-                aboveBottomNav
-                wide
-                detail={
-                  <>
-                    <p className="truncate text-sm font-semibold text-ink">
-                      {headline.name}
-                    </p>
-                    <p className="text-xs text-muted">
-                      {formatPaise(headline.visitFee)} visit fee
-                    </p>
-                  </>
-                }
-              >
-                <Button
-                  size="md"
-                  onClick={() => startBooking(headline.serviceKey)}
-                >
-                  Book a visit
-                </Button>
-              </StickyCTA>
-            </>
-          ) : null}
+          {/* Room at the foot for the floating Menu, which sits where a
+              pinned bar would otherwise be when the cart is empty. */}
+          {cart.length === 0 ? <div aria-hidden="true" className="h-24" /> : null}
         </>
       )}
       <ServiceSheet
@@ -840,6 +810,7 @@ export function ApplianceScreen() {
       <CartBar services={services} />
       {appliance && data.status === 'ready' ? (
         <SectionMenu
+          aboveBar={cart.length > 0}
           items={[
             ...(plan
               ? [{ id: 'annual-plan', label: 'Annual plan', note: '1 plan' }]

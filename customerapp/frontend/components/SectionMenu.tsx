@@ -24,7 +24,14 @@ export interface SectionMenuItem {
   note?: string
 }
 
-export function SectionMenu({ items }: { items: readonly SectionMenuItem[] }) {
+export function SectionMenu({
+  items,
+  aboveBar = false,
+}: {
+  items: readonly SectionMenuItem[]
+  /** Whether a bar is pinned over the bottom nav (the cart's), to clear it. */
+  aboveBar?: boolean
+}) {
   const [open, setOpen] = useState(false)
   const box = useRef<HTMLDivElement | null>(null)
 
@@ -60,9 +67,14 @@ export function SectionMenu({ items }: { items: readonly SectionMenuItem[] }) {
   return (
     <div
       ref={box}
-      // Above the bottom nav (72px) and the pinned bar over it (4.5rem), with
-      // a gap; on a laptop there is no bottom nav.
-      className="fixed inset-x-0 bottom-[calc(72px+4.5rem+0.75rem+var(--safe-bottom))] z-30 flex flex-col items-center px-4 lg:bottom-[calc(4.5rem+1rem)]"
+      // Above the bottom nav (72px), and above the pinned bar over it (4.5rem)
+      // when there is one, with a gap; on a laptop there is no bottom nav.
+      className={cn(
+        'fixed inset-x-0 z-30 flex flex-col items-center px-4',
+        aboveBar
+          ? 'bottom-[calc(72px+4.5rem+0.75rem+var(--safe-bottom))] lg:bottom-[calc(4.5rem+1rem)]'
+          : 'bottom-[calc(72px+1rem+var(--safe-bottom))] lg:bottom-6'
+      )}
     >
       {open ? (
         <nav
