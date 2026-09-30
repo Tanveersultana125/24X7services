@@ -39,6 +39,9 @@ export const viewport: Viewport = {
   // The app has a bottom nav and sticky CTAs that need the safe area.
   viewportFit: 'cover',
   themeColor: '#2547d0',
+  // The same opt-out as `color-scheme` in globals.css, as a meta tag, which
+  // the browser reads before any stylesheet has loaded.
+  colorScheme: 'only light',
 }
 
 export default function RootLayout({

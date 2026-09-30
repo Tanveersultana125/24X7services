@@ -119,6 +119,13 @@
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
+    /* Light only, and said so. The app has no dark theme, and a phone set to
+       dark mode otherwise lets the browser (Chrome's auto-dark, Samsung
+       Internet, the Android WebView) invert it by guesswork: product shots
+       multiplied onto white turned into black blobs, white photo plates
+       glared out of a dark card, and the brand's own colours flipped. `only`
+       is what opts out of that forced darkening, not just the default. */
+    color-scheme: only light;
     /* The safe-area inset the bottom nav and sticky CTAs sit above. */
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --safe-top: env(safe-area-inset-top, 0px);
