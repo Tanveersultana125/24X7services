@@ -5,7 +5,14 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { Route } from 'next'
-import { Check, ChevronRight, ShieldCheck, Star } from 'lucide-react'
+import {
+  Check,
+  ChevronRight,
+  Search,
+  Share2,
+  ShieldCheck,
+  Star,
+} from 'lucide-react'
 import {
   applianceIdSchema,
   type ApplianceId,
@@ -21,9 +28,10 @@ import {
 
 import { AppShell, Section } from '@/components/AppShell'
 import { Header } from '@/components/Header'
-import { CartButton } from '@/components/CartButton'
 import { ServiceRow } from '@/components/ServiceRow'
 import { SectionMenu } from '@/components/SectionMenu'
+import { useToast } from '@/components/Toast'
+import { shareText } from '@/lib/share'
 import { typeLabel, typePhoto } from '@/lib/applianceTypes'
 import { ReviewsSheet } from '@/components/ReviewsSheet'
 import { OfferBanner } from '@/components/OfferBanner'
@@ -273,6 +281,19 @@ export function ApplianceScreen() {
     plans.find((each) => each.applianceIds.length === 1) ?? plans[0] ?? null
 
   const earliest = useEarliestSlot()
+  const toast = useToast()
+
+  async function sharePage(): Promise<void> {
+    const outcome = await shareText(
+      `${appliance?.name ?? 'Appliance'} repair, service and installation on 24X7${
+        cheapestFee === null ? '' : ` — visits from ${formatPaise(cheapestFee)}`
+      }. ${window.location.href}`,
+      appliance?.name
+    )
+    if (outcome === 'copied') toast.show('Link copied.', { tone: 'success' })
+    else if (outcome === 'failed')
+      toast.show('We could not share that.', { tone: 'error' })
+  }
   const [reviewsOpen, setReviewsOpen] = useState(false)
   const reviewNames = new Map(
     services.map((service) => [
@@ -400,12 +421,31 @@ export function ApplianceScreen() {
   return (
     <AppShell
       mobileHeader={
+        // Only the way back, search and share, as the marketplaces keep it:
+        // the name and the earliest slot are the first things on the page
+        // itself, so the bar does not say them twice.
         <Header
-          title={appliance?.name ?? 'Services'}
-          subtitle={earliest ? `Earliest slot: ${earliest}` : undefined}
           showBack
           backFallback="/services"
-          right={<CartButton className="mr-2 size-11" />}
+          right={
+            <div className="mr-2 flex items-center gap-2">
+              <Link
+                href="/search"
+                aria-label="Search services"
+                className="flex size-11 items-center justify-center rounded-full border border-border bg-bg text-ink hover:bg-surface"
+              >
+                <Search className="size-5" aria-hidden="true" />
+              </Link>
+              <button
+                type="button"
+                onClick={() => void sharePage()}
+                aria-label={`Share ${appliance?.name ?? 'this page'}`}
+                className="flex size-11 items-center justify-center rounded-full border border-border bg-bg text-ink hover:bg-surface"
+              >
+                <Share2 className="size-5" aria-hidden="true" />
+              </button>
+            </div>
+          }
         />
       }
     >
