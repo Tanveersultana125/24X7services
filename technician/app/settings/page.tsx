@@ -3,8 +3,9 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Bell, CircleCheck, ChevronRight, Clock, Headset, KeyRound, Languages, Landmark, LogOut, Power, Radar, RotateCcw, Smartphone, UserRound } from 'lucide-react'
+import { Bell, CircleCheck, ChevronRight, Clock, Download, Headset, KeyRound, Languages, Landmark, LogOut, Power, QrCode as QrIcon, Radar, RotateCcw, Share2, Smartphone, UserRound } from 'lucide-react'
 import { TimeField } from '@/components/TimeField'
+import { QrCode, downloadQr, upiLink } from '@/components/UpiQr'
 import { Button, Card, Field, Page, ScreenHeader, SectionTitle, Segmented, Sheet, Toggle, inputClass } from '@/components/ui'
 import { chime } from '@/lib/chime'
 import { cn } from '@/lib/cn'
@@ -14,7 +15,15 @@ import { inShift, shiftHours } from '@/lib/shift'
 import { useStore, useTick } from '@/lib/store'
 import type { Settings } from '@/lib/types'
 
-type SheetName = 'payment' | 'account' | 'password' | 'devices' | 'logout'
+type SheetName = 'payment' | 'scanner' | 'account' | 'password' | 'devices' | 'logout'
+
+const NOTIFY_LABEL: Record<keyof Settings['notify'], string> = {
+  requests: 'New request alerts',
+  emergency: 'Emergency alerts',
+  schedule: 'Schedule alerts',
+  payments: 'Payment & rating alerts',
+  sound: 'Alert sound',
+}
 
 export default function SettingsPage() {
   const store = useStore()
@@ -27,6 +36,7 @@ export default function SettingsPage() {
   const notify = (k: keyof Settings['notify'], v: boolean) => {
     updateSettings({ notify: { ...s.notify, [k]: v } })
     if (k === 'sound' && v) chime()
+    flash(`${NOTIFY_LABEL[k]} ${v ? 'on' : 'off'}`)
   }
   const flash = (msg: string) => {
     setToast(msg)
@@ -141,6 +151,7 @@ export default function SettingsPage() {
             <section>
               <SectionTitle>{t('Account')}</SectionTitle>
               <Card className="divide-y divide-line">
+                <Nav icon={<QrIcon className="size-4" />} title={t('My payment scanner')} sub={t('Your UPI QR for customers to scan')} onClick={() => setSheet('scanner')} />
                 <Nav icon={<Landmark className="size-4" />} title={t('Payment settings')} sub={`${s.bank} · ${s.upi}`} onClick={() => setSheet('payment')} />
                 <Nav icon={<UserRound className="size-4" />} title={t('Account settings')} sub={t('Password, fingerprint, devices')} onClick={() => setSheet('account')} />
                 <Link href="/support" className="flex items-center gap-3 p-4 hover:bg-canvas">
@@ -183,6 +194,8 @@ export default function SettingsPage() {
         }}
       />
 
+      <ScannerSheet open={sheet === 'scanner'} onClose={() => setSheet(null)} onEdit={() => setSheet('payment')} flash={flash} />
+
       <Sheet open={sheet === 'account'} onClose={() => setSheet(null)} title={t('Account settings')}>
         <div className="-mx-4 -my-4 divide-y divide-line">
           <Nav
@@ -192,7 +205,14 @@ export default function SettingsPage() {
             onClick={() => setSheet('password')}
           />
           <Line icon={<Smartphone className="size-4" />} title="Fingerprint sign-in" sub={s.fingerprint ? 'On for this device' : 'Off · sign in with OTP'}>
-            <Toggle checked={s.fingerprint} onChange={(v) => updateSettings({ fingerprint: v })} label="Fingerprint sign-in" />
+            <Toggle
+              checked={s.fingerprint}
+              onChange={(v) => {
+                updateSettings({ fingerprint: v })
+                flash(`Fingerprint sign-in ${v ? 'on' : 'off'}`)
+              }}
+              label="Fingerprint sign-in"
+            />
           </Line>
           <Nav
             icon={<Smartphone className="size-4" />}
@@ -278,6 +298,67 @@ export default function SettingsPage() {
         </div>
       )}
     </>
+  )
+}
+
+/**
+ * The technician's own counter scanner: a static UPI QR any customer can scan
+ * and pay into, the way a shop keeps one by the till. Bills show a QR with the
+ * amount filled in; this one leaves the amount to the customer.
+ */
+function ScannerSheet({ open, onClose, onEdit, flash }: { open: boolean; onClose: () => void; onEdit: () => void; flash: (m: string) => void }) {
+  const { settings, tech } = useStore()
+  const link = upiLink({ upi: settings.upi, name: tech.name })
+  const file = `${tech.name.replace(/\s+/g, '-')}-UPI-QR.png`
+
+  return (
+    <Sheet open={open} onClose={onClose} title="My payment scanner">
+      <div className="mx-auto max-w-xs overflow-hidden rounded-2xl border border-line bg-card shadow-card">
+        <div className="bg-brand-ink px-5 py-4 text-center text-white">
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/60">Scan &amp; pay with any UPI app</p>
+          <p className="mt-1 text-lg font-extrabold tracking-tight">{tech.name}</p>
+          <p className="num text-xs font-semibold text-white/70">24X7 Technician · {tech.id}</p>
+        </div>
+        <div className="p-5">
+          <QrCode text={link} className="mx-auto aspect-square w-full max-w-[240px]" label={`UPI QR for ${settings.upi}`} />
+          <p className="num mt-3 text-center text-sm font-extrabold">{settings.upi}</p>
+          <p className="mt-1 text-center text-[11px] font-semibold text-muted">GPay · PhonePe · Paytm · BHIM</p>
+        </div>
+      </div>
+
+      <div className="mt-5 grid grid-cols-2 gap-2.5">
+        <Button
+          variant="secondary"
+          size="lg"
+          onClick={async () => {
+            await downloadQr(link, file)
+            flash('Scanner saved as PNG')
+          }}
+        >
+          <Download className="size-5" /> Download
+        </Button>
+        <Button
+          size="lg"
+          onClick={async () => {
+            try {
+              if (navigator.share) {
+                await navigator.share({ title: `Pay ${tech.name}`, text: `Pay ${tech.name} on UPI: ${settings.upi}` })
+                return
+              }
+              await navigator.clipboard.writeText(settings.upi)
+              flash('UPI ID copied')
+            } catch {
+              /* share sheet dismissed */
+            }
+          }}
+        >
+          <Share2 className="size-5" /> Share
+        </Button>
+      </div>
+      <button type="button" onClick={onEdit} className="mt-3 w-full py-2 text-center text-sm font-bold text-brand">
+        Change UPI ID
+      </button>
+    </Sheet>
   )
 }
 

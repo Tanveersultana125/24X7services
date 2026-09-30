@@ -6,6 +6,7 @@ import { Suspense, useState } from 'react'
 import { Banknote, CircleCheck, Clock, Pencil, Smartphone } from 'lucide-react'
 import { JobNotFound, useJobParam } from '@/components/JobParts'
 import { Logo } from '@/components/Logo'
+import { QrCode, upiLink } from '@/components/UpiQr'
 import { ActionDock, Card, Label, Page, ScreenHeader, SectionTitle, inputClass } from '@/components/ui'
 import { APPLIANCE_LABEL, BRAND_LABEL, LABOUR_RATE, inr } from '@/lib/catalog'
 import { cn } from '@/lib/cn'
@@ -170,12 +171,15 @@ function BillForm({ job }: { job: Job }) {
               </div>
               {bill.method === 'online' && !bill.paid && (
                 <Card className="mt-3 flex items-center gap-4 p-4">
-                  <QrMark seed={job.id} />
-                  <div className="text-sm">
+                  <QrCode
+                    text={upiLink({ upi: store.settings.upi, name: store.tech.name, amount: total, note: `24X7 ${job.id}` })}
+                    className="size-32 shrink-0 border border-line p-1"
+                  />
+                  <div className="min-w-0 text-sm">
                     <p className="font-extrabold">Customer scans to pay</p>
-                    <p className="num mt-0.5 font-semibold text-muted">24x7services@hdfcbank</p>
-                    <p className="num mt-2 text-lg font-extrabold">{inr(total)}</p>
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-warning">Demo QR</p>
+                    <p className="text-xs font-medium text-muted">Any UPI app · amount filled in</p>
+                    <p className="num mt-2 text-xl font-extrabold">{inr(total)}</p>
+                    <p className="num truncate text-xs font-semibold text-muted">{store.settings.upi}</p>
                   </div>
                 </Card>
               )}
@@ -252,35 +256,5 @@ function Choice({
       {icon}
       {label}
     </button>
-  )
-}
-
-/** A QR-shaped placeholder until the payment gateway issues real dynamic codes. */
-function QrMark({ seed }: { seed: string }) {
-  const n = 21
-  let h = [...seed].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7)
-  const cells: [number, number][] = []
-  const finder = (x: number, y: number) => (x < 7 && y < 7) || (x > n - 8 && y < 7) || (x < 7 && y > n - 8)
-  for (let y = 0; y < n; y++)
-    for (let x = 0; x < n; x++) {
-      h = (h * 1103515245 + 12345) >>> 0
-      if (!finder(x, y) && (h >>> 16) % 2) cells.push([x, y])
-    }
-  const eye = (x: number, y: number) => (
-    <g key={`${x}${y}`}>
-      <rect x={x} y={y} width="7" height="7" fill="#111827" />
-      <rect x={x + 1} y={y + 1} width="5" height="5" fill="#fff" />
-      <rect x={x + 2} y={y + 2} width="3" height="3" fill="#111827" />
-    </g>
-  )
-  return (
-    <svg viewBox={`-1 -1 ${n + 2} ${n + 2}`} className="size-28 shrink-0 rounded-lg border border-line bg-white p-1" aria-label="Payment QR code">
-      {cells.map(([x, y]) => (
-        <rect key={`${x}-${y}`} x={x} y={y} width="1" height="1" fill="#111827" />
-      ))}
-      {eye(0, 0)}
-      {eye(n - 7, 0)}
-      {eye(0, n - 7)}
-    </svg>
   )
 }
