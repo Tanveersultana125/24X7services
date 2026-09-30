@@ -2,15 +2,17 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { Route } from 'next'
-import { BadgeCheck, ChevronRight, ShieldCheck, Star } from 'lucide-react'
+import { ChevronRight, ShieldCheck, Star } from 'lucide-react'
 import {
   applianceIdSchema,
   type ApplianceId,
   type BusinessConfig,
   type CatalogAppliance,
   type CatalogBrand,
+  type CatalogPlan,
   type CatalogIssue,
   type CatalogService,
   type ServiceReview,
@@ -47,6 +49,9 @@ import {
   summaryByAppliance,
 } from '@/lib/catalog'
 import { countNote } from '@/components/ServiceScore'
+import { ApplianceHero, type HeroSlide } from '@/components/ApplianceHero'
+import { EarliestSlot } from '@/components/EarliestSlot'
+import { fetchCatalogPlans } from '@/lib/plans'
 import { formatPaise } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/cn'
@@ -86,6 +91,7 @@ interface ApplianceData {
   issues: CatalogIssue[]
   brands: CatalogBrand[]
   reviews: ServiceReview[]
+  plans: CatalogPlan[]
 }
 
 /**
@@ -140,9 +146,10 @@ export function ApplianceScreen() {
         issues: [],
         brands: [],
         reviews: [],
+        plans: [],
       }
     }
-    const [appliance, config, services, issues, brands] = await Promise.all([
+    const [appliance, config, services, issues, brands, plans] = await Promise.all([
       fetchAppliance(applianceId),
       // Only for the warranty line. A failed read leaves the strip out rather
       // than the page, which is the right trade for one sentence.
@@ -150,6 +157,9 @@ export function ApplianceScreen() {
       fetchServicesFor(applianceId),
       fetchIssuesFor(applianceId),
       fetchBrands(),
+      // Only for the plan tile in the service row, which is left out when
+      // this fails rather than taking the page with it.
+      fetchCatalogPlans().catch(() => [] as CatalogPlan[]),
     ])
     // Every service's reviews, pooled and newest first. A failed read leaves
     // the section empty rather than taking the price list down with it.
@@ -164,7 +174,7 @@ export function ApplianceScreen() {
     )
       .flat()
       .sort((a, b) => b.createdAt - a.createdAt)
-    return { appliance, config, services, issues, brands, reviews }
+    return { appliance, config, services, issues, brands, reviews, plans }
   }, [applianceId])
 
   const data = useAsync(load)
@@ -178,6 +188,14 @@ export function ApplianceScreen() {
   const score = applianceId
     ? summaryByAppliance(services).get(applianceId)
     : undefined
+
+  // The year's plan for this appliance, for the first tile in the service row:
+  // one made for it alone before one that covers the whole house.
+  const plans = (data.data?.plans ?? []).filter(
+    (plan) => applianceId !== null && plan.applianceIds.includes(applianceId)
+  )
+  const plan =
+    plans.find((each) => each.applianceIds.length === 1) ?? plans[0] ?? null
   const cart = useCart()
 
   // The service whose options sheet is open — a repair, where "Add" means
@@ -211,6 +229,33 @@ export function ApplianceScreen() {
         )
       )
     : 0
+
+  // The banner's slides: the appliance, then the repair and the next service
+  // on the list, each on its own photograph of a technician at that job.
+  const heroSlides: HeroSlide[] = []
+  if (appliance?.heroImage) {
+    heroSlides.push({
+      key: 'appliance',
+      photo: appliance.heroImage,
+      title: `${appliance.name} service & repair`,
+      note:
+        cheapestFee === null ? undefined : `Starts at ${formatPaise(cheapestFee)}`,
+    })
+    const featured = [
+      ...services.filter((service) => service.serviceKey === 'repair'),
+      ...services.filter((service) => service.serviceKey !== 'repair'),
+    ]
+    for (const service of featured) {
+      if (heroSlides.length >= 3) break
+      if (!service.technicianPhoto) continue
+      heroSlides.push({
+        key: service.id,
+        photo: service.technicianPhoto,
+        title: service.name,
+        note: `Starts at ${formatPaise(service.visitFee)}`,
+      })
+    }
+  }
 
   /**
    * Scroll to the service named in the URL, once it is on the page.
@@ -311,74 +356,42 @@ export function ApplianceScreen() {
               had asked for yet — the promises are still here, further down,
               where a customer is actually weighing one service against
               another. */}
-          {/* A photograph of the thing in a room, before its name.
-              Full-bleed on a phone, because a band inset by the page gutter
-              reads as a picture somebody pasted in rather than the top of the
-              page. Absent for an appliance nobody has photographed, and the
-              screen opens on the name the way it always did. */}
-          {/* The banner, the way the marketplaces open an appliance: what we
-              do to it and what it starts at, on the photograph rather than
-              under it. Two columns, not two layers — the words on the plate
-              to the left, the technician cropped into the right — so no crop
-              of the photograph can put a face under the headline. `plate` and
-              `night` because the photograph is a light room in either theme. */}
-          {appliance.heroImage ? (
-            <section className="relative -mx-4 mt-4 flex min-h-56 overflow-hidden bg-plate px-4 py-6 lg:mx-0 lg:mt-6 lg:min-h-64 lg:rounded-card lg:px-8">
-              <div className="absolute inset-y-0 right-0 w-1/2">
-                <Image
-                  src={appliance.heroImage}
-                  alt=""
-                  fill
-                  sizes="(min-width: 1024px) 320px, 50vw"
-                  // The one picture above the fold on this screen, so it is
-                  // fetched with the page rather than after layout has run.
-                  priority
-                  className="object-cover object-[68%_center]"
-                />
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-y-0 left-0 w-1/4 bg-linear-to-r from-plate to-transparent"
-                />
-              </div>
-
-              <div className="relative flex w-[54%] min-w-0 flex-col justify-center pr-2">
-                <span className="inline-flex w-fit items-center gap-1.5 rounded-md bg-success px-2 py-1 text-[11px] font-semibold tracking-[0.04em] uppercase text-white">
-                  <BadgeCheck className="size-3.5" aria-hidden="true" />
-                  Verified technicians
-                </span>
-                <p className="mt-3 text-xl font-bold leading-tight text-night sm:text-2xl">
-                  {appliance.name}{' '}service &amp; repair
-                </p>
-                {cheapestFee !== null ? (
-                  <p className="mt-2 text-base text-night/70">
-                    Starts at {formatPaise(cheapestFee)}
-                  </p>
-                ) : null}
-              </div>
-            </section>
+          {/* The banner, the way the marketplaces open an appliance: a few
+              slides of technicians at work, each with what it is and what it
+              starts at. Absent for an appliance nobody has photographed, and
+              the screen opens on the name the way it always did. */}
+          {heroSlides.length > 0 ? (
+            <ApplianceHero slides={heroSlides} className="mt-4 lg:mt-6" />
           ) : null}
 
           <section className="mt-6">
-            <h1 className="text-3xl font-bold leading-tight text-ink">
-              {appliance.name}
-            </h1>
+            {/* The name and its score on the left, and on the right how soon
+                somebody can come — the question before any price. */}
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <h1 className="text-3xl font-bold leading-tight text-ink">
+                  {appliance.name}
+                </h1>
 
-            {/* The score of every service here, weighted by how many people
-                gave one, as on the All services tile. It links to the reviews
-                it summarises, the way a dotted underline promises. */}
-            {score?.rating !== undefined && score.reviewCount !== undefined ? (
-              <a
-                href="#reviews"
-                className="mt-1.5 inline-flex items-center gap-1.5 text-sm text-ink underline decoration-muted decoration-dotted underline-offset-4"
-              >
-                <Star
-                  className="size-3.5 fill-ink text-ink"
-                  aria-hidden="true"
-                />
-                <span className="font-semibold">{score.rating.toFixed(2)}</span>
-                <span>({countNote(score.reviewCount)} reviews)</span>
-              </a>
-            ) : null}
+                {/* The score of every service here, weighted by how many people
+                    gave one, as on the All services tile. It links to the reviews
+                    it summarises, the way a dotted underline promises. */}
+                {score?.rating !== undefined && score.reviewCount !== undefined ? (
+                  <a
+                    href="#reviews"
+                    className="mt-1.5 inline-flex items-center gap-1.5 text-sm text-ink underline decoration-muted decoration-dotted underline-offset-4"
+                  >
+                    <Star
+                      className="size-3.5 fill-ink text-ink"
+                      aria-hidden="true"
+                    />
+                    <span className="font-semibold">{score.rating.toFixed(2)}</span>
+                    <span>({countNote(score.reviewCount)} reviews)</span>
+                  </a>
+                ) : null}
+              </div>
+              <EarliestSlot className="mt-1" />
+            </div>
 
             {appliance.heroImage ? null : cheapestFee !== null ? (
               <p className="mt-3 text-sm text-muted">
@@ -425,12 +438,34 @@ export function ApplianceScreen() {
               scanning for "the one where they clean it" finds a picture of
               somebody cleaning it faster than the word. Worth its space from
               two services up; one is already the list. */}
-          {services.length >= 2 ? (
+          {services.length >= 2 || plan ? (
             <nav
               aria-label="Services on this appliance"
               className="-mx-4 mt-6 border-y border-border px-4 py-5 lg:mx-0 lg:rounded-card lg:border-x"
             >
               <ul className="no-scrollbar -my-1 grid auto-cols-[5.5rem] grid-flow-col gap-3 overflow-x-auto py-1 sm:auto-cols-[6.5rem]">
+                {/* The year's plan first, as the marketplaces put their
+                    packages first: the one tile here that is not a single
+                    visit. Its price is the plan's own, per year. */}
+                {plan ? (
+                  <li>
+                    <Link
+                      href={'/care' as Route}
+                      className="group block touch-manipulation"
+                    >
+                      <span className="flex aspect-square flex-col items-center justify-center rounded-card bg-success/10 text-center text-success transition-transform duration-[var(--duration-fast)] group-active:scale-[0.97]">
+                        <span className="text-[11px] font-semibold">From</span>
+                        <span className="text-base font-bold leading-tight">
+                          {formatPaise(plan.price)}
+                        </span>
+                        <span className="text-[11px] font-semibold">a year</span>
+                      </span>
+                      <span className="mt-2 line-clamp-2 block text-center text-xs leading-snug text-ink group-hover:text-brand">
+                        Annual plan
+                      </span>
+                    </Link>
+                  </li>
+                ) : null}
                 {services.map((service) => {
                   const picture =
                     service.technicianPhoto ??

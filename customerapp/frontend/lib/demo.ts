@@ -17,6 +17,7 @@ import {
   type SearchHit,
 } from '@app/shared'
 import { db } from './firebase'
+import { addDaysToKey, todayKey } from './format'
 
 /**
  * The backend-free build.
@@ -79,9 +80,52 @@ export async function demoCall<N extends CallableName>(
       const { q } = input as CallableInput<'searchCatalog'>
       return { hits: await search(q) }
     }
+    case 'getAvailableSlots': {
+      const { fromDate, days } = input as CallableInput<'getAvailableSlots'>
+      return { days: demoSlots(fromDate, days) }
+    }
     default:
       throw new FunctionsError('failed-precondition', OFF_IN_DEMO)
   }
+}
+
+/**
+ * The visit windows the emulator is seeded with (`SLOT_WINDOWS` in
+ * backend/seed/seed.ts), every one of them open, since nobody can book in a
+ * demo. Slot documents are not in the bundle — there would be one per pincode
+ * per day — so the demo answers from the same timetable instead. Today's
+ * windows that have already started are shut, as they are on the server.
+ */
+const DEMO_WINDOWS = [
+  ['09:00', '11:00'],
+  ['11:00', '13:00'],
+  ['13:00', '15:00'],
+  ['15:00', '17:00'],
+  ['17:00', '19:00'],
+] as const
+
+function demoSlots(fromDate: string, days: number) {
+  const now = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Kolkata',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).format(new Date())
+  const today = todayKey()
+  return Array.from({ length: days }, (_, i) => {
+    const date = addDaysToKey(fromDate, i)
+    return {
+      date,
+      windows: DEMO_WINDOWS.map(([start, end]) => ({
+        start,
+        end,
+        availability:
+          date < today || (date === today && start <= now)
+            ? ('unavailable' as const)
+            : ('available' as const),
+      })),
+    }
+  })
 }
 
 /** The same matching searchCatalog does on the server, over the cached index. */

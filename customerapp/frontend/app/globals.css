@@ -288,6 +288,17 @@
   }
 }
 
+/* The bar under the slide on show in an appliance page's banner, filling for
+   as long as the slide stays. */
+@keyframes hero-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
 @keyframes shimmer {
   from {
     background-position: -200% 0;
