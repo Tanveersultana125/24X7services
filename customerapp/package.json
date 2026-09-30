@@ -17,7 +17,8 @@
     "build": "npm -w @app/shared run build && npm -w frontend run build",
     "typecheck": "npm -w @app/shared run typecheck && npm -w frontend run typecheck && npm -w functions run typecheck",
     "lint": "npm -w frontend run lint",
-    "emulators": "npm -w functions run build && firebase emulators:start --project demo-customerapp --config backend/firebase.json --import backend/.emulator-data --export-on-exit backend/.emulator-data",
+    "//emulators": "The CLI gives the functions bundle 10s to load before it gives up and serves every callable as a 404. On this OneDrive folder a cold load takes longer than that, so the deadline is raised here rather than remembered on the command line.",
+    "emulators": "npm -w functions run build && cross-env FUNCTIONS_DISCOVERY_TIMEOUT=90 firebase emulators:start --project demo-customerapp --config backend/firebase.json --import backend/.emulator-data --export-on-exit backend/.emulator-data",
     "seed": "firebase emulators:exec --only firestore --project demo-customerapp --config backend/firebase.json \"npm -w functions run seed\"",
     "demo:bundle": "firebase emulators:exec --only firestore --project demo-customerapp --config backend/firebase.json \"npm -w functions run seed && npm -w functions run demo:bundle\"",
     "simulate": "npm -w functions run simulate --",
@@ -27,6 +28,7 @@
     "//seed": "Seeds a throwaway emulator. To seed the emulator you are actually running, use `npm -w functions run seed` in a second terminal while `npm run emulators` is up."
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "typescript": "^5.9.2"
   }
 }
