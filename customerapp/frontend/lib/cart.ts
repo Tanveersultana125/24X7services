@@ -31,6 +31,12 @@ export interface CartItem {
   applianceId: ApplianceId
   serviceKey: ServiceKey
   issueId?: string
+  /**
+   * The kind of machine it is — "front-load", "split" — when the customer
+   * said so while adding it. The booking's details step opens with it chosen.
+   * Not part of what makes two items the same: one repair is one item.
+   */
+  applianceType?: string
 }
 
 /** A stable empty array — the prerender must not produce a new one each time. */
@@ -41,6 +47,7 @@ const listSchema = z.array(
     applianceId: applianceIdSchema,
     serviceKey: serviceKeySchema,
     issueId: z.string().min(1).optional(),
+    applianceType: z.string().min(1).optional(),
   })
 )
 
@@ -115,6 +122,9 @@ export function addToCart(item: CartItem): void {
       applianceId: item.applianceId,
       serviceKey: item.serviceKey,
       ...(item.issueId === undefined ? {} : { issueId: item.issueId }),
+      ...(item.applianceType === undefined
+        ? {}
+        : { applianceType: item.applianceType }),
     },
   ])
 }

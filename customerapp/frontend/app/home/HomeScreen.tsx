@@ -163,6 +163,7 @@ export function HomeScreen() {
         serviceKey: popular.serviceKey,
         options: listed ? serviceOptions(listed, data.issues).length : 0,
         onOptions: listed ? () => setSheetId(listed.id) : undefined,
+        onOpen: listed ? () => setSheetId(listed.id) : undefined,
       }
     }) ?? []
 
@@ -359,6 +360,7 @@ export function HomeScreen() {
                       serviceKey: service.serviceKey,
                       options: serviceOptions(service, data.issues).length,
                       onOptions: () => setSheetId(service.id),
+                      onOpen: () => setSheetId(service.id),
                     }))}
                   />
                 </Section>

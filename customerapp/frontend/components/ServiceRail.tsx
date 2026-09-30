@@ -80,6 +80,11 @@ export interface ServiceRailItem {
    */
   options?: number
   onOptions?: () => void
+  /**
+   * Opens the service in a sheet over the page instead of following `href`,
+   * where the page has one to open.
+   */
+  onOpen?: () => void
 }
 
 export function ServiceRail({
@@ -111,9 +116,8 @@ export function ServiceRail({
             // stopping two-thirds of the way over.
             className="flex w-40 shrink-0 snap-start flex-col lg:w-[calc((100%-3rem)/5)]"
           >
-            <Link
-              href={item.href}
-              className="group block"
+            <CardLink
+              item={item}
               aria-label={[item.name, scoreLabel(item.rating, item.reviewCount)]
                 .filter(Boolean)
                 .join(', ')}
@@ -132,7 +136,7 @@ export function ServiceRail({
               <span className="mt-2.5 block line-clamp-2 text-sm font-semibold leading-snug text-ink">
                 {item.name}
               </span>
-            </Link>
+            </CardLink>
 
             <ServiceScore
               rating={item.rating}
@@ -171,6 +175,36 @@ export function ServiceRail({
       <RailArrow direction={-1} visible={canPrev} onClick={() => page(-1)} />
       <RailArrow direction={1} visible={canNext} onClick={() => page(1)} />
     </div>
+  )
+}
+
+/** The picture and the name: a sheet over the page where there is one, else a link. */
+function CardLink({
+  item,
+  children,
+  'aria-label': label,
+}: {
+  item: ServiceRailItem
+  children: React.ReactNode
+  'aria-label': string
+}) {
+  if (item.onOpen) {
+    return (
+      <button
+        type="button"
+        onClick={item.onOpen}
+        aria-haspopup="dialog"
+        aria-label={label}
+        className="group block w-full text-left"
+      >
+        {children}
+      </button>
+    )
+  }
+  return (
+    <Link href={item.href} className="group block" aria-label={label}>
+      {children}
+    </Link>
   )
 }
 

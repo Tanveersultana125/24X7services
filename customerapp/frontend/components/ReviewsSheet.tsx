@@ -29,21 +29,38 @@ export function ReviewsSheet({
   open,
   onClose,
   title,
-  rating,
-  ratingCount,
-  reviews,
-  serviceNames,
+  ...panel
 }: {
   open: boolean
   onClose: () => void
   /** "Washing Machine reviews". */
   title: string
+} & ReviewsPanelProps) {
+  return (
+    <BottomSheet open={open} onClose={onClose} title={title}>
+      <ReviewsPanel {...panel} />
+    </BottomSheet>
+  )
+}
+
+interface ReviewsPanelProps {
   rating?: number
   ratingCount?: number
   reviews: readonly ServiceReview[]
   /** Short names per service, for the chips and the line under each author. */
   serviceNames: ReadonlyMap<ServiceReview['serviceKey'], string>
-}) {
+}
+
+/**
+ * The score, the bars and the list, without a frame — the sheet above wraps
+ * it, and the service sheet shows it at its foot.
+ */
+export function ReviewsPanel({
+  rating,
+  ratingCount,
+  reviews,
+  serviceNames,
+}: ReviewsPanelProps) {
   const [order, setOrder] = useState<Order>('recent')
   const [service, setService] = useState<ServiceReview['serviceKey'] | null>(
     null
@@ -79,7 +96,7 @@ export function ReviewsSheet({
   }, [reviews, service, stars, order])
 
   return (
-    <BottomSheet open={open} onClose={onClose} title={title}>
+    <>
       {rating !== undefined ? (
         <div>
           <p className="flex items-center gap-1.5 text-4xl font-bold text-ink">
@@ -215,7 +232,7 @@ export function ReviewsSheet({
           ))}
         </ul>
       )}
-    </BottomSheet>
+    </>
   )
 }
 

@@ -49,6 +49,8 @@ import { useAsync } from "@/lib/useAsync";
 interface Row {
   service: CatalogService;
   issues: CatalogIssue[];
+  /** The kind of machine, if it was said while adding. */
+  applianceType?: string;
 }
 
 export function CartScreen() {
@@ -82,6 +84,7 @@ export function CartScreen() {
     }
     const issue = catalog.data?.issues.find((each) => each.id === item.issueId);
     if (issue) row.issues.push(issue);
+    row.applianceType ??= item.applianceType;
   }
 
   const total = rows.reduce((sum, row) => sum + row.service.visitFee, 0);
@@ -91,6 +94,7 @@ export function CartScreen() {
       applianceId: row.service.applianceId,
       serviceKey: row.service.serviceKey,
       issueIds: row.issues.map((issue) => issue.id),
+      ...(row.applianceType ? { applianceType: row.applianceType } : {}),
       techPreference: "any",
     });
     router.push("/book/brand");
