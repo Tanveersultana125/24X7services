@@ -45,6 +45,7 @@ import { StickyCTA, StickySpacer } from '@/components/StickyCTA'
 import { ErrorState } from '@/components/ErrorState'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { durationNote } from '@/components/ServiceRail'
+import { ServiceClip } from '@/components/ServiceClip'
 import {
   fetchAppliance,
   fetchBrands,
@@ -464,16 +465,14 @@ function Media({
 
   if (service.video && !service.photo) {
     return (
-      <video
-        poster={still}
-        src={service.video}
-        muted
-        loop
-        autoPlay
-        playsInline
-        preload="metadata"
-        aria-hidden="true"
-        className="mt-5 aspect-video w-full rounded-card bg-plate object-cover"
+      <ServiceClip
+        video={service.video}
+        still={still}
+        cover={Boolean(service.poster)}
+        containClassName="p-6"
+        sizes="(min-width: 640px) 512px, 100vw"
+        priority
+        className="mt-5 aspect-video w-full rounded-card"
       />
     )
   }

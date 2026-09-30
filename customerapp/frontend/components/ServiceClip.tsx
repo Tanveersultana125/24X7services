@@ -29,6 +29,12 @@ import { isProductShot } from '@/lib/photoFit'
  * `play()` returns a promise that rejects when the browser declines — a tab in
  * the background, a battery-saver policy. That is the browser doing its job,
  * not an error to report, so the rejection is swallowed and the still stays.
+ *
+ * The clip is painted onto a canvas; the <video> that decodes it is never put
+ * in the page. Samsung Internet pins its own download and "video assistant"
+ * buttons over any <video> that plays, `controlsList` or not, and on a card
+ * those read as part of the picture. A canvas is not a video to any browser,
+ * so there is nothing for it to decorate.
  */
 
 export interface ServiceClipProps {
@@ -74,25 +80,13 @@ export function ServiceClip({
 }: ServiceClipProps) {
   const reducedMotion = usePrefersReducedMotion()
   const plays = motion && Boolean(video) && !reducedMotion
-  const ref = useVisiblePlayback(video, reducedMotion)
+  const ref = useVisiblePlayback(plays ? video : undefined)
 
   return (
     <span
       className={cn('relative block overflow-hidden bg-plate', className)}
     >
-      {plays ? (
-        <video
-          ref={ref}
-          poster={still}
-          src={video}
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          aria-hidden="true"
-          className="size-full object-cover"
-        />
-      ) : still ? (
+      {still ? (
         <Image
           src={still}
           alt=""
@@ -111,34 +105,93 @@ export function ServiceClip({
           }
         />
       ) : null}
+      {plays ? (
+        // Transparent until the first frame lands, so the still shows through
+        // instead of a blank box.
+        <canvas
+          ref={ref}
+          aria-hidden="true"
+          className="absolute inset-0 size-full object-cover opacity-0"
+        />
+      ) : null}
     </span>
   )
 }
 
-/** Play the clip while its box is on screen, and pause it the rest of the time. */
+/**
+ * Play the clip onto the canvas while its box is on screen, and pause it the
+ * rest of the time.
+ */
 function useVisiblePlayback(
-  src: string | undefined,
-  reducedMotion: boolean
-): React.RefObject<HTMLVideoElement | null> {
-  const ref = useRef<HTMLVideoElement | null>(null)
+  src: string | undefined
+): React.RefObject<HTMLCanvasElement | null> {
+  const ref = useRef<HTMLCanvasElement | null>(null)
 
   useEffect(() => {
-    const el = ref.current
-    if (!el) return
+    const canvas = ref.current
+    const context = canvas?.getContext('2d')
+    if (!canvas || !context || !src) return
+
+    const clip = document.createElement('video')
+    clip.muted = true
+    clip.loop = true
+    clip.playsInline = true
+    clip.preload = 'metadata'
+    clip.src = src
+
+    let frame = 0
+    let running = false
+    // Whether the box is on screen now. `play()` settles later, by which time
+    // the box may have left again.
+    let onScreen = false
+    const paint = () => {
+      if (!running) return
+      if (clip.videoWidth) {
+        if (canvas.width !== clip.videoWidth) {
+          canvas.width = clip.videoWidth
+          canvas.height = clip.videoHeight
+        }
+        context.drawImage(clip, 0, 0)
+        canvas.style.opacity = '1'
+      }
+      frame = requestAnimationFrame(paint)
+    }
+    const stop = () => {
+      running = false
+      cancelAnimationFrame(frame)
+      clip.pause()
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries[entries.length - 1]?.isIntersecting
         if (visible === undefined) return
-        if (visible) void el.play().catch(() => {})
-        else el.pause()
+        onScreen = visible
+        if (!visible) return stop()
+        clip
+          .play()
+          .then(() => {
+            if (!onScreen) return clip.pause()
+            if (running) return
+            running = true
+            frame = requestAnimationFrame(paint)
+          })
+          .catch(() => {})
       },
       // A screen-height early, so a clip that is scrolled to is already moving
       // rather than starting from its first frame on arrival.
       { rootMargin: '100% 0px' }
     )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [src, reducedMotion])
+    observer.observe(canvas)
+
+    return () => {
+      observer.disconnect()
+      stop()
+      // Let go of the connection and the decoder, not just the frames.
+      clip.removeAttribute('src')
+      clip.load()
+    }
+  }, [src])
 
   return ref
 }
