@@ -1,8 +1,7 @@
 'use client'
 
-import Link from 'next/link'
 import type { Route } from 'next'
-import { useRouter } from 'next/navigation'
+import { useBack } from '@/lib/nav'
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { ArrowLeft, Flame, X } from 'lucide-react'
@@ -284,25 +283,16 @@ export function ScreenHeader({
   back?: Route | true
   right?: React.ReactNode
 }) {
-  const router = useRouter()
+  // `back` is only where to go when there is no previous in-app page.
+  const goBack = useBack(back === true || !back ? '/home' : back)
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-card/95 pt-[var(--safe-top)] backdrop-blur">
       <div className="mx-auto flex h-14 max-w-5xl items-center gap-2 px-2 lg:h-16 lg:px-8">
-        {back &&
-          (back === true ? (
-            <button
-              type="button"
-              aria-label="Back"
-              onClick={() => router.back()}
-              className="grid size-11 place-items-center rounded-full text-ink hover:bg-canvas"
-            >
-              <ArrowLeft className="size-5" />
-            </button>
-          ) : (
-            <Link href={back} aria-label="Back" className="grid size-11 place-items-center rounded-full text-ink hover:bg-canvas">
-              <ArrowLeft className="size-5" />
-            </Link>
-          ))}
+        {back && (
+          <button type="button" aria-label="Back" onClick={goBack} className="grid size-11 place-items-center rounded-full text-ink hover:bg-canvas">
+            <ArrowLeft className="size-5" />
+          </button>
+        )}
         <div className={cn('min-w-0 flex-1', !back && 'pl-2 lg:pl-0')}>
           <h1 className="truncate text-[17px] font-extrabold tracking-tight lg:text-xl">{title}</h1>
           {subtitle && <p className="truncate text-xs font-medium text-muted">{subtitle}</p>}

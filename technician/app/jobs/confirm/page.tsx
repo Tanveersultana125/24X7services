@@ -195,7 +195,7 @@ function Closed({ job }: { job: Job }) {
           )}
         </Card>
         <div className="mt-6 grid gap-2">
-          <Link href="/home" className="flex h-14 items-center justify-center rounded-xl bg-brand text-base font-extrabold text-white">
+          <Link href="/home" replace className="flex h-14 items-center justify-center rounded-xl bg-brand text-base font-extrabold text-white">
             Back to today’s jobs
           </Link>
           <Link href={stepHref('bill', job.id)} className="flex h-12 items-center justify-center rounded-xl text-sm font-bold text-brand">

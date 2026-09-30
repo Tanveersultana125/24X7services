@@ -21,6 +21,7 @@ import {
   X,
 } from 'lucide-react'
 import { cn } from '@/lib/cn'
+import { recordPath } from '@/lib/nav'
 import { useStore } from '@/lib/store'
 import { Avatar } from './ui'
 import { IncomingRequest } from './IncomingRequest'
@@ -63,6 +64,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const store = useStore()
   const bare = pathname === '/' || pathname.startsWith('/login')
   const [menuOpen, setMenuOpen] = useState(false)
+
+  useEffect(() => {
+    recordPath(pathname, bare)
+  }, [pathname, bare])
 
   useEffect(() => {
     if (store.ready && !store.signedIn && !bare) router.replace('/login')

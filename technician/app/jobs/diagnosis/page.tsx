@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useBack } from '@/lib/nav'
 import { Suspense, useState } from 'react'
 import { ChevronRight, Package } from 'lucide-react'
 import { JobNotFound, useJobParam } from '@/components/JobParts'
@@ -37,7 +37,7 @@ const CONDITION_TONE: Record<Condition, string> = {
 
 function DiagnosisForm({ job }: { job: Job }) {
   const store = useStore()
-  const router = useRouter()
+  const goBack = useBack(stepHref('detail', job.id))
   const d = job.diagnosis
   const [condition, setCondition] = useState<Condition>(d?.condition ?? 'Not working')
   const [problem, setProblem] = useState(d?.problem ?? '')
@@ -163,7 +163,7 @@ function DiagnosisForm({ job }: { job: Job }) {
                 onClick={() => {
                   save()
                   store.advance(job.id, 'repair')
-                  router.push(stepHref('detail', job.id))
+                  goBack()
                 }}
                 className="h-14 flex-[1.6] rounded-xl bg-brand text-[15px] font-extrabold text-white hover:bg-brand-deep disabled:bg-line-strong disabled:text-muted"
               >
