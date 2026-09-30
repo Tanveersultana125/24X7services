@@ -10,7 +10,8 @@ import { Card, Empty, Page, ScreenHeader, SectionTitle, Sheet, StatusChip } from
 import { PURPOSE_LABEL, RESULT_LABEL } from '@/lib/ai/call'
 import { applianceTitle } from '@/lib/catalog'
 import { cn } from '@/lib/cn'
-import { ago, time } from '@/lib/format'
+import { ago, dayLabel, time } from '@/lib/format'
+import type { Job } from '@/lib/types'
 import { stepHref } from '@/lib/routes'
 import { useStore } from '@/lib/store'
 
@@ -20,10 +21,13 @@ const CALL_POINTS = ['Confirm appointments', 'Share ETA', 'Collect customer info
 export default function AiAssistPage() {
   const { jobs, aiThreads, aiCalls } = useStore()
   const [pick, setPick] = useState<null | 'chat' | 'call'>(null)
-  const callable = jobs
-    .filter((j) => !['request', 'cancelled', 'rejected'].includes(j.status))
-    .sort((a, b) => Number(a.status === 'closed') - Number(b.status === 'closed') || a.scheduledAt.localeCompare(b.scheduledAt))
-    .slice(0, 12)
+  // Today's open work first; then the last few finished jobs, which only
+  // matter here for a follow-up call or notes.
+  const active = jobs.filter((j) => !['request', 'cancelled', 'rejected', 'closed'].includes(j.status)).sort((a, b) => a.scheduledAt.localeCompare(b.scheduledAt))
+  const recent = jobs
+    .filter((j) => j.status === 'closed')
+    .sort((a, b) => b.scheduledAt.localeCompare(a.scheduledAt))
+    .slice(0, 4)
 
   const activity = [
     ...aiThreads.map((t) => ({ kind: 'chat' as const, id: t.id, at: t.updatedAt, jobId: t.jobId, title: t.title, sub: `${t.messages.filter((m) => m.role === 'tech').length} questions` })),
@@ -90,31 +94,13 @@ export default function AiAssistPage() {
       </Page>
 
       <Sheet open={pick !== null} onClose={() => setPick(null)} title={pick === 'call' ? 'Which job is the call about?' : 'Which job is this about?'}>
-        {callable.length === 0 ? (
-          <p className="text-sm text-muted">No active jobs right now.</p>
+        {active.length === 0 && recent.length === 0 ? (
+          <p className="text-sm text-muted">No jobs to pick from right now.</p>
         ) : (
-          <ul className="-mx-4 -my-4 divide-y divide-line">
-            {callable.map((j) => (
-              <li key={j.id}>
-                <Link
-                  href={(pick === 'call' ? `/ai/call/?id=${j.id}` : `/ai/chat/?id=${j.id}`) as Route}
-                  className="flex items-center gap-3 p-4 hover:bg-canvas"
-                >
-                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-canvas text-ink-2">
-                    <ApplianceGlyph appliance={j.appliance} className="size-5" />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-extrabold">{applianceTitle(j.brand, j.appliance)}</span>
-                    <span className="block truncate text-xs font-medium text-muted">
-                      {j.customer.name} · {time(j.scheduledAt)} · {j.issue}
-                    </span>
-                  </span>
-                  <StatusChip status={j.status} className="hidden sm:inline-flex" />
-                  <ChevronRight className="size-4 shrink-0 text-faint" />
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <div className="-mx-4 -my-4">
+            <PickGroup title="Active jobs" hint={pick === 'call' ? 'Confirm, ETA, reschedule' : undefined} jobs={active} kind={pick} />
+            <PickGroup title="Recently completed" hint={pick === 'call' ? 'For follow-up calls' : undefined} jobs={recent} kind={pick} />
+          </div>
         )}
       </Sheet>
     </>
@@ -179,5 +165,46 @@ function AgentCard({
         )}
       </div>
     </Card>
+  )
+}
+
+function PickGroup({ title, hint, jobs, kind }: { title: string; hint?: string; jobs: Job[]; kind: 'chat' | 'call' | null }) {
+  if (jobs.length === 0) return null
+  return (
+    <section>
+      <div className="flex items-baseline justify-between gap-3 border-b border-line bg-canvas px-4 py-2">
+        <p className="text-[11px] font-extrabold uppercase tracking-[0.1em] text-muted">
+          {title} <span className="num text-faint">· {jobs.length}</span>
+        </p>
+        {hint && <p className="text-[11px] font-semibold text-faint">{hint}</p>}
+      </div>
+      <ul className="divide-y divide-line">
+        {jobs.map((j) => {
+          const done = j.status === 'closed'
+          return (
+            <li key={j.id}>
+              <Link href={(kind === 'call' ? `/ai/call/?id=${j.id}` : `/ai/chat/?id=${j.id}`) as Route} className="flex items-start gap-3 px-4 py-3.5 hover:bg-canvas active:bg-canvas">
+                <span className={cn('mt-0.5 grid size-11 shrink-0 place-items-center rounded-xl', done ? 'bg-canvas text-faint' : 'bg-brand-soft text-brand')}>
+                  <ApplianceGlyph appliance={j.appliance} className="size-6" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[14.5px] font-extrabold leading-snug">{applianceTitle(j.brand, j.appliance)}</span>
+                  <span className="mt-1 flex items-center gap-2">
+                    <StatusChip status={j.status} className="shrink-0" />
+                    <span className="num truncate text-[12px] font-bold text-ink-2">
+                      {dayLabel(j.scheduledAt)}, {time(j.scheduledAt)}
+                    </span>
+                  </span>
+                  <span className="mt-1 block truncate text-[12.5px] font-medium text-muted">
+                    <span className="font-semibold text-ink-2">{j.customer.name}</span> · “{j.issue}”
+                  </span>
+                </span>
+                <ChevronRight className="mt-3.5 size-4 shrink-0 text-faint" />
+              </Link>
+            </li>
+          )
+        })}
+      </ul>
+    </section>
   )
 }
