@@ -813,16 +813,29 @@ export function ApplianceScreen() {
           aboveBar={cart.length > 0}
           items={[
             ...(plan
-              ? [{ id: 'annual-plan', label: 'Annual plan', note: '1 plan' }]
+              ? [
+                  {
+                    id: 'annual-plan',
+                    label: 'Annual plan',
+                    ...(planSaving(plan)
+                      ? {
+                          offer: [
+                            'Save',
+                            `${planSaving(plan)}%`,
+                            'OFF',
+                          ] as const,
+                        }
+                      : { photo: appliance.heroImage }),
+                  },
+                ]
               : []),
             ...groupServices(services).map((group) => ({
               id: `group-${group.key}`,
               label: group.title,
-              note: `${group.services.length} ${
-                group.services.length === 1 ? 'service' : 'services'
-              }`,
+              photo:
+                group.services.find((s) => s.technicianPhoto)
+                  ?.technicianPhoto ?? appliance.image,
             })),
-            { id: 'reviews', label: 'Reviews' },
           ]}
         />
       ) : null}
