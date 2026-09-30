@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Bell, ChevronRight, Clock, Headset, KeyRound, Languages, Landmark, LogOut, Power, Radar, RotateCcw, Smartphone, UserRound } from 'lucide-react'
 import { Button, Card, Field, Page, ScreenHeader, SectionTitle, Segmented, Sheet, Toggle, inputClass } from '@/components/ui'
+import { TimeField } from '@/components/TimeField'
 import { useStore } from '@/lib/store'
 import type { Settings } from '@/lib/types'
 
@@ -32,12 +33,8 @@ export default function SettingsPage() {
                     <Clock className="size-4 text-ink-2" /> Working hours
                   </p>
                   <div className="grid grid-cols-2 gap-3">
-                    <Field label="Shift starts">
-                      <input type="time" value={s.shiftStart} onChange={(e) => updateSettings({ shiftStart: e.target.value })} className={inputClass} />
-                    </Field>
-                    <Field label="Shift ends">
-                      <input type="time" value={s.shiftEnd} onChange={(e) => updateSettings({ shiftEnd: e.target.value })} className={inputClass} />
-                    </Field>
+                    <TimeField label="Shift starts" value={s.shiftStart} onChange={(v) => updateSettings({ shiftStart: v })} />
+                    <TimeField label="Shift ends" value={s.shiftEnd} onChange={(v) => updateSettings({ shiftEnd: v })} />
                   </div>
                   <p className="mt-2 text-xs font-medium text-muted">Emergency requests can still reach you outside these hours if you stay online.</p>
                 </div>
