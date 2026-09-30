@@ -56,15 +56,15 @@ export default function SettingsPage() {
                     <p className="flex items-center gap-2 text-sm font-extrabold">
                       <Clock className="size-4 text-ink-2" /> {t('Working hours')}
                     </p>
-                    <span className={cn('num rounded-pill px-2.5 py-1 text-[11px] font-extrabold', onShift ? 'bg-success-soft text-success' : 'bg-canvas text-muted')}>
-                      {t(onShift ? 'On shift now' : 'Off shift now')} · {shiftHours(s)} h
+                    <span dir="auto" className={cn('num rounded-pill px-2.5 py-1 text-[11px] font-extrabold', onShift ? 'bg-success-soft text-success' : 'bg-canvas text-muted')}>
+                      {t(onShift ? 'On shift now · {h} h' : 'Off shift now · {h} h', { h: shiftHours(s) })}
                     </span>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <TimeField label={t('Shift starts')} value={s.shiftStart} onChange={(v) => updateSettings({ shiftStart: v })} />
                     <TimeField label={t('Shift ends')} value={s.shiftEnd} onChange={(v) => updateSettings({ shiftEnd: v })} />
                   </div>
-                  <p className="mt-2 text-xs font-medium text-muted">{t('Emergency requests can still reach you outside these hours if you stay online.')}</p>
+                  <p dir="auto" className="mt-2 text-xs font-medium text-muted">{t('Emergency requests can still reach you outside these hours if you stay online.')}</p>
                 </div>
                 <div className="p-4">
                   <div className="mb-2 flex items-baseline justify-between">
@@ -86,7 +86,7 @@ export default function SettingsPage() {
                     <span>3 km</span>
                     <span>25 km</span>
                   </div>
-                  <p className="num mt-2 text-xs font-medium text-muted">
+                  <p dir="auto" className="num mt-2 text-xs font-medium text-muted">
                     {t(
                       waiting === 0 ? 'No waiting requests within {km} km' : waiting === 1 ? '{n} waiting request within {km} km' : '{n} waiting requests within {km} km',
                       { n: waiting, km: s.radiusKm }
@@ -109,6 +109,7 @@ export default function SettingsPage() {
                     { value: 'English', label: 'English' },
                     { value: 'हिन्दी', label: 'हिन्दी' },
                     { value: 'తెలుగు', label: 'తెలుగు' },
+                    { value: 'اردو', label: 'اردو' },
                   ]}
                 />
               </Card>

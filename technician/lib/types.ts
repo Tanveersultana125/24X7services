@@ -151,7 +151,7 @@ export interface Settings {
   shiftStart: string
   shiftEnd: string
   radiusKm: number
-  language: 'English' | 'हिन्दी' | 'తెలుగు'
+  language: 'English' | 'हिन्दी' | 'తెలుగు' | 'اردو'
   notify: {
     requests: boolean
     emergency: boolean
