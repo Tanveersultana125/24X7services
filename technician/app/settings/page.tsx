@@ -318,7 +318,7 @@ function ScannerSheet({ open, onClose, onEdit, flash }: { open: boolean; onClose
           <Avatar name={tech.name} photo={tech.photo} size={36} className="ring-2 ring-white/20" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-[15px] font-extrabold leading-tight">{tech.name}</p>
-            <p className="num truncate text-[11px] font-semibold text-white/60">Technician ID · {tech.id}</p>
+            <p className="num truncate text-[11px] font-semibold text-white/60">{tech.id}</p>
           </div>
           <span className="rounded-md bg-white/10 px-2 py-1 text-[10px] font-extrabold tracking-[0.14em]">UPI</span>
         </div>
