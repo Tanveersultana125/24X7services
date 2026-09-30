@@ -337,7 +337,7 @@ export function ServiceSheet({
                                 // machine in half. Multiplied onto the tile so
                                 // each one's own near-white backdrop becomes
                                 // the tile's colour instead of a box within it.
-                                <div className="relative mt-4 aspect-[16/10] overflow-hidden rounded-card bg-surface">
+                                <div className="relative mt-4 aspect-[16/10] overflow-hidden rounded-card bg-plate">
                                   <Image
                                     src={photo}
                                     alt=""
@@ -430,7 +430,7 @@ export function ServiceSheet({
                 <Link
                   href="/cart"
                   onClick={onClose}
-                  className="inline-flex h-12 items-center justify-center rounded-card bg-brand px-7 text-base font-semibold text-bg hover:bg-brand-deep"
+                  className="inline-flex h-12 items-center justify-center rounded-card bg-brand px-7 text-base font-semibold text-white hover:bg-brand-deep"
                 >
                   View cart
                 </Link>

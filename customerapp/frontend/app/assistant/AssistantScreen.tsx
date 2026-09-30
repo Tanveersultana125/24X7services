@@ -111,7 +111,7 @@ export function AssistantScreen() {
           message.from === 'customer' ? (
             <p
               key={message.id}
-              className="ml-auto max-w-[85%] rounded-card rounded-br-sm bg-brand px-4 py-2.5 text-sm text-bg"
+              className="ml-auto max-w-[85%] rounded-card rounded-br-sm bg-brand px-4 py-2.5 text-sm text-white"
             >
               {message.text}
             </p>
@@ -169,7 +169,7 @@ export function AssistantScreen() {
             type="submit"
             aria-label="Send"
             disabled={!draft.trim() || thinking}
-            className="flex size-12 shrink-0 items-center justify-center rounded-full bg-brand text-bg disabled:bg-border disabled:text-muted"
+            className="flex size-12 shrink-0 items-center justify-center rounded-full bg-brand text-white disabled:bg-border disabled:text-muted"
           >
             <ArrowUp className="size-5" aria-hidden="true" />
           </button>
@@ -190,7 +190,7 @@ function AssistantBubble({
     <div className="flex max-w-[92%] gap-2.5">
       <span
         aria-hidden="true"
-        className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-[#7C5CFF] to-[#E85DA8] text-bg"
+        className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-[#7C5CFF] to-[#E85DA8] text-white"
       >
         <Sparkles className="size-4" />
       </span>
@@ -240,7 +240,7 @@ function AssistantBubble({
                 className={cn(
                   'flex min-h-11 items-center justify-center rounded-pill px-4 text-center text-sm font-semibold',
                   action.primary
-                    ? 'bg-brand text-bg hover:bg-brand-deep'
+                    ? 'bg-brand text-white hover:bg-brand-deep'
                     : 'border border-border text-brand hover:border-brand'
                 )}
               >

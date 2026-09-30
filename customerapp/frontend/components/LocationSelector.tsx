@@ -53,7 +53,7 @@ export function LocationSelector({
       onClick={onClick}
       className={cn(
         'flex max-w-full items-start gap-1.5 rounded-card px-1 py-1 text-left',
-        onDark ? 'hover:bg-bg/10' : 'hover:bg-surface',
+        onDark ? 'hover:bg-white/10' : 'hover:bg-surface',
         className
       )}
       aria-label={
@@ -65,7 +65,7 @@ export function LocationSelector({
       <MapPin
         className={cn(
           'mt-0.5 size-5 shrink-0',
-          onDark ? 'text-bg' : 'text-brand'
+          onDark ? 'text-white' : 'text-brand'
         )}
         aria-hidden="true"
       />
@@ -73,7 +73,7 @@ export function LocationSelector({
         <span
           className={cn(
             'block truncate text-lg font-bold leading-tight',
-            onDark ? 'text-bg' : 'text-ink'
+            onDark ? 'text-white' : 'text-ink'
           )}
         >
           {headline}
@@ -83,7 +83,7 @@ export function LocationSelector({
             <span
               className={cn(
                 'min-w-0 truncate text-sm',
-                onDark ? 'text-bg/75' : 'text-muted'
+                onDark ? 'text-white/75' : 'text-muted'
               )}
             >
               {sub}
@@ -91,7 +91,7 @@ export function LocationSelector({
             <ChevronDown
               className={cn(
                 'size-4 shrink-0',
-                onDark ? 'text-bg/75' : 'text-muted'
+                onDark ? 'text-white/75' : 'text-muted'
               )}
               aria-hidden="true"
             />

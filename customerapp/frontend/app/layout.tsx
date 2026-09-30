@@ -38,10 +38,15 @@ export const viewport: Viewport = {
   initialScale: 1,
   // The app has a bottom nav and sticky CTAs that need the safe area.
   viewportFit: 'cover',
-  themeColor: '#2547d0',
-  // The same opt-out as `color-scheme` in globals.css, as a meta tag, which
-  // the browser reads before any stylesheet has loaded.
-  colorScheme: 'only light',
+  // The status bar matches the page in each theme.
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#121110' },
+  ],
+  // As `color-scheme` in globals.css, but as a meta tag, which the browser
+  // reads before any stylesheet has loaded — so it never paints a guessed
+  // dark version first.
+  colorScheme: 'light dark',
 }
 
 export default function RootLayout({

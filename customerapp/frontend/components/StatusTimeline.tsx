@@ -42,7 +42,7 @@ export function StatusTimeline({
                   'flex size-6 shrink-0 items-center justify-center rounded-full border-2',
                   isCurrent
                     ? 'border-brand bg-bg'
-                    : 'border-brand bg-brand text-bg'
+                    : 'border-brand bg-brand text-white'
                 )}
                 aria-hidden="true"
               >

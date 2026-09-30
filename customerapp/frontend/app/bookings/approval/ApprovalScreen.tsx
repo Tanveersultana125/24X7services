@@ -259,7 +259,7 @@ function ItemRow({
       <span
         className={cn(
           'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded border-2',
-          checked ? 'border-brand bg-brand text-bg' : 'border-border'
+          checked ? 'border-brand bg-brand text-white' : 'border-border'
         )}
         aria-hidden="true"
       >

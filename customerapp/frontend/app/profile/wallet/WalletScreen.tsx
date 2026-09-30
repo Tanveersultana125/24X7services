@@ -132,7 +132,7 @@ function SignedOut() {
       action={
         <Link
           href={SIGN_IN}
-          className="mt-3 flex h-12 w-full items-center justify-center rounded-pill bg-brand text-base font-semibold text-bg"
+          className="mt-3 flex h-12 w-full items-center justify-center rounded-pill bg-brand text-base font-semibold text-white"
         >
           Sign in to see your balance
         </Link>
@@ -413,7 +413,7 @@ function BalanceCard({
   onAdd?: () => void
 }) {
   return (
-    <div className="relative overflow-hidden rounded-card bg-linear-to-br from-brand-deep to-brand p-5 text-bg">
+    <div className="relative overflow-hidden rounded-card bg-linear-to-br from-brand-deep to-brand p-5 text-white">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-10 -right-10 size-56 opacity-25 [background-image:radial-gradient(circle,var(--color-bg)_1.5px,transparent_1.6px)] [background-size:14px_14px] [mask-image:radial-gradient(circle_at_70%_30%,#000,transparent_70%)]"
@@ -426,7 +426,7 @@ function BalanceCard({
         </p>
       </div>
 
-      <p className="relative mt-10 text-xs font-semibold tracking-[0.08em] uppercase text-bg/70">
+      <p className="relative mt-10 text-xs font-semibold tracking-[0.08em] uppercase text-white/70">
         Balance
       </p>
       <div className="relative mt-0.5 flex items-end justify-between gap-4">
@@ -436,7 +436,7 @@ function BalanceCard({
           <button
             type="button"
             onClick={onAdd}
-            className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-pill bg-bg px-4 text-sm font-semibold text-brand hover:bg-brand-soft"
+            className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-pill bg-white px-4 text-sm font-semibold text-royal hover:bg-white/90"
           >
             <Plus className="size-4" aria-hidden="true" />
             Add money
@@ -444,7 +444,7 @@ function BalanceCard({
         ) : null}
       </div>
 
-      <p className="relative mt-3 max-w-[22rem] text-sm text-bg/80">
+      <p className="relative mt-3 max-w-[22rem] text-sm text-white/80">
         {!signedIn
           ? 'Your balance is tied to your number. Sign in to see it.'
           : balance > 0

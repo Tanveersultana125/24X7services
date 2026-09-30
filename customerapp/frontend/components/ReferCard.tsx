@@ -65,7 +65,7 @@ export function ReferCard({ code }: { code: string }) {
   }
 
   return (
-    <div className="relative mt-5 overflow-hidden rounded-card bg-linear-to-br from-brand-deep to-brand text-bg">
+    <div className="relative mt-5 overflow-hidden rounded-card bg-linear-to-br from-brand-deep to-brand text-white">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-10 -right-10 size-56 opacity-25 [background-image:radial-gradient(circle,var(--color-bg)_1.5px,transparent_1.6px)] [background-size:14px_14px] [mask-image:radial-gradient(circle_at_70%_30%,#000,transparent_70%)]"
@@ -78,12 +78,12 @@ export function ReferCard({ code }: { code: string }) {
               Refer a friend, you both get{' '}
               {formatPaise(REFERRAL_WELCOME)}
             </p>
-            <p className="mt-2 max-w-[22rem] text-sm text-bg/80">
+            <p className="mt-2 max-w-[22rem] text-sm text-white/80">
               Credits land on both balances once their first job is finished —
               not when they sign up.
             </p>
           </div>
-          <Gift className="size-10 shrink-0 text-bg/70" aria-hidden="true" />
+          <Gift className="size-10 shrink-0 text-white/70" aria-hidden="true" />
         </div>
 
         {/* The code as a thing you can press, because the first instinct is to
@@ -91,22 +91,22 @@ export function ReferCard({ code }: { code: string }) {
         <button
           type="button"
           onClick={() => void copyCode()}
-          className="mt-5 flex w-full items-center justify-between gap-3 rounded-card border border-dashed border-bg/40 px-4 py-3 text-left hover:bg-bg/10"
+          className="mt-5 flex w-full items-center justify-between gap-3 rounded-card border border-dashed border-white/40 px-4 py-3 text-left hover:bg-white/10"
         >
           <span className="min-w-0">
-            <span className="block text-xs font-semibold tracking-[0.08em] uppercase text-bg/70">
+            <span className="block text-xs font-semibold tracking-[0.08em] uppercase text-white/70">
               Your code
             </span>
             <span className="mt-0.5 block font-mono text-xl font-bold tracking-[0.12em]">
               {code}
             </span>
           </span>
-          <Copy className="size-5 shrink-0 text-bg/80" aria-hidden="true" />
+          <Copy className="size-5 shrink-0 text-white/80" aria-hidden="true" />
         </button>
       </div>
 
-      <div className="relative border-t border-bg/20 px-5 py-4">
-        <p className="text-center text-xs font-semibold tracking-[0.06em] uppercase text-bg/70">
+      <div className="relative border-t border-white/20 px-5 py-4">
+        <p className="text-center text-xs font-semibold tracking-[0.06em] uppercase text-white/70">
           Refer via
         </p>
         <div className="mt-3 grid grid-cols-4 gap-2">
@@ -156,16 +156,16 @@ function Channel({
 }) {
   const body = (
     <>
-      <span className="flex size-11 items-center justify-center rounded-full bg-bg text-brand">
+      <span className="flex size-11 items-center justify-center rounded-full bg-white text-royal">
         <Icon className="size-5" aria-hidden="true" />
       </span>
-      <span className="text-xs font-medium text-bg/90">{label}</span>
+      <span className="text-xs font-medium text-white/90">{label}</span>
     </>
   )
 
   const classes = cn(
     'flex min-w-0 flex-col items-center gap-1.5 rounded-card py-1',
-    disabled ? 'opacity-60' : 'hover:bg-bg/10'
+    disabled ? 'opacity-60' : 'hover:bg-white/10'
   )
 
   if (href) {

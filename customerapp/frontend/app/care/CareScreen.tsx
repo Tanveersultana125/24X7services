@@ -389,7 +389,7 @@ function RangeTile({
     >
       <span className="relative block h-24">
         {badge ? (
-          <span className="absolute top-0 left-0 z-10 inline-flex items-center gap-1 rounded-card bg-success px-2 py-1 text-[11px] leading-none font-bold text-bg">
+          <span className="absolute top-0 left-0 z-10 inline-flex items-center gap-1 rounded-card bg-success px-2 py-1 text-[11px] leading-none font-bold text-white">
             <Sparkles className="size-3" aria-hidden="true" />
             {badge}
           </span>
@@ -472,9 +472,9 @@ function PlanTile({
 
   return (
     <article className="flex h-full flex-col">
-      <span className="relative block aspect-square overflow-hidden rounded-card bg-surface">
+      <span className="relative block aspect-square overflow-hidden rounded-card bg-plate">
         {saving > 0 ? (
-          <span className="absolute top-0 left-0 z-10 rounded-card bg-success px-2 py-1 text-[11px] leading-none font-bold text-bg">
+          <span className="absolute top-0 left-0 z-10 rounded-card bg-success px-2 py-1 text-[11px] leading-none font-bold text-white">
             {formatPaise(saving)} off
           </span>
         ) : null}
@@ -643,7 +643,7 @@ function PlusBlock({
           {signInHref ? (
             <Link
               href={signInHref}
-              className="mt-4 flex h-12 w-full items-center justify-center rounded-pill bg-brand text-base font-semibold text-bg hover:bg-brand-deep"
+              className="mt-4 flex h-12 w-full items-center justify-center rounded-pill bg-brand text-base font-semibold text-white hover:bg-brand-deep"
             >
               Sign in to buy
             </Link>

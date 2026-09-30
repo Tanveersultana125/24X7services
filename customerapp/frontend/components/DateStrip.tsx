@@ -96,7 +96,7 @@ export function DateStrip({
               !day.hasAvailability
                 ? 'cursor-not-allowed border-border bg-surface text-muted'
                 : selected
-                  ? 'border-brand bg-brand text-bg'
+                  ? 'border-brand bg-brand text-white'
                   : 'border-border bg-bg text-ink hover:border-brand'
             )}
           >

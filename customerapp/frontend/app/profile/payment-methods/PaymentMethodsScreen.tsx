@@ -224,7 +224,7 @@ function Methods({ uid }: { uid: string | null }) {
                 <span
                   className={cn(
                     'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border',
-                    selected ? 'border-brand bg-brand text-bg' : 'border-border'
+                    selected ? 'border-brand bg-brand text-white' : 'border-border'
                   )}
                   aria-hidden="true"
                 >

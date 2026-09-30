@@ -141,7 +141,7 @@ export function BookingsScreen() {
                   'min-h-11 shrink-0 rounded-pill border px-4 text-sm font-medium',
                   'transition-colors duration-[var(--duration-fast)]',
                   selected
-                    ? 'border-brand bg-brand text-bg'
+                    ? 'border-brand bg-brand text-white'
                     : 'border-border bg-bg text-ink hover:border-brand'
                 )}
               >
@@ -177,7 +177,7 @@ export function BookingsScreen() {
               <div className="mt-2 flex w-full max-w-xs flex-col gap-2 sm:max-w-md sm:flex-row sm:justify-center">
                 <Link
                   href={signIn}
-                  className="inline-flex min-h-11 flex-1 items-center justify-center rounded-pill bg-brand px-5 text-sm font-semibold text-bg transition-colors duration-[var(--duration-fast)] hover:bg-brand-deep"
+                  className="inline-flex min-h-11 flex-1 items-center justify-center rounded-pill bg-brand px-5 text-sm font-semibold text-white transition-colors duration-[var(--duration-fast)] hover:bg-brand-deep"
                 >
                   Sign in
                 </Link>

@@ -46,7 +46,7 @@ export function TimeSlot({
         unavailable
           ? 'cursor-not-allowed border-border bg-surface text-muted'
           : selected
-            ? 'border-brand bg-brand text-bg'
+            ? 'border-brand bg-brand text-white'
             : 'border-border bg-bg text-ink hover:border-brand',
         className
       )}
@@ -58,7 +58,7 @@ export function TimeSlot({
         <span
           className={cn(
             'text-[11px] font-medium',
-            selected ? 'text-bg/80' : 'text-warning'
+            selected ? 'text-white/80' : 'text-warning'
           )}
         >
           Filling fast

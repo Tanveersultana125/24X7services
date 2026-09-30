@@ -250,7 +250,7 @@ export function ProfileScreen() {
                 </p>
                 <Link
                   href={signInTo('/profile')}
-                  className="mt-4 flex h-12 w-full items-center justify-center rounded-pill bg-brand text-base font-semibold text-bg hover:bg-brand-deep sm:w-auto sm:px-8"
+                  className="mt-4 flex h-12 w-full items-center justify-center rounded-pill bg-brand text-base font-semibold text-white hover:bg-brand-deep sm:w-auto sm:px-8"
                 >
                   Sign in
                 </Link>
@@ -381,7 +381,7 @@ function ReferCard() {
 
       <Link
         href="/profile/refer"
-        className="mt-4 inline-flex h-12 items-center justify-center rounded-pill bg-brand px-6 text-base font-semibold text-bg hover:bg-brand-deep"
+        className="mt-4 inline-flex h-12 items-center justify-center rounded-pill bg-brand px-6 text-base font-semibold text-white hover:bg-brand-deep"
       >
         Refer now
       </Link>

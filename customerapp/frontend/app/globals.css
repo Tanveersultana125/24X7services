@@ -45,6 +45,20 @@
   --color-warning-soft: #fdf4e7;
   --color-error-soft: #fcefef;
 
+  /* The ground under a product photograph or a brand logo. Most of them are
+     cut-outs on white, multiplied onto this, so it has to stay light in the
+     dark theme too — on a dark plate they turn into black shapes. `logo` is
+     the logo tiles' white. */
+  --color-plate: #f4f2ec;
+  --color-plate-deep: #e6e2d8;
+  --color-logo: #ffffff;
+
+  /* Fixed, whatever the theme. `night` is the scrim over a photo or a video
+     and the ground of a video card; `royal` is brand blue for text on a white
+     pill that sits on a coloured card, where the theme's brand would shift. */
+  --color-night: #17150f;
+  --color-royal: #2547d0;
+
   /* --- Type -------------------------------------------------------------- */
   --font-sans: 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
     sans-serif;
@@ -78,6 +92,43 @@
   --duration-fast: 150ms;
   --duration-base: 200ms;
   --duration-slow: 250ms;
+}
+
+/* ===========================================================================
+   Dark theme
+   ---------------------------------------------------------------------------
+   Follows the phone. The same warm palette, turned down rather than inverted:
+   a warm near-black ground, one step up for cards, borders just visible,
+   and a brighter brand blue so links still read on it while white text on a
+   blue button still clears AA. Photographs keep a light plate (see `plate`).
+   =========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-ink: #f1ede4;
+    --color-bg: #121110;
+    --color-surface: #1c1a17;
+    --color-border: #2f2c27;
+    --color-muted: #a8a193;
+
+    --color-brand: #4d6ef0;
+    --color-brand-deep: #2c47b8;
+    --color-brand-soft: #1b2344;
+
+    --color-success: #1fb57a;
+    --color-warning: #e39a3b;
+    --color-error: #e5605f;
+    --color-success-soft: #10281e;
+    --color-warning-soft: #2c2113;
+    --color-error-soft: #2d1616;
+
+    --color-plate: #ece8e0;
+    --color-plate-deep: #ded9cf;
+    --color-logo: #ece8e0;
+
+    --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.4),
+      0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  }
 }
 
 /* ===========================================================================
@@ -119,13 +170,11 @@
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
-    /* Light only, and said so. The app has no dark theme, and a phone set to
-       dark mode otherwise lets the browser (Chrome's auto-dark, Samsung
-       Internet, the Android WebView) invert it by guesswork: product shots
-       multiplied onto white turned into black blobs, white photo plates
-       glared out of a dark card, and the brand's own colours flipped. `only`
-       is what opts out of that forced darkening, not just the default. */
-    color-scheme: only light;
+    /* Both, and the dark one is designed (below). Declaring dark support is
+       also what stops a phone in dark mode from darkening the page by
+       guesswork — Chrome's auto-dark, Samsung Internet, the Android WebView —
+       which is what turned product shots into black blobs. */
+    color-scheme: light dark;
     /* The safe-area inset the bottom nav and sticky CTAs sit above. */
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --safe-top: env(safe-area-inset-top, 0px);

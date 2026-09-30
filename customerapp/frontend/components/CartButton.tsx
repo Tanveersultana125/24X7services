@@ -35,7 +35,7 @@ export function CartButton({ className }: { className?: string }) {
       {count > 0 ? (
         <span
           aria-hidden="true"
-          className="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-pill bg-brand px-1 text-[11px] font-bold leading-none text-bg ring-2 ring-bg"
+          className="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-pill bg-brand px-1 text-[11px] font-bold leading-none text-white ring-2 ring-bg"
         >
           {count > 9 ? '9+' : count}
         </span>

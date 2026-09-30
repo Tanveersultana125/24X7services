@@ -131,7 +131,7 @@ function ActiveCard({ membership }: { membership: Membership }) {
   const left = daysUntil(membership.expiresAt)
 
   return (
-    <div className="relative mt-5 overflow-hidden rounded-card bg-linear-to-br from-brand-deep to-brand p-5 text-bg">
+    <div className="relative mt-5 overflow-hidden rounded-card bg-linear-to-br from-brand-deep to-brand p-5 text-white">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-10 -right-10 size-56 opacity-25 [background-image:radial-gradient(circle,var(--color-bg)_1.5px,transparent_1.6px)] [background-size:14px_14px] [mask-image:radial-gradient(circle_at_70%_30%,#000,transparent_70%)]"
@@ -145,14 +145,14 @@ function ActiveCard({ membership }: { membership: Membership }) {
       </div>
 
       <p className="relative mt-8 text-2xl font-bold">You are a member</p>
-      <p className="relative mt-1 text-sm text-bg/80">
+      <p className="relative mt-1 text-sm text-white/80">
         {left > 0
           ? `${left} ${left === 1 ? 'day' : 'days'} left — until ${formatDateTime(
               membership.expiresAt
             )}`
           : 'Ending today'}
       </p>
-      <p className="relative mt-3 text-sm text-bg/80">
+      <p className="relative mt-3 text-sm text-white/80">
         Paid {membership.period === 'yearly' ? 'yearly' : 'monthly'}. It will not
         renew on its own.
       </p>
@@ -288,7 +288,7 @@ function Buy({
       ) : (
         <Link
           href={signIn}
-          className="mt-4 flex h-12 w-full items-center justify-center rounded-pill bg-brand text-base font-semibold text-bg hover:bg-brand-deep"
+          className="mt-4 flex h-12 w-full items-center justify-center rounded-pill bg-brand text-base font-semibold text-white hover:bg-brand-deep"
         >
           Sign in to join
         </Link>

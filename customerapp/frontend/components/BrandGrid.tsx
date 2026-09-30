@@ -61,7 +61,7 @@ function BrandTile({ brand }: { brand: CatalogBrand }) {
   return (
     <div
       className={cn(
-        'flex h-16 items-center justify-center rounded-card bg-surface px-3'
+        'flex h-16 items-center justify-center rounded-card bg-plate px-3'
       )}
     >
       {brand.logo ? (

@@ -122,7 +122,7 @@ export function OtpScreen() {
       subtitle={
         <>
           We sent a 6-digit code to{' '}
-          <span className="font-semibold text-bg">
+          <span className="font-semibold text-white">
             {formatPhone(pending.phoneE164)}
           </span>
           .

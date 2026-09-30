@@ -473,7 +473,7 @@ function Media({
         playsInline
         preload="metadata"
         aria-hidden="true"
-        className="mt-5 aspect-video w-full rounded-card bg-surface object-cover"
+        className="mt-5 aspect-video w-full rounded-card bg-plate object-cover"
       />
     )
   }
@@ -481,7 +481,7 @@ function Media({
   if (!still) return null
 
   return (
-    <span className="relative mt-5 block aspect-video w-full overflow-hidden rounded-card bg-surface">
+    <span className="relative mt-5 block aspect-video w-full overflow-hidden rounded-card bg-plate">
       <Image
         src={still}
         alt=""

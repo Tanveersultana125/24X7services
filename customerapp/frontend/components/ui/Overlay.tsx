@@ -123,7 +123,7 @@ export function Overlay({
         onClick={close}
         className={
           backdropClassName ??
-          'absolute inset-0 bg-ink/40 transition-opacity duration-[var(--duration-base)]'
+          'absolute inset-0 bg-night/40 transition-opacity duration-[var(--duration-base)]'
         }
       />
       <div

@@ -21,7 +21,7 @@ export interface ButtonProps
 const variants: Record<Variant, string> = {
   // Solid brand blue is the only primary in the system.
   primary:
-    'bg-brand text-bg border border-brand hover:bg-brand-deep active:bg-brand-deep disabled:bg-muted disabled:border-muted',
+    'bg-brand text-white border border-brand hover:bg-brand-deep active:bg-brand-deep disabled:bg-muted disabled:border-muted',
   // The quieter of the two: brand edge and brand label, no fill. Used beside a
   // primary, where two filled buttons would be a coin toss.
   secondary:

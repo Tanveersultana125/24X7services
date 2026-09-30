@@ -78,7 +78,7 @@ export function ServiceClip({
 
   return (
     <span
-      className={cn('relative block overflow-hidden bg-surface', className)}
+      className={cn('relative block overflow-hidden bg-plate', className)}
     >
       {plays ? (
         <video

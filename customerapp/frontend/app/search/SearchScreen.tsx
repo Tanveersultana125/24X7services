@@ -315,7 +315,7 @@ function Results({
                 onClick={() => onOpen(`/services/appliance/?a=${appliance.id}`)}
                 className="group flex w-full min-w-0 flex-col items-center gap-2"
               >
-                <span className="relative block aspect-square w-full overflow-hidden rounded-card bg-surface transition-colors duration-[var(--duration-fast)] group-hover:bg-border">
+                <span className="relative block aspect-square w-full overflow-hidden rounded-card bg-plate transition-colors duration-[var(--duration-fast)] group-hover:bg-plate-deep">
                   <Image
                     src={appliance.image}
                     alt=""

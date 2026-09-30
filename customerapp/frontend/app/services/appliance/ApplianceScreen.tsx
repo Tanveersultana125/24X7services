@@ -283,7 +283,7 @@ export function ApplianceScreen() {
               page. Absent for an appliance nobody has photographed, and the
               screen opens on the name the way it always did. */}
           {appliance.heroImage ? (
-            <span className="relative -mx-4 mt-4 block aspect-video overflow-hidden bg-surface lg:mx-0 lg:mt-6 lg:aspect-[3/1] lg:rounded-card">
+            <span className="relative -mx-4 mt-4 block aspect-video overflow-hidden bg-plate lg:mx-0 lg:mt-6 lg:aspect-[3/1] lg:rounded-card">
               <Image
                 src={appliance.heroImage}
                 alt=""

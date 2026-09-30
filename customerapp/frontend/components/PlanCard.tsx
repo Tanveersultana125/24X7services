@@ -182,7 +182,7 @@ export function PlanOfferCard({
       )}
     >
       {highlight ? (
-        <p className="flex items-center gap-1.5 bg-brand px-4 py-1.5 text-xs font-bold tracking-[0.06em] text-bg uppercase">
+        <p className="flex items-center gap-1.5 bg-brand px-4 py-1.5 text-xs font-bold tracking-[0.06em] text-white uppercase">
           <Sparkles className="size-3.5" aria-hidden="true" />
           Best value
         </p>
@@ -260,7 +260,7 @@ export function PlanOfferCard({
             className={cn(
               'mt-4 flex h-12 w-full items-center justify-center rounded-pill text-base font-semibold',
               highlight
-                ? 'bg-brand text-bg hover:bg-brand-deep'
+                ? 'bg-brand text-white hover:bg-brand-deep'
                 : 'border border-brand text-brand hover:bg-brand-soft'
             )}
           >

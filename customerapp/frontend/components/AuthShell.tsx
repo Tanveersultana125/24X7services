@@ -58,21 +58,21 @@ export function AuthShell({
                 type="button"
                 onClick={goBack}
                 aria-label="Go back"
-                className="-ml-2 flex size-11 items-center justify-center rounded-full text-bg hover:bg-bg/10"
+                className="-ml-2 flex size-11 items-center justify-center rounded-full text-white hover:bg-white/10"
               >
                 <ArrowLeft className="size-5" aria-hidden="true" />
               </button>
             ) : (
               <span className="size-11" />
             )}
-            <span className="text-lg font-extrabold tracking-tight text-bg">
+            <span className="text-lg font-extrabold tracking-tight text-white">
               {brand.wordmark}
             </span>
           </div>
 
-          <h1 className="mt-3 text-2xl font-bold text-bg">{title}</h1>
+          <h1 className="mt-3 text-2xl font-bold text-white">{title}</h1>
           {subtitle ? (
-            <p className="mt-2 text-sm leading-relaxed text-bg/75">{subtitle}</p>
+            <p className="mt-2 text-sm leading-relaxed text-white/75">{subtitle}</p>
           ) : null}
         </div>
         {/* The sheet laps over this, so the block needs height under the text

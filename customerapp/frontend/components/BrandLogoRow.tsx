@@ -15,7 +15,7 @@ export function BrandLogoRow({ brands }: { brands: readonly CatalogBrand[] }) {
       {brands.map((brand) => (
         <li
           key={brand.id}
-          className="flex h-14 items-center justify-center rounded-card border border-border px-3"
+          className="flex h-14 items-center justify-center rounded-card border border-border bg-logo px-3"
         >
           {brand.logo ? (
             <span className="relative block h-6 w-full">

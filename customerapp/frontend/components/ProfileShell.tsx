@@ -189,7 +189,7 @@ export function SignInPrompt({
       <div className="flex flex-col items-center gap-3">
         <Link
           href={href}
-          className="inline-flex min-h-12 w-full items-center justify-center rounded-pill bg-brand px-5 text-base font-semibold text-bg hover:bg-brand-deep"
+          className="inline-flex min-h-12 w-full items-center justify-center rounded-pill bg-brand px-5 text-base font-semibold text-white hover:bg-brand-deep"
         >
           Log in with your mobile number
         </Link>

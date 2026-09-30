@@ -127,7 +127,7 @@ export function ServiceRail({
                 // A photograph is cropped square, which is the shape the rail
                 // was laid out on. A drawing keeps that square too, with the
                 // room around it it was drawn with.
-                className="aspect-square rounded-card transition-colors duration-[var(--duration-fast)] group-hover:bg-border"
+                className="aspect-square rounded-card transition-colors duration-[var(--duration-fast)] group-hover:bg-plate-deep"
               />
               <span className="mt-2.5 block line-clamp-2 text-sm font-semibold leading-snug text-ink">
                 {item.name}

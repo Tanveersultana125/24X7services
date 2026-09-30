@@ -53,7 +53,7 @@ export function HowItWorks({ className }: { className?: string }) {
               />
             ) : null}
             <span
-              className="relative flex size-7 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-bg"
+              className="relative flex size-7 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-white"
               aria-hidden="true"
             >
               {index + 1}

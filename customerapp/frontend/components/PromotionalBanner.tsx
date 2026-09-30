@@ -180,8 +180,8 @@ export function PromotionalBanner({
                 className={cn(
                   'h-1.5 rounded-full transition-all duration-[var(--duration-base)]',
                   index === active
-                    ? 'w-5 bg-bg lg:bg-brand'
-                    : 'w-1.5 bg-bg/45 lg:bg-border'
+                    ? 'w-5 bg-white lg:bg-brand'
+                    : 'w-1.5 bg-white/45 lg:bg-border'
                 )}
               />
             </button>
@@ -251,7 +251,7 @@ export function BannerCard({
   const body = (
     <div
       className={cn(
-        'flex h-full min-h-52 gap-5 overflow-hidden rounded-card bg-linear-to-br p-5 text-bg sm:min-h-56',
+        'flex h-full min-h-52 gap-5 overflow-hidden rounded-card bg-linear-to-br p-5 text-white sm:min-h-56',
         TONES[banner.tone],
         className
       )}
@@ -259,20 +259,20 @@ export function BannerCard({
       <div className="flex min-w-0 flex-1 flex-col justify-between gap-4">
         <div>
           {banner.badge ? (
-            <span className="mb-2.5 inline-flex items-center rounded-pill bg-bg/20 px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] uppercase text-bg">
+            <span className="mb-2.5 inline-flex items-center rounded-pill bg-white/20 px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] uppercase text-white">
               {banner.badge}
             </span>
           ) : null}
           <h3 className="text-xl font-bold leading-snug">{banner.title}</h3>
           {banner.subtitle ? (
-            <p className="mt-1.5 line-clamp-3 text-sm text-bg/80">
+            <p className="mt-1.5 line-clamp-3 text-sm text-white/80">
               {banner.subtitle}
             </p>
           ) : null}
         </div>
 
         {banner.ctaLabel ? (
-          <span className="inline-flex w-fit items-center rounded-pill bg-bg px-4 py-2 text-sm font-semibold text-brand">
+          <span className="inline-flex w-fit items-center rounded-pill bg-white px-4 py-2 text-sm font-semibold text-royal">
             {banner.ctaLabel}
           </span>
         ) : null}

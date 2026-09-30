@@ -48,7 +48,7 @@ export function CartBar({
       >
         <Link
           href="/cart"
-          className="inline-flex h-12 items-center justify-center rounded-card border border-brand bg-brand px-8 text-base font-semibold text-bg hover:bg-brand-deep"
+          className="inline-flex h-12 items-center justify-center rounded-card border border-brand bg-brand px-8 text-base font-semibold text-white hover:bg-brand-deep"
         >
           View cart
         </Link>

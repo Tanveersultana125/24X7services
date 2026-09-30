@@ -93,7 +93,7 @@ export function VideoRail({
                   kitchen, clear by the middle so the room still shows. */}
               <span
                 aria-hidden="true"
-                className="absolute inset-x-0 bottom-0 h-3/5 bg-linear-to-t from-ink/85 via-ink/35 to-transparent"
+                className="absolute inset-x-0 bottom-0 h-3/5 bg-linear-to-t from-night/85 via-night/35 to-transparent"
               />
 
               <span
@@ -101,11 +101,11 @@ export function VideoRail({
                 className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-2 p-3"
               >
                 {item.tag ? (
-                  <span className="rounded-pill border border-bg/40 bg-bg/20 px-2.5 py-1 text-[11px] font-semibold text-bg backdrop-blur-sm">
+                  <span className="rounded-pill border border-white/40 bg-white/20 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
                     {item.tag}
                   </span>
                 ) : null}
-                <span className="text-base leading-tight font-bold text-bg">
+                <span className="text-base leading-tight font-bold text-white">
                   {item.title}
                 </span>
               </span>

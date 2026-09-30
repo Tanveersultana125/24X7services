@@ -257,7 +257,7 @@ export function MediaUploader({
               )}
 
               {item.progress !== undefined ? (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-ink/60 text-bg">
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-night/60 text-white">
                   <Loader2 className="size-5 animate-spin" aria-hidden="true" />
                   <span className="text-xs tabular-nums">
                     {Math.round(item.progress)}%
@@ -275,12 +275,12 @@ export function MediaUploader({
                 type="button"
                 onClick={() => remove(item.id)}
                 aria-label={`Remove ${item.kind === 'image' ? 'photo' : 'video'}`}
-                className="absolute right-1 top-1 flex size-8 min-h-0 items-center justify-center rounded-full bg-ink/70 text-bg"
+                className="absolute right-1 top-1 flex size-8 min-h-0 items-center justify-center rounded-full bg-night/70 text-white"
               >
                 <Trash2 className="size-3.5" aria-hidden="true" />
               </button>
 
-              <span className="absolute bottom-1 left-1 rounded-pill bg-ink/70 px-1.5 py-0.5 text-[10px] text-bg">
+              <span className="absolute bottom-1 left-1 rounded-pill bg-night/70 px-1.5 py-0.5 text-[10px] text-white">
                 {formatBytes(item.file.size)}
               </span>
             </li>
