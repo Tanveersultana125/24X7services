@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation'
 import { MapPin, MessageSquareText, Phone } from 'lucide-react'
 import { ApplianceGlyph, BrandTag } from './glyphs'
 import { Card, Empty, Label, PriorityBadge, StatusChip } from './ui'
-import { applianceTitle } from '@/lib/catalog'
+import { LABOUR_RATE, applianceTitle, inr } from '@/lib/catalog'
 import { cn } from '@/lib/cn'
 import { telHref } from '@/lib/format'
 import { useJob } from '@/lib/store'
@@ -103,6 +103,110 @@ export function CustomerBlock({ job, masked }: { job: Job; masked?: boolean }) {
           {masked && <p className="text-xs text-muted">Full address and number unlock when you accept.</p>}
         </div>
       </div>
+    </Card>
+  )
+}
+
+/**
+ * What has been found and what it costs, on the job screen itself — so the
+ * technician (or a supervisor looking over their shoulder) sees the whole
+ * job without opening Diagnosis, Parts and Bill one by one.
+ */
+export function ServiceSummary({ job }: { job: Job }) {
+  const labour = job.bill?.labour ?? LABOUR_RATE[job.appliance]
+  const parts = job.parts.reduce((s, p) => s + p.qty * p.price, 0)
+  const additional = job.bill?.additional ?? 0
+  const legacy = job.status === 'closed' && !job.bill && job.amount !== undefined
+  const total = legacy ? job.amount! : labour + parts + additional
+  const paid = job.status === 'closed' || !!job.bill?.paid
+
+  return (
+    <Card className="divide-y divide-line">
+      <div className="p-4">
+        <Label>Diagnosis</Label>
+        {job.diagnosis ? (
+          <div className="mt-1 text-sm">
+            <p className="font-extrabold">{job.diagnosis.problem}</p>
+            <p className="mt-0.5 font-medium text-ink-2">{job.diagnosis.repair}</p>
+            <p className="mt-1.5 flex flex-wrap gap-1.5 text-[11px] font-bold">
+              <span className="rounded-md bg-canvas px-2 py-0.5 text-ink-2">{job.diagnosis.category}</span>
+              <span className="rounded-md bg-canvas px-2 py-0.5 text-ink-2">Condition: {job.diagnosis.condition}</span>
+            </p>
+          </div>
+        ) : (
+          <p className="mt-1 text-sm font-semibold text-muted">Not recorded yet — done on site after arrival.</p>
+        )}
+      </div>
+
+      <div className="p-4">
+        <Label>Parts required</Label>
+        {job.parts.length ? (
+          <ul className="mt-1.5 space-y-1 text-sm">
+            {job.parts.map((p) => (
+              <li key={p.sku} className="flex items-baseline justify-between gap-3">
+                <span className="min-w-0 truncate font-semibold">
+                  {p.name} <span className="text-muted">× {p.qty}</span>
+                  {!p.inVan && <span className="ml-1.5 text-[11px] font-bold text-danger">From hub</span>}
+                </span>
+                <span className="num shrink-0 font-bold">{inr(p.qty * p.price)}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-1 text-sm font-semibold text-muted">None selected</p>
+        )}
+      </div>
+
+      <div className="p-4">
+        <div className="flex items-center justify-between">
+          <Label>Service charges</Label>
+          <span
+            className={cn(
+              'rounded-md px-2 py-0.5 text-[10.5px] font-extrabold uppercase tracking-wider',
+              paid ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning'
+            )}
+          >
+            {paid ? `Paid${job.bill?.method ? ` · ${job.bill.method === 'cash' ? 'Cash' : 'Online'}` : ''}` : 'Payment pending'}
+          </span>
+        </div>
+        {!legacy && (
+          <dl className="mt-2 space-y-1 text-sm">
+            <div className="flex justify-between">
+              <dt className="font-medium text-muted">Labour / service</dt>
+              <dd className="num font-bold">{inr(labour)}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="font-medium text-muted">Parts</dt>
+              <dd className="num font-bold">{inr(parts)}</dd>
+            </div>
+            {additional > 0 && (
+              <div className="flex justify-between">
+                <dt className="font-medium text-muted">Additional</dt>
+                <dd className="num font-bold">{inr(additional)}</dd>
+              </div>
+            )}
+          </dl>
+        )}
+        <div className="mt-2 flex items-baseline justify-between border-t border-dashed border-line pt-2">
+          <span className="text-sm font-extrabold">Total</span>
+          <span className="num text-lg font-extrabold">{inr(total)}</span>
+        </div>
+      </div>
+
+      {job.photos.length > 0 && (
+        <div className="p-4">
+          <Label>Photos</Label>
+          <div className="mt-2 grid grid-cols-4 gap-2">
+            {job.photos.map((p) => (
+              <div key={p.id} className="relative aspect-square overflow-hidden rounded-lg border border-line bg-canvas">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={p.url} alt={`${p.kind} photo`} className="size-full object-cover" />
+                <span className="absolute inset-x-0 bottom-0 bg-ink/60 px-1 py-0.5 text-center text-[9.5px] font-bold uppercase text-white">{p.kind}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </Card>
   )
 }

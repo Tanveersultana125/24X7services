@@ -61,7 +61,7 @@ export function FilterButton({ value, onChange, hideStatus }: { value: FilterSta
             </div>
           </div>
           <div>
-            <p className="mb-2 text-xs font-bold uppercase tracking-wider text-faint">Appliance</p>
+            <p className="mb-2 text-xs font-bold uppercase tracking-wider text-faint">Service</p>
             <div className="flex flex-wrap gap-2">
               {APPLIANCES.map((a) => (
                 <FilterChip key={a} active={draft.appliances.includes(a)} onClick={() => setDraft((d) => ({ ...d, appliances: toggle(d.appliances, a) }))}>

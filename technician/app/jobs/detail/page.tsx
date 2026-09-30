@@ -17,7 +17,7 @@ import {
   Stethoscope,
   TriangleAlert,
 } from 'lucide-react'
-import { CustomerBlock, JobNotFound, JobSummary, useJobParam } from '@/components/JobParts'
+import { CustomerBlock, JobNotFound, JobSummary, ServiceSummary, useJobParam } from '@/components/JobParts'
 import { ServiceMap } from '@/components/ServiceMap'
 import { FlowBar, Timeline } from '@/components/Timeline'
 import { ActionDock, Card, Page, ScreenHeader, SectionTitle } from '@/components/ui'
@@ -205,6 +205,13 @@ function JobDetail() {
                     <MessageCircle className="size-4 text-brand" /> Chat
                   </a>
                 </div>
+              </section>
+            )}
+
+            {!cancelled && (
+              <section>
+                <SectionTitle>Service summary</SectionTitle>
+                <ServiceSummary job={job} />
               </section>
             )}
 

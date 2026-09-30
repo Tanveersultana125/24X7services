@@ -3,14 +3,14 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { Bell, ChevronRight, Locate, Search, SearchX, X, MessageCircle, Navigation, Phone, PowerOff, Siren, Star } from 'lucide-react'
-import { ApplianceGlyph, BrandTag } from '@/components/glyphs'
+import { ApplianceGlyph } from '@/components/glyphs'
 import { JobCard } from '@/components/JobCard'
 import { MenuButton } from '@/components/menu'
 import { FlowBar } from '@/components/Timeline'
-import { Avatar, Card, Empty, PriorityBadge, SectionTitle, StatusChip, Toggle } from '@/components/ui'
+import { Avatar, Card, Empty, SectionTitle, StatusChip, Toggle } from '@/components/ui'
 import { applianceTitle, inr } from '@/lib/catalog'
 import { cn } from '@/lib/cn'
-import { ago, directionsHref, earned, isToday, matchesQuery, telHref, time } from '@/lib/format'
+import { directionsHref, earned, isToday, matchesQuery, telHref, time } from '@/lib/format'
 import { jobHref, stepHref } from '@/lib/routes'
 import { IN_PROGRESS, NEXT_ACTION } from '@/lib/status'
 import { useStore, useTick } from '@/lib/store'
@@ -197,7 +197,7 @@ export default function HomePage() {
                 </SectionTitle>
                 <div className="space-y-3">
                   {requests.map((j) => (
-                    <RequestCard key={j.id} job={j} />
+                    <JobCard key={j.id} job={j} />
                   ))}
                 </div>
               </section>
@@ -294,62 +294,6 @@ function CurrentJob({ job }: { job: Job }) {
         )}
       </Card>
     </section>
-  )
-}
-
-function RequestCard({ job }: { job: Job }) {
-  const { accept, reject } = useStore()
-  const emergency = job.priority === 'emergency'
-  return (
-    <Card className={cn('overflow-hidden', emergency && 'border-danger/40')}>
-      {emergency && (
-        <div className="flex items-center justify-between bg-danger px-4 py-1.5 text-[11px] font-extrabold uppercase tracking-wider text-white">
-          <span className="flex items-center gap-1.5">
-            <Siren className="size-3.5" /> High priority · emergency
-          </span>
-          <span className="num normal-case tracking-normal">{ago(job.requestedAt)}</span>
-        </div>
-      )}
-      <Link href={jobHref(job)} className="block p-4">
-        <div className="flex items-start gap-3">
-          <div className={cn('grid size-11 shrink-0 place-items-center rounded-xl', emergency ? 'bg-danger-soft text-danger' : 'bg-brand-soft text-brand')}>
-            <ApplianceGlyph appliance={job.appliance} className="size-6" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5">
-              <BrandTag brand={job.brand} />
-              {!emergency && <PriorityBadge priority={job.priority} />}
-            </div>
-            <p className="mt-1 text-[15.5px] font-extrabold leading-snug tracking-tight">{applianceTitle(job.brand, job.appliance)}</p>
-            <p className="text-sm font-semibold text-ink-2">&ldquo;{job.issue}&rdquo;</p>
-          </div>
-          <div className="text-right">
-            <p className="num text-[15px] font-extrabold text-success">{inr(job.estFee)}</p>
-            <p className="text-[11px] font-bold text-faint">est. fee</p>
-          </div>
-        </div>
-        <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs font-semibold text-muted">
-          <span className="rounded-lg bg-canvas py-1.5">
-            <span className="num block text-sm font-extrabold text-ink">{job.distanceKm} km</span>distance
-          </span>
-          <span className="rounded-lg bg-canvas py-1.5">
-            <span className="num block text-sm font-extrabold text-ink">{emergency ? 'ASAP' : time(job.scheduledAt)}</span>requested
-          </span>
-          <span className="truncate rounded-lg bg-canvas px-1 py-1.5">
-            <span className="block truncate text-sm font-extrabold text-ink">{job.customer.area}</span>
-            {job.customer.name.split(' ')[0]}
-          </span>
-        </div>
-      </Link>
-      <div className="grid grid-cols-[1fr_1.5fr] gap-2 px-4 pb-4">
-        <button type="button" onClick={() => reject(job.id)} className="h-12 rounded-xl border-2 border-line-strong text-sm font-extrabold text-ink-2 hover:border-danger hover:text-danger">
-          Reject
-        </button>
-        <button type="button" onClick={() => accept(job.id)} className="h-12 rounded-xl bg-success text-sm font-extrabold text-white hover:brightness-95">
-          Accept job
-        </button>
-      </div>
-    </Card>
   )
 }
 
