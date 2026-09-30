@@ -594,24 +594,49 @@ export function ApplianceScreen() {
               <p className="text-sm font-semibold text-ink">
                 Your {kindField.label.toLowerCase()}
               </p>
-              <div className="no-scrollbar -mx-4 mt-2 flex gap-2 overflow-x-auto px-4 pb-1">
+              <div className="no-scrollbar -mx-4 mt-3 flex gap-3 overflow-x-auto px-4 pt-1 pb-1">
                 {kinds.map((each) => {
                   const on = kind === each
+                  const photo = typePhoto(appliance.id, each) ?? appliance.image
                   return (
                     <button
                       key={each}
                       type="button"
                       onClick={() => setKind(on ? null : each)}
                       aria-pressed={on}
-                      className={cn(
-                        'inline-flex h-10 shrink-0 items-center gap-1.5 rounded-pill border px-4 text-sm transition-colors duration-[var(--duration-fast)]',
-                        on
-                          ? 'border-brand bg-brand-soft font-semibold text-brand'
-                          : 'border-border text-ink hover:border-muted'
-                      )}
+                      className="group flex w-22 shrink-0 flex-col items-center text-center sm:w-26"
                     >
-                      {on ? <Check className="size-4" aria-hidden="true" /> : null}
-                      {typeLabel(each)}
+                      <span
+                        className={cn(
+                          'relative block aspect-square w-full overflow-hidden rounded-card bg-plate transition-transform duration-[var(--duration-fast)] group-active:scale-95',
+                          on && 'ring-2 ring-brand ring-offset-2 ring-offset-bg'
+                        )}
+                      >
+                        {photo ? (
+                          // Product shots on white: contained and multiplied
+                          // onto the tile, not cropped through the machine.
+                          <Image
+                            src={photo}
+                            alt=""
+                            fill
+                            sizes="(min-width: 640px) 104px, 88px"
+                            className="object-contain p-2 mix-blend-multiply"
+                          />
+                        ) : null}
+                        {on ? (
+                          <span className="absolute right-1.5 top-1.5 flex size-5 items-center justify-center rounded-full bg-brand text-white">
+                            <Check className="size-3.5" aria-hidden="true" />
+                          </span>
+                        ) : null}
+                      </span>
+                      <span
+                        className={cn(
+                          'mt-2 line-clamp-2 text-xs leading-snug',
+                          on ? 'font-semibold text-brand' : 'text-ink'
+                        )}
+                      >
+                        {typeLabel(each)}
+                      </span>
                     </button>
                   )
                 })}
