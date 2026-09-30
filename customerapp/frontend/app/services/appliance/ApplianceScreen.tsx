@@ -376,20 +376,6 @@ export function ApplianceScreen() {
    * step, so that step never renders against a draft that has not been written
    * yet and bounces the customer back out of the flow it just sent them into.
    */
-  /**
-   * Open the service rather than book it.
-   *
-   * The card is a way of choosing what to read about, not a commitment. The
-   * booking starts from the page it opens, where the fee, the time and the
-   * warranty have already been answered.
-   */
-  function openService(serviceKey: CatalogService['serviceKey']): void {
-    if (!applianceId) return
-    router.push(
-      `/services/detail?a=${applianceId}&s=${serviceKey}` as Route
-    )
-  }
-
   function startBooking(serviceKey: CatalogService['serviceKey'], issueId?: string): void {
     if (!applianceId) return
     startDraft({
@@ -728,7 +714,7 @@ export function ApplianceScreen() {
                           }}
                         />
                       }
-                      onOpen={() => openService(service.serviceKey)}
+                      onOpen={() => setSheetId(service.id)}
                       openLabel={`${service.name}, visit fee ${formatPaise(service.visitFee)}. See what it covers.`}
                     />
                   )

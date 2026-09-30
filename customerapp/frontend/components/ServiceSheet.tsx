@@ -29,6 +29,7 @@ import { ReviewsPanel } from "@/components/ReviewsSheet";
 import { usePrefersReducedMotion } from "@/components/ServiceClip";
 import { useToast } from "@/components/Toast";
 import { durationNote } from "@/components/ServiceRail";
+import { StickyCTA, StickySpacer } from "@/components/StickyCTA";
 import {
   addToCart,
   countForService,
@@ -114,8 +115,9 @@ export function ServiceSheet({
             <X className="size-5" aria-hidden="true" />
           </button>
           {/* Keyed, so opening another service starts its choices afresh. */}
-          <SheetBody
+          <ServiceDetails
             key={service.id}
+            variant="sheet"
             titleId={titleId}
             service={service}
             appliance={appliance}
@@ -128,19 +130,30 @@ export function ServiceSheet({
   );
 }
 
-function SheetBody({
+/**
+ * Everything the sheet shows, as its own piece: the sheet frames it in a
+ * panel from the bottom, and the service's own page (`/services/detail`) lays
+ * the same thing out full width — one design wherever a service is opened,
+ * rather than a sheet saying one thing and a page another.
+ */
+export function ServiceDetails({
+  variant,
   titleId,
   service,
   appliance,
   issues,
   onClose,
 }: {
-  titleId: string;
+  /** In the sheet it scrolls inside the panel; on a page, with the page. */
+  variant: "sheet" | "page";
+  titleId?: string;
   service: CatalogService;
   appliance?: CatalogAppliance;
   issues: readonly CatalogIssue[];
-  onClose: () => void;
+  /** Closes the sheet on the way to another page; nothing to close on a page. */
+  onClose?: () => void;
 }) {
+  const page = variant === "page";
   const cart = useCart();
   const toast = useToast();
 
@@ -202,15 +215,84 @@ function SheetBody({
       toast.show("We could not share that.", { tone: "error" });
   }
 
+  const footerDetail = (
+    <p className="min-w-0 flex-1" aria-live="polite">
+      {added > 0 ? (
+        <>
+          <span className="block text-base font-semibold text-ink">
+            {added} {added === 1 ? "item" : "items"} added
+          </span>
+          <Link
+            href="/cart"
+            onClick={onClose}
+            className="text-sm font-semibold text-brand"
+          >
+            View cart
+          </Link>
+        </>
+      ) : (
+        <>
+          <span className="block text-base font-semibold text-ink">
+            {formatPaise(service.visitFee)}
+          </span>
+          <span className="block text-sm text-muted">
+            {ready ? "Visit fee" : "Pick the options above"}
+          </span>
+        </>
+      )}
+    </p>
+  );
+  const footerButton = (
+    <button
+      type="button"
+      disabled={!ready || already}
+      onClick={() => addToCart(item)}
+      className={cn(
+        "inline-flex h-12 items-center justify-center gap-1.5 rounded-card px-7 text-base font-semibold transition-colors duration-[var(--duration-fast)]",
+        already
+          ? "border border-brand bg-brand-soft text-brand"
+          : "bg-brand text-white hover:bg-brand-deep disabled:bg-surface disabled:text-muted",
+      )}
+    >
+      {already ? (
+        <>
+          <Check className="size-4" aria-hidden="true" />
+          Added
+        </>
+      ) : (
+        "Add to cart"
+      )}
+    </button>
+  );
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-t-[1.25rem] bg-bg sm:rounded-card sm:shadow-raised">
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-        <PhotoStrip photos={photos} />
+    <div
+      className={cn(
+        page
+          ? "-mx-4 lg:mx-0"
+          : "flex min-h-0 flex-1 flex-col overflow-hidden rounded-t-[1.25rem] bg-bg sm:rounded-card sm:shadow-raised",
+      )}
+    >
+      <div
+        className={cn(
+          !page && "min-h-0 flex-1 overflow-y-auto overscroll-contain",
+        )}
+      >
+        <PhotoStrip photos={photos} rounded={page} />
 
         <section className="px-5 pb-6 pt-6">
-          <h2 id={titleId} className="text-2xl font-bold leading-tight text-ink">
-            {service.name}
-          </h2>
+          {page ? (
+            <h1 className="text-2xl font-bold leading-tight text-ink">
+              {service.name}
+            </h1>
+          ) : (
+            <h2
+              id={titleId}
+              className="text-2xl font-bold leading-tight text-ink"
+            >
+              {service.name}
+            </h2>
+          )}
           <p className="mt-1.5 text-base text-ink">
             <span className="font-semibold">
               Starts at {formatPaise(service.visitFee)}
@@ -480,53 +562,19 @@ function SheetBody({
       {/* The way to add it, for as long as the sheet is open: waits for the
           choices above, then adds; once anything of this service is in the
           cart, the way to it sits beside. */}
-      <div className="flex items-center gap-3 border-t border-border bg-bg px-5 py-3 pb-[calc(0.75rem+var(--safe-bottom))]">
-        <p className="min-w-0 flex-1" aria-live="polite">
-          {added > 0 ? (
-            <>
-              <span className="block text-base font-semibold text-ink">
-                {added} {added === 1 ? "item" : "items"} added
-              </span>
-              <Link
-                href="/cart"
-                onClick={onClose}
-                className="text-sm font-semibold text-brand"
-              >
-                View cart
-              </Link>
-            </>
-          ) : (
-            <>
-              <span className="block text-base font-semibold text-ink">
-                {formatPaise(service.visitFee)}
-              </span>
-              <span className="block text-sm text-muted">
-                {ready ? "Visit fee" : "Pick the options above"}
-              </span>
-            </>
-          )}
-        </p>
-        <button
-          type="button"
-          disabled={!ready || already}
-          onClick={() => addToCart(item)}
-          className={cn(
-            "inline-flex h-12 items-center justify-center gap-1.5 rounded-card px-7 text-base font-semibold transition-colors duration-[var(--duration-fast)]",
-            already
-              ? "border border-brand bg-brand-soft text-brand"
-              : "bg-brand text-white hover:bg-brand-deep disabled:bg-surface disabled:text-muted",
-          )}
-        >
-          {already ? (
-            <>
-              <Check className="size-4" aria-hidden="true" />
-              Added
-            </>
-          ) : (
-            "Add to cart"
-          )}
-        </button>
-      </div>
+      {page ? (
+        <>
+          <StickySpacer aboveBottomNav />
+          <StickyCTA aboveBottomNav wide detail={footerDetail}>
+            {footerButton}
+          </StickyCTA>
+        </>
+      ) : (
+        <div className="flex items-center gap-3 border-t border-border bg-bg px-5 py-3 pb-[calc(0.75rem+var(--safe-bottom))]">
+          {footerDetail}
+          {footerButton}
+        </div>
+      )}
     </div>
   );
 }
@@ -537,7 +585,14 @@ function SheetBody({
  * on the appliance page, and none at all for somebody who asked for less
  * motion.
  */
-function PhotoStrip({ photos }: { photos: readonly string[] }) {
+function PhotoStrip({
+  photos,
+  rounded = false,
+}: {
+  photos: readonly string[];
+  /** On a page from a laptop up, where it sits inside the column. */
+  rounded?: boolean;
+}) {
   const [index, setIndex] = useState(0);
   const reducedMotion = usePrefersReducedMotion();
   const count = photos.length;
@@ -551,7 +606,12 @@ function PhotoStrip({ photos }: { photos: readonly string[] }) {
   if (count === 0) return <div className="h-6" />;
 
   return (
-    <div className="relative aspect-[16/11] overflow-hidden bg-plate">
+    <div
+      className={cn(
+        "relative aspect-[16/11] overflow-hidden bg-plate",
+        rounded && "lg:mt-6 lg:rounded-card",
+      )}
+    >
       {photos.map((photo, i) => (
         <Image
           key={photo}
