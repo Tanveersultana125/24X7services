@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { Route } from 'next'
-import { ChevronRight, ShieldCheck } from 'lucide-react'
+import { BadgeCheck, ChevronRight, ShieldCheck, Star } from 'lucide-react'
 import {
   applianceIdSchema,
   type ApplianceId,
@@ -44,7 +44,9 @@ import {
   fetchIssuesFor,
   fetchServiceReviews,
   fetchServicesFor,
+  summaryByAppliance,
 } from '@/lib/catalog'
+import { countNote } from '@/components/ServiceScore'
 import { formatPaise } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/cn'
@@ -173,6 +175,9 @@ export function ApplianceScreen() {
     services.map((service) => [service.serviceKey, service.name])
   )
   const tileLabels = shortLabels(services)
+  const score = applianceId
+    ? summaryByAppliance(services).get(applianceId)
+    : undefined
   const cart = useCart()
 
   // The service whose options sheet is open — a repair, where "Add" means
@@ -311,30 +316,71 @@ export function ApplianceScreen() {
               reads as a picture somebody pasted in rather than the top of the
               page. Absent for an appliance nobody has photographed, and the
               screen opens on the name the way it always did. */}
+          {/* The banner, the way the marketplaces open an appliance: what we
+              do to it and what it starts at, on the photograph rather than
+              under it. Two columns, not two layers — the words on the plate
+              to the left, the technician cropped into the right — so no crop
+              of the photograph can put a face under the headline. `plate` and
+              `night` because the photograph is a light room in either theme. */}
           {appliance.heroImage ? (
-            <span className="relative -mx-4 mt-4 block aspect-video overflow-hidden bg-plate lg:mx-0 lg:mt-6 lg:aspect-[3/1] lg:rounded-card">
-              <Image
-                src={appliance.heroImage}
-                alt=""
-                fill
-                sizes="(min-width: 1024px) 640px, 100vw"
-                // The one picture above the fold on this screen, so it is
-                // fetched with the page rather than after layout has run.
-                priority
-                className="object-cover"
-              />
-            </span>
+            <section className="relative -mx-4 mt-4 flex min-h-56 overflow-hidden bg-plate px-4 py-6 lg:mx-0 lg:mt-6 lg:min-h-64 lg:rounded-card lg:px-8">
+              <div className="absolute inset-y-0 right-0 w-1/2">
+                <Image
+                  src={appliance.heroImage}
+                  alt=""
+                  fill
+                  sizes="(min-width: 1024px) 320px, 50vw"
+                  // The one picture above the fold on this screen, so it is
+                  // fetched with the page rather than after layout has run.
+                  priority
+                  className="object-cover object-[68%_center]"
+                />
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-y-0 left-0 w-1/4 bg-linear-to-r from-plate to-transparent"
+                />
+              </div>
+
+              <div className="relative flex w-[54%] min-w-0 flex-col justify-center pr-2">
+                <span className="inline-flex w-fit items-center gap-1.5 rounded-md bg-success px-2 py-1 text-[11px] font-semibold tracking-[0.04em] uppercase text-white">
+                  <BadgeCheck className="size-3.5" aria-hidden="true" />
+                  Verified technicians
+                </span>
+                <p className="mt-3 text-xl font-bold leading-tight text-night sm:text-2xl">
+                  {appliance.name}{' '}service &amp; repair
+                </p>
+                {cheapestFee !== null ? (
+                  <p className="mt-2 text-base text-night/70">
+                    Starts at {formatPaise(cheapestFee)}
+                  </p>
+                ) : null}
+              </div>
+            </section>
           ) : null}
 
           <section className="mt-6">
-            <h1 className="text-2xl font-bold leading-tight text-ink">
+            <h1 className="text-3xl font-bold leading-tight text-ink">
               {appliance.name}
             </h1>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted">
-              Repair, service and installation at your doorstep.
-            </p>
 
-            {cheapestFee !== null ? (
+            {/* The score of every service here, weighted by how many people
+                gave one, as on the All services tile. It links to the reviews
+                it summarises, the way a dotted underline promises. */}
+            {score?.rating !== undefined && score.reviewCount !== undefined ? (
+              <a
+                href="#reviews"
+                className="mt-1.5 inline-flex items-center gap-1.5 text-sm text-ink underline decoration-muted decoration-dotted underline-offset-4"
+              >
+                <Star
+                  className="size-3.5 fill-ink text-ink"
+                  aria-hidden="true"
+                />
+                <span className="font-semibold">{score.rating.toFixed(2)}</span>
+                <span>({countNote(score.reviewCount)} reviews)</span>
+              </a>
+            ) : null}
+
+            {appliance.heroImage ? null : cheapestFee !== null ? (
               <p className="mt-3 text-sm text-muted">
                 Visit from{' '}
                 <span className="text-base font-bold text-ink">
@@ -450,11 +496,14 @@ export function ApplianceScreen() {
             </div>
           </Section>
 
-          <ServiceReviews
-            reviews={data.data?.reviews ?? []}
-            serviceNames={serviceNames}
-            action={<WriteReviewButton applianceId={appliance.id} />}
-          />
+          {/* The rating under the name points here. */}
+          <div id="reviews" className={JUMP_OFFSET}>
+            <ServiceReviews
+              reviews={data.data?.reviews ?? []}
+              serviceNames={serviceNames}
+              action={<WriteReviewButton applianceId={appliance.id} />}
+            />
+          </div>
 
           {data.data && data.data.issues.length > 0 ? (
             <Section
