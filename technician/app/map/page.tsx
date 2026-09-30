@@ -112,13 +112,16 @@ export default function MapPage() {
                   <Phone className="size-5" />
                 </a>
               )}
+              <Link href={jobHref(sel)} className="flex h-12 flex-1 items-center justify-center rounded-xl border-2 border-line-strong text-[15px] font-extrabold hover:border-ink-2">
+                Open Job
+              </Link>
               <a
                 href={directionsHref(sel.customer.lat, sel.customer.lng)}
                 target="_blank"
                 rel="noreferrer"
-                className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-brand text-[15px] font-extrabold text-white hover:bg-brand-deep"
+                className="flex h-12 flex-[1.3] items-center justify-center gap-2 rounded-xl bg-brand text-[15px] font-extrabold text-white hover:bg-brand-deep"
               >
-                <Navigation className="size-5" /> Start navigation
+                <Navigation className="size-5" /> Navigate
               </a>
             </div>
           </div>

@@ -12,7 +12,7 @@ import { FlowBar } from '@/components/Timeline'
 import { Avatar, Card, Empty, SectionTitle, StatusChip, Toggle } from '@/components/ui'
 import { applianceTitle, inr } from '@/lib/catalog'
 import { cn } from '@/lib/cn'
-import { directionsHref, earned, isToday, matchesQuery, telHref, time } from '@/lib/format'
+import { dayLabel, directionsHref, earned, isToday, matchesQuery, telHref, time } from '@/lib/format'
 import { jobHref, stepHref } from '@/lib/routes'
 import { IN_PROGRESS, NEXT_ACTION } from '@/lib/status'
 import { useStore, useTick } from '@/lib/store'
@@ -32,6 +32,11 @@ export default function HomePage() {
   const current =
     jobs.find((j) => IN_PROGRESS.includes(j.status)) ?? jobs.find((j) => j.status === 'on_the_way') ?? schedule.find((j) => j.status === 'accepted')
   const unread = store.notices.filter((n) => !n.read).length
+  const emergencies = requests.filter((j) => j.priority === 'emergency')
+  const emergencyWaiting = emergencies[0]
+  // The next visit after the one in hand, and the last one finished.
+  const upcoming = schedule.find((j) => (j.status === 'accepted' || j.status === 'assigned') && j.id !== current?.id)
+  const recent = [...jobs].filter((j) => j.status === 'closed').sort((a, b) => (b.log.closed ?? b.scheduledAt).localeCompare(a.log.closed ?? a.scheduledAt))[0]
 
   const stats = {
     today: today.filter((j) => j.status !== 'cancelled').length,
@@ -140,18 +145,20 @@ export default function HomePage() {
         ) : (
           <>
         {/* Today's pipeline */}
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
           {(
             [
-              ['Pending', stats.pending, 'bg-warning'],
-              ['Accepted', stats.accepted, 'bg-brand'],
-              ['Active', stats.progress, 'bg-violet'],
-              ['Done', stats.done, 'bg-success'],
+              ["Today's jobs", stats.today, 'bg-ink', '/jobs'],
+              ['Pending', stats.pending, 'bg-warning', '/jobs'],
+              ['Accepted', stats.accepted, 'bg-brand', '/jobs'],
+              ['In progress', stats.progress, 'bg-violet', '/jobs'],
+              ['Completed', stats.done, 'bg-success', '/history'],
+              ["Today's earnings", inr(stats.earnings), 'bg-success', '/earnings'],
             ] as const
-          ).map(([label, value, bar]) => (
+          ).map(([label, value, bar, href]) => (
             <Link
               key={label}
-              href="/jobs"
+              href={href}
               className="relative overflow-hidden rounded-xl border border-line bg-card px-2.5 pb-2.5 pt-3 shadow-card"
             >
               <span className={cn('absolute inset-x-0 top-0 h-[3px]', bar)} />
@@ -180,7 +187,14 @@ export default function HomePage() {
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:items-start">
           <div className="space-y-6">
+            {emergencyWaiting && <EmergencyAlert job={emergencyWaiting} count={emergencies.length} />}
             {current && <CurrentJob job={current} />}
+            {(upcoming || recent) && (
+              <div className="grid gap-3 sm:grid-cols-2">
+                {upcoming && <MiniJob kicker="Upcoming service" job={upcoming} meta={`${dayLabel(upcoming.scheduledAt)}, ${time(upcoming.scheduledAt)}`} />}
+                {recent && <MiniJob kicker="Recent job" job={recent} meta={`Completed · ${inr(earned(recent))}`} done />}
+              </div>
+            )}
 
             {/* New requests */}
             {requests.length > 0 && (
@@ -349,5 +363,49 @@ function AiAssistCard({ job }: { job?: Job }) {
         </Link>
       </div>
     </Card>
+  )
+}
+
+/**
+ * A waiting emergency, flagged without turning the dashboard red: a red rail
+ * and label carry the priority, the card itself stays white.
+ */
+function EmergencyAlert({ job, count }: { job: Job; count: number }) {
+  return (
+    <Link href={`/request/?id=${job.id}` as Route} className="relative flex items-center gap-3 overflow-hidden rounded-card border border-danger/30 bg-card p-4 pl-5 shadow-card hover:border-danger/60">
+      <span className="absolute inset-y-0 left-0 w-1 bg-danger" />
+      <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-danger-soft text-danger">
+        <Siren className="size-5" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.1em] text-danger">
+          <span className="size-1.5 animate-blink rounded-full bg-danger" />
+          Emergency request{count > 1 ? ` · ${count} waiting` : ''}
+        </span>
+        <span className="mt-0.5 block truncate text-[15px] font-extrabold">{applianceTitle(job.brand, job.appliance)}</span>
+        <span className="block truncate text-xs font-medium text-muted">
+          {job.customer.area} · {job.distanceKm} km · “{job.issue}”
+        </span>
+      </span>
+      <span className="shrink-0 rounded-lg bg-danger px-3 py-2 text-xs font-extrabold text-white">Respond</span>
+    </Link>
+  )
+}
+
+function MiniJob({ kicker, job, meta, done }: { kicker: string; job: Job; meta: string; done?: boolean }) {
+  return (
+    <Link href={jobHref(job)} className="flex items-center gap-3 rounded-card border border-line bg-card p-3.5 shadow-card hover:border-line-strong">
+      <span className={cn('grid size-11 shrink-0 place-items-center rounded-xl', done ? 'bg-success-soft text-success' : 'bg-brand-soft text-brand')}>
+        <ApplianceGlyph appliance={job.appliance} className="size-6" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[10.5px] font-extrabold uppercase tracking-[0.1em] text-faint">{kicker}</span>
+        <span className="block truncate text-sm font-extrabold">{applianceTitle(job.brand, job.appliance)}</span>
+        <span className="block truncate text-xs font-medium text-muted">
+          {job.customer.name} · <span className="num">{meta}</span>
+        </span>
+      </span>
+      <ChevronRight className="size-4 shrink-0 text-faint" />
+    </Link>
   )
 }

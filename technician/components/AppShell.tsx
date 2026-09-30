@@ -25,7 +25,7 @@ import { cn } from '@/lib/cn'
 import { LANG_CODE, useT } from '@/lib/i18n'
 import { recordPath } from '@/lib/nav'
 import { useStore } from '@/lib/store'
-import { Avatar } from './ui'
+import { Avatar, Toggle } from './ui'
 import { IncomingRequest } from './IncomingRequest'
 import { Logo } from './Logo'
 import { MenuContext } from './menu'
@@ -34,7 +34,7 @@ import { TechnicianSheet } from './TechnicianSheet'
 const TABS = [
   { href: '/home', label: 'Home', icon: House },
   { href: '/jobs', label: 'Jobs', icon: BriefcaseBusiness },
-  { href: '/map', label: 'Map', icon: MapIcon },
+  { href: '/ai', label: 'AI Assist', icon: Sparkles },
   { href: '/earnings', label: 'Earnings', icon: Wallet },
   { href: '/profile', label: 'Profile', icon: UserRound },
 ] as const satisfies ReadonlyArray<{ href: Route; label: string; icon: typeof House }>
@@ -55,9 +55,9 @@ const SIDE = [
 
 /** Which tab a screen belongs to, so /jobs/detail still lights up Jobs. */
 function section(pathname: string): string {
-  if (pathname.startsWith('/jobs') || pathname.startsWith('/request') || pathname.startsWith('/history')) return '/jobs'
+  if (pathname.startsWith('/jobs') || pathname.startsWith('/request') || pathname.startsWith('/history') || pathname.startsWith('/map')) return '/jobs'
   if (pathname.startsWith('/settings') || pathname.startsWith('/support')) return '/profile'
-  if (pathname.startsWith('/emergency') || pathname.startsWith('/notifications') || pathname.startsWith('/ai')) return '/home'
+  if (pathname.startsWith('/emergency') || pathname.startsWith('/notifications')) return '/home'
   return '/' + (pathname.split('/')[1] ?? '')
 }
 
@@ -216,17 +216,21 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
           </ul>
         </nav>
         <div className="border-t border-line p-4">
-          <button
-            type="button"
-            onClick={() => store.setOnline(!store.online)}
+          <div
             className={cn(
-              'flex w-full items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left text-sm font-bold',
-              store.online ? 'border-success/30 bg-success-soft text-success' : 'border-line-strong bg-canvas text-muted'
+              'flex items-center gap-2.5 rounded-xl border py-2 pl-3 pr-2',
+              store.online ? 'border-success/30 bg-success-soft' : 'border-line-strong bg-canvas'
             )}
           >
-            <span className={cn('size-2.5 rounded-full', store.online ? 'bg-success animate-blink' : 'bg-faint')} />
-            {t(store.online ? 'Online · receiving jobs' : 'Offline')}
-          </button>
+            <span className={cn('size-2.5 shrink-0 rounded-full', store.online ? 'animate-blink bg-success' : 'bg-faint')} />
+            <span className="min-w-0 flex-1">
+              <span className={cn('block text-[10.5px] font-extrabold tracking-[0.12em]', store.online ? 'text-success' : 'text-muted')}>
+                {t(store.online ? 'ONLINE' : 'OFFLINE')}
+              </span>
+              <span className="block truncate text-xs font-semibold text-ink-2">{t(store.online ? 'Receiving jobs' : 'Not receiving jobs')}</span>
+            </span>
+            <Toggle checked={store.online} onChange={store.setOnline} label="Availability" tone="success" />
+          </div>
           <button
             type="button"
             onClick={() => {

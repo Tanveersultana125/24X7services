@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import type { Route } from 'next'
 import { useState } from 'react'
-import { BellOff, BriefcaseBusiness, CalendarClock, CircleX, IndianRupee, MessageCircle, Siren, Star, Zap } from 'lucide-react'
+import { BellOff, BriefcaseBusiness, CalendarClock, CircleCheck, CircleX, IndianRupee, MessageCircle, PhoneCall, Siren, Star, Zap } from 'lucide-react'
 import { Card, Empty, FilterChip, Page, ScreenHeader } from '@/components/ui'
 import { cn } from '@/lib/cn'
 import { ago } from '@/lib/format'
@@ -11,14 +11,16 @@ import { useStore, useTick } from '@/lib/store'
 import type { NotificationKind } from '@/lib/types'
 
 const KIND: Record<NotificationKind, { icon: typeof Zap; tone: string; label: string }> = {
-  request: { icon: Zap, tone: 'bg-brand-soft text-brand', label: 'New request' },
+  request: { icon: Zap, tone: 'bg-brand-soft text-brand', label: 'New job' },
+  emergency: { icon: Siren, tone: 'bg-danger text-white', label: 'Emergency request' },
+  accepted: { icon: CircleCheck, tone: 'bg-success-soft text-success', label: 'Job accepted' },
   assigned: { icon: BriefcaseBusiness, tone: 'bg-brand-soft text-brand', label: 'Assigned' },
-  customer: { icon: MessageCircle, tone: 'bg-info-soft text-info', label: 'Customer' },
-  schedule: { icon: CalendarClock, tone: 'bg-warning-soft text-warning', label: 'Schedule' },
+  schedule: { icon: CalendarClock, tone: 'bg-warning-soft text-warning', label: 'Schedule change' },
   cancelled: { icon: CircleX, tone: 'bg-canvas text-muted', label: 'Cancelled' },
-  emergency: { icon: Siren, tone: 'bg-danger text-white', label: 'Emergency' },
+  customer: { icon: MessageCircle, tone: 'bg-info-soft text-info', label: 'Customer update' },
   payment: { icon: IndianRupee, tone: 'bg-success-soft text-success', label: 'Payment' },
-  rating: { icon: Star, tone: 'bg-warning-soft text-warning', label: 'Rating' },
+  ai_call: { icon: PhoneCall, tone: 'bg-violet-soft text-violet', label: 'AI call summary' },
+  rating: { icon: Star, tone: 'bg-warning-soft text-warning', label: 'New rating' },
 }
 
 type Tab = 'all' | 'jobs' | 'payments'

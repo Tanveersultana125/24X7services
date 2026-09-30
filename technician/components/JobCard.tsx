@@ -115,7 +115,7 @@ export function JobCard({ job }: { job: Job }) {
           {variant === 'completed' || variant === 'cancelled' ? (
             <Fact icon={MapPin} label="Area" value={job.customer.area} />
           ) : (
-            <Fact icon={MapPin} label="Location" value={`${job.distanceKm} km away`} />
+            <Fact icon={MapPin} label="Location" value={`${job.customer.area} · ${job.distanceKm} km`} />
           )}
           <VariantFacts job={job} variant={variant} now={now} />
         </dl>
@@ -155,6 +155,7 @@ function VariantFacts({ job, variant, now }: { job: Job; variant: CardVariant; n
       return (
         <>
           <Fact icon={Clock} label="Requested" value={fresh ? 'Now' : ago(job.requestedAt)} tone="text-danger" />
+          <Fact icon={Navigation} label="ETA" value={`${job.etaMin} min drive`} />
           <Fact icon={IndianRupee} label="Est. service" value={inr(job.estFee)} />
         </>
       )
@@ -163,6 +164,7 @@ function VariantFacts({ job, variant, now }: { job: Job; variant: CardVariant; n
       return (
         <>
           <Fact icon={Clock} label="Appointment" value={when(job.scheduledAt)} />
+          <Fact icon={Navigation} label="ETA" value={`${job.etaMin} min drive`} />
           <Fact icon={IndianRupee} label="Est. service" value={inr(job.estFee)} />
         </>
       )
@@ -170,7 +172,8 @@ function VariantFacts({ job, variant, now }: { job: Job; variant: CardVariant; n
       return (
         <>
           <Fact icon={Clock} label="Appointment" value={when(job.scheduledAt)} />
-          <Fact icon={Navigation} label="ETA" value={`${job.etaMin} min`} />
+          <Fact icon={Navigation} label="ETA" value={`${job.etaMin} min drive`} />
+          <Fact icon={IndianRupee} label="Service amount" value={inr(job.estFee)} />
         </>
       )
     case 'on_the_way': {
@@ -275,6 +278,7 @@ function Actions({ job, variant }: { job: Job; variant: CardVariant }) {
           </>
         ) : (
           <>
+            <CallButton job={job} />
             <Link href={stepHref('detail', job.id)} className={secondary}>
               View job
             </Link>
@@ -300,6 +304,7 @@ function Actions({ job, variant }: { job: Job; variant: CardVariant }) {
     case 'in_progress':
       row = (
         <>
+          <CallButton job={job} />
           <Link href={stepHref('diagnosis', job.id)} className={secondary}>
             Update diagnosis
           </Link>
@@ -323,4 +328,17 @@ function Actions({ job, variant }: { job: Job; variant: CardVariant }) {
       break
   }
   return <div className="flex gap-2.5 border-t border-line px-4 py-3 sm:px-5">{row}</div>
+}
+
+/** A square call key beside the text actions; only once the number is unlocked. */
+function CallButton({ job }: { job: Job }) {
+  return (
+    <a
+      href={telHref(job.customer.phone)}
+      aria-label={`Call ${job.customer.name}`}
+      className="grid size-12 shrink-0 place-items-center rounded-xl border-2 border-success/30 bg-success-soft text-success hover:border-success"
+    >
+      <Phone className="size-5" aria-hidden />
+    </a>
+  )
 }

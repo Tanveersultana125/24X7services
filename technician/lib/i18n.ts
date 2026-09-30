@@ -12,6 +12,10 @@ type Lang = Settings['language']
  */
 const DICT: Record<Exclude<Lang, 'English'>, Record<string, string>> = {
   हिन्दी: {
+    'ONLINE': 'ऑनलाइन',
+    'OFFLINE': 'ऑफ़लाइन',
+    'Receiving jobs': 'जॉब मिल रहे हैं',
+    'Not receiving jobs': 'जॉब नहीं मिल रहे',
     'AI Assist': 'AI असिस्ट',
     'On': 'चालू',
     'Off': 'बंद',
@@ -72,6 +76,10 @@ const DICT: Record<Exclude<Lang, 'English'>, Record<string, string>> = {
     '{n} waiting requests within {km} km': '{km} km के अंदर {n} रिक्वेस्ट इंतज़ार में',
   },
   తెలుగు: {
+    'ONLINE': 'ఆన్‌లైన్',
+    'OFFLINE': 'ఆఫ్‌లైన్',
+    'Receiving jobs': 'జాబ్స్ వస్తున్నాయి',
+    'Not receiving jobs': 'జాబ్స్ రావడం లేదు',
     'AI Assist': 'AI అసిస్ట్',
     'On': 'ఆన్',
     'Off': 'ఆఫ్',
@@ -132,6 +140,10 @@ const DICT: Record<Exclude<Lang, 'English'>, Record<string, string>> = {
     '{n} waiting requests within {km} km': '{km} km లోపు {n} రిక్వెస్ట్‌లు వేచి ఉన్నాయి',
   },
   اردو: {
+    'ONLINE': 'آن لائن',
+    'OFFLINE': 'آف لائن',
+    'Receiving jobs': 'جابز مل رہی ہیں',
+    'Not receiving jobs': 'جابز نہیں مل رہیں',
     'AI Assist': 'AI اسسٹ',
     'On': 'آن',
     'Off': 'آف',

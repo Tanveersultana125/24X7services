@@ -3,6 +3,7 @@
 import { ShieldCheck, Siren } from 'lucide-react'
 import { JobCard } from '@/components/JobCard'
 import { Empty, Page, ScreenHeader, SectionTitle } from '@/components/ui'
+import { cn } from '@/lib/cn'
 import { isActive } from '@/lib/status'
 import { useStore, useTick } from '@/lib/store'
 
@@ -20,19 +21,30 @@ export default function EmergencyPage() {
     <>
       <ScreenHeader back="/home" title="Emergency Jobs" subtitle="24×7 high-priority desk" />
       <Page className="space-y-5">
-        <div className="relative overflow-hidden rounded-card bg-[#8f1d17] p-4 text-white">
-          <div className="pointer-events-none absolute -right-10 -top-10 size-40 rounded-full border-[24px] border-white/[0.06]" />
-          <div className="flex items-center gap-3">
-            <span className="relative grid size-12 place-items-center rounded-full bg-white/15">
-              <span className="animate-pulse-ring absolute inset-1 rounded-full bg-white/25" />
-              <Siren className="relative size-6" />
+        {/* Priority is carried by the rail, icon and numbers — the page stays white. */}
+        <div className="relative overflow-hidden rounded-card border border-line bg-card shadow-card">
+          <span className="absolute inset-y-0 left-0 w-1 bg-danger" />
+          <div className="flex items-center gap-3 p-4 pl-5">
+            <span className="relative grid size-11 shrink-0 place-items-center rounded-xl bg-danger-soft text-danger">
+              {open.length > 0 && <span className="animate-pulse-ring absolute inset-1 rounded-xl bg-danger/20" />}
+              <Siren className="relative size-5" />
             </span>
-            <div>
-              <p className="num text-2xl font-extrabold leading-none">{open.length} open</p>
-              <p className="mt-1 text-sm font-medium text-white/75">Target: accept within 2 min, arrive within 45 min.</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-extrabold uppercase tracking-[0.1em] text-danger">24×7 priority desk</p>
+              <p className="text-sm font-medium text-muted">Accept within 2 min · arrive within 45 min</p>
             </div>
           </div>
-          {!online && <p className="mt-3 rounded-lg bg-white/10 px-3 py-2 text-xs font-bold">You’re offline — go online to take emergency jobs.</p>}
+          <dl className="grid grid-cols-2 divide-x divide-line border-t border-line">
+            <div className="px-4 py-3">
+              <dt className="text-[10.5px] font-bold uppercase tracking-wider text-faint">Waiting</dt>
+              <dd className={cn('num text-2xl font-extrabold leading-tight', open.length ? 'text-danger' : 'text-ink')}>{open.length}</dd>
+            </div>
+            <div className="px-4 py-3">
+              <dt className="text-[10.5px] font-bold uppercase tracking-wider text-faint">Your emergency jobs</dt>
+              <dd className="num text-2xl font-extrabold leading-tight">{mine.length}</dd>
+            </div>
+          </dl>
+          {!online && <p className="border-t border-line bg-warning-soft px-4 py-2.5 text-xs font-bold text-warning">You’re offline — go online to take emergency jobs.</p>}
         </div>
 
         {mine.length > 0 && (

@@ -121,6 +121,8 @@ export type NotificationKind =
   | 'emergency'
   | 'payment'
   | 'rating'
+  | 'accepted'
+  | 'ai_call'
 
 export interface Notice {
   id: string

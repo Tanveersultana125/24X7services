@@ -82,6 +82,8 @@ const NOTICE_SWITCH: Partial<Record<NotificationKind, keyof Settings['notify']>>
   cancelled: 'schedule',
   payment: 'payments',
   rating: 'payments',
+  accepted: 'schedule',
+  ai_call: 'schedule',
 }
 
 const allowed = (s: Settings, kind: NotificationKind) => {
@@ -192,12 +194,22 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       signIn: () => setState((s) => ({ ...s, signedIn: true })),
       signOut: () => setState((s) => ({ ...s, signedIn: false })),
       setOnline: (v) => setState((s) => ({ ...s, online: v })),
-      accept: (id) =>
+      accept: (id) => {
         patchJob(id, (j) => ({
           ...j,
           status: 'accepted',
           log: { ...j.log, assigned: j.log.assigned ?? now(), accepted: now() },
-        })),
+        }))
+        const job = state.jobs.find((j) => j.id === id)
+        if (job) {
+          notify({
+            kind: 'accepted',
+            title: `Job accepted · ${job.id}`,
+            body: `${applianceTitle(job.brand, job.appliance)} for ${job.customer.name}, ${job.customer.area}.`,
+            jobId: id,
+          })
+        }
+      },
       reject: (id) => patchJob(id, (j) => ({ ...j, status: 'rejected' })),
       advance: (id, to) => {
         patchJob(id, (j) => {
@@ -241,7 +253,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       markAllRead: () => setState((s) => ({ ...s, notices: s.notices.map((n) => ({ ...n, read: true })) })),
       saveThread: (thread) =>
         setState((s) => ({ ...s, aiThreads: [thread, ...s.aiThreads.filter((t) => t.id !== thread.id)] })),
-      saveCall: (call) => setState((s) => ({ ...s, aiCalls: [call, ...s.aiCalls.filter((c) => c.id !== call.id)] })),
+      saveCall: (call) => {
+        const first = !state.aiCalls.some((c) => c.id === call.id)
+        setState((s) => ({ ...s, aiCalls: [call, ...s.aiCalls.filter((c) => c.id !== call.id)] }))
+        // One notice per call, not one per re-save after an edit.
+        if (first) {
+          notify({ kind: 'ai_call', title: `AI call summary · ${call.jobId}`, body: call.summary.result, jobId: call.jobId })
+        }
+      },
       saveServiceNotes: (jobId, notes) => patchJob(jobId, (j) => ({ ...j, serviceNotes: { ...notes, savedAt: now() } })),
       updateTech: (patch) => setState((s) => ({ ...s, tech: { ...s.tech, ...patch } })),
       updateSettings: (patch) =>

@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { History } from 'lucide-react'
 import { ActiveFilters, FilterButton, NO_FILTERS, applyFilters, type FilterState } from '@/components/Filters'
 import { ApplianceGlyph, BrandTag } from '@/components/glyphs'
-import { Card, Empty, Page, ScreenHeader, Segmented, StatusChip } from '@/components/ui'
+import { Card, Empty, FilterChip, Page, ScreenHeader, Segmented, StatusChip } from '@/components/ui'
 import { APPLIANCE_LABEL, BRAND_LABEL, inr } from '@/lib/catalog'
 import { dayLabel, earned, isToday, shortDate, thisMonth, withinDays } from '@/lib/format'
 import { jobHref } from '@/lib/routes'
@@ -24,13 +24,17 @@ export default function HistoryPage() {
   const { jobs } = useStore()
   const [range, setRange] = useState<Range>('week')
   const [filters, setFilters] = useState<FilterState>(NO_FILTERS)
+  const [outcome, setOutcome] = useState<'all' | 'closed' | 'cancelled'>('all')
 
-  const rows = applyFilters(
-    jobs.filter((j) => j.status !== 'request' && j.status !== 'rejected' && RANGE[range](j.scheduledAt)),
+  // History is finished work only; open jobs live on the Jobs board.
+  const finished = applyFilters(
+    jobs.filter((j) => (j.status === 'closed' || j.status === 'cancelled') && RANGE[range](j.scheduledAt)),
     filters
-  ).sort((a, b) => b.scheduledAt.localeCompare(a.scheduledAt))
+  )
+  const rows = finished.filter((j) => outcome === 'all' || j.status === outcome).sort((a, b) => b.scheduledAt.localeCompare(a.scheduledAt))
 
-  const completed = rows.filter((j) => j.status === 'closed')
+  const completed = finished.filter((j) => j.status === 'closed')
+  const cancelled = finished.filter((j) => j.status === 'cancelled')
   const total = completed.reduce((s, j) => s + earned(j), 0)
 
   const groups = rows.reduce<Record<string, Job[]>>((g, j) => {
@@ -41,7 +45,7 @@ export default function HistoryPage() {
 
   return (
     <>
-      <ScreenHeader back="/jobs" title="Job history" subtitle="Every job you’ve worked" />
+      <ScreenHeader back="/jobs" title="Job history" subtitle="Completed and cancelled jobs" />
       <Page className="space-y-4">
         <Segmented
           value={range}
@@ -53,14 +57,28 @@ export default function HistoryPage() {
           ]}
         />
 
+        <div className="flex gap-2">
+          {(
+            [
+              ['all', 'All', finished.length],
+              ['closed', 'Completed', completed.length],
+              ['cancelled', 'Cancelled', cancelled.length],
+            ] as const
+          ).map(([k, label, n]) => (
+            <FilterChip key={k} active={outcome === k} onClick={() => setOutcome(k)}>
+              {label} <span className="num opacity-70">{n}</span>
+            </FilterChip>
+          ))}
+        </div>
+
         <Card className="grid grid-cols-3 divide-x divide-line">
-          <div className="p-3 text-center">
-            <p className="num text-xl font-extrabold">{rows.length}</p>
-            <p className="text-[11px] font-bold uppercase tracking-wide text-muted">Jobs</p>
-          </div>
           <div className="p-3 text-center">
             <p className="num text-xl font-extrabold text-success">{completed.length}</p>
             <p className="text-[11px] font-bold uppercase tracking-wide text-muted">Completed</p>
+          </div>
+          <div className="p-3 text-center">
+            <p className="num text-xl font-extrabold text-muted">{cancelled.length}</p>
+            <p className="text-[11px] font-bold uppercase tracking-wide text-muted">Cancelled</p>
           </div>
           <div className="p-3 text-center">
             <p className="num text-xl font-extrabold">{inr(total)}</p>

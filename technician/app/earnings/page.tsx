@@ -2,12 +2,12 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { Banknote, ChevronRight, Landmark, Smartphone, TrendingUp, Wallet } from 'lucide-react'
+import { Banknote, ChevronRight, CircleCheck, Hourglass, Landmark, Smartphone, TrendingUp, Wallet } from 'lucide-react'
 import { ApplianceGlyph } from '@/components/glyphs'
-import { Card, Page, ScreenHeader, SectionTitle, Segmented } from '@/components/ui'
+import { Card, Page, ScreenHeader, SectionTitle } from '@/components/ui'
 import { APPLIANCES, APPLIANCE_LABEL, inr } from '@/lib/catalog'
 import { cn } from '@/lib/cn'
-import { earned, isToday, thisMonth, withinDays } from '@/lib/format'
+import { billTotal, earned, isToday, thisMonth, withinDays } from '@/lib/format'
 import { jobHref } from '@/lib/routes'
 import { useStore } from '@/lib/store'
 
@@ -21,6 +21,14 @@ export default function EarningsPage() {
     range === 'today' ? isToday(j.scheduledAt) : range === 'week' ? withinDays(j.scheduledAt, 7) : thisMonth(j.scheduledAt)
   )
   const total = inRange.reduce((s, j) => s + earned(j), 0)
+  const sum = (list: typeof closed) => list.reduce((s, j) => s + earned(j), 0)
+  const totals = {
+    today: sum(closed.filter((j) => isToday(j.scheduledAt))),
+    week: sum(closed.filter((j) => withinDays(j.scheduledAt, 7))),
+    month: sum(closed.filter((j) => thisMonth(j.scheduledAt))),
+  }
+  // Billed but not yet collected: the work is done, the money isn't in.
+  const pending = jobs.filter((j) => j.bill && !j.bill.paid && j.status !== 'cancelled' && j.status !== 'rejected')
   // The partner keeps 80% of the bill; the rest is the platform fee.
   const share = Math.round(total * 0.8)
   const cash = inRange.filter((j) => j.bill?.method === 'cash').reduce((s, j) => s + earned(j), 0)
@@ -49,15 +57,53 @@ export default function EarningsPage() {
     <>
       <ScreenHeader back="/home" title="Earnings" subtitle="Service revenue & payouts" />
       <Page className="space-y-5">
-        <Segmented
-          value={range}
-          onChange={setRange}
-          options={[
-            { value: 'today', label: 'Today' },
-            { value: 'week', label: 'This Week' },
-            { value: 'month', label: 'This Month' },
-          ]}
-        />
+        {/* The three periods side by side; tapping one scopes the page below. */}
+        <div className="grid grid-cols-3 gap-2">
+          {(
+            [
+              ['today', 'Today', totals.today],
+              ['week', 'This week', totals.week],
+              ['month', 'This month', totals.month],
+            ] as const
+          ).map(([key, label, value]) => (
+            <button
+              key={key}
+              type="button"
+              aria-pressed={range === key}
+              onClick={() => setRange(key)}
+              className={cn(
+                'rounded-xl border px-3 py-3 text-left transition-colors',
+                range === key ? 'border-brand bg-brand-soft ring-1 ring-brand/20' : 'border-line bg-card hover:border-line-strong'
+              )}
+            >
+              <span className={cn('block text-[11px] font-bold uppercase tracking-wider', range === key ? 'text-brand' : 'text-faint')}>{label}</span>
+              <span className="num mt-1 block truncate text-lg font-extrabold leading-tight">{inr(value)}</span>
+            </button>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <Card className="flex items-center gap-3 p-3.5">
+            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-success-soft text-success">
+              <CircleCheck className="size-5" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[11px] font-bold uppercase tracking-wider text-faint">Completed services</span>
+              <span className="num block text-lg font-extrabold leading-tight">{inRange.length}</span>
+            </span>
+          </Card>
+          <Card className="flex items-center gap-3 p-3.5">
+            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-warning-soft text-warning">
+              <Hourglass className="size-5" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[11px] font-bold uppercase tracking-wider text-faint">Pending payments</span>
+              <span className="num block truncate text-lg font-extrabold leading-tight">
+                {inr(pending.reduce((s, j) => s + billTotal(j), 0))}
+                <span className="ml-1 text-xs font-bold text-muted">· {pending.length}</span>
+              </span>
+            </span>
+          </Card>
+        </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
           <Card className="overflow-hidden">
