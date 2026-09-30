@@ -21,7 +21,12 @@ import { cn } from '@/lib/cn'
 /** How far ahead to look. A week with nothing open is not worth a box. */
 const DAYS_AHEAD = 7
 
-export function EarliestSlot({ className }: { className?: string }) {
+/**
+ * The first open window as "Tomorrow, 9 AM", or null while it is loading and
+ * whenever there is nothing honest to say. The header and the box beside the
+ * name both read it, so each loads it once.
+ */
+export function useEarliestSlot(): string | null {
   const { location } = useLocation()
   const pincode = location?.serviceable ? location.pincode : undefined
 
@@ -43,7 +48,20 @@ export function EarliestSlot({ className }: { className?: string }) {
 
   const earliest = useAsync(load)
   const slot = earliest.status === 'ready' ? earliest.data : null
-  if (!slot) return null
+  return slot
+    ? `${relativeDateLabel(slot.date)}, ${formatTime(slot.start)}`
+    : null
+}
+
+export function EarliestSlot({
+  label,
+  className,
+}: {
+  /** From `useEarliestSlot`. */
+  label: string | null
+  className?: string
+}) {
+  if (!label) return null
 
   return (
     <div
@@ -57,7 +75,7 @@ export function EarliestSlot({ className }: { className?: string }) {
         Earliest
       </p>
       <p className="px-3 py-1.5 text-sm font-semibold text-ink">
-        {relativeDateLabel(slot.date)}, {formatTime(slot.start)}
+        {label}
       </p>
     </div>
   )

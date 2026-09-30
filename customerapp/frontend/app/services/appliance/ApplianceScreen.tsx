@@ -15,13 +15,16 @@ import {
   type CatalogPlan,
   type CatalogIssue,
   type CatalogService,
+  type ServiceKey,
   type ServiceReview,
 } from '@app/shared'
 
 import { AppShell, Section } from '@/components/AppShell'
 import { Header } from '@/components/Header'
 import { CartButton } from '@/components/CartButton'
-import { ServiceCard } from '@/components/ServiceCard'
+import { ServiceRow } from '@/components/ServiceRow'
+import { OfferBanner } from '@/components/OfferBanner'
+import { AddButton, durationNote } from '@/components/ServiceRail'
 import { ServiceReviews } from '@/components/ServiceReviews'
 import { WriteReviewButton } from '@/components/WriteReviewButton'
 import { ServiceSheet, serviceOptions } from '@/components/ServiceSheet'
@@ -50,7 +53,7 @@ import {
 } from '@/lib/catalog'
 import { countNote } from '@/components/ServiceScore'
 import { ApplianceHero, type HeroSlide } from '@/components/ApplianceHero'
-import { EarliestSlot } from '@/components/EarliestSlot'
+import { EarliestSlot, useEarliestSlot } from '@/components/EarliestSlot'
 import { fetchCatalogPlans } from '@/lib/plans'
 import { formatPaise } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
@@ -101,6 +104,77 @@ interface ApplianceData {
  * heading underneath it. This is its height and a little air.
  */
 const JUMP_OFFSET = 'scroll-mt-[calc(4.5rem+var(--safe-top))] lg:scroll-mt-20'
+
+/**
+ * The heading over each group in the service list, pinned under the header
+ * while the group's rows scroll past it.
+ */
+const GROUP_HEADING =
+  'sticky top-[calc(3.5rem+var(--safe-top))] z-20 -mx-4 bg-bg px-4 py-4 text-2xl font-bold text-ink lg:top-16 lg:mx-0 lg:px-0'
+
+/** Where a jump to a row stops: under the header and the pinned heading. */
+const ROW_OFFSET =
+  'scroll-mt-[calc(8rem+var(--safe-top))] lg:scroll-mt-36'
+
+/**
+ * The service list's groups, in the order their first service comes in the
+ * catalog. A group a given appliance has nothing in is left out, and its name
+ * says only what it holds — "Repair" for a repair alone, "Repair & gas
+ * refill" once there is a refill to go with it.
+ */
+const GROUPS: ReadonlyArray<{
+  key: string
+  keys: readonly ServiceKey[]
+  title: (present: ReadonlySet<ServiceKey>) => string
+}> = [
+  {
+    key: 'service',
+    keys: ['service', 'deep-clean', 'maintenance'],
+    title: () => 'Service',
+  },
+  {
+    key: 'repair',
+    keys: ['repair', 'gas-refill'],
+    title: (present) =>
+      present.has('gas-refill')
+        ? present.has('repair')
+          ? 'Repair & gas refill'
+          : 'Gas refill'
+        : 'Repair',
+  },
+  {
+    key: 'fitting',
+    keys: ['installation', 'uninstallation'],
+    title: (present) =>
+      present.has('installation') && present.has('uninstallation')
+        ? 'Installation & uninstallation'
+        : present.has('installation')
+          ? 'Installation'
+          : 'Uninstallation',
+  },
+]
+
+function groupServices(services: readonly CatalogService[]) {
+  return GROUPS.map((group) => {
+    const members = services.filter((service) =>
+      group.keys.includes(service.serviceKey)
+    )
+    const present = new Set(members.map((service) => service.serviceKey))
+    return { key: group.key, title: group.title(present), services: members }
+  })
+    .filter((group) => group.services.length > 0)
+    .sort(
+      (a, b) =>
+        Math.min(...a.services.map((s) => s.order)) -
+        Math.min(...b.services.map((s) => s.order))
+    )
+}
+
+/** How much the plan saves on the same visits booked one at a time, in %. */
+function planSaving(plan: CatalogPlan): number | null {
+  if (!plan.compareAt || plan.compareAt <= plan.price) return null
+  return Math.round((1 - plan.price / plan.compareAt) * 100)
+}
 
 /**
  * What each picture in the service row is called: the service's name without
@@ -196,6 +270,10 @@ export function ApplianceScreen() {
   )
   const plan =
     plans.find((each) => each.applianceIds.length === 1) ?? plans[0] ?? null
+
+  const earliest = useEarliestSlot()
+  const warrantyFor = (service: CatalogService): number =>
+    service.warrantyDays ?? data.data?.config?.defaultWarrantyDays ?? 0
   const cart = useCart()
 
   // The service whose options sheet is open — a repair, where "Add" means
@@ -323,6 +401,7 @@ export function ApplianceScreen() {
       mobileHeader={
         <Header
           title={appliance?.name ?? 'Services'}
+          subtitle={earliest ? `Earliest slot: ${earliest}` : undefined}
           showBack
           backFallback="/services"
           right={<CartButton className="mr-2 size-11" />}
@@ -390,7 +469,7 @@ export function ApplianceScreen() {
                   </a>
                 ) : null}
               </div>
-              <EarliestSlot className="mt-1" />
+              <EarliestSlot label={earliest} className="mt-1" />
             </div>
 
             {appliance.heroImage ? null : cheapestFee !== null ? (
@@ -500,39 +579,152 @@ export function ApplianceScreen() {
             </nav>
           ) : null}
 
-          <Section
-            title="Select your service"
-            subtitle="The visit fee is what you pay to book. Everything after it is quoted first."
-          >
-            {/* A rule between services rather than a box around each: the
-                cards are tall enough now that a border as well would be two
-                lines doing one job. */}
-            {/* Two columns from a laptop up: one full-width card per service
-                makes each picture the size of the screen. */}
-            <div className="flex flex-col divide-y divide-border lg:grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-10 lg:divide-y-0">
-              {services.map((service, index) => (
-                <div
-                  key={service.id}
-                  id={`service-${service.id}`}
-                  className={cn('py-6 first:pt-0 last:pb-0 lg:py-0', JUMP_OFFSET)}
-                >
-                  {/* `motion` only reaches a service with no photograph of
-                      its own; one that has one shows it and stays still.
-                      Where it does apply, the first card is the only one
-                      that moves — six clips down one screen is six decoders
-                      and nowhere for the eye to rest. */}
-                  <ServiceCard
-                    service={service}
-                    image={appliance.image}
-                    motion={index === 0}
-                    onSelect={() => openService(service.serviceKey)}
-                    options={serviceOptions(service, issues).length}
-                    onOptions={() => setSheetId(service.id)}
-                  />
-                </div>
-              ))}
-            </div>
-          </Section>
+          {/* The list, in groups, the way the marketplaces lay an appliance
+              out: the year's plan first, then servicing, repairs, and fitting
+              or removing. Each group's name stays pinned under the header
+              while its rows scroll past, so a customer halfway down still
+              knows which kind of visit they are reading about. A group of two
+              or more opens on a card for its first service. */}
+          {plan ? (
+            <section className="-mx-4 mt-8 border-t-8 border-surface px-4 lg:mx-0 lg:px-0">
+              <h2 className={GROUP_HEADING}>Annual plan</h2>
+              <OfferBanner
+                badge={planSaving(plan) ? `${planSaving(plan)}% OFF` : undefined}
+                title={plan.name}
+                photo={appliance.heroImage ?? appliance.image}
+                body={
+                  <>
+                    <p className="flex flex-wrap items-baseline gap-x-2">
+                      {plan.compareAt ? (
+                        <span className="text-base line-through">
+                          {formatPaise(plan.compareAt)}
+                        </span>
+                      ) : null}
+                      <span className="text-xl font-bold text-success">
+                        {formatPaise(plan.price)}/year
+                      </span>
+                    </p>
+                    <p className="mt-1">
+                      {plan.visitsIncluded}{' '}
+                      {plan.visitsIncluded === 1 ? 'visit' : 'visits'} over the
+                      year
+                    </p>
+                  </>
+                }
+                className="mt-2"
+              />
+              <ServiceRow
+                title={plan.name}
+                price={
+                  <>
+                    {formatPaise(plan.price)} a year
+                    {plan.compareAt ? (
+                      <span className="ml-2 font-normal text-muted line-through">
+                        {formatPaise(plan.compareAt)}
+                      </span>
+                    ) : null}
+                  </>
+                }
+                offer={
+                  planSaving(plan)
+                    ? `Save ${planSaving(plan)}% on separate visits`
+                    : undefined
+                }
+                points={plan.benefits.slice(0, 2)}
+                photo={
+                  services.find((s) => s.serviceKey === 'service')
+                    ?.technicianPhoto ?? appliance.heroImage
+                }
+                action={
+                  <Link
+                    href={'/care' as Route}
+                    className="inline-flex h-11 w-[5.5rem] items-center justify-center rounded-card border border-border bg-bg text-sm font-semibold text-brand hover:border-brand"
+                  >
+                    View
+                  </Link>
+                }
+                onOpen={() => router.push('/care' as Route)}
+                openLabel={`${plan.name}, ${formatPaise(plan.price)} a year. See the plan.`}
+              />
+            </section>
+          ) : null}
+
+          {groupServices(services).map((group) => (
+            <section
+              key={group.key}
+              className="-mx-4 mt-8 border-t-8 border-surface px-4 lg:mx-0 lg:px-0"
+            >
+              <h2 className={GROUP_HEADING}>{group.title}</h2>
+              {group.services.length > 1 && group.services[0]?.technicianPhoto ? (
+                <OfferBanner
+                  badge={
+                    warrantyFor(group.services[0])
+                      ? `${warrantyFor(group.services[0])}-day warranty`
+                      : undefined
+                  }
+                  title={group.services[0].name}
+                  body={
+                    <p className="line-clamp-3">{group.services[0].description}</p>
+                  }
+                  photo={group.services[0].technicianPhoto}
+                  className="mt-2"
+                />
+              ) : null}
+              <div className="divide-y divide-border">
+                {group.services.map((service) => {
+                  const duration = durationNote(service.durationMinutes)
+                  const warranty = warrantyFor(service)
+                  return (
+                    <ServiceRow
+                      key={service.id}
+                      id={`service-${service.id}`}
+                      className={ROW_OFFSET}
+                      title={service.name}
+                      rating={service.rating}
+                      reviewCount={service.reviewCount}
+                      price={
+                        <>
+                          Starts at {formatPaise(service.visitFee)}
+                          {duration ? (
+                            <span className="font-normal text-muted">
+                              {' · '}
+                              {duration.replace(/^About /, '')}
+                            </span>
+                          ) : null}
+                        </>
+                      }
+                      offer={warranty ? `${warranty}-day service warranty` : undefined}
+                      points={[
+                        service.description,
+                        service.startingPrice > service.visitFee
+                          ? `Repairs usually start at ${formatPaise(service.startingPrice)}, quoted on site and begun only after you approve.`
+                          : 'Anything beyond this is quoted on site and starts only after you approve it.',
+                      ]}
+                      photo={
+                        service.technicianPhoto ??
+                        service.photo ??
+                        service.poster ??
+                        appliance.image
+                      }
+                      action={
+                        <AddButton
+                          item={{
+                            name: service.name,
+                            applianceId: service.applianceId,
+                            serviceKey: service.serviceKey,
+                            options: serviceOptions(service, issues).length,
+                            onOptions: () => setSheetId(service.id),
+                          }}
+                        />
+                      }
+                      onOpen={() => openService(service.serviceKey)}
+                      openLabel={`${service.name}, visit fee ${formatPaise(service.visitFee)}. See what it covers.`}
+                    />
+                  )
+                })}
+              </div>
+            </section>
+          ))}
 
           {/* The rating under the name points here. */}
           <div id="reviews" className={JUMP_OFFSET}>
