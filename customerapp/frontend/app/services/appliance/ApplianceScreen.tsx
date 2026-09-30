@@ -23,6 +23,7 @@ import { AppShell, Section } from '@/components/AppShell'
 import { Header } from '@/components/Header'
 import { CartButton } from '@/components/CartButton'
 import { ServiceRow } from '@/components/ServiceRow'
+import { SectionMenu } from '@/components/SectionMenu'
 import { ReviewsSheet } from '@/components/ReviewsSheet'
 import { OfferBanner } from '@/components/OfferBanner'
 import { AddButton, durationNote } from '@/components/ServiceRail'
@@ -583,7 +584,13 @@ export function ApplianceScreen() {
               knows which kind of visit they are reading about. A group of two
               or more opens on a card for its first service. */}
           {plan ? (
-            <section className="-mx-4 mt-8 border-t-8 border-surface px-4 lg:mx-0 lg:px-0">
+            <section
+              id="annual-plan"
+              className={cn(
+                '-mx-4 mt-8 border-t-8 border-surface px-4 lg:mx-0 lg:px-0',
+                JUMP_OFFSET
+              )}
+            >
               <h2 className={GROUP_HEADING}>Annual plan</h2>
               <OfferBanner
                 badge={planSaving(plan) ? `${planSaving(plan)}% OFF` : undefined}
@@ -649,7 +656,11 @@ export function ApplianceScreen() {
           {groupServices(services).map((group) => (
             <section
               key={group.key}
-              className="-mx-4 mt-8 border-t-8 border-surface px-4 lg:mx-0 lg:px-0"
+              id={`group-${group.key}`}
+              className={cn(
+                '-mx-4 mt-8 border-t-8 border-surface px-4 lg:mx-0 lg:px-0',
+                JUMP_OFFSET
+              )}
             >
               <h2 className={GROUP_HEADING}>{group.title}</h2>
               {group.services.length > 1 && group.services[0]?.technicianPhoto ? (
@@ -827,6 +838,23 @@ export function ApplianceScreen() {
         onClose={() => setSheetId(null)}
       />
       <CartBar services={services} />
+      {appliance && data.status === 'ready' ? (
+        <SectionMenu
+          items={[
+            ...(plan
+              ? [{ id: 'annual-plan', label: 'Annual plan', note: '1 plan' }]
+              : []),
+            ...groupServices(services).map((group) => ({
+              id: `group-${group.key}`,
+              label: group.title,
+              note: `${group.services.length} ${
+                group.services.length === 1 ? 'service' : 'services'
+              }`,
+            })),
+            { id: 'reviews', label: 'Reviews' },
+          ]}
+        />
+      ) : null}
       <ReviewsSheet
         open={reviewsOpen}
         onClose={() => setReviewsOpen(false)}
