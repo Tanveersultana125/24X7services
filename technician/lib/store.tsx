@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { DEFAULT_SETTINGS, TECHNICIAN, lateRequest, seedJobs, seedNotices } from './seed'
 import { LABOUR_RATE, applianceTitle, inr } from './catalog'
 import { billTotal } from './format'
-import type { Bill, Confirmation, Diagnosis, FlowStep, Job, Notice, PartLine, Photo, Settings, Technician } from './types'
+import type { Bill, Confirmation, Diagnosis, FlowStep, Job, Notice, NotificationKind, PartLine, Photo, Settings, Technician } from './types'
 
 /**
  * The whole app's state, kept on the device.
@@ -54,8 +54,10 @@ function load(): Persisted {
       // but who is signed in and how they set the app up carries over.
       // Every launch opens signed in, so the app never strands anyone on the
       // login screen; Logout still ends the session until the next reload.
-      if (saved.seededOn === new Date().toDateString()) return { ...saved, signedIn: true }
-      return { ...fresh(), tech: saved.tech, settings: saved.settings }
+      // Settings added since the save was written fall back to their defaults.
+      const settings = { ...DEFAULT_SETTINGS, ...saved.settings }
+      if (saved.seededOn === new Date().toDateString()) return { ...saved, settings, signedIn: true }
+      return { ...fresh(), tech: saved.tech, settings }
     }
   } catch {
     /* storage unavailable — run from the seed */
@@ -64,6 +66,21 @@ function load(): Persisted {
 }
 
 let noticeSeq = 100
+
+/** Which Settings → Notifications switch lets each kind of notice through. */
+const NOTICE_SWITCH: Partial<Record<NotificationKind, keyof Settings['notify']>> = {
+  request: 'requests',
+  emergency: 'emergency',
+  schedule: 'schedule',
+  cancelled: 'schedule',
+  payment: 'payments',
+  rating: 'payments',
+}
+
+const allowed = (s: Settings, kind: NotificationKind) => {
+  const key = NOTICE_SWITCH[kind]
+  return !key || s.notify[key]
+}
 
 interface Store extends Persisted {
   ready: boolean
@@ -123,7 +140,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           ...s,
           lateDelivered: true,
           jobs: [job, ...s.jobs],
-          notices: [
+          notices: !allowed(s.settings, 'request') ? s.notices : [
             {
               id: `n${noticeSeq++}`,
               kind: 'request',
@@ -146,16 +163,20 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const notify = useCallback((n: Omit<Notice, 'id' | 'at' | 'read'>) => {
-    setState((s) => ({
-      ...s,
-      notices: [{ ...n, id: `n${noticeSeq++}`, at: new Date().toISOString(), read: false }, ...s.notices],
-    }))
+    setState((s) =>
+      allowed(s.settings, n.kind)
+        ? { ...s, notices: [{ ...n, id: `n${noticeSeq++}`, at: new Date().toISOString(), read: false }, ...s.notices] }
+        : s
+    )
   }, [])
 
   const value = useMemo<Store>(() => {
     const now = () => new Date().toISOString()
     return {
       ...state,
+      // Dispatch only offers requests inside the service radius set in
+      // Settings; widening it brings the farther ones back.
+      jobs: state.jobs.filter((j) => j.status !== 'request' || j.distanceKm <= state.settings.radiusKm),
       ready,
       signIn: () => setState((s) => ({ ...s, signedIn: true })),
       signOut: () => setState((s) => ({ ...s, signedIn: false })),

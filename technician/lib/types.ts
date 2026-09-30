@@ -161,4 +161,8 @@ export interface Settings {
   }
   upi: string
   bank: string
+  fingerprint: boolean
+  passwordChangedAt: string
+  /** Other phones signed in to this account; this device is always listed first. */
+  devices: { id: string; name: string; lastActive: string }[]
 }

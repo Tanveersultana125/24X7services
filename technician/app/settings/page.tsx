@@ -3,45 +3,73 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Bell, ChevronRight, Clock, Headset, KeyRound, Languages, Landmark, LogOut, Power, Radar, RotateCcw, Smartphone, UserRound } from 'lucide-react'
-import { Button, Card, Field, Page, ScreenHeader, SectionTitle, Segmented, Sheet, Toggle, inputClass } from '@/components/ui'
+import { Bell, CircleCheck, ChevronRight, Clock, Headset, KeyRound, Languages, Landmark, LogOut, Power, Radar, RotateCcw, Smartphone, UserRound } from 'lucide-react'
 import { TimeField } from '@/components/TimeField'
-import { useStore } from '@/lib/store'
+import { Button, Card, Field, Page, ScreenHeader, SectionTitle, Segmented, Sheet, Toggle, inputClass } from '@/components/ui'
+import { chime } from '@/lib/chime'
+import { cn } from '@/lib/cn'
+import { ago } from '@/lib/format'
+import { useT } from '@/lib/i18n'
+import { inShift, shiftHours } from '@/lib/shift'
+import { useStore, useTick } from '@/lib/store'
 import type { Settings } from '@/lib/types'
+
+type SheetName = 'payment' | 'account' | 'password' | 'devices' | 'logout'
 
 export default function SettingsPage() {
   const store = useStore()
   const router = useRouter()
+  const t = useT()
+  const now = useTick(60_000)
   const { settings: s, updateSettings } = store
-  const [sheet, setSheet] = useState<null | 'payment' | 'account' | 'logout'>(null)
-  const notify = (k: keyof Settings['notify'], v: boolean) => updateSettings({ notify: { ...s.notify, [k]: v } })
+  const [sheet, setSheet] = useState<null | SheetName>(null)
+  const [toast, setToast] = useState<string | null>(null)
+  const notify = (k: keyof Settings['notify'], v: boolean) => {
+    updateSettings({ notify: { ...s.notify, [k]: v } })
+    if (k === 'sound' && v) chime()
+  }
+  const flash = (msg: string) => {
+    setToast(msg)
+    setTimeout(() => setToast(null), 2500)
+  }
+
+  const onShift = inShift(s, new Date(now))
+  // store.jobs already drops requests outside the radius, so this count moves
+  // with the slider.
+  const waiting = store.jobs.filter((j) => j.status === 'request').length
+  const passwordAge = Math.floor((now - new Date(s.passwordChangedAt).getTime()) / 86_400_000)
 
   return (
     <>
-      <ScreenHeader back="/profile" title="Settings" />
+      <ScreenHeader back="/profile" title={t('Settings')} />
       <Page className="space-y-5">
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:items-start">
           <div className="space-y-5">
             <section>
-              <SectionTitle>Availability</SectionTitle>
+              <SectionTitle>{t('Availability')}</SectionTitle>
               <Card className="divide-y divide-line">
-                <Line icon={<Power className="size-4" />} title="Online for new requests" sub={store.online ? 'Dispatch can send you jobs' : 'You won’t receive requests'}>
+                <Line icon={<Power className="size-4" />} title={t('Online for new requests')} sub={t(store.online ? 'Dispatch can send you jobs' : 'You won’t receive requests')}>
                   <Toggle checked={store.online} onChange={store.setOnline} label="Online" tone="success" />
                 </Line>
                 <div className="p-4">
-                  <p className="mb-3 flex items-center gap-2 text-sm font-extrabold">
-                    <Clock className="size-4 text-ink-2" /> Working hours
-                  </p>
-                  <div className="grid grid-cols-2 gap-3">
-                    <TimeField label="Shift starts" value={s.shiftStart} onChange={(v) => updateSettings({ shiftStart: v })} />
-                    <TimeField label="Shift ends" value={s.shiftEnd} onChange={(v) => updateSettings({ shiftEnd: v })} />
+                  <div className="mb-3 flex items-center justify-between gap-2">
+                    <p className="flex items-center gap-2 text-sm font-extrabold">
+                      <Clock className="size-4 text-ink-2" /> {t('Working hours')}
+                    </p>
+                    <span className={cn('num rounded-pill px-2.5 py-1 text-[11px] font-extrabold', onShift ? 'bg-success-soft text-success' : 'bg-canvas text-muted')}>
+                      {t(onShift ? 'On shift now' : 'Off shift now')} · {shiftHours(s)} h
+                    </span>
                   </div>
-                  <p className="mt-2 text-xs font-medium text-muted">Emergency requests can still reach you outside these hours if you stay online.</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <TimeField label={t('Shift starts')} value={s.shiftStart} onChange={(v) => updateSettings({ shiftStart: v })} />
+                    <TimeField label={t('Shift ends')} value={s.shiftEnd} onChange={(v) => updateSettings({ shiftEnd: v })} />
+                  </div>
+                  <p className="mt-2 text-xs font-medium text-muted">{t('Emergency requests can still reach you outside these hours if you stay online.')}</p>
                 </div>
                 <div className="p-4">
                   <div className="mb-2 flex items-baseline justify-between">
                     <p className="flex items-center gap-2 text-sm font-extrabold">
-                      <Radar className="size-4 text-ink-2" /> Service radius
+                      <Radar className="size-4 text-ink-2" /> {t('Service radius')}
                     </p>
                     <span className="num text-sm font-extrabold text-brand">{s.radiusKm} km</span>
                   </div>
@@ -58,15 +86,21 @@ export default function SettingsPage() {
                     <span>3 km</span>
                     <span>25 km</span>
                   </div>
+                  <p className="num mt-2 text-xs font-medium text-muted">
+                    {t(
+                      waiting === 0 ? 'No waiting requests within {km} km' : waiting === 1 ? '{n} waiting request within {km} km' : '{n} waiting requests within {km} km',
+                      { n: waiting, km: s.radiusKm }
+                    )}
+                  </p>
                 </div>
               </Card>
             </section>
 
             <section>
-              <SectionTitle>Language</SectionTitle>
+              <SectionTitle>{t('Language')}</SectionTitle>
               <Card className="p-4">
                 <p className="mb-3 flex items-center gap-2 text-sm font-extrabold">
-                  <Languages className="size-4 text-ink-2" /> App language
+                  <Languages className="size-4 text-ink-2" /> {t('App language')}
                 </p>
                 <Segmented
                   value={s.language}
@@ -83,39 +117,47 @@ export default function SettingsPage() {
 
           <div className="space-y-5">
             <section>
-              <SectionTitle>Notifications</SectionTitle>
+              <SectionTitle>{t('Notifications')}</SectionTitle>
               <Card className="divide-y divide-line">
-                <Line icon={<Bell className="size-4" />} title="New service requests">
+                <Line icon={<Bell className="size-4" />} title={t('New service requests')}>
                   <Toggle checked={s.notify.requests} onChange={(v) => notify('requests', v)} label="New requests" />
                 </Line>
-                <Line icon={<Bell className="size-4" />} title="Emergency requests" sub="Full-screen alert with sound">
+                <Line icon={<Bell className="size-4" />} title={t('Emergency requests')} sub={t('Full-screen alert with sound')}>
                   <Toggle checked={s.notify.emergency} onChange={(v) => notify('emergency', v)} label="Emergency" />
                 </Line>
-                <Line icon={<Bell className="size-4" />} title="Schedule changes & cancellations">
+                <Line icon={<Bell className="size-4" />} title={t('Schedule changes & cancellations')}>
                   <Toggle checked={s.notify.schedule} onChange={(v) => notify('schedule', v)} label="Schedule" />
                 </Line>
-                <Line icon={<Bell className="size-4" />} title="Payments & ratings">
+                <Line icon={<Bell className="size-4" />} title={t('Payments & ratings')}>
                   <Toggle checked={s.notify.payments} onChange={(v) => notify('payments', v)} label="Payments" />
                 </Line>
-                <Line icon={<Bell className="size-4" />} title="Alert sound">
+                <Line icon={<Bell className="size-4" />} title={t('Alert sound')}>
                   <Toggle checked={s.notify.sound} onChange={(v) => notify('sound', v)} label="Sound" />
                 </Line>
               </Card>
             </section>
 
             <section>
-              <SectionTitle>Account</SectionTitle>
+              <SectionTitle>{t('Account')}</SectionTitle>
               <Card className="divide-y divide-line">
-                <Nav icon={<Landmark className="size-4" />} title="Payment settings" sub={`${s.bank} · ${s.upi}`} onClick={() => setSheet('payment')} />
-                <Nav icon={<UserRound className="size-4" />} title="Account settings" sub="Password, fingerprint, devices" onClick={() => setSheet('account')} />
+                <Nav icon={<Landmark className="size-4" />} title={t('Payment settings')} sub={`${s.bank} · ${s.upi}`} onClick={() => setSheet('payment')} />
+                <Nav icon={<UserRound className="size-4" />} title={t('Account settings')} sub={t('Password, fingerprint, devices')} onClick={() => setSheet('account')} />
                 <Link href="/support" className="flex items-center gap-3 p-4 hover:bg-canvas">
                   <span className="grid size-9 place-items-center rounded-lg bg-canvas text-ink-2">
                     <Headset className="size-4" />
                   </span>
-                  <span className="flex-1 text-sm font-extrabold">Help &amp; Support</span>
+                  <span className="flex-1 text-sm font-extrabold">{t('Help & Support')}</span>
                   <ChevronRight className="size-4 text-faint" />
                 </Link>
-                <Nav icon={<RotateCcw className="size-4" />} title="Reset demo data" sub="Reload today’s sample jobs" onClick={() => store.resetDemo()} />
+                <Nav
+                  icon={<RotateCcw className="size-4" />}
+                  title={t('Reset demo data')}
+                  sub={t('Reload today’s sample jobs')}
+                  onClick={() => {
+                    store.resetDemo()
+                    flash('Demo data reset')
+                  }}
+                />
               </Card>
             </section>
             <button
@@ -123,39 +165,87 @@ export default function SettingsPage() {
               onClick={() => setSheet('logout')}
               className="flex h-14 w-full items-center justify-center gap-2 rounded-xl border-2 border-danger/30 bg-card text-base font-extrabold text-danger hover:bg-danger-soft"
             >
-              <LogOut className="size-5" /> Logout
+              <LogOut className="size-5" /> {t('Logout')}
             </button>
             <p className="text-center text-xs font-semibold text-faint">24X7 Technician Partner · v0.1.0</p>
           </div>
         </div>
       </Page>
 
-      <Sheet open={sheet === 'payment'} onClose={() => setSheet(null)} title="Payment settings">
-        <div className="space-y-4">
-          <Field label="Payout bank account">
-            <input value={s.bank} onChange={(e) => updateSettings({ bank: e.target.value })} className={inputClass} />
-          </Field>
-          <Field label="UPI ID for collections" hint="Shown to customers on the bill QR">
-            <input value={s.upi} onChange={(e) => updateSettings({ upi: e.target.value })} className={inputClass} />
-          </Field>
-          <Button size="lg" className="w-full" onClick={() => setSheet(null)}>
-            Save
-          </Button>
+      <PaymentSheet
+        open={sheet === 'payment'}
+        onClose={() => setSheet(null)}
+        onSave={(bank, upi) => {
+          updateSettings({ bank, upi })
+          setSheet(null)
+          flash('Payment settings saved')
+        }}
+      />
+
+      <Sheet open={sheet === 'account'} onClose={() => setSheet(null)} title={t('Account settings')}>
+        <div className="-mx-4 -my-4 divide-y divide-line">
+          <Nav
+            icon={<KeyRound className="size-4" />}
+            title="Change password"
+            sub={passwordAge <= 0 ? 'Changed today' : `Last changed ${passwordAge} day${passwordAge === 1 ? '' : 's'} ago`}
+            onClick={() => setSheet('password')}
+          />
+          <Line icon={<Smartphone className="size-4" />} title="Fingerprint sign-in" sub={s.fingerprint ? 'On for this device' : 'Off · sign in with OTP'}>
+            <Toggle checked={s.fingerprint} onChange={(v) => updateSettings({ fingerprint: v })} label="Fingerprint sign-in" />
+          </Line>
+          <Nav
+            icon={<Smartphone className="size-4" />}
+            title="Signed-in devices"
+            sub={`${s.devices.length + 1} active · this phone${s.devices.length ? ` + ${s.devices.length} more` : ''}`}
+            onClick={() => setSheet('devices')}
+          />
         </div>
       </Sheet>
 
-      <Sheet open={sheet === 'account'} onClose={() => setSheet(null)} title="Account settings">
-        <div className="divide-y divide-line">
-          <Line icon={<KeyRound className="size-4" />} title="Change password" sub="Last changed 42 days ago">
-            <ChevronRight className="size-4 text-faint" />
-          </Line>
-          <Line icon={<Smartphone className="size-4" />} title="Fingerprint sign-in" sub="This device">
-            <Toggle checked onChange={() => {}} label="Fingerprint sign-in" />
-          </Line>
-          <Line icon={<Smartphone className="size-4" />} title="Signed-in devices" sub="1 active · this phone">
-            <ChevronRight className="size-4 text-faint" />
-          </Line>
-        </div>
+      <PasswordSheet
+        open={sheet === 'password'}
+        onClose={() => setSheet('account')}
+        onSave={() => {
+          updateSettings({ passwordChangedAt: new Date().toISOString() })
+          setSheet('account')
+          flash('Password updated')
+        }}
+      />
+
+      <Sheet open={sheet === 'devices'} onClose={() => setSheet('account')} title="Signed-in devices">
+        <ul className="-mx-4 -my-4 divide-y divide-line">
+          <li className="flex items-center gap-3 p-4">
+            <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
+              <Smartphone className="size-4" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-extrabold">This phone</p>
+              <p className="text-xs font-medium text-success">Active now</p>
+            </div>
+          </li>
+          {s.devices.map((d) => (
+            <li key={d.id} className="flex items-center gap-3 p-4">
+              <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-canvas text-ink-2">
+                <Smartphone className="size-4" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-extrabold">{d.name}</p>
+                <p className="text-xs font-medium text-muted">Last active {ago(d.lastActive)}</p>
+              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  updateSettings({ devices: s.devices.filter((x) => x.id !== d.id) })
+                  flash(`Signed out ${d.name.split(' · ')[0]}`)
+                }}
+              >
+                Sign out
+              </Button>
+            </li>
+          ))}
+        </ul>
+        {s.devices.length === 0 && <p className="mt-6 text-center text-xs font-medium text-muted">No other device is signed in to your account.</p>}
       </Sheet>
 
       <Sheet open={sheet === 'logout'} onClose={() => setSheet(null)} title="Log out?">
@@ -174,11 +264,88 @@ export default function SettingsPage() {
               router.replace('/login')
             }}
           >
-            Logout
+            {t('Logout')}
           </Button>
         </div>
       </Sheet>
+
+      {toast && (
+        <div role="status" className="pointer-events-none fixed inset-x-0 top-[calc(var(--safe-top)+0.75rem)] z-[80] flex justify-center px-4">
+          <p className="animate-slide-up flex items-center gap-2 rounded-xl bg-ink px-4 py-3 text-sm font-bold text-white shadow-float">
+            <CircleCheck className="size-4 text-[#4ade80]" /> {toast}
+          </p>
+        </div>
+      )}
     </>
+  )
+}
+
+/** Edits a draft, so closing the sheet without saving leaves the account as it was. */
+function PaymentSheet({ open, onClose, onSave }: { open: boolean; onClose: () => void; onSave: (bank: string, upi: string) => void }) {
+  const { settings } = useStore()
+  const [bank, setBank] = useState(settings.bank)
+  const [upi, setUpi] = useState(settings.upi)
+  const [wasOpen, setWasOpen] = useState(open)
+  // Reset the draft to the saved values each time the sheet opens.
+  if (open !== wasOpen) {
+    setWasOpen(open)
+    if (open) {
+      setBank(settings.bank)
+      setUpi(settings.upi)
+    }
+  }
+  const upiOk = /^[\w.-]{2,}@[a-z]{2,}$/i.test(upi.trim())
+  const ok = bank.trim().length > 2 && upiOk
+
+  return (
+    <Sheet open={open} onClose={onClose} title="Payment settings">
+      <div className="space-y-4">
+        <Field label="Payout bank account">
+          <input value={bank} onChange={(e) => setBank(e.target.value)} className={inputClass} />
+        </Field>
+        <Field label="UPI ID for collections" hint={upi && !upiOk ? <span className="text-danger">Enter a UPI ID like name@okhdfc</span> : 'Shown to customers on the bill QR'}>
+          <input value={upi} onChange={(e) => setUpi(e.target.value)} className={inputClass} autoCapitalize="none" autoCorrect="off" />
+        </Field>
+        <Button size="lg" className="w-full" disabled={!ok} onClick={() => onSave(bank.trim(), upi.trim())}>
+          Save
+        </Button>
+      </div>
+    </Sheet>
+  )
+}
+
+function PasswordSheet({ open, onClose, onSave }: { open: boolean; onClose: () => void; onSave: () => void }) {
+  const [current, setCurrent] = useState('')
+  const [next, setNext] = useState('')
+  const [again, setAgain] = useState('')
+  const [wasOpen, setWasOpen] = useState(open)
+  if (open !== wasOpen) {
+    setWasOpen(open)
+    setCurrent('')
+    setNext('')
+    setAgain('')
+  }
+  const error =
+    next && next.length < 8 ? 'Use at least 8 characters' : next && current && next === current ? 'Pick a password you haven’t used here' : again && again !== next ? 'Passwords don’t match' : null
+  const ok = current.length > 0 && next.length >= 8 && next === again && next !== current
+
+  return (
+    <Sheet open={open} onClose={onClose} title="Change password">
+      <div className="space-y-4">
+        <Field label="Current password">
+          <input type="password" autoComplete="current-password" value={current} onChange={(e) => setCurrent(e.target.value)} className={inputClass} />
+        </Field>
+        <Field label="New password">
+          <input type="password" autoComplete="new-password" value={next} onChange={(e) => setNext(e.target.value)} className={inputClass} />
+        </Field>
+        <Field label="Confirm new password" hint={error ? <span className="text-danger">{error}</span> : 'At least 8 characters'}>
+          <input type="password" autoComplete="new-password" value={again} onChange={(e) => setAgain(e.target.value)} className={inputClass} />
+        </Field>
+        <Button size="lg" className="w-full" disabled={!ok} onClick={onSave}>
+          Update password
+        </Button>
+      </div>
+    </Sheet>
   )
 }
 

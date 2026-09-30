@@ -9,7 +9,9 @@ import { cn } from '@/lib/cn'
 import { ago, time } from '@/lib/format'
 import { jobHref, stepHref } from '@/lib/routes'
 import type { Job } from '@/lib/types'
-import { useStore } from '@/lib/store'
+import { chime } from '@/lib/chime'
+import { inShift } from '@/lib/shift'
+import { useStore, useTick } from '@/lib/store'
 import { ApplianceGlyph, BrandTag } from './glyphs'
 import { PriorityBadge } from './ui'
 
@@ -51,9 +53,11 @@ function remember(id: string) {
  * Jobs list until dispatch reassigns it.
  */
 export function IncomingRequest() {
-  const { jobs, online } = useStore()
+  const { jobs, online, settings } = useStore()
   const pathname = usePathname()
   const [, force] = useState(0)
+  // Re-check each minute so a shift starting mid-session starts the alerts.
+  const now = useTick(60_000)
 
   const byUrgency = (a: Job, b: Job) =>
     Number(b.priority === 'emergency') - Number(a.priority === 'emergency') || b.requestedAt.localeCompare(a.requestedAt)
@@ -68,7 +72,13 @@ export function IncomingRequest() {
     jobs.filter((j) => j.status === 'request').sort(byUrgency).slice(1).forEach((j) => remember(j.id))
   }, [jobs])
 
-  const pending = jobs.filter((j) => j.status === 'request' && !shown.has(j.id)).sort(byUrgency)
+  // Settings decide what may interrupt: emergencies on their own switch (and
+  // at any hour, as the Working hours note promises); everything else needs
+  // the requests switch and falls inside the shift. Held-back requests still
+  // wait in Jobs.
+  const onShift = inShift(settings, new Date(now))
+  const interrupts = (j: Job) => (j.priority === 'emergency' ? settings.notify.emergency : settings.notify.requests && onShift)
+  const pending = jobs.filter((j) => j.status === 'request' && !shown.has(j.id) && interrupts(j)).sort(byUrgency)
   const job = online && !pathname.startsWith('/request') ? pending[0] : undefined
   if (!job) return null
 
@@ -86,10 +96,15 @@ export function IncomingRequest() {
 
 /** Keyed by job, so each request starts its own fresh countdown. */
 function Takeover({ job, onDone }: { job: Job; onDone: () => void }) {
-  const { accept, reject } = useStore()
+  const { accept, reject, settings } = useStore()
   const router = useRouter()
   const [left, setLeft] = useState(WINDOW)
   const dismiss = onDone
+  const sound = settings.notify.sound
+
+  useEffect(() => {
+    if (sound) chime(job.priority === 'emergency')
+  }, [sound, job.priority])
 
   useEffect(() => {
     const i = setInterval(() => setLeft((l) => l - 1), 1000)

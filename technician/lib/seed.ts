@@ -379,6 +379,9 @@ export const DEFAULT_SETTINGS: Settings = {
   notify: { requests: true, emergency: true, schedule: true, payments: true, sound: true },
   upi: 'ravinaidu@okhdfc',
   bank: 'HDFC Bank ···· 4471',
+  fingerprint: true,
+  passwordChangedAt: new Date(Date.now() - 42 * 86_400_000).toISOString(),
+  devices: [{ id: 'd1', name: 'Redmi Note 12 · Android', lastActive: new Date(Date.now() - 3 * 86_400_000).toISOString() }],
 }
 
 /** Demo credentials shown on the login screen. */

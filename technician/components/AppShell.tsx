@@ -21,6 +21,7 @@ import {
   X,
 } from 'lucide-react'
 import { cn } from '@/lib/cn'
+import { LANG_CODE, useT } from '@/lib/i18n'
 import { recordPath } from '@/lib/nav'
 import { useStore } from '@/lib/store'
 import { Avatar } from './ui'
@@ -64,6 +65,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const store = useStore()
   const bare = pathname === '/' || pathname.startsWith('/login')
   const [menuOpen, setMenuOpen] = useState(false)
+  const t = useT()
+  const lang = store.settings.language
+
+  useEffect(() => {
+    document.documentElement.lang = LANG_CODE[lang]
+  }, [lang])
 
   useEffect(() => {
     recordPath(pathname, bare)
@@ -123,7 +130,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 >
                   {active && <span className="absolute inset-x-5 top-0 h-[3px] rounded-b-full bg-brand" />}
                   <Icon className="size-[22px]" strokeWidth={active ? 2.3 : 1.8} aria-hidden />
-                  {label}
+                  {t(label)}
                 </Link>
               </li>
             )
@@ -145,6 +152,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
   const emergencies = store.jobs.filter((j) => j.status === 'request' && j.priority === 'emergency').length
   const unread = store.notices.filter((n) => !n.read).length
   const [details, setDetails] = useState(false)
+  const t = useT()
   return (
     <>
         <div className="flex h-16 items-center border-b border-line px-5">
@@ -188,7 +196,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
                     )}
                   >
                     <Icon className="size-[18px]" strokeWidth={active ? 2.3 : 1.9} aria-hidden />
-                    <span className="flex-1">{label}</span>
+                    <span className="flex-1">{t(label)}</span>
                     {badge > 0 && (
                       <span
                         className={cn(
@@ -215,7 +223,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
             )}
           >
             <span className={cn('size-2.5 rounded-full', store.online ? 'bg-success animate-blink' : 'bg-faint')} />
-            {store.online ? 'Online · receiving jobs' : 'Offline'}
+            {t(store.online ? 'Online · receiving jobs' : 'Offline')}
           </button>
           <button
             type="button"
@@ -228,7 +236,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
             className="mt-2 flex h-11 w-full items-center gap-2.5 rounded-xl px-3 text-left text-sm font-bold text-danger hover:bg-danger-soft"
           >
             <LogOut className="size-[18px]" aria-hidden />
-            Logout
+            {t('Logout')}
           </button>
         </div>
     </>
