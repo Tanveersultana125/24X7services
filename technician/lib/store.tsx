@@ -109,6 +109,8 @@ interface Store extends Persisted {
   markAllRead: () => void
   saveThread: (thread: AiThread) => void
   saveCall: (call: CallRecord) => void
+  /** Remove AI conversations and call summaries by id. */
+  deleteAi: (ids: { threads?: string[]; calls?: string[] }) => void
   saveServiceNotes: (jobId: string, notes: { diagnosis: string; action: string; recommendation: string }) => void
   updateTech: (patch: Partial<Technician>) => void
   /** A patch, or a function of the latest settings when it builds on them. */
@@ -261,6 +263,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           notify({ kind: 'ai_call', title: `AI call summary · ${call.jobId}`, body: call.summary.result, jobId: call.jobId })
         }
       },
+      deleteAi: ({ threads = [], calls = [] }) =>
+        setState((s) => ({
+          ...s,
+          aiThreads: s.aiThreads.filter((t) => !threads.includes(t.id)),
+          aiCalls: s.aiCalls.filter((c) => !calls.includes(c.id)),
+        })),
       saveServiceNotes: (jobId, notes) => patchJob(jobId, (j) => ({ ...j, serviceNotes: { ...notes, savedAt: now() } })),
       updateTech: (patch) => setState((s) => ({ ...s, tech: { ...s.tech, ...patch } })),
       updateSettings: (patch) =>

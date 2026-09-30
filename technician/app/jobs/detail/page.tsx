@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import type { Route } from 'next'
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 import {
   Camera,
   Check,
@@ -21,13 +21,14 @@ import {
   TriangleAlert,
 } from 'lucide-react'
 import { AiMark, CallMark } from '@/components/ai/AiMark'
+import { ConfirmDelete, DeleteKey } from '@/components/ai/DeleteAi'
 import { CustomerBlock, JobNotFound, JobSummary, ServiceSummary, useJobParam } from '@/components/JobParts'
 import { ServiceMap } from '@/components/ServiceMap'
 import { FlowBar, Timeline } from '@/components/Timeline'
 import { ActionDock, Card, Page, ScreenHeader, SectionTitle } from '@/components/ui'
 import { applianceTitle, inr } from '@/lib/catalog'
 import { cn } from '@/lib/cn'
-import { ago, billTotal, directionsHref, driveProgress, telHref, time } from '@/lib/format'
+import { ago, billTotal, directionsHref, driveProgress, plural, telHref, time } from '@/lib/format'
 import { stepHref } from '@/lib/routes'
 import { PURPOSE_LABEL, RESULT_LABEL } from '@/lib/ai/call'
 import { NEXT_ACTION, STATUS, stepIndex } from '@/lib/status'
@@ -316,7 +317,8 @@ function QuickAction({ href, icon, label, tone, internal }: { href: string; icon
  * conversations to reopen, and call summaries.
  */
 function AiAssistance({ job }: { job: Job }) {
-  const { aiThreads, aiCalls } = useStore()
+  const { aiThreads, aiCalls, deleteAi } = useStore()
+  const [doomed, setDoomed] = useState<null | { kind: 'chat' | 'call'; id: string; title: string }>(null)
   const threads = aiThreads.filter((t) => t.jobId === job.id)
   const calls = aiCalls.filter((c) => c.jobId === job.id)
   const done = job.status === 'closed' || job.status === 'confirmation'
@@ -361,18 +363,21 @@ function AiAssistance({ job }: { job: Job }) {
         )}
 
         {threads.map((t) => (
-          <Link key={t.id} href={`/ai/chat/?id=${job.id}&t=${t.id}` as Route} className="flex items-center gap-3 p-3 hover:bg-canvas">
+          <div key={t.id} className="flex items-center gap-1 pr-2 hover:bg-canvas">
+          <Link href={`/ai/chat/?id=${job.id}&t=${t.id}` as Route} className="flex min-w-0 flex-1 items-center gap-3 p-3 pr-1">
             <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-soft text-brand">
               <MessageSquareText className="size-5" />
             </span>
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm font-extrabold">{t.title}</span>
               <span className="block text-xs font-medium text-muted">
-                AI chat · {t.messages.filter((m) => m.role === 'tech').length} questions · {ago(t.updatedAt)}
+                AI chat · {plural(t.messages.filter((m) => m.role === 'tech').length, 'question')} · {ago(t.updatedAt)}
               </span>
             </span>
             <ChevronRight className="size-4 text-faint" />
           </Link>
+          <DeleteKey label={`Delete ${t.title}`} onClick={() => setDoomed({ kind: 'chat', id: t.id, title: t.title })} />
+          </div>
         ))}
 
         {calls.map((c) => (
@@ -396,6 +401,7 @@ function AiAssistance({ job }: { job: Job }) {
               {c.summary.request && <span className="block text-xs font-medium text-muted">Request: {c.summary.request}</span>}
               <span className="block text-[11px] font-semibold text-faint">AI call · {ago(c.at)}</span>
             </span>
+            <DeleteKey label={`Delete ${PURPOSE_LABEL[c.purpose]} summary`} onClick={() => setDoomed({ kind: 'call', id: c.id, title: PURPOSE_LABEL[c.purpose] })} />
           </div>
         ))}
 
@@ -403,6 +409,16 @@ function AiAssistance({ job }: { job: Job }) {
           <p className="p-4 text-sm font-medium text-muted">Ask AI for diagnosis help or run an AI call — conversations and call summaries are kept here.</p>
         )}
       </Card>
+      <ConfirmDelete
+        open={doomed !== null}
+        title={doomed?.kind === 'call' ? 'Delete call summary?' : 'Delete conversation?'}
+        body={`“${doomed?.title ?? ''}” will be removed from this job. This can’t be undone.`}
+        onCancel={() => setDoomed(null)}
+        onConfirm={() => {
+          if (doomed) deleteAi(doomed.kind === 'chat' ? { threads: [doomed.id] } : { calls: [doomed.id] })
+          setDoomed(null)
+        }}
+      />
     </section>
   )
 }

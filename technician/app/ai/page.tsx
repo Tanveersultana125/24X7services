@@ -5,12 +5,13 @@ import type { Route } from 'next'
 import { useState } from 'react'
 import { ArrowRight, Check, ChevronRight, MessageSquareText, PhoneCall } from 'lucide-react'
 import { AiMark, CallMark } from '@/components/ai/AiMark'
+import { ConfirmDelete, DeleteKey } from '@/components/ai/DeleteAi'
 import { ApplianceGlyph } from '@/components/glyphs'
 import { Card, Empty, Page, ScreenHeader, SectionTitle, Sheet, StatusChip } from '@/components/ui'
 import { PURPOSE_LABEL, RESULT_LABEL } from '@/lib/ai/call'
 import { applianceTitle } from '@/lib/catalog'
 import { cn } from '@/lib/cn'
-import { ago, dayLabel, time } from '@/lib/format'
+import { ago, dayLabel, plural, time } from '@/lib/format'
 import type { Job } from '@/lib/types'
 import { stepHref } from '@/lib/routes'
 import { useStore } from '@/lib/store'
@@ -19,8 +20,9 @@ const CHAT_POINTS = ['Diagnose problems', 'Troubleshoot appliances', 'Find possi
 const CALL_POINTS = ['Confirm appointments', 'Share ETA', 'Collect customer information', 'Follow-up calls']
 
 export default function AiAssistPage() {
-  const { jobs, aiThreads, aiCalls } = useStore()
+  const { jobs, aiThreads, aiCalls, deleteAi } = useStore()
   const [pick, setPick] = useState<null | 'chat' | 'call'>(null)
+  const [doomed, setDoomed] = useState<null | 'all' | { kind: 'chat' | 'call'; id: string; title: string }>(null)
   // Today's open work first; then the last few finished jobs, which only
   // matter here for a follow-up call or notes.
   const active = jobs.filter((j) => !['request', 'cancelled', 'rejected', 'closed'].includes(j.status)).sort((a, b) => a.scheduledAt.localeCompare(b.scheduledAt))
@@ -30,7 +32,7 @@ export default function AiAssistPage() {
     .slice(0, 4)
 
   const activity = [
-    ...aiThreads.map((t) => ({ kind: 'chat' as const, id: t.id, at: t.updatedAt, jobId: t.jobId, title: t.title, sub: `${t.messages.filter((m) => m.role === 'tech').length} questions` })),
+    ...aiThreads.map((t) => ({ kind: 'chat' as const, id: t.id, at: t.updatedAt, jobId: t.jobId, title: t.title, sub: plural(t.messages.filter((m) => m.role === 'tech').length, 'question') })),
     ...aiCalls.map((c) => ({ kind: 'call' as const, id: c.id, at: c.at, jobId: c.jobId, title: PURPOSE_LABEL[c.purpose], sub: RESULT_LABEL[c.result] })),
   ]
     .sort((a, b) => b.at.localeCompare(a.at))
@@ -63,7 +65,18 @@ export default function AiAssistPage() {
         </div>
 
         <section>
-          <SectionTitle count={activity.length}>Recent AI activity</SectionTitle>
+          <SectionTitle
+            count={aiThreads.length + aiCalls.length}
+            action={
+              activity.length > 0 && (
+                <button type="button" onClick={() => setDoomed('all')} className="text-xs font-bold text-danger hover:underline">
+                  Clear all
+                </button>
+              )
+            }
+          >
+            Recent AI activity
+          </SectionTitle>
           {activity.length === 0 ? (
             <Card className="p-2">
               <Empty icon={<AiMark size={20} className="bg-transparent text-brand" />} title="No AI activity yet" body="Conversations and call summaries you save appear here and under each job." />
@@ -74,7 +87,8 @@ export default function AiAssistPage() {
                 const job = jobs.find((j) => j.id === a.jobId)
                 const href = (a.kind === 'chat' ? `/ai/chat/?${job ? `id=${job.id}&` : ''}t=${a.id}` : job ? stepHref('detail', job.id) : '/ai') as Route
                 return (
-                  <Link key={a.id} href={href} className="flex items-center gap-3 p-3.5 hover:bg-canvas">
+                  <div key={a.id} className="flex items-center gap-1 pr-2 hover:bg-canvas">
+                  <Link href={href} className="flex min-w-0 flex-1 items-center gap-3 p-3.5 pr-1">
                     <span className={cn('grid size-10 shrink-0 place-items-center rounded-xl', a.kind === 'chat' ? 'bg-brand-soft text-brand' : 'bg-success-soft text-success')}>
                       {a.kind === 'chat' ? <MessageSquareText className="size-5" /> : <PhoneCall className="size-5" />}
                     </span>
@@ -86,12 +100,30 @@ export default function AiAssistPage() {
                     </span>
                     <span className="num shrink-0 text-[11px] font-semibold text-faint">{ago(a.at)}</span>
                   </Link>
+                  <DeleteKey label={`Delete ${a.title}`} onClick={() => setDoomed({ kind: a.kind, id: a.id, title: a.title })} />
+                  </div>
                 )
               })}
             </Card>
           )}
         </section>
       </Page>
+
+      <ConfirmDelete
+        open={doomed !== null}
+        title={doomed === 'all' ? 'Clear all AI activity?' : doomed?.kind === 'call' ? 'Delete call summary?' : 'Delete conversation?'}
+        body={
+          doomed === 'all'
+            ? 'Every AI conversation and call summary on this phone will be removed, including those saved under jobs. Service notes already saved to a job stay.'
+            : `“${doomed?.title ?? ''}” will be removed from this phone and from its job. This can’t be undone.`
+        }
+        onCancel={() => setDoomed(null)}
+        onConfirm={() => {
+          if (doomed === 'all') deleteAi({ threads: aiThreads.map((t) => t.id), calls: aiCalls.map((c) => c.id) })
+          else if (doomed) deleteAi(doomed.kind === 'chat' ? { threads: [doomed.id] } : { calls: [doomed.id] })
+          setDoomed(null)
+        }}
+      />
 
       <Sheet open={pick !== null} onClose={() => setPick(null)} title={pick === 'call' ? 'Which job is the call about?' : 'Which job is this about?'}>
         {active.length === 0 && recent.length === 0 ? (

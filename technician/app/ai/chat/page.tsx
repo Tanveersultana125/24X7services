@@ -155,7 +155,7 @@ function AiChat() {
     const appliance = APPLIANCES.find((a) => APPLIANCE_LABEL[a] === s)
     if (!job && appliance) {
       setPick((p) => ({ ...p, appliance }))
-      push([{ id: uid(), role: 'tech', at: new Date().toISOString(), text: s }])
+      push([{ id: uid(), role: 'tech', at: new Date().toISOString(), text: s }], `${APPLIANCE_LABEL[appliance]} help`)
       reply(() => ({ lead: `Got it — ${APPLIANCE_LABEL[appliance]}. Which brand, and what’s the problem? You can also use the quick actions below.`, sections: [], suggestions: BRANDS.map((b) => BRAND_LABEL[b]) }))
       return
     }

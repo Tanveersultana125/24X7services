@@ -118,3 +118,8 @@ export function matchesQuery(job: Job, q: string): boolean {
     .toLowerCase()
   return words.every((w) => hay.includes(w))
 }
+
+/** plural(1, 'question') → "1 question"; plural(3, 'question') → "3 questions". */
+export function plural(n: number, word: string): string {
+  return `${n} ${word}${n === 1 ? '' : 's'}`
+}
