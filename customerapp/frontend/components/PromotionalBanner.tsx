@@ -251,8 +251,12 @@ export const TONE_TOP: Record<BannerTone, string> = {
   violet: '#0E0E22',
 }
 
-/** The same gradients run top to bottom, from `TONE_TOP` down. */
-const TONES_EDGE: Record<BannerTone, string> = {
+/**
+ * The same gradients run top to bottom, from `TONE_TOP` down. On a phone they
+ * are painted by Home behind the header and the banner together, as one
+ * block, not by the card.
+ */
+export const TONES_EDGE: Record<BannerTone, string> = {
   blue: 'from-[#1E3A8A] via-[#2547D0] to-[#4AA8DC]',
   amber: 'from-[#3B1A05] via-[#8C4F10] to-[#E0952E]',
   green: 'from-[#08402F] via-[#0B7A50] to-[#2FB483]',
@@ -330,11 +334,15 @@ export function BannerCard({
   ) : (
     <div
       className={cn(
-        'relative flex h-full min-h-52 gap-5 overflow-hidden rounded-card bg-linear-to-br p-5 text-white sm:min-h-56',
+        'relative flex h-full min-h-52 gap-5 overflow-hidden rounded-card p-5 text-white sm:min-h-56',
+        !edgeToEdge && 'bg-linear-to-br',
         edgeToEdge
           ? cn(
-              'min-h-48 rounded-none bg-linear-to-b px-4 pt-4 pb-7 lg:min-h-56 lg:rounded-card lg:bg-linear-to-br lg:p-5',
-              TONES_EDGE[banner.tone]
+              // No ground of its own on a phone: Home paints one gradient
+              // behind the header and this card together. A card again, with
+              // its own gradient, from a laptop up.
+              'min-h-48 rounded-none px-4 pt-4 pb-7 lg:min-h-56 lg:rounded-card lg:bg-linear-to-br lg:p-5',
+              TONES[banner.tone]
             )
           : TONES[banner.tone],
         className

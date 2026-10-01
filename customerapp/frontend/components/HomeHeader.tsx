@@ -60,6 +60,11 @@ export function HomeHeader({
   // Painted while the banner is in view under it; the caller stops passing a
   // tone once the banner has scrolled away.
   const painted = Boolean(tone);
+  // At the very top the page paints one gradient behind the header and the
+  // banner together, so the header's own strips stay clear and the two read
+  // as one block. Scrolled, the pinned bar takes the colour so the banner
+  // sliding under it does not show through.
+  const clear = painted && !raised;
 
   return (
     <>
@@ -71,14 +76,14 @@ export function HomeHeader({
           "fixed inset-x-0 top-0 z-40 h-[var(--safe-top)] transition-colors duration-500 lg:hidden",
           !painted && "bg-bg",
         )}
-        style={painted ? { backgroundColor: tone } : undefined}
+        style={painted && !clear ? { backgroundColor: tone } : undefined}
       />
       <div
         className={cn(
-          "pt-[var(--safe-top)] transition-colors duration-500 lg:hidden",
+          "relative z-[1] pt-[var(--safe-top)] transition-colors duration-500 lg:hidden",
           !tone && "bg-bg",
         )}
-        style={tone ? { backgroundColor: tone } : undefined}
+        style={tone && !clear ? { backgroundColor: tone } : undefined}
       >
         <div className="mx-auto flex max-w-lg items-start gap-2 px-4 pt-2">
           <LocationSelector
@@ -128,7 +133,7 @@ export function HomeHeader({
         // through the joins as thin white lines. The bar's own colour, drawn a
         // pixel past its top and bottom, covers both joins.
         style={
-          painted
+          painted && !clear
             ? {
                 backgroundColor: tone,
                 boxShadow: `0 -1px 0 ${tone}, 0 1px 0 ${tone}`,

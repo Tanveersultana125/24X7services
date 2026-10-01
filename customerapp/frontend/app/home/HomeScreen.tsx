@@ -22,6 +22,7 @@ import {
   PromotionalBanner,
   BannerCard,
   TONE_TOP,
+  TONES_EDGE,
 } from '@/components/PromotionalBanner'
 import { CategoryGrid } from '@/components/CategoryGrid'
 import {
@@ -44,6 +45,7 @@ import { CartBar } from '@/components/CartBar'
 import { VideoRail, type ReelItem } from '@/components/VideoRail'
 import { ServiceSheet, serviceOptions } from '@/components/ServiceSheet'
 import { ReferBanner } from '@/components/ReferBanner'
+import { cn } from '@/lib/cn'
 import {
   fetchAllIssues,
   fetchAllServices,
@@ -129,6 +131,25 @@ export function HomeScreen() {
   // colour opens between it and the banner still in view.
   const [heroTone, setHeroTone] = useState<BannerTone | null>(null)
   const pastHero = useScrolled(HERO_HEIGHT)
+
+  // How far down the page the banner ends, for the gradient behind the header
+  // and the banner to reach exactly that far.
+  const heroRef = useRef<HTMLDivElement | null>(null)
+  const [heroHeight, setHeroHeight] = useState(0)
+  useEffect(() => {
+    const el = heroRef.current
+    if (!el) return
+    const measure = (): void => {
+      setHeroHeight(Math.round(el.getBoundingClientRect().bottom + window.scrollY))
+    }
+    const observer = new ResizeObserver(measure)
+    observer.observe(el)
+    window.addEventListener('resize', measure)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', measure)
+    }
+  }, [])
 
   useStaleLocationCheck(location, setLocation)
 
@@ -244,7 +265,33 @@ export function HomeScreen() {
 
       {/* The banner's own height while it loads, so the page does not jump
           when it lands; nothing at all once there is genuinely no banner. */}
-      <div className="-mx-4 lg:mx-0 lg:mt-5">
+      {/* One gradient behind the header and the banner together, from the
+          top of the screen to the foot of the banner, in the colour of the
+          slide in view — the way the marketplaces open Home, as one block.
+          A layer per tone, cross-fading, so a slide change is a change of
+          light rather than a cut. Phone only; a laptop has the card. */}
+      {data && heroBanners.length > 0 && heroHeight > 0 ? (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 lg:hidden"
+          style={{ height: heroHeight }}
+        >
+          {[...new Set(heroBanners.map((banner) => banner.tone))].map((tone) => (
+            <div
+              key={tone}
+              className={cn(
+                'absolute inset-0 bg-linear-to-b transition-opacity duration-500',
+                TONES_EDGE[tone],
+                tone === (heroTone ?? heroBanners[0]?.tone)
+                  ? 'opacity-100'
+                  : 'opacity-0'
+              )}
+            />
+          ))}
+        </div>
+      ) : null}
+
+      <div ref={heroRef} className="relative z-[1] -mx-4 lg:mx-0 lg:mt-5">
         {data && heroBanners.length > 0 ? (
           <PromotionalBanner
             banners={heroBanners}
