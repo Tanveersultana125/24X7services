@@ -327,7 +327,24 @@ export function BannerCard({
   // When the lines under the headline follow: once its last word is up.
   const after = words.length * 70 + 120
 
-  const body = banner.chips?.length ? (
+  const body = banner.chips?.length && banner.motion === 'steps' ? (
+    <StepsBody
+      banner={banner}
+      steps={banner.chips}
+      edgeToEdge={edgeToEdge}
+      moving={moving}
+      className={className}
+    />
+  ) : banner.chips?.length && banner.motion === 'spotlight' ? (
+    <SpotlightBody
+      banner={banner}
+      points={banner.chips}
+      edgeToEdge={edgeToEdge}
+      moving={moving}
+      priority={priority}
+      className={className}
+    />
+  ) : banner.chips?.length ? (
     <StoryBody
       banner={banner}
       chips={banner.chips}
@@ -672,6 +689,215 @@ function StoryBody({
           {banner.ctaLabel}
           <span aria-hidden="true">→</span>
         </span>
+      ) : null}
+    </div>
+  )
+}
+
+/** The ground under a story banner: none on a phone edge to edge (Home paints it), the tone otherwise. */
+function storyGround(
+  banner: Banner,
+  edgeToEdge: boolean,
+  className?: string
+): string {
+  return cn(
+    'relative flex h-full min-h-52 overflow-hidden text-white sm:min-h-56',
+    edgeToEdge
+      ? cn('min-h-48 rounded-none lg:rounded-card lg:bg-linear-to-br', TONES[banner.tone])
+      : cn('rounded-card bg-linear-to-br', TONES[banner.tone]),
+    className
+  )
+}
+
+/** An animation, played only while the slide is in view and moving. */
+function play(moving: boolean, animation: string): React.CSSProperties | undefined {
+  return moving ? { animation } : undefined
+}
+
+const EASE = 'cubic-bezier(0.2,0.7,0.2,1)'
+
+/** A headline that rises in word by word, read whole by a screen reader. */
+function WordHeadline({ title, moving }: { title: string; moving: boolean }) {
+  const words = title.split(' ')
+  return (
+    <h3 className="text-[1.375rem] leading-tight font-bold" aria-label={title}>
+      {words.map((word, index) => (
+        <span key={`${word}-${index}`} aria-hidden="true">
+          <span
+            className="inline-block"
+            style={play(moving, `banner-word 620ms ${EASE} ${index * 0.07}s both`)}
+          >
+            {word}
+          </span>
+          {index < words.length - 1 ? ' ' : null}
+        </span>
+      ))}
+    </h3>
+  )
+}
+
+/**
+ * A story banner told as a line of steps: the headline, then the steps in a
+ * row joined by a line that fills from the first to the last, each step's
+ * dot popping in with a tick as the line reaches it. For a promise that is
+ * an order of events: inspect, quote, your yes, then repair.
+ */
+function StepsBody({
+  banner,
+  steps,
+  edgeToEdge,
+  moving,
+  className,
+}: {
+  banner: Banner
+  steps: readonly string[]
+  edgeToEdge: boolean
+  moving: boolean
+  className?: string
+}) {
+  const title = [banner.title, banner.titleAfter].filter(Boolean).join(' ')
+  const start = title.split(' ').length * 0.07 + 0.35 // the line starts once the headline is up
+  const each = 0.55 // seconds the line takes from one step to the next
+  const last = steps.length - 1
+  // The rail runs between the first and the last dot: half a column in from each side.
+  const inset = `${50 / steps.length}%`
+
+  return (
+    <div className={cn(storyGround(banner, edgeToEdge, className), 'flex-col justify-center px-4 py-5 lg:px-6')}>
+      <WordHeadline title={title} moving={moving} />
+
+      <ol
+        className="relative mt-4 grid"
+        style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}
+      >
+        <span
+          aria-hidden="true"
+          className="absolute top-3 h-0.5 rounded-pill bg-white/25"
+          style={{ left: inset, right: inset }}
+        />
+        <span
+          aria-hidden="true"
+          className="absolute top-3 h-0.5 origin-left rounded-pill bg-white"
+          style={{
+            left: inset,
+            right: inset,
+            ...play(moving, `story-line ${each * last}s linear ${start}s both`),
+          }}
+        />
+        {steps.map((step, index) => (
+          <li key={step} className="relative flex flex-col items-center text-center">
+            <span
+              className="flex size-6 items-center justify-center rounded-full bg-white text-xs font-bold"
+              style={{
+                color: TONE_TOP[banner.tone],
+                ...play(moving, `story-node 420ms ${EASE} ${start + index * each}s both`),
+              }}
+            >
+              &#10003;
+            </span>
+            <span
+              className="mt-2 text-xs leading-tight font-medium text-white/90"
+              style={play(moving, `banner-rise 420ms ${EASE} ${start + index * each + 0.1}s both`)}
+            >
+              {step}
+            </span>
+          </li>
+        ))}
+      </ol>
+
+      {banner.ctaLabel ? (
+        <span
+          className="mt-4 inline-flex w-fit items-center rounded-pill bg-white px-4 py-2 text-sm font-semibold text-royal"
+          style={play(moving, `banner-rise 520ms ${EASE} ${start + last * each + 0.5}s both`)}
+        >
+          {banner.ctaLabel}
+        </span>
+      ) : null}
+    </div>
+  )
+}
+
+/**
+ * A story banner told as a spotlight: the headline word by word on the left
+ * with its points ticked in under it one at a time, and the artwork on the
+ * right settling in while rings of light pulse out from behind it. For a
+ * promise that is a thing you get: every repair, under warranty.
+ */
+function SpotlightBody({
+  banner,
+  points,
+  edgeToEdge,
+  moving,
+  priority,
+  className,
+}: {
+  banner: Banner
+  points: readonly string[]
+  edgeToEdge: boolean
+  moving: boolean
+  priority: boolean
+  className?: string
+}) {
+  const title = [banner.title, banner.titleAfter].filter(Boolean).join(' ')
+  const after = title.split(' ').length * 0.07 + 0.25
+  // Three at most: a fourth line makes this slide, and so the whole rail,
+  // taller than the others need to be.
+  points = points.slice(0, 3)
+
+  return (
+    <div className={cn(storyGround(banner, edgeToEdge, className), 'items-center gap-3 px-4 py-5 lg:px-6')}>
+      <div className="relative min-w-0 flex-1">
+        <WordHeadline title={title} moving={moving} />
+        <ul className="mt-2.5 flex flex-col gap-1">
+          {points.map((point, index) => (
+            <li
+              key={point}
+              className="flex items-center gap-2 text-sm text-white/90"
+              style={play(moving, `banner-rise 480ms ${EASE} ${after + index * 0.32}s both`)}
+            >
+              <span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-white/20 text-[10px]">
+                &#10003;
+              </span>
+              {point}
+            </li>
+          ))}
+        </ul>
+        {banner.ctaLabel ? (
+          <span
+            className="mt-3.5 inline-flex w-fit items-center rounded-pill bg-white px-4 py-2 text-sm font-semibold text-royal"
+            style={play(moving, `banner-rise 520ms ${EASE} ${after + points.length * 0.32 + 0.2}s both`)}
+          >
+            {banner.ctaLabel}
+          </span>
+        ) : null}
+      </div>
+
+      {banner.image ? (
+        <div className="relative aspect-square w-[32%] shrink-0">
+          {moving
+            ? [0, 1, 2].map((ring) => (
+                <span
+                  key={ring}
+                  aria-hidden="true"
+                  className="absolute inset-0 rounded-full border-2 border-white/40 opacity-0"
+                  style={{ animation: `story-ring 2.7s ease-out ${0.6 + ring * 0.9}s infinite` }}
+                />
+              ))
+            : null}
+          <div
+            className="absolute inset-[12%]"
+            style={play(moving, `banner-art-in 700ms ${EASE} 0.2s both`)}
+          >
+            <Image
+              src={banner.image}
+              alt=""
+              fill
+              sizes="140px"
+              priority={priority}
+              className="object-contain"
+            />
+          </div>
+        </div>
       ) : null}
     </div>
   )

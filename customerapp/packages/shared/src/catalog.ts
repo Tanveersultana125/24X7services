@@ -370,6 +370,13 @@ export const bannerSchema = z.object({
   chips: z.array(z.string().min(1).max(24)).max(6).optional(),
   /** The headline's second half, arriving once the chips have gone. */
   titleAfter: z.string().min(1).max(40).optional(),
+  /**
+   * How a story banner plays, so slides side by side do not all move alike:
+   * `chips` floats them around a centred headline, `steps` lays them out as a
+   * line of steps that fill in turn, `spotlight` lists them under the
+   * headline beside the artwork. Defaults to `chips`.
+   */
+  motion: z.enum(['chips', 'steps', 'spotlight']).optional(),
   /** A small pill in the corner of the card: "New", "Trending". */
   badge: z.string().optional(),
   slot: bannerSlotSchema.default('hero'),

@@ -380,6 +380,45 @@
   }
 }
 
+/* A "steps" story banner: the line between the steps filling left to right,
+   and each step's dot popping in as the line reaches it. */
+@keyframes story-line {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes story-node {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* A "spotlight" story banner: rings of light pulsing out from behind the
+   artwork. */
+@keyframes story-ring {
+  from {
+    opacity: 0.55;
+    transform: scale(0.55);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
 /* The bar under the slide on show in an appliance page's banner, filling for
    as long as the slide stays. */
 @keyframes hero-progress {
