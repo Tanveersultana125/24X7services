@@ -25,6 +25,13 @@ export function AreasTab() {
   const bookings30 = (area: string) => store.bookings.filter((b) => b.area === area && now - new Date(b.scheduledAt).getTime() < 30 * 86_400_000).length
   const techs = (area: string) => store.technicians.filter((t) => t.area === area && t.kyc === 'verified').length
 
+  const setActive = (a: (typeof areas)[number], v: boolean) => {
+    if (!canEdit) return
+    store.updateSettings((s) => ({ areas: s.areas.map((x) => (x.pincode === a.pincode ? { ...x, active: v } : x)) }))
+    store.record({ module: 'catalog', action: v ? 'Activated service area' : 'Paused service area', target: `${a.area} ${a.pincode}`, old: v ? 'Paused' : 'Active', new: v ? 'Active' : 'Paused' })
+    toast(`${a.area} ${v ? 'is taking bookings' : 'paused'}`)
+  }
+
   return (
     <Card>
       <CardHeader
@@ -50,6 +57,23 @@ export function AreasTab() {
           ]}
         />
       </div>
+      {/* Phone: one row per area — the table would scroll sideways. */}
+      <ul className="divide-y divide-line sm:hidden">
+        {list.map((a) => (
+          <li key={a.pincode} className="flex items-center gap-3 px-4 py-3">
+            <MapPin className="size-4 shrink-0 text-faint" aria-hidden />
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-bold">{a.area}</span>
+              <span className="num block text-xs font-medium text-muted">
+                {a.pincode} · {bookings30(a.area)} bookings · {techs(a.area)} technicians
+              </span>
+            </span>
+            <Toggle checked={a.active} label={`${a.area} active`} onChange={(v) => setActive(a, v)} />
+          </li>
+        ))}
+        {list.length === 0 && <li className="px-4 py-10 text-center text-sm font-semibold text-muted">No areas match.</li>}
+      </ul>
+      <div className="hidden sm:block">
       <TableWrap className="[&_table]:min-w-[560px]">
         <thead>
           <tr>
@@ -75,12 +99,7 @@ export function AreasTab() {
                 <Toggle
                   checked={a.active}
                   label={`${a.area} active`}
-                  onChange={(v) => {
-                    if (!canEdit) return
-                    store.updateSettings((s) => ({ areas: s.areas.map((x) => (x.pincode === a.pincode ? { ...x, active: v } : x)) }))
-                    store.record({ module: 'catalog', action: v ? 'Activated service area' : 'Paused service area', target: `${a.area} ${a.pincode}`, old: v ? 'Paused' : 'Active', new: v ? 'Active' : 'Paused' })
-                    toast(`${a.area} ${v ? 'is taking bookings' : 'paused'}`)
-                  }}
+                  onChange={(v) => setActive(a, v)}
                 />
               </td>
             </tr>
@@ -94,6 +113,7 @@ export function AreasTab() {
           )}
         </tbody>
       </TableWrap>
+      </div>
       {adding && <AddArea onClose={() => setAdding(false)} />}
     </Card>
   )
@@ -160,7 +180,27 @@ export function AvailabilityTab() {
   return (
     <Card>
       <CardHeader title="Service availability" sub={`${enabled} of ${BRANDS.length * APPLIANCES.length} brand × appliance pairs bookable`} />
-      <div className="overflow-x-auto">
+      {/* Phone: one card per brand — the matrix would scroll sideways. */}
+      <ul className="divide-y divide-line sm:hidden">
+        {BRANDS.map((b) => (
+          <li key={b} className="px-4 py-3">
+            <p className="text-sm font-extrabold">
+              {BRAND_LABEL[b]}
+              {!store.catalog.brands[b].enabled && <span className="ml-2 text-[11px] font-semibold text-warning">Brand disabled in draft</span>}
+            </p>
+            <ul className="mt-2 divide-y divide-line rounded-lg border border-line">
+              {APPLIANCES.map((a) => (
+                <li key={a} className="flex items-center gap-2.5 px-3 py-2">
+                  <ApplianceGlyph appliance={a} className="size-4 text-brand" />
+                  <span className="flex-1 text-[13px] font-semibold">{APPLIANCE_LABEL[a]}</span>
+                  <Toggle size="sm" checked={m[b][a]} label={`${BRAND_LABEL[b]} ${APPLIANCE_LABEL[a]}`} onChange={(v) => flip(b, a, v)} />
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
+      <div className="hidden overflow-x-auto sm:block">
         <table className="w-full min-w-[640px] text-sm">
           <thead>
             <tr>

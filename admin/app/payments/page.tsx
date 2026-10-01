@@ -7,6 +7,7 @@ import { BarChart, Donut } from '@/components/charts'
 import { useToast } from '@/components/toast'
 import {
   Button,
+  Avatar,
   Card,
   CardHeader,
   Chip,
@@ -189,7 +190,53 @@ export default function Payments() {
         {shown.length === 0 ? (
           <Empty icon={<Wallet />} title="No transactions" body="Nothing matches this filter." />
         ) : (
-          <TableWrap>
+          <>
+          {/* Phone: one card per transaction — the table would scroll sideways. */}
+          <ul className="divide-y divide-line sm:hidden">
+            {shown.map((b) => {
+              const st = payState(b)
+              const c = store.customer(b.customerId)
+              const refundable = b.paid && (b.status === 'completed' || b.status === 'cancelled')
+              return (
+                <li key={b.id} className="px-4 py-3">
+                  <div className="flex items-start gap-3">
+                    {c && <Avatar name={c.name} size={36} side="customer" />}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm font-bold">{c?.name}</span>
+                          <span className="num block truncate text-xs font-medium text-muted">{txnId(b)}</span>
+                        </span>
+                        <span className="shrink-0 text-right">
+                          <span className="num block text-sm font-extrabold">{inr(b.amount)}</span>
+                          <Chip tone={st.tone} className="mt-1">{st.label}</Chip>
+                        </span>
+                      </div>
+                      <button type="button" onClick={() => setOpen(b.id)} className="mt-2 block w-full rounded-lg bg-canvas px-3 py-2 text-left text-xs">
+                        <span className="flex justify-between gap-2">
+                          <span className="truncate font-bold text-brand">
+                            {b.id} · {BRAND_LABEL[b.brand]} {APPLIANCE_LABEL[b.appliance]}
+                          </span>
+                          <span className="shrink-0 font-semibold text-ink-2">{b.method ? METHOD_LABEL[b.method] : '—'}</span>
+                        </span>
+                        <span className="mt-0.5 flex justify-between gap-2 font-medium text-muted">
+                          <span>{dateTime(b.scheduledAt)}</span>
+                          <span className="truncate">{b.coupon ? `${b.coupon} · −${inr(b.discount)}` : ''}</span>
+                        </span>
+                      </button>
+                      {refundable && (
+                        <Button size="xs" variant="secondary" className="mt-2" onClick={() => setRefunding(b)}>
+                          <RotateCcw /> Refund
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+          <div className="hidden sm:block">
+<TableWrap>
             <thead>
               <tr>
                 <th className={th}>Transaction</th>
@@ -241,6 +288,8 @@ export default function Payments() {
               })}
             </tbody>
           </TableWrap>
+          </div>
+          </>
         )}
         <Pager page={page} pages={pages} total={rows.length} onPage={setPage} />
       </Card>

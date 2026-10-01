@@ -165,7 +165,65 @@ function Technicians() {
             ))}
           </div>
         ) : (
-          <TableWrap>
+          <>
+          {/* Phone: one card per technician — the table would scroll sideways. */}
+          <ul className="divide-y divide-line sm:hidden">
+            {shown.map((x) => (
+              <li key={x.id}>
+                <button type="button" onClick={() => setOpen(x.id)} className="flex w-full items-start gap-3 px-4 py-3 text-left">
+                  <span className="relative shrink-0">
+                    <Avatar name={x.name} size={36} side="technician" />
+                    <span className={cn('absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-card', presenceDot[x.presence])} />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-start justify-between gap-2">
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-bold">{x.name}</span>
+                        <span className="flex items-center gap-1.5 text-xs font-medium text-muted">
+                          <span className="truncate">{x.area}</span> · <Rating value={x.rating} className="text-xs" />
+                        </span>
+                      </span>
+                      <span className="shrink-0">
+                        {x.kyc === 'verified' ? <Chip tone={PRESENCE[x.presence].tone}>{PRESENCE[x.presence].label}</Chip> : <Chip tone={KYC[x.kyc].tone}>{KYC[x.kyc].label}</Chip>}
+                      </span>
+                    </span>
+                    <span className="mt-1.5 flex flex-wrap items-center gap-1">
+                      {x.brands.map((b) => (
+                        <BrandTag key={b} brand={b} />
+                      ))}
+                      <span className="ml-1 flex gap-1 text-muted">
+                        {x.appliances.map((a) => (
+                          <span key={a} title={APPLIANCE_LABEL[a]}>
+                            <ApplianceGlyph appliance={a} className="size-4" />
+                          </span>
+                        ))}
+                      </span>
+                    </span>
+                    <span className="mt-2 grid grid-cols-4 gap-2 rounded-lg bg-canvas px-3 py-2 text-xs">
+                      <span>
+                        <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">Jobs</span>
+                        <span className="num font-bold">{x.completedJobs.toLocaleString('en-IN')}</span>
+                      </span>
+                      <span>
+                        <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">Accept</span>
+                        <span className="num font-semibold">{x.acceptanceRate ? `${x.acceptanceRate}%` : '—'}</span>
+                      </span>
+                      <span>
+                        <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">On-time</span>
+                        <span className="num font-semibold">{x.onTimeRate ? `${x.onTimeRate}%` : '—'}</span>
+                      </span>
+                      <span className="text-right">
+                        <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">Cash</span>
+                        <span className={cn('num font-semibold', x.cashInHand > 5000 && 'text-warning')}>{x.cashInHand ? inr(x.cashInHand) : '—'}</span>
+                      </span>
+                    </span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+          <div className="hidden sm:block">
+<TableWrap>
             <thead>
               <tr>
                 <th className={th}>Technician</th>
@@ -226,6 +284,8 @@ function Technicians() {
               ))}
             </tbody>
           </TableWrap>
+          </div>
+          </>
         )}
         <Pager page={page} pages={pages} total={filtered.length} onPage={setPage} />
       </Card>

@@ -114,7 +114,79 @@ export default function Payouts() {
           {rows.length === 0 ? (
             <Empty icon={<Wallet />} title="Nothing here" body="No payouts in this state." />
           ) : (
-            <TableWrap>
+            <>
+            {/* Phone: one card per payout — the table would scroll sideways. */}
+            <div className="sm:hidden">
+              {filter !== 'paid' && releasable.length > 0 && (
+                <label className="flex items-center gap-2.5 border-b border-line px-4 py-2.5 text-xs font-bold text-ink-2">
+                  <input
+                    type="checkbox"
+                    checked={allOn}
+                    onChange={() => setSelected(allOn ? [] : releasable.map((p) => p.id))}
+                    className="size-4 accent-brand"
+                  />
+                  Select all
+                </label>
+              )}
+              <ul className="divide-y divide-line">
+                {rows.map((p) => {
+                  const t = store.technician(p.technicianId)
+                  const on = chosen.includes(p.id)
+                  return (
+                    <li key={p.id} className={cn('flex items-start gap-3 px-4 py-3', on && 'bg-brand-soft/40')}>
+                      {filter !== 'paid' && (
+                        <input
+                          type="checkbox"
+                          aria-label={`Select ${p.id}`}
+                          checked={on}
+                          onChange={() => setSelected((s) => (on ? s.filter((x) => x !== p.id) : [...s, p.id]))}
+                          className="mt-2.5 size-4 shrink-0 accent-brand"
+                        />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <Link href={`/technicians/?id=${p.technicianId}` as Route} className="flex min-w-0 items-center gap-2.5">
+                            <Avatar name={t?.name ?? '?'} size={32} side="technician" />
+                            <span className="min-w-0">
+                              <span className="block truncate text-sm font-bold">{t?.name}</span>
+                              <span className="block truncate text-xs font-medium text-muted">{p.period}</span>
+                            </span>
+                          </Link>
+                          <Chip tone={STATUS[p.status].tone} className="shrink-0">
+                            {STATUS[p.status].label}
+                          </Chip>
+                        </div>
+                        <div className="mt-2 grid grid-cols-4 gap-2 rounded-lg bg-canvas px-3 py-2 text-xs">
+                          <span>
+                            <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">Jobs</span>
+                            <span className="num font-bold">{p.jobs}</span>
+                          </span>
+                          <span>
+                            <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">Gross</span>
+                            <span className="num">{inr(p.gross)}</span>
+                          </span>
+                          <span>
+                            <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">Comm.</span>
+                            <span className="num text-muted">−{inr(p.commission)}</span>
+                          </span>
+                          <span className="text-right">
+                            <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">Net</span>
+                            <span className="num font-extrabold">{inr(net(p))}</span>
+                          </span>
+                        </div>
+                        {filter !== 'paid' && (
+                          <Button size="xs" className="mt-2" onClick={() => release([p.id])}>
+                            Release
+                          </Button>
+                        )}
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+            <div className="hidden sm:block">
+<TableWrap>
               <thead>
                 <tr>
                   {filter !== 'paid' && (
@@ -184,6 +256,8 @@ export default function Payouts() {
                 })}
               </tbody>
             </TableWrap>
+            </div>
+            </>
           )}
           <p className="px-5 py-3 text-xs font-semibold text-muted">
             {rows.length} payouts · net {inr(rows.reduce((s, p) => s + net(p), 0))}

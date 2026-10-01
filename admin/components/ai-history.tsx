@@ -89,6 +89,59 @@ export function CallHistoryTab() {
       {shown.length === 0 ? (
         <Empty icon={<PhoneOff />} title="No calls match" body="Try another purpose, status or date range." />
       ) : (
+        <>
+        {/* Phone: one card per call — the table would scroll sideways. */}
+        <ul className="divide-y divide-line sm:hidden">
+          {shown.map((c) => {
+            const cu = store.customer(c.customerId)
+            const t = store.technician(c.technicianId)
+            return (
+              <li key={c.id} className="px-4 py-3">
+                <div className="flex items-start gap-3">
+                  {cu && <Avatar name={cu.name} size={36} side="customer" />}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-bold">{cu?.name}</span>
+                        <span className="block truncate text-xs font-medium text-muted">{c.purpose}</span>
+                      </span>
+                      <span className="shrink-0">
+                        <CallStatusChip status={c.status} />
+                      </span>
+                    </div>
+                    <div className="mt-2 rounded-lg bg-canvas px-3 py-2 text-xs">
+                      <p className="line-clamp-2 text-ink-2">{c.summary}</p>
+                      <p className="mt-1 flex items-center justify-between gap-2 font-medium text-muted">
+                        <span className="flex min-w-0 items-center gap-1.5">
+                          {t && <Avatar name={t.name} size={16} side="technician" />}
+                          <span className="truncate">{t?.name ?? '—'}</span>
+                        </span>
+                        <span className="num shrink-0">
+                          {dateTime(c.at)} · {c.durationSec ? mmss(c.durationSec) : '—'}
+                        </span>
+                      </p>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      <Button size="xs" variant="secondary" onClick={() => setView({ id: c.id, focus: 'details' })}>
+                        View
+                      </Button>
+                      <Button size="xs" variant="secondary" disabled={!c.transcript.length} onClick={() => setView({ id: c.id, focus: 'transcript' })}>
+                        <ScrollText /> Transcript
+                      </Button>
+                      <Button size="xs" variant="secondary" onClick={() => setSummary(c.id)}>
+                        <FileText /> Summary
+                      </Button>
+                      <Button size="xs" variant="subtle" onClick={() => setBooking(c.bookingId)}>
+                        {c.bookingId}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            )
+          })}
+        </ul>
+        <div className="hidden sm:block">
         <TableWrap>
           <thead>
             <tr>
@@ -160,6 +213,8 @@ export function CallHistoryTab() {
             })}
           </tbody>
         </TableWrap>
+        </div>
+        </>
       )}
       <Pager page={p} pages={pages} total={rows.length} onPage={setPage} />
 

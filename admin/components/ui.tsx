@@ -4,7 +4,7 @@ import Link from 'next/link'
 import type { Route } from 'next'
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import { ArrowDownRight, ArrowUpRight, Search, Star, UserRound, Wrench, X } from 'lucide-react'
+import { ArrowDownRight, ArrowLeft, ArrowUpRight, Search, Star, UserRound, Wrench, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { BOOKING_STATUS, PRIORITY, type Tone } from '@/lib/status'
 import type { BookingStatus, Priority } from '@/lib/types'
@@ -436,12 +436,16 @@ export function Drawer({
     <div className="fixed inset-0 z-[80]" role="dialog" aria-modal="true">
       <button type="button" aria-label="Close" className="animate-fade absolute inset-0 bg-ink/40" onClick={onClose} />
       <div className={cn('animate-panel absolute inset-y-0 right-0 flex w-full flex-col bg-card shadow-float', width)}>
-        <div className="flex items-start justify-between gap-3 border-b border-line px-5 py-4">
-          <div className="min-w-0">
+        <div className="flex items-start gap-2 border-b border-line px-3 py-3 sm:gap-3 sm:px-5 sm:py-4">
+          {/* On a phone the drawer fills the screen, so it leads with Back like any page. */}
+          <button type="button" onClick={onClose} aria-label="Back" className="grid size-10 shrink-0 place-items-center rounded-lg text-ink hover:bg-canvas sm:hidden">
+            <ArrowLeft className="size-5" />
+          </button>
+          <div className="min-w-0 flex-1 pt-1.5 sm:pt-0">
             <h2 className="truncate text-lg font-extrabold tracking-tight">{title}</h2>
             {sub && <div className="mt-0.5 text-[13px] font-medium text-muted">{sub}</div>}
           </div>
-          <button type="button" onClick={onClose} aria-label="Close" className="-mr-2 grid size-9 shrink-0 place-items-center rounded-lg text-muted hover:bg-canvas hover:text-ink">
+          <button type="button" onClick={onClose} aria-label="Close" className="-mr-2 hidden size-9 shrink-0 place-items-center rounded-lg text-muted hover:bg-canvas hover:text-ink sm:grid">
             <X className="size-5" />
           </button>
         </div>

@@ -147,7 +147,47 @@ function Customers() {
         {shown.length === 0 ? (
           <Empty icon={<Users />} title="No customers match" body="Try a different search or area." />
         ) : (
-          <TableWrap>
+          <>
+          {/* Phone: one card per customer — the table would scroll sideways. */}
+          <ul className="divide-y divide-line sm:hidden">
+            {shown.map(({ c, bookings, spend, last }) => (
+              <li key={c.id}>
+                <button type="button" onClick={() => setOpen(c.id)} className="flex w-full items-start gap-3 px-4 py-3 text-left">
+                  <Avatar name={c.name} size={36} side="customer" />
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-start justify-between gap-2">
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-bold">{c.name}</span>
+                        <span className="block truncate text-xs font-medium text-muted">
+                          <span className="num">{c.id}</span> · {c.area}
+                        </span>
+                      </span>
+                      <Chip tone={c.status === 'active' ? 'success' : 'danger'} className="shrink-0">
+                        {c.status === 'active' ? 'Active' : 'Suspended'}
+                      </Chip>
+                    </span>
+                    <span className="num mt-1 block truncate text-xs font-semibold text-ink-2">{c.phone}</span>
+                    <span className="mt-2 grid grid-cols-3 gap-2 rounded-lg bg-canvas px-3 py-2 text-xs">
+                      <span>
+                        <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">Bookings</span>
+                        <span className="num font-bold">{bookings.length}</span>
+                      </span>
+                      <span>
+                        <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">Spend</span>
+                        <span className="num font-extrabold">{inr(spend)}</span>
+                      </span>
+                      <span className="text-right">
+                        <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">Last</span>
+                        <span className="font-semibold text-muted">{last ? ago(last) : '—'}</span>
+                      </span>
+                    </span>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+          <div className="hidden sm:block">
+<TableWrap>
             <thead>
               <tr>
                 <th className={th}>Customer</th>
@@ -188,6 +228,8 @@ function Customers() {
               ))}
             </tbody>
           </TableWrap>
+          </div>
+          </>
         )}
         <Pager page={page} pages={pages} total={filtered.length} onPage={setPage} />
       </Card>

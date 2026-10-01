@@ -167,6 +167,46 @@ export default function Reports() {
             />
           }
         />
+        {/* Phone: one card per technician — the table would scroll sideways. */}
+        <ul className="divide-y divide-line sm:hidden">
+          {r.techs.map(({ t, jobs, revenue: rev, cancelled, rating }) => (
+            <li key={t.id}>
+              <Link href={`/technicians/?id=${t.id}` as Route} className="flex items-start gap-3 px-4 py-3">
+                <Avatar name={t.name} size={36} side="technician" />
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-start justify-between gap-2">
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-bold">{t.name}</span>
+                      <span className="flex items-center gap-1.5 text-xs font-medium text-muted">
+                        <span className="truncate">{t.area}</span> · <Rating value={rating || t.rating} className="text-xs" />
+                      </span>
+                    </span>
+                    <span className="num shrink-0 text-sm font-extrabold">{inr(rev)}</span>
+                  </span>
+                  <span className="mt-2 grid grid-cols-4 gap-2 rounded-lg bg-canvas px-3 py-2 text-xs">
+                    <span>
+                      <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">Jobs</span>
+                      <span className="num font-bold">{jobs}</span>
+                    </span>
+                    <span>
+                      <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">Cancel</span>
+                      <span className="num text-muted">{cancelled}</span>
+                    </span>
+                    <span>
+                      <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">On-time</span>
+                      <span className="num font-semibold">{t.onTimeRate}%</span>
+                    </span>
+                    <span className="text-right">
+                      <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">Accept</span>
+                      <span className="num font-semibold">{t.acceptanceRate}%</span>
+                    </span>
+                  </span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <div className="hidden sm:block">
         <TableWrap>
           <thead>
             <tr>
@@ -210,6 +250,7 @@ export default function Reports() {
             ))}
           </tbody>
         </TableWrap>
+        </div>
       </Card>
     </Page>
   )

@@ -58,7 +58,57 @@ export function PricingTab() {
     <div className="grid gap-5 2xl:grid-cols-[1fr_380px]">
       <Card className="min-w-0">
         <CardHeader title="Base prices · brand × appliance" sub="Normal and emergency price per visit, before parts. Amber cells differ from the live price." />
-        <div className="overflow-x-auto">
+        {/* Phone: one card per brand with a row per appliance — the matrix would scroll sideways. */}
+        <ul className="divide-y divide-line sm:hidden">
+          {BRANDS.map((b) => (
+            <li key={b} className="px-4 py-3">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-sm font-extrabold">{BRAND_LABEL[b]}</p>
+                <p className="flex gap-3 text-[10.5px] font-bold uppercase tracking-wider">
+                  <span className="w-[104px] text-faint">Normal</span>
+                  <span className="w-[104px] text-danger">Emergency</span>
+                </p>
+              </div>
+              <ul className="space-y-2">
+                {APPLIANCES.map((a) => {
+                  const row = p.rows[b][a]
+                  const was = live.rows[b][a]
+                  return (
+                    <li key={a} className="flex items-start gap-2">
+                      <span className="flex min-w-0 flex-1 items-center gap-1.5 pt-2 text-[13px] font-semibold">
+                        <ApplianceGlyph appliance={a} className="size-4 shrink-0 text-brand" />
+                        <span className="truncate">{APPLIANCE_LABEL[a]}</span>
+                      </span>
+                      <span className="w-[104px] shrink-0">
+                        <NumberInput
+                          className="w-full"
+                          label={`${BRAND_LABEL[b]} ${APPLIANCE_LABEL[a]} normal price`}
+                          value={row.normal}
+                          disabled={!canEdit}
+                          changed={row.normal !== was.normal}
+                          onCommit={(v) => setRow(b, a, 'normal', v)}
+                        />
+                        {row.normal !== was.normal && <span className="num block pl-1 pt-0.5 text-[10.5px] font-semibold text-faint">Live {inr(was.normal)}</span>}
+                      </span>
+                      <span className="w-[104px] shrink-0">
+                        <NumberInput
+                          className="w-full"
+                          label={`${BRAND_LABEL[b]} ${APPLIANCE_LABEL[a]} emergency price`}
+                          value={row.emergency}
+                          disabled={!canEdit}
+                          changed={row.emergency !== was.emergency}
+                          onCommit={(v) => setRow(b, a, 'emergency', v)}
+                        />
+                        {row.emergency !== was.emergency && <span className="num block pl-1 pt-0.5 text-[10.5px] font-semibold text-faint">Live {inr(was.emergency)}</span>}
+                      </span>
+                    </li>
+                  )
+                })}
+              </ul>
+            </li>
+          ))}
+        </ul>
+        <div className="hidden overflow-x-auto sm:block">
           <table className="w-full min-w-[860px] text-sm">
             <thead>
               <tr className="border-b border-line bg-canvas/60">
@@ -316,7 +366,30 @@ export function EmergencyTab() {
 
       <Card className="min-w-0">
         <CardHeader title="Emergency prices · brand × appliance" sub="Edit these on the Pricing tab. The uplift column shows emergency over normal." />
-        <div className="overflow-x-auto">
+        {/* Phone: one card per appliance — the matrix would scroll sideways. */}
+        <ul className="divide-y divide-line sm:hidden">
+          {APPLIANCES.map((a) => (
+            <li key={a} className="px-4 py-3">
+              <p className="mb-2 flex items-center gap-2 text-sm font-bold">
+                <ApplianceGlyph appliance={a} className="size-4 text-brand" />
+                {APPLIANCE_LABEL[a]}
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {BRANDS.map((b) => {
+                  const r = p.rows[b][a]
+                  return (
+                    <div key={b} className="rounded-lg bg-canvas px-3 py-2">
+                      <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">{BRAND_LABEL[b]}</span>
+                      <span className="num block text-sm font-extrabold text-danger">{inr(r.emergency)}</span>
+                      <span className="num block text-[11px] font-semibold text-faint">+{inr(r.emergency - r.normal)} over {inr(r.normal)}</span>
+                    </div>
+                  )
+                })}
+              </div>
+            </li>
+          ))}
+        </ul>
+        <div className="hidden overflow-x-auto sm:block">
           <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr className="border-b border-line bg-canvas/60 text-[11px] font-bold uppercase tracking-[0.06em] text-faint">

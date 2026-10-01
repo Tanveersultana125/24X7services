@@ -167,6 +167,78 @@ function Bookings() {
         {shown.length === 0 ? (
           <Empty icon={<SearchX />} title="No bookings match" body="Try another status tab or clear a filter." />
         ) : (
+          <>
+          {/* Phone: one card per booking — the table would scroll sideways. */}
+          <ul className="divide-y divide-line sm:hidden">
+            {shown.map((b) => {
+              const c = store.customer(b.customerId)
+              const t = store.technician(b.technicianId)
+              const canAssign = !t && b.status === 'confirmed'
+              return (
+                <li key={b.id}>
+                  <div role="button" tabIndex={0} onClick={() => setOpen(b.id)} onKeyDown={(e) => e.key === 'Enter' && setOpen(b.id)} className="block w-full cursor-pointer px-4 py-3 text-left">
+                    <div className="flex items-start gap-3">
+                      <span className={cn('grid size-9 shrink-0 place-items-center rounded-lg', b.priority === 'emergency' ? 'bg-danger-soft text-danger' : 'bg-brand-soft text-brand')}>
+                        <ApplianceGlyph appliance={b.appliance} className="size-[18px]" />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="min-w-0">
+                            <span className="block truncate text-sm font-bold">
+                              {BRAND_LABEL[b.brand]} {APPLIANCE_LABEL[b.appliance]}
+                            </span>
+                            <span className="flex flex-wrap items-center gap-1.5 text-xs font-medium text-muted">
+                              <span className="num">{b.id}</span> · {b.service}
+                              {b.priority !== 'normal' && <PriorityTag priority={b.priority} />}
+                            </span>
+                          </span>
+                          <span className="shrink-0">
+                            <StatusChip status={b.status} />
+                          </span>
+                        </div>
+                        <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 rounded-lg bg-canvas px-3 py-2 text-xs">
+                          <span className="flex min-w-0 items-center gap-1.5 font-semibold">
+                            {c && <Avatar name={c.name} size={16} side="customer" />}
+                            <span className="truncate">{c?.name}</span>
+                          </span>
+                          <span className="num text-right font-bold">{inr(b.amount)}</span>
+                          <span className="truncate font-medium text-muted">
+                            {dayLabel(b.scheduledAt)}, {time(b.scheduledAt)} · {b.area}
+                          </span>
+                          <span className={cn('text-right text-[11px] font-bold', b.status === 'refunded' ? 'text-muted' : b.paid ? 'text-success' : 'text-warning')}>
+                            {b.status === 'refunded' ? 'Refunded' : b.paid ? 'Paid' : b.method === 'cash' ? 'Cash due' : 'Unpaid'}
+                          </span>
+                        </div>
+                        <div className="mt-2 flex items-center justify-between gap-2">
+                          {t ? (
+                            <span className="flex min-w-0 items-center gap-1.5 text-xs font-semibold text-ink-2">
+                              <Avatar name={t.name} size={18} side="technician" />
+                              <span className="truncate">{t.name}</span>
+                            </span>
+                          ) : (
+                            <span className="text-xs font-semibold text-faint">No technician yet</span>
+                          )}
+                          {canAssign && (
+                            <Button
+                              size="xs"
+                              variant={b.priority === 'emergency' ? 'danger' : 'primary'}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setAssign(b)
+                              }}
+                            >
+                              Assign
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+          <div className="hidden sm:block">
           <TableWrap>
             <thead>
               <tr>
@@ -263,6 +335,8 @@ function Bookings() {
               })}
             </tbody>
           </TableWrap>
+          </div>
+          </>
         )}
         <Pager page={current} pages={pages} total={rows.length} onPage={setPage} />
       </Card>

@@ -106,6 +106,24 @@ function UsersTab({ canEdit }: { canEdit: boolean }) {
     [store.admins, q, role]
   )
   const count = (st: AdminUser['status']) => store.admins.filter((a) => a.status === st).length
+  /** The row menu, shared by the phone cards and the desktop table. */
+  const menuFor = (a: AdminUser, me: boolean) => [
+    { label: 'Edit', icon: <UserRoundCheck />, onClick: () => setEditing(a) },
+    ...(a.status === 'invited' ? [{ label: 'Resend invite', icon: <RotateCcw />, onClick: () => toast(`Invite re-sent to ${a.email}`) }] : []),
+    ...(!me
+      ? [
+          {
+            label: a.status === 'disabled' ? 'Enable' : 'Disable',
+            icon: a.status === 'disabled' ? <UserRoundCheck /> : <UserRoundX />,
+            onClick: () => {
+              store.saveAdmin({ ...a, status: a.status === 'disabled' ? 'active' : 'disabled' })
+              toast(`${a.name} ${a.status === 'disabled' ? 'enabled' : 'disabled'}`)
+            },
+          },
+          { label: 'Remove', icon: <Trash2 />, danger: true, onClick: () => setRemoving(a) },
+        ]
+      : []),
+  ]
 
   return (
     <>
@@ -136,6 +154,43 @@ function UsersTab({ canEdit }: { canEdit: boolean }) {
             options={[{ value: 'all' as const, label: 'All roles' }, ...ADMIN_ROLES.map((r) => ({ value: r, label: r }))]}
           />
         </div>
+        {/* Phone: one card per admin — the table would scroll sideways. */}
+        <ul className="divide-y divide-line sm:hidden">
+          {list.length === 0 && <li className="px-4 py-12 text-center text-sm font-semibold text-muted">No admins match these filters.</li>}
+          {list.map((a) => {
+            const me = a.email === ADMIN.email
+            return (
+              <li key={a.id} className="flex items-start gap-3 px-4 py-3">
+                <Avatar name={a.name} size={36} />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-bold">
+                        {a.name}
+                        {me && <span className="ml-1.5 text-xs font-semibold text-faint">(you)</span>}
+                      </span>
+                      <span className="block truncate text-xs font-medium text-muted">{a.email}</span>
+                    </span>
+                    {canEdit && <RowMenu items={menuFor(a, me)} />}
+                  </div>
+                  <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                    <Chip tone={ROLE_TONE[a.role]}>{a.role}</Chip>
+                    <Chip tone={STATUS_TONE[a.status]}>{STATUS_LABEL[a.status]}</Chip>
+                    {a.twoFactor && (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-success">
+                        <ShieldCheck className="size-3.5" aria-hidden /> 2FA
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-1.5 text-xs font-medium text-muted">
+                    <span className="num">{a.phone}</span> · {a.status === 'invited' ? `Invited ${ago(a.createdAt)}` : `Active ${ago(a.lastActive)}`}
+                  </p>
+                </div>
+              </li>
+            )
+          })}
+        </ul>
+        <div className="hidden sm:block">
         <TableWrap>
           <thead>
             <tr>
@@ -194,27 +249,7 @@ function UsersTab({ canEdit }: { canEdit: boolean }) {
                   <td className={cn(td, 'text-xs font-semibold text-muted')}>{a.status === 'invited' ? `Invited ${ago(a.createdAt)}` : ago(a.lastActive)}</td>
                   <td className={cn(td, 'text-right')}>
                     {canEdit && (
-                      <RowMenu
-                        items={[
-                          { label: 'Edit', icon: <UserRoundCheck />, onClick: () => setEditing(a) },
-                          ...(a.status === 'invited'
-                            ? [{ label: 'Resend invite', icon: <RotateCcw />, onClick: () => toast(`Invite re-sent to ${a.email}`) }]
-                            : []),
-                          ...(!me
-                            ? [
-                                {
-                                  label: a.status === 'disabled' ? 'Enable' : 'Disable',
-                                  icon: a.status === 'disabled' ? <UserRoundCheck /> : <UserRoundX />,
-                                  onClick: () => {
-                                    store.saveAdmin({ ...a, status: a.status === 'disabled' ? 'active' : 'disabled' })
-                                    toast(`${a.name} ${a.status === 'disabled' ? 'enabled' : 'disabled'}`)
-                                  },
-                                },
-                                { label: 'Remove', icon: <Trash2 />, danger: true, onClick: () => setRemoving(a) },
-                              ]
-                            : []),
-                        ]}
-                      />
+                      <RowMenu items={menuFor(a, me)} />
                     )}
                   </td>
                 </tr>
@@ -222,6 +257,7 @@ function UsersTab({ canEdit }: { canEdit: boolean }) {
             })}
           </tbody>
         </TableWrap>
+        </div>
         <p className="px-5 py-3 text-xs font-semibold text-muted">{list.length} admins</p>
       </Card>
 
@@ -446,6 +482,7 @@ function RolesTab({ canEdit }: { canEdit: boolean }) {
 
       <Card>
         <CardHeader
+          className="flex-wrap"
           title={`${role} permissions`}
           sub={role === 'Super Admin' ? 'Super Admin always has full access. It can’t be narrowed.' : 'Tick what this role may do in each module. Every change is recorded in Audit Logs.'}
           action={
@@ -484,7 +521,57 @@ function RolesTab({ canEdit }: { canEdit: boolean }) {
             <Lock className="size-3.5" aria-hidden /> You can view permissions but not change them as {store.as}.
           </p>
         )}
-        <div className="overflow-x-auto">
+        {/* Phone: one card per module — the matrix would scroll sideways. */}
+        <ul className="divide-y divide-line sm:hidden">
+          {MODULES.map((m) => {
+            const cur = perms[m] ?? []
+            const allowed = m === 'audit' ? AUDIT_PERMS : PERMS
+            const all = allowed.every((p) => cur.includes(p))
+            return (
+              <li key={m} className="px-4 py-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="min-w-0">
+                    <span className="block text-sm font-bold">{MODULE_LABEL[m]}</span>
+                    {m === 'audit' && <span className="block text-[11px] font-semibold text-faint">Audit logs are read-only</span>}
+                  </span>
+                  <span className={cn('inline-flex shrink-0 items-center gap-2 text-[11px] font-bold text-muted', locked && 'pointer-events-none opacity-50')}>
+                    All
+                    <Toggle
+                      size="sm"
+                      checked={all}
+                      label={`All permissions for ${MODULE_LABEL[m]}`}
+                      onChange={(v) => {
+                        if (locked) return
+                        set(m, v ? [...allowed] : [])
+                      }}
+                    />
+                  </span>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {allowed.map((p) => {
+                    const checked = cur.includes(p)
+                    return (
+                      <button
+                        key={p}
+                        type="button"
+                        disabled={locked}
+                        aria-pressed={checked}
+                        onClick={() => toggle(m, p)}
+                        className={cn(
+                          'h-7 rounded-md border px-2.5 text-xs font-bold transition-colors disabled:cursor-not-allowed',
+                          checked ? 'border-brand bg-brand-soft text-brand' : 'border-line-strong text-muted hover:border-ink-2'
+                        )}
+                      >
+                        {PERM_LABEL[p]}
+                      </button>
+                    )
+                  })}
+                </div>
+              </li>
+            )
+          })}
+        </ul>
+        <div className="hidden overflow-x-auto sm:block">
           <table className="w-full min-w-[860px] border-collapse text-left text-sm">
             <thead>
               <tr>

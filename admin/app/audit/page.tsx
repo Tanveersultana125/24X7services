@@ -166,6 +166,47 @@ export default function AuditPage() {
           </div>
         </div>
 
+        {/* Phone: one card per entry — the table would scroll sideways. */}
+        <ul className="divide-y divide-line sm:hidden">
+          {rows.length === 0 && <li className="px-4 py-12 text-center text-sm font-semibold text-muted">No audit entries match these filters.</li>}
+          {rows.map((e) => (
+            <li key={e.id}>
+              <button type="button" onClick={() => setOpen(e)} className="block w-full px-4 py-3 text-left">
+                <span className="flex items-start justify-between gap-2">
+                  <span className="min-w-0">
+                    <span className="block text-sm font-bold">{e.action}</span>
+                    <span className="block truncate text-xs font-medium text-ink-2">{e.target ?? '—'}</span>
+                  </span>
+                  <Chip tone="neutral" dot={false} className="shrink-0">
+                    {MODULE_LABEL[e.module]}
+                  </Chip>
+                </span>
+                {(e.old || e.new) && (
+                  <span className="mt-2 block overflow-hidden rounded-lg bg-canvas px-3 py-2">
+                    <ChangeCell e={e} />
+                  </span>
+                )}
+                <span className="mt-2 flex items-center justify-between gap-2 text-xs">
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    {e.role === 'System' ? (
+                      <span className="grid size-5 shrink-0 place-items-center rounded-full bg-canvas text-muted">
+                        <ShieldCheck className="size-3" aria-hidden />
+                      </span>
+                    ) : (
+                      <Avatar name={e.admin} size={20} />
+                    )}
+                    <span className="truncate font-semibold">{e.admin}</span>
+                    <span className="truncate text-muted">· {e.role}</span>
+                  </span>
+                  <span className="num shrink-0 font-medium text-muted">
+                    {longDate(e.at)}, {time(e.at)}
+                  </span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+        <div className="hidden sm:block">
         <TableWrap>
           <thead>
             <tr>
@@ -221,6 +262,7 @@ export default function AuditPage() {
             ))}
           </tbody>
         </TableWrap>
+        </div>
         <Pager page={cur} pages={pages} total={list.length} onPage={setPage} />
       </Card>
 
