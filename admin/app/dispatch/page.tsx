@@ -133,7 +133,7 @@ function Dispatch() {
         sub={`${count('online') + count('on_job')} of ${verified.length} technicians on shift · ${q.live.length} live jobs · ${q.emergency.length + q.unassigned.length} waiting for a technician`}
       />
 
-      <div className="no-scrollbar -mx-4 mb-5 flex gap-2.5 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-4 sm:px-0 xl:grid-cols-7" role="toolbar" aria-label="Filter the board">
+      <div className="mb-5 grid grid-cols-2 gap-2.5 sm:grid-cols-4 xl:grid-cols-7" role="toolbar" aria-label="Filter the board">
         {counters.map((c) => {
           const on = focus === c.key
           return (
@@ -143,14 +143,14 @@ function Dispatch() {
               aria-pressed={on}
               onClick={() => setFocus(on ? null : c.key)}
               className={cn(
-                'flex min-w-[148px] items-center gap-3 rounded-card border bg-card px-3.5 py-3 text-left shadow-card transition-colors sm:min-w-0',
+                'flex items-center gap-2.5 rounded-card border bg-card px-3 py-2.5 text-left shadow-card transition-colors last:col-span-2 sm:gap-3 sm:px-3.5 sm:py-3 sm:last:col-span-1',
                 on ? 'border-brand ring-1 ring-brand' : 'border-line hover:border-line-strong'
               )}
             >
               <span className={cn('grid size-8 shrink-0 place-items-center rounded-lg [&_svg]:size-4', c.tone)}>{c.icon}</span>
               <span className="min-w-0">
                 <span className={cn('num block text-xl font-extrabold leading-tight', c.key === 'emergency' && c.n > 0 && 'text-danger')}>{c.n}</span>
-                <span className="block truncate text-[11px] font-bold text-muted">{c.label}</span>
+                <span className="block text-[11px] font-bold leading-tight text-muted sm:truncate">{c.label}</span>
               </span>
             </button>
           )
