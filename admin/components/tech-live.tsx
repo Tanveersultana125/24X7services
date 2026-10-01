@@ -43,7 +43,103 @@ export function LiveTechnicians({
   const toast = useToast()
   const canAssign = store.can('dispatch', 'assign')
   if (rows.length === 0) return <Empty icon={<Phone />} title="No technicians in this view" body="Pick another counter above." />
+
+  const info = (t: Technician, job?: Booking) => {
+    const d = job ? Math.round(km(t, job) * 1.25 * 10) / 10 : undefined
+    const onSite = !!job && (job.status === 'arrived' || job.status === 'in_progress')
+    return { c: job ? store.customer(job.customerId) : undefined, d, onSite, eta: !job ? '—' : onSite ? 'On site' : `~${etaMin(d!)} min` }
+  }
+
+  const actions = (t: Technician, job?: Booking) => (
+    <>
+      {canAssign &&
+        t.presence !== 'offline' &&
+        (job ? (
+          <Button size="xs" variant="secondary" onClick={() => onReassign(job)}>
+            Reassign
+          </Button>
+        ) : (
+          <Button size="xs" onClick={() => onAssign(t)}>
+            Assign
+          </Button>
+        ))}
+      {job && (
+        <Button size="xs" variant="secondary" onClick={() => onOpen(job.id)}>
+          Open job
+        </Button>
+      )}
+      <a
+        href={telHref(t.phone)}
+        onClick={() => toast(`Calling ${t.name} · ${t.phone}`)}
+        aria-label={`Call ${t.name}`}
+        className={buttonClass('secondary', 'xs', 'px-2')}
+      >
+        <Phone />
+      </a>
+    </>
+  )
+
+  const dot = (t: Technician) => (
+    <span
+      className={cn(
+        'absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full border-2 border-card',
+        t.presence === 'on_job' ? 'bg-violet' : t.presence === 'online' ? 'bg-success' : 'bg-faint'
+      )}
+    />
+  )
+
   return (
+    <>
+    {/* Phone: one card per technician — the table would scroll sideways. */}
+    <ul className="divide-y divide-line sm:hidden">
+      {rows.map(({ t, job }) => {
+        const { c, d, onSite, eta } = info(t, job)
+        return (
+          <li key={t.id} className="px-4 py-3">
+            <div className="flex items-start gap-3">
+              <Link href={`/technicians/?id=${t.id}` as Route} className="relative shrink-0">
+                <Avatar name={t.name} size={36} side="technician" />
+                {dot(t)}
+              </Link>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-2">
+                  <Link href={`/technicians/?id=${t.id}` as Route} className="min-w-0">
+                    <span className="block truncate text-sm font-bold">{t.name}</span>
+                    <span className="block truncate text-xs font-medium text-muted">
+                      {t.area}
+                      {!t.tracking && ' · location off'}
+                    </span>
+                  </Link>
+                  <span className="shrink-0">
+                    {job ? <StatusChip status={job.status} /> : <Chip tone={PRESENCE[t.presence].tone}>{t.presence === 'online' ? 'Free' : PRESENCE[t.presence].label}</Chip>}
+                  </span>
+                </div>
+                {job && (
+                  <button type="button" onClick={() => onOpen(job.id)} className="mt-2 block w-full rounded-lg bg-canvas px-3 py-2 text-left">
+                    <span className="flex items-center justify-between gap-2 text-[13px]">
+                      <span className="min-w-0 truncate font-bold">
+                        {job.id} · {BRAND_LABEL[job.brand]} {APPLIANCE_LABEL[job.appliance]}
+                      </span>
+                    </span>
+                    <span className="mt-0.5 flex items-center justify-between gap-2 text-xs font-medium text-muted">
+                      <span className="flex min-w-0 items-center gap-1.5">
+                        {c && <Avatar name={c.name} size={16} side="customer" />}
+                        <span className="truncate">{c?.name ?? '—'}</span>
+                      </span>
+                      <span className="num shrink-0 font-bold text-ink-2">
+                        {d} km · <span className={onSite ? 'text-violet' : ''}>{eta}</span>
+                      </span>
+                    </span>
+                  </button>
+                )}
+                <div className="mt-2 flex flex-wrap gap-1.5">{actions(t, job)}</div>
+              </div>
+            </div>
+          </li>
+        )
+      })}
+    </ul>
+    <div className="hidden sm:block">
     <TableWrap>
       <thead>
         <tr>
@@ -58,9 +154,7 @@ export function LiveTechnicians({
       </thead>
       <tbody>
         {rows.map(({ t, job }) => {
-          const c = job ? store.customer(job.customerId) : undefined
-          const d = job ? Math.round(km(t, job) * 1.25 * 10) / 10 : undefined
-          const onSite = job && (job.status === 'arrived' || job.status === 'in_progress')
+          const { c, d, onSite } = info(t, job)
           return (
             <tr key={t.id} className={tr}>
               <td className={td}>
@@ -109,35 +203,14 @@ export function LiveTechnicians({
               <td className={cn(td, 'num whitespace-nowrap text-right font-bold')}>{!job ? '—' : onSite ? <span className="text-violet">On site</span> : `~${etaMin(d!)} min`}</td>
               <td className={td}>{job ? <StatusChip status={job.status} /> : <Chip tone={PRESENCE[t.presence].tone}>{t.presence === 'online' ? 'Free' : PRESENCE[t.presence].label}</Chip>}</td>
               <td className={cn(td, 'text-right')}>
-                <span className="inline-flex gap-1.5">
-                  {canAssign && t.presence !== 'offline' && (job ? (
-                    <Button size="xs" variant="secondary" onClick={() => onReassign(job)}>
-                      Reassign
-                    </Button>
-                  ) : (
-                    <Button size="xs" onClick={() => onAssign(t)}>
-                      Assign
-                    </Button>
-                  ))}
-                  {job && (
-                    <Button size="xs" variant="secondary" onClick={() => onOpen(job.id)}>
-                      Open job
-                    </Button>
-                  )}
-                  <a
-                    href={telHref(t.phone)}
-                    onClick={() => toast(`Calling ${t.name} · ${t.phone}`)}
-                    aria-label={`Call ${t.name}`}
-                    className={buttonClass('secondary', 'xs', 'px-2')}
-                  >
-                    <Phone />
-                  </a>
-                </span>
+                <span className="inline-flex gap-1.5">{actions(t, job)}</span>
               </td>
             </tr>
           )
         })}
       </tbody>
     </TableWrap>
+    </div>
+    </>
   )
 }
