@@ -315,7 +315,7 @@ export function BannerCard({
         'flex h-full min-h-52 gap-5 overflow-hidden rounded-card bg-linear-to-br p-5 text-white sm:min-h-56',
         edgeToEdge
           ? cn(
-              'min-h-60 rounded-none bg-linear-to-b px-4 pt-6 pb-8 lg:min-h-56 lg:rounded-card lg:bg-linear-to-br lg:p-5',
+              'min-h-48 rounded-none bg-linear-to-b px-4 pt-4 pb-7 lg:min-h-56 lg:rounded-card lg:bg-linear-to-br lg:p-5',
               TONES_EDGE[banner.tone]
             )
           : TONES[banner.tone],
@@ -333,7 +333,7 @@ export function BannerCard({
             className={cn(
               'font-bold',
               edgeToEdge
-                ? 'text-3xl leading-tight lg:text-xl lg:leading-snug'
+                ? 'text-[1.375rem] leading-tight lg:text-xl lg:leading-snug'
                 : 'text-xl leading-snug'
             )}
           >

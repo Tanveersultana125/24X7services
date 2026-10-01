@@ -252,7 +252,7 @@ export function HomeScreen() {
             onToneChange={setHeroTone}
           />
         ) : home.status === 'loading' ? (
-          <Skeleton className="h-60 rounded-none lg:hidden" />
+          <Skeleton className="h-48 rounded-none lg:hidden" />
         ) : null}
       </div>
 
@@ -442,7 +442,7 @@ const SCROLL_THRESHOLD = 8
  * scroll costs two renders — one each way — and not one per frame.
  */
 /** Roughly the edge-to-edge banner's height on a phone, in px. */
-const HERO_HEIGHT = 220
+const HERO_HEIGHT = 180
 
 function useScrolled(threshold: number): boolean {
   const [scrolled, setScrolled] = useState(false)
