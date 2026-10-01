@@ -575,13 +575,15 @@ function StoryBody({
   // Where each chip floats, as fractions of the slide: around the headline,
   // never over it.
   // Two bands, above and below the headline's row, so a chip never crosses it.
+  // Kept to the corners — the headline can run to two lines — and the lower
+  // right one clear of the dots.
   const spots = [
-    'left-[8%] top-[10%]',
-    'right-[5%] top-[18%]',
-    'left-[4%] bottom-[14%]',
-    'right-[10%] bottom-[8%]',
-    'left-[40%] top-[4%]',
-    'left-[36%] bottom-[4%]',
+    'left-[5%] top-[5%]',
+    'right-[4%] top-[3%]',
+    'left-[4%] bottom-[6%]',
+    'right-[24%] bottom-[4%]',
+    'left-[40%] top-[2%]',
+    'left-[36%] bottom-[2%]',
   ]
   const leave = 3.6 // seconds: when the chips go and the answer arrives
 
@@ -627,7 +629,7 @@ function StoryBody({
       >
         <span
           aria-hidden="true"
-          className="inline-block bg-linear-to-r from-white to-[#CFE0FF] bg-clip-text text-transparent"
+          className="inline-block text-white/90"
           style={
             moving
               ? { animation: 'banner-word 700ms cubic-bezier(0.2,0.7,0.2,1) 0.5s both' }

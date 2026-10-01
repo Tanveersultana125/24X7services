@@ -1,21 +1,11 @@
 {
   "banners": [
     {
-      "id": "banner_four-problems",
-      "title": "4 problems.",
-      "titleAfter": "1 visit.",
-      "chips": ["Not cooling", "Water leaking", "Not draining", "Strange noise"],
-      "tone": "blue",
-      "slot": "hero",
-      "ctaLabel": "Find your fix",
-      "ctaHref": "/services",
-      "order": 0,
-      "active": true
-    },
-    {
       "id": "banner_ac-season",
       "badge": "In season",
-      "title": "Summer-ready AC service",
+      "title": "Summer-ready",
+      "titleAfter": "AC service.",
+      "chips": ["Filter clean", "Gas check", "Cooling test", "Drain line"],
       "subtitle": "Filter clean, gas check and a cooling test in under an hour.",
       "image": "/banners/ac-unit.svg",
       "tone": "blue",
@@ -27,7 +17,9 @@
     },
     {
       "id": "banner_no-surprise",
-      "title": "You approve the repair before it starts",
+      "title": "You approve",
+      "titleAfter": "before we repair.",
+      "chips": ["Inspect", "Quote", "Your yes", "Then repair"],
       "subtitle": "The expert inspects, quotes, and waits for your yes.",
       "image": "/banners/estimate.svg",
       "tone": "amber",
@@ -39,7 +31,9 @@
     },
     {
       "id": "banner_warranty",
-      "title": "Every repair carries a service warranty",
+      "title": "Every repair,",
+      "titleAfter": "under warranty.",
+      "chips": ["Service warranty", "GST invoice", "In the app", "Every job"],
       "subtitle": "With a GST invoice in the app the moment the job is done.",
       "image": "/banners/shield.svg",
       "tone": "green",
