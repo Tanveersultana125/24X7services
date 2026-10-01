@@ -31,12 +31,23 @@ import { cn } from '@/lib/cn'
 export interface PromotionalBannerProps {
   banners: readonly Banner[]
   intervalMs?: number
+  /**
+   * Edge to edge under a header painted the slide's own colour, on a phone —
+   * the way the marketplaces open Home. The header and the slide never share a
+   * pixel, so the words cannot collide; the colour just runs on from one into
+   * the other. A rounded card again from a laptop up.
+   */
+  edgeToEdge?: boolean
+  /** The tone of the slide in view, for the header above to match. */
+  onToneChange?: (tone: BannerTone) => void
   className?: string
 }
 
 export function PromotionalBanner({
   banners,
   intervalMs = 5000,
+  edgeToEdge = false,
+  onToneChange,
   className,
 }: PromotionalBannerProps) {
   const railRef = useRef<HTMLDivElement>(null)
@@ -124,6 +135,11 @@ export function PromotionalBanner({
 
   const stopAutoplay = useCallback(() => setAutoplay(false), [])
 
+  const tone = banners[active]?.tone
+  useEffect(() => {
+    if (tone) onToneChange?.(tone)
+  }, [tone, onToneChange])
+
   if (banners.length === 0) return null
 
   return (
@@ -137,7 +153,10 @@ export function PromotionalBanner({
     >
       <div
         ref={railRef}
-        className="no-scrollbar -my-1 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth py-1"
+        className={cn(
+          'no-scrollbar flex snap-x snap-mandatory overflow-x-auto scroll-smooth',
+          edgeToEdge ? 'gap-0 lg:-my-1 lg:gap-3 lg:py-1' : '-my-1 gap-3 py-1'
+        )}
       >
         {banners.map((banner, index) => (
           <article
@@ -146,20 +165,29 @@ export function PromotionalBanner({
             aria-label={`${index + 1} of ${banners.length}`}
             className="w-full shrink-0 snap-start"
           >
-            <BannerCard banner={banner} priority={index === 0} />
+            <BannerCard
+              banner={banner}
+              priority={index === 0}
+              edgeToEdge={edgeToEdge}
+            />
           </article>
         ))}
         {looping && banners[0] ? (
           // The copy of the first slide. Hidden from assistive tech and out of
           // the tab order: it is there for the motion, not as a fourth offer.
           <article aria-hidden="true" inert className="w-full shrink-0 snap-start">
-            <BannerCard banner={banners[0]} />
+            <BannerCard banner={banners[0]} edgeToEdge={edgeToEdge} />
           </article>
         ) : null}
       </div>
 
       {banners.length > 1 ? (
-        <div className="absolute right-2 bottom-0 flex gap-1.5 lg:static lg:-mb-3 lg:justify-center">
+        <div
+          className={cn(
+            'absolute bottom-0 flex gap-1.5 lg:static lg:-mb-3 lg:justify-center',
+            edgeToEdge ? 'right-4' : 'right-2'
+          )}
+        >
           {banners.map((banner, index) => (
             <button
               key={banner.id}
@@ -204,6 +232,29 @@ export function PromotionalBanner({
  * Every one of them starts dark enough at the top left to carry white text at
  * well over AA, which is what lets the card go without a scrim.
  */
+/**
+ * Each tone's darkest colour, as a fixed value: the header over an
+ * edge-to-edge banner is painted with it, and the slide's gradient starts from
+ * exactly it, so the two read as one block. Fixed rather than tokens because
+ * `brand-deep` lightens in the dark theme and the seam would show.
+ */
+export const TONE_TOP: Record<BannerTone, string> = {
+  blue: '#1E3A8A',
+  amber: '#3B1A05',
+  green: '#08402F',
+  teal: '#11293E',
+  violet: '#0E0E22',
+}
+
+/** The same gradients run top to bottom, from `TONE_TOP` down. */
+const TONES_EDGE: Record<BannerTone, string> = {
+  blue: 'from-[#1E3A8A] via-[#2547D0] to-[#4AA8DC]',
+  amber: 'from-[#3B1A05] via-[#8C4F10] to-[#E0952E]',
+  green: 'from-[#08402F] via-[#0B7A50] to-[#2FB483]',
+  teal: 'from-[#11293E] via-[#1E6E8C] to-[#5FC9E8]',
+  violet: 'from-[#0E0E22] via-[#2B2A6E] to-[#5A4ED0]',
+}
+
 const TONES: Record<BannerTone, string> = {
   blue: 'from-brand-deep via-brand to-[#4AA8DC]',
   amber: 'from-[#3B1A05] via-[#8C4F10] to-[#E0952E]',
@@ -242,10 +293,13 @@ const TONES: Record<BannerTone, string> = {
 export function BannerCard({
   banner,
   priority = false,
+  edgeToEdge = false,
   className,
 }: {
   banner: Banner
   priority?: boolean
+  /** Square-cornered, a top-to-bottom gradient, and taller — see the rail. */
+  edgeToEdge?: boolean
   className?: string
 }) {
   const body = banner.photo ? (
@@ -259,7 +313,12 @@ export function BannerCard({
     <div
       className={cn(
         'flex h-full min-h-52 gap-5 overflow-hidden rounded-card bg-linear-to-br p-5 text-white sm:min-h-56',
-        TONES[banner.tone],
+        edgeToEdge
+          ? cn(
+              'min-h-60 rounded-none bg-linear-to-b px-4 pt-6 pb-8 lg:min-h-56 lg:rounded-card lg:bg-linear-to-br lg:p-5',
+              TONES_EDGE[banner.tone]
+            )
+          : TONES[banner.tone],
         className
       )}
     >
@@ -270,7 +329,16 @@ export function BannerCard({
               {banner.badge}
             </span>
           ) : null}
-          <h3 className="text-xl font-bold leading-snug">{banner.title}</h3>
+          <h3
+            className={cn(
+              'font-bold',
+              edgeToEdge
+                ? 'text-3xl leading-tight lg:text-xl lg:leading-snug'
+                : 'text-xl leading-snug'
+            )}
+          >
+            {banner.title}
+          </h3>
           {banner.subtitle ? (
             <p className="mt-1.5 line-clamp-3 text-sm text-white/80">
               {banner.subtitle}

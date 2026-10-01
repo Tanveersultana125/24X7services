@@ -7,6 +7,7 @@ import type { Route } from 'next'
 import { ChevronRight, MapPinOff, ShieldCheck } from 'lucide-react'
 import type {
   Banner,
+  BannerTone,
   CatalogAppliance,
   CatalogBrand,
   CatalogIssue,
@@ -17,7 +18,11 @@ import type {
 import { AppShell, Section } from '@/components/AppShell'
 import { HomeHeader } from '@/components/HomeHeader'
 import { SearchBar } from '@/components/SearchBar'
-import { PromotionalBanner, BannerCard } from '@/components/PromotionalBanner'
+import {
+  PromotionalBanner,
+  BannerCard,
+  TONE_TOP,
+} from '@/components/PromotionalBanner'
 import { CategoryGrid } from '@/components/CategoryGrid'
 import {
   ServiceRail,
@@ -119,6 +124,11 @@ export function HomeScreen() {
   // Once the page leaves the top, the pinned search field grows a shadow so
   // it reads as sitting above what scrolls under it.
   const scrolled = useScrolled(SCROLL_THRESHOLD)
+  // The banner's colour under the header, and whether the banner has gone up
+  // past it — the header keeps the colour until then, so no strip of page
+  // colour opens between it and the banner still in view.
+  const [heroTone, setHeroTone] = useState<BannerTone | null>(null)
+  const pastHero = useScrolled(HERO_HEIGHT)
 
   useStaleLocationCheck(location, setLocation)
 
@@ -212,6 +222,12 @@ export function HomeScreen() {
           detail={
             location ? `${location.city} ${location.pincode}` : undefined
           }
+          // The banner's colour while there is a banner to match.
+          tone={
+            heroTone && heroBanners.length > 0 && !pastHero
+              ? TONE_TOP[heroTone]
+              : undefined
+          }
           onChangeLocation={() => router.push('/location')}
           onSearch={() => router.push('/search')}
         />
@@ -228,11 +244,15 @@ export function HomeScreen() {
 
       {/* The banner's own height while it loads, so the page does not jump
           when it lands; nothing at all once there is genuinely no banner. */}
-      <div className="mt-1 lg:mt-5">
+      <div className="-mx-4 lg:mx-0 lg:mt-5">
         {data && heroBanners.length > 0 ? (
-          <PromotionalBanner banners={heroBanners} />
+          <PromotionalBanner
+            banners={heroBanners}
+            edgeToEdge
+            onToneChange={setHeroTone}
+          />
         ) : home.status === 'loading' ? (
-          <Skeleton className="h-52 rounded-card lg:hidden" />
+          <Skeleton className="h-60 rounded-none lg:hidden" />
         ) : null}
       </div>
 
@@ -421,6 +441,9 @@ const SCROLL_THRESHOLD = 8
  * A passive listener that sets state only when the answer flips, so a long
  * scroll costs two renders — one each way — and not one per frame.
  */
+/** Roughly the edge-to-edge banner's height on a phone, in px. */
+const HERO_HEIGHT = 220
+
 function useScrolled(threshold: number): boolean {
   const [scrolled, setScrolled] = useState(false)
 

@@ -37,9 +37,17 @@ export function HomeHeader({
   area,
   detail,
   raised = false,
+  tone,
   onChangeLocation,
   onSearch,
 }: {
+  /**
+   * The colour of the banner in view under the header, as a hex value. Given,
+   * the header is painted with it and its words turn white, so header and
+   * banner read as one block, as on the marketplaces' home screens; once the
+   * page scrolls, the pinned search bar goes back to the page colour.
+   */
+  tone?: string;
   /** The saved area, once there is one. Absent reads as "Set your location". */
   area?: string;
   /** City and pincode, on the line under it. */
@@ -49,20 +57,35 @@ export function HomeHeader({
   onChangeLocation: () => void;
   onSearch: () => void;
 }) {
+  // Painted while the banner is in view under it; the caller stops passing a
+  // tone once the banner has scrolled away.
+  const painted = Boolean(tone);
+
   return (
     <>
       {/* The status bar's own strip, so the pinned search field never slides
           under the clock. Zero tall on anything without a notch. */}
       <div
         aria-hidden="true"
-        className="fixed inset-x-0 top-0 z-40 h-[var(--safe-top)] bg-bg lg:hidden"
+        className={cn(
+          "fixed inset-x-0 top-0 z-40 h-[var(--safe-top)] transition-colors duration-500 lg:hidden",
+          !painted && "bg-bg",
+        )}
+        style={painted ? { backgroundColor: tone } : undefined}
       />
-      <div className="bg-bg pt-[var(--safe-top)] lg:hidden">
+      <div
+        className={cn(
+          "pt-[var(--safe-top)] transition-colors duration-500 lg:hidden",
+          !tone && "bg-bg",
+        )}
+        style={tone ? { backgroundColor: tone } : undefined}
+      >
         <div className="mx-auto flex max-w-lg items-start gap-2 px-4 pt-2">
           <LocationSelector
             className="min-w-0 flex-1"
             area={area}
             detail={detail}
+            onDark={Boolean(tone)}
             onClick={onChangeLocation}
           />
           <div className="flex shrink-0 gap-2">
@@ -74,29 +97,42 @@ export function HomeHeader({
               href="/profile/wallet"
               label="Balance"
               icon={WalletMinimal}
+              onDark={Boolean(tone)}
             />
             <HeaderTile
               href="/profile/notifications"
               label="Notifications"
               icon={Bell}
+              onDark={Boolean(tone)}
             />
-            <AccountTile />
+            <AccountTile onDark={Boolean(tone)} />
           </div>
         </div>
       </div>
       <div
         className={cn(
-          "sticky top-[var(--safe-top)] z-30 bg-bg lg:hidden",
-          "transition-shadow duration-[var(--duration-base)] ease-[var(--ease-out-soft)]",
+          "sticky top-[var(--safe-top)] z-30 lg:hidden",
+          "transition-[box-shadow,background-color] duration-[var(--duration-base)] ease-[var(--ease-out-soft)]",
+          !painted && "bg-bg",
+          // The hairline belongs to the page colour; on the banner's colour
+          // it would draw a white seam across the block.
           raised &&
+            !painted &&
             "shadow-[0_1px_0_var(--color-border),0_6px_16px_-10px_rgb(23_21_15/0.25)]",
         )}
+        style={painted ? { backgroundColor: tone } : undefined}
       >
         {/* The cart beside the search, so it stays in reach once the location
             row has scrolled away. */}
         <div className="mx-auto flex max-w-lg items-center gap-2 px-4 pt-3 pb-3">
-          <SearchBar readOnly onOpen={onSearch} className="min-w-0 flex-1" />
-          <CartButton />
+          <SearchBar
+            readOnly
+            onOpen={onSearch}
+            className={cn("min-w-0 flex-1", painted && "border-transparent")}
+          />
+          <CartButton
+            className={cn(painted && "border-white/25 bg-white/15 text-white hover:bg-white/25")}
+          />
         </div>
       </div>
     </>
@@ -114,7 +150,7 @@ export function HomeHeader({
  * Nothing until Firebase has reported whether anyone is signed in, so the
  * button never says "Login" for a beat to somebody who already is.
  */
-function AccountTile() {
+function AccountTile({ onDark = false }: { onDark?: boolean }) {
   const { user, ready } = useAuth();
   const toast = useToast();
   const [confirming, setConfirming] = useState(false);
@@ -126,7 +162,7 @@ function AccountTile() {
     return (
       <Link
         href={`/login?next=${encodeURIComponent("/home")}` as Route}
-        className={PILL_CLASS}
+        className={cn(PILL_CLASS, onDark && ON_DARK)}
       >
         <LogIn className="size-4" aria-hidden="true" />
         Login
@@ -154,7 +190,7 @@ function AccountTile() {
       <button
         type="button"
         onClick={() => setConfirming(true)}
-        className={PILL_CLASS}
+        className={cn(PILL_CLASS, onDark && ON_DARK)}
       >
         <LogOut className="size-4" aria-hidden="true" />
         Logout
@@ -192,17 +228,26 @@ const TILE_CLASS =
  * and the Login button is the ceiling — the location has to keep enough width
  * to show an area name before it truncates.
  */
+/** The tiles over a painted header: glass on the colour, white glyphs. */
+const ON_DARK = "border-white/25 bg-white/15 text-white hover:bg-white/25";
+
 function HeaderTile({
   href,
   label,
   icon: Icon,
+  onDark = false,
 }: {
   href: Route;
   label: string;
   icon: typeof Bell;
+  onDark?: boolean;
 }) {
   return (
-    <Link href={href} aria-label={label} className={TILE_CLASS}>
+    <Link
+      href={href}
+      aria-label={label}
+      className={cn(TILE_CLASS, onDark && ON_DARK)}
+    >
       <Icon className="size-5" aria-hidden="true" />
     </Link>
   );
