@@ -56,6 +56,19 @@ export interface CategoryGridProps {
   className?: string
 }
 
+/**
+ * A light colour per appliance for its tile, so the grid reads in colour
+ * rather than as five grey machines on five grey squares. Fixed light values
+ * in both themes, like `plate`, because the photographs are shot on white.
+ */
+const TILE_TINTS: Partial<Record<ApplianceId, string>> = {
+  'washing-machine': '#E4ECFF',
+  'air-conditioner': '#DCF2FA',
+  refrigerator: '#DFF4EA',
+  geyser: '#FDE9D9',
+  microwave: '#EEE5FB',
+}
+
 export function CategoryGrid({
   appliances,
   services,
@@ -82,7 +95,10 @@ export function CategoryGrid({
           )
           const tile = (
             <>
-              <span className="relative block aspect-square w-full overflow-hidden rounded-card bg-plate transition-colors duration-[var(--duration-fast)] group-hover:bg-plate-deep">
+              <span
+                className="relative block aspect-square w-full overflow-hidden rounded-card bg-plate transition-[filter] duration-[var(--duration-fast)] group-hover:brightness-95"
+                style={{ backgroundColor: TILE_TINTS[appliance.id] }}
+              >
                 <Image
                   src={appliance.image}
                   alt=""
@@ -93,7 +109,9 @@ export function CategoryGrid({
                   // The three tiles above the fold, and no others: the rest of
                   // the grid can wait for layout.
                   priority={index < 3}
-                  className="object-contain p-4"
+                  // Multiplied, so the photograph's white ground takes the
+                  // tile's colour instead of sitting on it as a white box.
+                  className="object-contain p-4 mix-blend-multiply"
                 />
               </span>
               <span className="text-center text-xs font-semibold leading-tight text-ink">

@@ -12,8 +12,10 @@ import type {
   CatalogBrand,
   CatalogIssue,
   CatalogService,
+  Paise,
   PopularService,
 } from '@app/shared'
+import { formatPaise } from '@app/shared'
 
 import { AppShell, Section } from '@/components/AppShell'
 import { HomeHeader } from '@/components/HomeHeader'
@@ -45,6 +47,7 @@ import { CartBar } from '@/components/CartBar'
 import { VideoRail, type ReelItem } from '@/components/VideoRail'
 import { ServiceSheet, serviceOptions } from '@/components/ServiceSheet'
 import { ReferBanner } from '@/components/ReferBanner'
+import { SpotlightRail } from '@/components/SpotlightRail'
 import { cn } from '@/lib/cn'
 import {
   fetchAllIssues,
@@ -183,8 +186,10 @@ export function HomeScreen() {
         image: popular.image ?? imageFor.get(popular.applianceId),
         // A promoted row names an appliance and a service key; the
         // photograph and the score both belong to the catalog entry behind
-        // that pair, not to the promotion.
-        photo: listed?.photo,
+        // that pair, not to the promotion. The technician at that job, where
+        // there is one: a row of people at work, in colour, rather than a
+        // row of grey machines.
+        photo: listed?.technicianPhoto ?? listed?.photo,
         rating: listed?.rating,
         reviewCount: listed?.reviewCount,
         href: `/services/appliance/?a=${popular.applianceId}` as Route,
@@ -357,6 +362,31 @@ export function HomeScreen() {
 
       {data ? (
         <>
+          {/* Large photograph cards, one per appliance, between the
+              categories and the lists — the technician at work, and what a
+              visit starts at. */}
+          <Section title="In the spotlight">
+            <SpotlightRail
+              items={data.appliances.flatMap((appliance) => {
+                if (!appliance.heroImage) return []
+                const fees = data.services
+                  .filter((service) => service.applianceId === appliance.id)
+                  .map((service) => service.visitFee)
+                return [
+                  {
+                    id: appliance.id,
+                    title: `${appliance.name} service & repair`,
+                    note: fees.length
+                      ? `Starts at ${formatPaise(Math.min(...fees) as Paise)}`
+                      : undefined,
+                    photo: appliance.heroImage,
+                    href: `/services/appliance/?a=${appliance.id}` as Route,
+                  },
+                ]
+              })}
+            />
+          </Section>
+
           {popularItems.length > 0 ? (
             <Section
               title="Most booked"
