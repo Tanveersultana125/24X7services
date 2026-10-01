@@ -38,6 +38,7 @@ import {
 import { CartBar } from '@/components/CartBar'
 import { VideoRail, type ReelItem } from '@/components/VideoRail'
 import { ServiceSheet, serviceOptions } from '@/components/ServiceSheet'
+import { ReferBanner } from '@/components/ReferBanner'
 import {
   fetchAllIssues,
   fetchAllServices,
@@ -381,6 +382,8 @@ export function HomeScreen() {
               <TrustPoints />
             </Card>
           </Section>
+
+          <ReferBanner className="mt-8" />
 
           <HomeFooter />
         </>
