@@ -120,7 +120,18 @@ export function HomeHeader({
             !painted &&
             "shadow-[0_1px_0_var(--color-border),0_6px_16px_-10px_rgb(23_21_15/0.25)]",
         )}
-        style={painted ? { backgroundColor: tone } : undefined}
+        // At a fractional display scale (125% on Windows, most Androids) the
+        // blocks above and below land on half pixels and the page colour shows
+        // through the joins as thin white lines. The bar's own colour, drawn a
+        // pixel past its top and bottom, covers both joins.
+        style={
+          painted
+            ? {
+                backgroundColor: tone,
+                boxShadow: `0 -1px 0 ${tone}, 0 1px 0 ${tone}`,
+              }
+            : undefined
+        }
       >
         {/* Once the banner slides up under the pinned bar, its lighter colour
             meets the bar's solid one in a hard edge that reads as a line.
