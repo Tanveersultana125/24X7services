@@ -169,6 +169,7 @@ export function PromotionalBanner({
               banner={banner}
               priority={index === 0}
               edgeToEdge={edgeToEdge}
+              active={index === active}
             />
           </article>
         ))}
@@ -232,6 +233,10 @@ export function PromotionalBanner({
  * Every one of them starts dark enough at the top left to carry white text at
  * well over AA, which is what lets the card go without a scrim.
  */
+/** The lines under a banner's headline, rising in after it. */
+const RISE =
+  'motion-safe:animate-[banner-rise_520ms_cubic-bezier(0.2,0.7,0.2,1)_both]'
+
 /**
  * Each tone's darkest colour, as a fixed value: the header over an
  * edge-to-edge banner is painted with it, and the slide's gradient starts from
@@ -294,14 +299,27 @@ export function BannerCard({
   banner,
   priority = false,
   edgeToEdge = false,
+  active = false,
   className,
 }: {
   banner: Banner
   priority?: boolean
   /** Square-cornered, a top-to-bottom gradient, and taller — see the rail. */
   edgeToEdge?: boolean
+  /**
+   * The slide in view. Edge to edge, it plays in like footage each time it
+   * arrives: the headline word by word, then the lines under it, the artwork
+   * settling and floating, a light drifting across. Off-screen slides hold
+   * still, so arriving again plays it again.
+   */
+  active?: boolean
   className?: string
 }) {
+  const moving = edgeToEdge && active
+  const words = banner.title.split(' ')
+  // When the lines under the headline follow: once its last word is up.
+  const after = words.length * 70 + 120
+
   const body = banner.photo ? (
     <PhotoBody
       banner={banner}
@@ -312,7 +330,7 @@ export function BannerCard({
   ) : (
     <div
       className={cn(
-        'flex h-full min-h-52 gap-5 overflow-hidden rounded-card bg-linear-to-br p-5 text-white sm:min-h-56',
+        'relative flex h-full min-h-52 gap-5 overflow-hidden rounded-card bg-linear-to-br p-5 text-white sm:min-h-56',
         edgeToEdge
           ? cn(
               'min-h-48 rounded-none bg-linear-to-b px-4 pt-4 pb-7 lg:min-h-56 lg:rounded-card lg:bg-linear-to-br lg:p-5',
@@ -322,10 +340,23 @@ export function BannerCard({
         className
       )}
     >
-      <div className="flex min-w-0 flex-1 flex-col justify-between gap-4">
+      {/* A soft band of light drifting across the ground, now and then. */}
+      {moving ? (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-linear-to-r from-transparent via-white/12 to-transparent opacity-0 motion-safe:animate-[banner-sheen_5.5s_ease-in-out_1.2s_infinite] motion-safe:opacity-100"
+        />
+      ) : null}
+
+      <div className="relative flex min-w-0 flex-1 flex-col justify-between gap-4">
         <div>
           {banner.badge ? (
-            <span className="mb-2.5 inline-flex items-center rounded-pill bg-white/20 px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] uppercase text-white">
+            <span
+              className={cn(
+                'mb-2.5 inline-flex items-center rounded-pill bg-white/20 px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] uppercase text-white',
+                moving && RISE
+              )}
+            >
               {banner.badge}
             </span>
           ) : null}
@@ -336,18 +367,44 @@ export function BannerCard({
                 ? 'text-[1.375rem] leading-tight lg:text-xl lg:leading-snug'
                 : 'text-xl leading-snug'
             )}
+            // Read whole, however it is drawn.
+            aria-label={moving ? banner.title : undefined}
           >
-            {banner.title}
+            {moving
+              ? words.map((word, index) => (
+                  <span key={`${word}-${index}`} aria-hidden="true">
+                    <span
+                      className="inline-block motion-safe:animate-[banner-word_620ms_cubic-bezier(0.2,0.7,0.2,1)_both]"
+                      style={{ animationDelay: `${index * 70}ms` }}
+                    >
+                      {word}
+                    </span>
+                    {index < words.length - 1 ? ' ' : null}
+                  </span>
+                ))
+              : banner.title}
           </h3>
           {banner.subtitle ? (
-            <p className="mt-1.5 line-clamp-3 text-sm text-white/80">
+            <p
+              className={cn(
+                'mt-1.5 line-clamp-3 text-sm text-white/80',
+                moving && RISE
+              )}
+              style={moving ? { animationDelay: `${after}ms` } : undefined}
+            >
               {banner.subtitle}
             </p>
           ) : null}
         </div>
 
         {banner.ctaLabel ? (
-          <span className="inline-flex w-fit items-center rounded-pill bg-white px-4 py-2 text-sm font-semibold text-royal">
+          <span
+            className={cn(
+              'inline-flex w-fit items-center rounded-pill bg-white px-4 py-2 text-sm font-semibold text-royal',
+              moving && RISE
+            )}
+            style={moving ? { animationDelay: `${after + 140}ms` } : undefined}
+          >
             {banner.ctaLabel}
           </span>
         ) : null}
@@ -357,7 +414,20 @@ export function BannerCard({
         // Under a third, and a full gutter clear of the words. The artwork is
         // drawn to the edges of its own box, so whatever this column is set to
         // is exactly how close the picture comes to the end of a line of text.
-        <div className="relative w-[30%] shrink-0">
+        <div
+          className={cn(
+            'relative w-[30%] shrink-0',
+            moving &&
+              'motion-safe:animate-[banner-art-in_700ms_cubic-bezier(0.2,0.7,0.2,1)_150ms_both]'
+          )}
+        >
+          <div
+            className={cn(
+              'absolute inset-0',
+              moving &&
+                'motion-safe:animate-[banner-float_4.5s_ease-in-out_900ms_infinite]'
+            )}
+          >
           <Image
             src={banner.image}
             alt=""
@@ -367,6 +437,7 @@ export function BannerCard({
             priority={priority}
             className="object-contain object-right"
           />
+          </div>
         </div>
       ) : null}
     </div>

@@ -288,6 +288,65 @@
   }
 }
 
+/* Home's edge-to-edge banner, moving like footage: each word of the headline
+   rising out of a blur in turn, the lines under it after, the artwork
+   settling in and then floating, and a soft light drifting across the
+   ground. All of it is applied with motion-safe:, so somebody who asked for
+   less motion gets the slide as it stands. */
+@keyframes banner-word {
+  from {
+    opacity: 0;
+    transform: translateY(0.45em);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+@keyframes banner-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes banner-art-in {
+  from {
+    opacity: 0;
+    transform: scale(0.86) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes banner-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes banner-sheen {
+  from {
+    transform: translateX(-60%) skewX(-18deg);
+  }
+  to {
+    transform: translateX(260%) skewX(-18deg);
+  }
+}
+
 /* The bar under the slide on show in an appliance page's banner, filling for
    as long as the slide stays. */
 @keyframes hero-progress {
