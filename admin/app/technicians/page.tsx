@@ -3,7 +3,7 @@
 import type { Route } from 'next'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useState } from 'react'
-import { Check, Download, FileCheck2, FileX2, UserPlus, UserRoundCog, X } from 'lucide-react'
+import { Check, Download, FileCheck2, FileX2, UserPlus, UserRoundCog, X, ChevronRight } from 'lucide-react'
 import { DOCS, TechnicianDrawer } from '@/components/tech-drawer'
 import { ApplianceGlyph, BrandTag } from '@/components/glyphs'
 import { useToast } from '@/components/toast'
@@ -170,54 +170,36 @@ function Technicians() {
           <ul className="divide-y divide-line sm:hidden">
             {shown.map((x) => (
               <li key={x.id}>
-                <button type="button" onClick={() => setOpen(x.id)} className="flex w-full items-start gap-3 px-4 py-3 text-left">
+                <button type="button" onClick={() => setOpen(x.id)} className="flex w-full items-center gap-3 px-4 py-3 text-left active:bg-canvas">
                   <span className="relative shrink-0">
-                    <Avatar name={x.name} size={36} side="technician" />
+                    <Avatar name={x.name} size={40} side="technician" />
                     <span className={cn('absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-card', presenceDot[x.presence])} />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="flex items-start justify-between gap-2">
-                      <span className="min-w-0">
-                        <span className="block truncate text-sm font-bold">{x.name}</span>
-                        <span className="flex items-center gap-1.5 text-xs font-medium text-muted">
-                          <span className="truncate">{x.area}</span> · <Rating value={x.rating} className="text-xs" />
-                        </span>
-                      </span>
-                      <span className="shrink-0">
-                        {x.kyc === 'verified' ? <Chip tone={PRESENCE[x.presence].tone}>{PRESENCE[x.presence].label}</Chip> : <Chip tone={KYC[x.kyc].tone}>{KYC[x.kyc].label}</Chip>}
-                      </span>
+                    <span className="block truncate text-sm font-bold">{x.name}</span>
+                    <span className="flex items-center gap-1.5 text-xs font-medium text-muted">
+                      <span className="truncate">{x.area}</span>
+                      <span aria-hidden>·</span>
+                      <Rating value={x.rating} className="shrink-0 text-xs" />
                     </span>
-                    <span className="mt-1.5 flex flex-wrap items-center gap-1">
-                      {x.brands.map((b) => (
-                        <BrandTag key={b} brand={b} />
-                      ))}
-                      <span className="ml-1 flex gap-1 text-muted">
-                        {x.appliances.map((a) => (
-                          <span key={a} title={APPLIANCE_LABEL[a]}>
-                            <ApplianceGlyph appliance={a} className="size-4" />
-                          </span>
-                        ))}
-                      </span>
-                    </span>
-                    <span className="mt-2 grid grid-cols-4 gap-2 rounded-lg bg-canvas px-3 py-2 text-xs">
-                      <span>
-                        <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">Jobs</span>
-                        <span className="num font-bold">{x.completedJobs.toLocaleString('en-IN')}</span>
-                      </span>
-                      <span>
-                        <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">Accept</span>
-                        <span className="num font-semibold">{x.acceptanceRate ? `${x.acceptanceRate}%` : '—'}</span>
-                      </span>
-                      <span>
-                        <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">On-time</span>
-                        <span className="num font-semibold">{x.onTimeRate ? `${x.onTimeRate}%` : '—'}</span>
-                      </span>
-                      <span className="text-right">
-                        <span className="block text-[10.5px] font-bold uppercase tracking-wider text-faint">Cash</span>
-                        <span className={cn('num font-semibold', x.cashInHand > 5000 && 'text-warning')}>{x.cashInHand ? inr(x.cashInHand) : '—'}</span>
-                      </span>
+                    <span className="block truncate text-[11px] font-semibold text-faint">
+                      {x.brands.length === 4 ? 'All 4 brands' : x.brands.map((b) => BRAND_LABEL[b]).join(', ')} · {x.appliances.length === 5 ? 'all appliances' : `${x.appliances.length} appliances`}
                     </span>
                   </span>
+                  <span className="shrink-0 text-right">
+                    {x.kyc === 'verified' ? (
+                      <Chip tone={PRESENCE[x.presence].tone} className="h-5 px-1.5 text-[10px]">
+                        {PRESENCE[x.presence].label}
+                      </Chip>
+                    ) : (
+                      <Chip tone={KYC[x.kyc].tone} className="h-5 px-1.5 text-[10px]">
+                        {KYC[x.kyc].label}
+                      </Chip>
+                    )}
+                    <span className="num mt-1 block text-[11px] font-semibold text-muted">{x.completedJobs.toLocaleString('en-IN')} jobs</span>
+                    {x.cashInHand > 0 && <span className={cn('num block text-[11px] font-semibold', x.cashInHand > 5000 ? 'text-warning' : 'text-faint')}>{inr(x.cashInHand)} cash</span>}
+                  </span>
+                  <ChevronRight className="size-4 shrink-0 text-faint" aria-hidden />
                 </button>
               </li>
             ))}
