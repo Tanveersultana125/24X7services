@@ -30,8 +30,7 @@ import { AppShell, Section } from '@/components/AppShell'
 import { Header } from '@/components/Header'
 import { ServiceRow } from '@/components/ServiceRow'
 import { SectionMenu } from '@/components/SectionMenu'
-import { useToast } from '@/components/Toast'
-import { shareText } from '@/lib/share'
+import { ShareSheet } from '@/components/ShareSheet'
 import { typeLabel, typePhoto } from '@/lib/applianceTypes'
 import { ReviewsSheet } from '@/components/ReviewsSheet'
 import { OfferBanner } from '@/components/OfferBanner'
@@ -281,20 +280,7 @@ export function ApplianceScreen() {
     plans.find((each) => each.applianceIds.length === 1) ?? plans[0] ?? null
 
   const earliest = useEarliestSlot()
-  const toast = useToast()
-
-  async function sharePage(): Promise<void> {
-    const outcome = await shareText(
-      `${appliance?.name ?? 'Appliance'} repair, service and installation on 24X7${
-        cheapestFee === null ? '' : ` — visits from ${formatPaise(cheapestFee)}`
-      }.`,
-      appliance?.name,
-      window.location.href
-    )
-    if (outcome === 'copied') toast.show('Link copied.', { tone: 'success' })
-    else if (outcome === 'failed')
-      toast.show('We could not share that.', { tone: 'error' })
-  }
+  const [shareOpen, setShareOpen] = useState(false)
   const [reviewsOpen, setReviewsOpen] = useState(false)
   const reviewNames = new Map(
     services.map((service) => [
@@ -439,7 +425,8 @@ export function ApplianceScreen() {
               </Link>
               <button
                 type="button"
-                onClick={() => void sharePage()}
+                onClick={() => setShareOpen(true)}
+                aria-haspopup="dialog"
                 aria-label={`Share ${appliance?.name ?? 'this page'}`}
                 className="flex size-11 items-center justify-center rounded-full border border-border bg-bg text-ink hover:bg-surface"
               >
@@ -953,6 +940,18 @@ export function ApplianceScreen() {
                   ?.technicianPhoto ?? appliance.image,
             })),
           ]}
+        />
+      ) : null}
+      {appliance ? (
+        <ShareSheet
+          open={shareOpen}
+          onClose={() => setShareOpen(false)}
+          title={appliance.name}
+          text={`${appliance.name} repair, service and installation on 24X7${
+            cheapestFee === null ? '' : ` — visits from ${formatPaise(cheapestFee)}`
+          }.`}
+          url={typeof window === 'undefined' ? '' : window.location.href}
+          image={appliance.heroImage ?? appliance.image}
         />
       ) : null}
       <ReviewsSheet

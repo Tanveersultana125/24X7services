@@ -27,7 +27,6 @@ import { Overlay } from "@/components/ui/Overlay";
 import { BrandDisclaimer } from "@/components/BrandCard";
 import { ReviewsPanel } from "@/components/ReviewsSheet";
 import { usePrefersReducedMotion } from "@/components/ServiceClip";
-import { useToast } from "@/components/Toast";
 import { durationNote } from "@/components/ServiceRail";
 import { StickyCTA, StickySpacer } from "@/components/StickyCTA";
 import {
@@ -42,7 +41,7 @@ import {
   fetchServiceReviews,
 } from "@/lib/catalog";
 import { formatPaise } from "@/lib/format";
-import { shareText } from "@/lib/share";
+import { ShareSheet } from "@/components/ShareSheet";
 import { useAsync } from "@/lib/useAsync";
 import { cn } from "@/lib/cn";
 
@@ -162,7 +161,6 @@ export function ServiceDetails({
 }) {
   const page = variant === "page";
   const cart = useCart();
-  const toast = useToast();
 
   const loadExtras = useCallback(async () => {
     const [config, brands, reviews] = await Promise.all([
@@ -213,17 +211,11 @@ export function ServiceDetails({
   const duration = durationNote(service.durationMinutes)?.replace(/^About /, "");
   const brands = extras.data?.brands ?? [];
 
-  async function share(): Promise<void> {
-    const url = typeof window !== "undefined" ? window.location.origin : "";
-    const outcome = await shareText(
-      `${service.name} on 24X7 — ${formatPaise(service.visitFee)} visit fee, quoted before any work starts.`,
-      service.name,
-      `${url}/services/detail/?a=${service.applianceId}&s=${service.serviceKey}`,
-    );
-    if (outcome === "copied") toast.show("Link copied.", { tone: "success" });
-    else if (outcome === "failed")
-      toast.show("We could not share that.", { tone: "error" });
-  }
+  const [shareOpen, setShareOpen] = useState(false);
+  const shareUrl =
+    typeof window === "undefined"
+      ? ""
+      : `${window.location.origin}/services/detail/?a=${service.applianceId}&s=${service.serviceKey}`;
 
   const footerDetail = (
     <p className="min-w-0 flex-1" aria-live="polite">
@@ -550,7 +542,8 @@ export function ServiceDetails({
           </p>
           <button
             type="button"
-            onClick={() => void share()}
+            onClick={() => setShareOpen(true)}
+            aria-haspopup="dialog"
             className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-card border border-border text-base font-semibold text-brand hover:border-brand"
           >
             Share
@@ -560,6 +553,14 @@ export function ServiceDetails({
 
         <Band />
         <section className="px-5 py-7">
+          <ShareSheet
+            open={shareOpen}
+            onClose={() => setShareOpen(false)}
+            title={service.name}
+            text={`${service.name} on 24X7 — ${formatPaise(service.visitFee)} visit fee, quoted before any work starts.`}
+            url={shareUrl}
+            image={photos[0]}
+          />
           <ReviewsPanel
             rating={service.rating}
             ratingCount={service.reviewCount}
