@@ -359,7 +359,36 @@ export default function Dashboard() {
         </Card>
         <Card className="xl:col-span-2">
           <CardHeader title="Top technicians · 30 days" sub="By revenue from completed jobs" action={<Link href="/reports" className="text-xs font-bold text-brand hover:underline">Full report</Link>} />
-          <div className="overflow-x-auto">
+          {/* Phone: one compact row per technician instead of a sideways-scrolling table. */}
+          <ul className="divide-y divide-line sm:hidden">
+            {m.top.map(({ t, jobs, revenue }, i) => (
+              <li key={t.id}>
+                <Link href={`/technicians/?id=${t.id}` as Route} className="flex items-center gap-3 px-4 py-3 hover:bg-canvas/60">
+                  <span className="num w-4 shrink-0 text-xs font-bold text-faint">{i + 1}</span>
+                  <span className="relative shrink-0">
+                    <Avatar name={t.name} size={36} side="technician" />
+                    <span
+                      className={cn('absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-card', t.presence === 'online' ? 'bg-success' : t.presence === 'on_job' ? 'bg-violet' : 'bg-faint')}
+                      aria-label={PRESENCE[t.presence].label}
+                    />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-bold">{t.name}</span>
+                    <span className="flex items-center gap-1.5 text-xs font-medium text-muted">
+                      <span className="truncate">{t.area}</span>
+                      <span aria-hidden>·</span>
+                      <Rating value={t.rating} className="text-xs" />
+                    </span>
+                  </span>
+                  <span className="shrink-0 text-right">
+                    <span className="num block text-sm font-extrabold">{inr(revenue)}</span>
+                    <span className="num block text-[11px] font-semibold text-faint">{jobs} jobs</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <div className="hidden overflow-x-auto sm:block">
             <table className="w-full min-w-[560px] text-left text-sm">
               <thead>
                 <tr className="text-[11px] font-bold uppercase tracking-[0.06em] text-faint">
