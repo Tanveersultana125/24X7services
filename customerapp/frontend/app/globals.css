@@ -347,6 +347,39 @@
   }
 }
 
+/* A story banner on Home: the problems float in around the headline as
+   chips, drift while they are read, then fade so the answer can arrive. */
+@keyframes story-chip-in {
+  from {
+    opacity: 0;
+    transform: scale(0.82);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+@keyframes story-chip-out {
+  to {
+    opacity: 0;
+    transform: scale(0.92);
+    filter: blur(4px);
+  }
+}
+
+@keyframes story-drift {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -5px;
+  }
+}
+
 /* The bar under the slide on show in an appliance page's banner, filling for
    as long as the slide stays. */
 @keyframes hero-progress {

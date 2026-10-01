@@ -362,6 +362,14 @@ export const bannerSchema = z.object({
    * unused — the card is the photograph, the way the big marketplaces do it.
    */
   photo: z.string().optional(),
+  /**
+   * A banner told as a short story instead of a card: these problems float in
+   * around the headline, then give way to `titleAfter` beside it — "4
+   * problems." → "4 problems. 1 visit." The image is unused on such a banner.
+   */
+  chips: z.array(z.string().min(1).max(24)).max(6).optional(),
+  /** The headline's second half, arriving once the chips have gone. */
+  titleAfter: z.string().min(1).max(40).optional(),
   /** A small pill in the corner of the card: "New", "Trending". */
   badge: z.string().optional(),
   slot: bannerSlotSchema.default('hero'),

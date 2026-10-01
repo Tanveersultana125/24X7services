@@ -1,6 +1,18 @@
 {
   "banners": [
     {
+      "id": "banner_four-problems",
+      "title": "4 problems.",
+      "titleAfter": "1 visit.",
+      "chips": ["Not cooling", "Water leaking", "Not draining", "Strange noise"],
+      "tone": "blue",
+      "slot": "hero",
+      "ctaLabel": "Find your fix",
+      "ctaHref": "/services",
+      "order": 0,
+      "active": true
+    },
+    {
       "id": "banner_ac-season",
       "badge": "In season",
       "title": "Summer-ready AC service",

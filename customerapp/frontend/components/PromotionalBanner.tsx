@@ -123,15 +123,15 @@ export function PromotionalBanner({
       window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduced) return
 
-    const timer = setInterval(() => {
-      setActive((current) => {
-        // From the last slide, on into the copy rather than back to the start.
-        scrollTo(current + 1)
-        return (current + 1) % banners.length
-      })
-    }, intervalMs)
-    return () => clearInterval(timer)
-  }, [autoplay, banners.length, intervalMs, looping, scrollTo])
+    // A story slide stays long enough to be told; the rest, the usual time.
+    const dwell = banners[active]?.chips?.length ? STORY_MS : intervalMs
+    const timer = setTimeout(() => {
+      // From the last slide, on into the copy rather than back to the start.
+      scrollTo(active + 1)
+      setActive((active + 1) % banners.length)
+    }, dwell)
+    return () => clearTimeout(timer)
+  }, [active, autoplay, banners, intervalMs, looping, scrollTo])
 
   const stopAutoplay = useCallback(() => setAutoplay(false), [])
 
@@ -233,6 +233,9 @@ export function PromotionalBanner({
  * Every one of them starts dark enough at the top left to carry white text at
  * well over AA, which is what lets the card go without a scrim.
  */
+/** How long a story slide stays: its chips, its answer, a moment to read. */
+const STORY_MS = 8000
+
 /** The lines under a banner's headline, rising in after it. */
 const RISE =
   'motion-safe:animate-[banner-rise_520ms_cubic-bezier(0.2,0.7,0.2,1)_both]'
@@ -324,7 +327,15 @@ export function BannerCard({
   // When the lines under the headline follow: once its last word is up.
   const after = words.length * 70 + 120
 
-  const body = banner.photo ? (
+  const body = banner.chips?.length ? (
+    <StoryBody
+      banner={banner}
+      chips={banner.chips}
+      edgeToEdge={edgeToEdge}
+      moving={moving}
+      className={className}
+    />
+  ) : banner.photo ? (
     <PhotoBody
       banner={banner}
       photo={banner.photo}
@@ -536,3 +547,131 @@ function PhotoBody({
     </div>
   )
 }
+
+/**
+ * A banner told as a short story, the way the marketplaces open Home: the
+ * problems float in around the middle as chips and drift there, the headline
+ * rises out of a blur — "4 problems." — then the chips fade and the answer
+ * arrives beside it — "1 visit." — with the way in under them.
+ *
+ * Played once each time the slide arrives, and held on its last frame.
+ * Somebody who asked for less motion gets that last frame straight away: the
+ * global reduced-motion rule shortens every animation to nothing, and every
+ * one of these keeps its end state.
+ */
+function StoryBody({
+  banner,
+  chips,
+  edgeToEdge,
+  moving,
+  className,
+}: {
+  banner: Banner
+  chips: readonly string[]
+  edgeToEdge: boolean
+  moving: boolean
+  className?: string
+}) {
+  // Where each chip floats, as fractions of the slide: around the headline,
+  // never over it.
+  // Two bands, above and below the headline's row, so a chip never crosses it.
+  const spots = [
+    'left-[8%] top-[10%]',
+    'right-[5%] top-[18%]',
+    'left-[4%] bottom-[14%]',
+    'right-[10%] bottom-[8%]',
+    'left-[40%] top-[4%]',
+    'left-[36%] bottom-[4%]',
+  ]
+  const leave = 3.6 // seconds: when the chips go and the answer arrives
+
+  return (
+    <div
+      className={cn(
+        'relative flex h-full min-h-52 flex-col items-center justify-center overflow-hidden px-4 py-8 text-center text-white sm:min-h-56',
+        edgeToEdge
+          ? cn('min-h-48 rounded-none lg:rounded-card lg:bg-linear-to-br', TONES[banner.tone])
+          : cn('rounded-card bg-linear-to-br', TONES[banner.tone]),
+        className
+      )}
+    >
+      {chips.map((chip, index) => (
+        <span
+          key={chip}
+          aria-hidden="true"
+          className={cn(
+            'absolute rounded-pill border border-white/30 bg-white/10 px-3 py-1.5 text-sm font-medium whitespace-nowrap text-white backdrop-blur-sm',
+            spots[index % spots.length],
+            // Still, with no story to tell, the chips are not shown at all.
+            !moving && 'hidden'
+          )}
+          style={
+            moving
+              ? {
+                  animation: [
+                    `story-chip-in 600ms cubic-bezier(0.2,0.7,0.2,1) ${0.15 + index * 0.35}s both`,
+                    `story-drift 3.2s ease-in-out ${0.8 + index * 0.35}s infinite`,
+                    `story-chip-out 500ms ease-in ${leave + index * 0.08}s forwards`,
+                  ].join(', '),
+                }
+              : undefined
+          }
+        >
+          {chip}
+        </span>
+      ))}
+
+      <h3
+        className="relative text-[1.75rem] leading-tight font-bold"
+        aria-label={[banner.title, banner.titleAfter].filter(Boolean).join(' ')}
+      >
+        <span
+          aria-hidden="true"
+          className="inline-block bg-linear-to-r from-white to-[#CFE0FF] bg-clip-text text-transparent"
+          style={
+            moving
+              ? { animation: 'banner-word 700ms cubic-bezier(0.2,0.7,0.2,1) 0.5s both' }
+              : undefined
+          }
+        >
+          {banner.title}
+        </span>
+        {banner.titleAfter ? (
+          <>
+            {' '}
+            <span
+              aria-hidden="true"
+              className="inline-block text-white"
+              style={
+                moving
+                  ? {
+                      animation: `banner-word 700ms cubic-bezier(0.2,0.7,0.2,1) ${leave + 0.3}s both`,
+                    }
+                  : undefined
+              }
+            >
+              {banner.titleAfter}
+            </span>
+          </>
+        ) : null}
+      </h3>
+
+      {banner.ctaLabel ? (
+        <span
+          className="relative mt-3 inline-flex items-center gap-2 text-base font-semibold text-white/75"
+          style={
+            moving
+              ? {
+                  animation: `banner-rise 520ms cubic-bezier(0.2,0.7,0.2,1) ${leave + 0.9}s both`,
+                }
+              : undefined
+          }
+        >
+          {banner.ctaLabel}
+          <span aria-hidden="true">→</span>
+        </span>
+      ) : null}
+    </div>
+  )
+}
+
