@@ -136,6 +136,13 @@
   ::placeholder {
     color: var(--color-faint);
   }
+
+  /* A grid cell may never grow past its track. Without this, one long
+     truncated line (a booking's issue, an address) widens its card past the
+     phone screen and pushes buttons off the edge. */
+  .grid > * {
+    min-width: 0;
+  }
 }
 
 @utility no-scrollbar {

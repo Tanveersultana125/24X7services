@@ -189,7 +189,7 @@ export default function Dashboard() {
         <StatCard label="Avg. rating · 30 days" value={m.rating.toFixed(2)} icon={<Star />} toneName="warning" hint={<span>{m.ratedCount} ratings</span>} href="/reviews" />
       </section>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-3">
+      <div className="mt-5 grid gap-5 [&>*]:min-w-0 xl:grid-cols-3">
         <Card className="xl:col-span-2">
           <CardHeader title="Bookings · last 14 days" sub="By service date. Hover a bar for completions and revenue." action={<span className="num text-sm font-bold text-muted">{m.days.reduce((s, d) => s + d.value, 0)} total</span>} />
           <div className="px-4 pb-4 pt-5 sm:px-5">
@@ -218,7 +218,7 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-3">
+      <div className="mt-5 grid gap-5 [&>*]:min-w-0 xl:grid-cols-3">
         <Card className="xl:col-span-2">
           <CardHeader
             title="Needs dispatch"
@@ -236,26 +236,31 @@ export default function Dashboard() {
               {m.unassigned.slice(0, 6).map((b) => {
                 const c = store.customer(b.customerId)
                 return (
-                  <li key={b.id} className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-canvas/60">
+                  <li key={b.id} className="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-canvas/60 sm:items-center sm:px-5">
                     <span className={cn('grid size-10 shrink-0 place-items-center rounded-xl', b.priority === 'emergency' ? 'bg-danger-soft text-danger' : 'bg-brand-soft text-brand')}>
                       <ApplianceGlyph appliance={b.appliance} />
                     </span>
                     <button type="button" onClick={() => setOpen(b.id)} className="min-w-0 flex-1 text-left">
-                      <span className="flex flex-wrap items-center gap-2">
+                      <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
                         <span className="text-sm font-bold">
                           {BRAND_LABEL[b.brand]} {APPLIANCE_LABEL[b.appliance]}
                         </span>
                         <PriorityTag priority={b.priority} />
                       </span>
-                      <span className="block truncate text-xs font-medium text-muted">
-                        {b.id} · {c?.name} · {b.area} · {b.issue}
+                      <span className="mt-0.5 block truncate text-xs font-medium text-muted">
+                        {b.id} · {c?.name} · {b.area}
+                      </span>
+                      <span className="block truncate text-xs font-medium text-ink-2 sm:hidden">{b.issue}</span>
+                      <span className="hidden truncate text-xs font-medium text-muted sm:block">{b.issue}</span>
+                      <span className="num mt-1 block text-xs font-bold text-ink-2 sm:hidden">
+                        {time(b.scheduledAt)} · <span className="font-semibold text-faint">{isToday(b.scheduledAt) ? ago(b.scheduledAt) : 'Tomorrow'}</span>
                       </span>
                     </button>
                     <span className="hidden shrink-0 text-right sm:block">
                       <span className="num block text-sm font-bold">{time(b.scheduledAt)}</span>
                       <span className="block text-[11px] font-semibold text-faint">{isToday(b.scheduledAt) ? ago(b.scheduledAt) : 'Tomorrow'}</span>
                     </span>
-                    <Button size="sm" variant={b.priority === 'emergency' ? 'danger' : 'primary'} onClick={() => setAssign(b)}>
+                    <Button size="sm" className="self-center" variant={b.priority === 'emergency' ? 'danger' : 'primary'} onClick={() => setAssign(b)}>
                       Assign
                     </Button>
                   </li>
@@ -294,7 +299,7 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-5 grid gap-5 [&>*]:min-w-0 md:grid-cols-2 xl:grid-cols-3">
         <SideCard
           title="Customer side"
           side="customer"
@@ -345,7 +350,7 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-3">
+      <div className="mt-5 grid gap-5 [&>*]:min-w-0 xl:grid-cols-3">
         <Card>
           <CardHeader title="Revenue by appliance" sub="Completed jobs · last 30 days" />
           <div className="p-5">
