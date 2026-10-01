@@ -34,6 +34,13 @@
   --color-violet: #6d3fd1;
   --color-violet-soft: #f1ecfd;
 
+  /* Who a record belongs to — never a status. Customer is blue, technician
+     green, and both always travel with the word or icon that names them. */
+  --color-cust: #0369a1;
+  --color-cust-soft: #e7f3fb;
+  --color-tech: #047857;
+  --color-tech-soft: #e5f5ee;
+
   --font-sans: 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
     sans-serif;
   --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;

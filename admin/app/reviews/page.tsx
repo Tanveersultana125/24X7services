@@ -56,7 +56,8 @@ export default function Reviews() {
 
   return (
     <Page>
-      <PageHeader title="Reviews & Ratings" sub="Customer feedback on every completed job" />
+      <PageHeader
+        side="customer" title="Reviews & Ratings" sub="Customer feedback on every completed job" />
 
       <section className="grid grid-cols-2 gap-3 xl:grid-cols-4 xl:gap-4">
         <StatCard label="Average · 30 days" value={m.avg.toFixed(2)} icon={<Star />} toneName="warning" />
@@ -115,7 +116,7 @@ export default function Reviews() {
                     <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold text-muted">
                       {c && (
                         <Link href={`/customers/?id=${c.id}` as Route} className="flex items-center gap-1.5 hover:text-brand">
-                          <Avatar name={c.name} size={20} /> {c.name}
+                          <Avatar name={c.name} size={20} side="customer" /> {c.name}
                         </Link>
                       )}
                       {t && (

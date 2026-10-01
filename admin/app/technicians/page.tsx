@@ -123,6 +123,7 @@ function Technicians() {
   return (
     <Page>
       <PageHeader
+        side="technician"
         title="Technicians"
         sub={`${verified.length} verified partners · ${verified.filter((x) => x.presence !== 'offline').length} on shift now`}
         actions={
@@ -198,7 +199,7 @@ function Technicians() {
                   <td className={td}>
                     <span className="flex items-center gap-3">
                       <span className="relative">
-                        <Avatar name={x.name} size={32} />
+                        <Avatar name={x.name} size={32} side="technician" />
                         <span className={cn('absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-card', presenceDot[x.presence])} />
                       </span>
                       <span>
@@ -264,7 +265,7 @@ function Application({ t, onOpen }: { t: Technician; onOpen: () => void }) {
   return (
     <div className="rounded-card border border-line bg-card p-4">
       <button type="button" onClick={onOpen} className="flex w-full items-center gap-3 text-left">
-        <Avatar name={t.name} size={44} />
+        <Avatar name={t.name} size={44} side="technician" />
         <span className="min-w-0 flex-1">
           <span className="block font-extrabold hover:text-brand">{t.name}</span>
           <span className="block text-xs font-semibold text-muted">
@@ -388,7 +389,7 @@ function TechnicianDrawer({ t, onClose }: { t?: Technician; onClose: () => void 
       >
         <div className="flex items-center gap-4">
           <span className="relative">
-            <Avatar name={t.name} size={60} />
+            <Avatar name={t.name} size={60} side="technician" />
             <span className={cn('absolute bottom-0.5 right-0.5 size-3.5 rounded-full border-2 border-card', presenceDot[t.presence])} />
           </span>
           <div className="min-w-0 space-y-0.5">

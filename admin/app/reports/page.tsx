@@ -184,7 +184,7 @@ export default function Reports() {
               <tr key={t.id} className={tr}>
                 <td className={td}>
                   <Link href={`/technicians/?id=${t.id}` as Route} className="flex items-center gap-2.5">
-                    <Avatar name={t.name} size={30} />
+                    <Avatar name={t.name} size={30} side="technician" />
                     <span>
                       <span className="block font-bold hover:text-brand">{t.name}</span>
                       <span className="block text-xs font-medium text-muted">{t.area}</span>

@@ -13,7 +13,7 @@ import { useStore } from '@/lib/store'
 import { BOOKING_FLOW, type Booking, type BookingStatus } from '@/lib/types'
 import { ApplianceGlyph } from './glyphs'
 import { useToast } from './toast'
-import { Avatar, Button, Chip, Detail, Drawer, Field, inputClass, Modal, PriorityTag, Rating, SectionLabel, StatusChip } from './ui'
+import { Avatar, Button, Chip, Detail, Drawer, Field, inputClass, Modal, PriorityTag, Rating, SectionLabel, SideTag, StatusChip } from './ui'
 
 const METHOD: Record<string, string> = { upi: 'UPI', card: 'Card', cash: 'Cash on service', wallet: '24X7 Wallet' }
 
@@ -103,10 +103,10 @@ export function BookingDrawer({ id, onClose }: { id: string | null; onClose: () 
           </div>
         </div>
 
-        <SectionLabel>Customer</SectionLabel>
+        <SectionLabel action={<SideTag side="customer" label="Customer" />}>Customer</SectionLabel>
         {c && (
           <div className="flex items-center gap-3">
-            <Avatar name={c.name} size={40} />
+            <Avatar name={c.name} size={40} side="customer" />
             <div className="min-w-0 flex-1">
               <Link href={`/customers/?id=${c.id}` as Route} className="font-bold hover:text-brand hover:underline">
                 {c.name}
@@ -124,10 +124,10 @@ export function BookingDrawer({ id, onClose }: { id: string | null; onClose: () 
           <MapPin className="mt-0.5 size-4 shrink-0 text-faint" aria-hidden /> {b.address}
         </p>
 
-        <SectionLabel>Technician</SectionLabel>
+        <SectionLabel action={<SideTag side="technician" label="Technician" />}>Technician</SectionLabel>
         {t ? (
           <div className="flex items-center gap-3">
-            <Avatar name={t.name} size={40} />
+            <Avatar name={t.name} size={40} side="technician" />
             <div className="min-w-0 flex-1">
               <Link href={`/technicians/?id=${t.id}` as Route} className="font-bold hover:text-brand hover:underline">
                 {t.name}
@@ -265,7 +265,7 @@ export function AssignModal({ booking, onClose }: { booking: Booking | null; onC
                   tech.presence === 'offline' && !on && 'opacity-60'
                 )}
               >
-                <Avatar name={tech.name} size={36} />
+                <Avatar name={tech.name} size={36} side="technician" />
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-2">
                     <span className="truncate text-sm font-bold">{tech.name}</span>

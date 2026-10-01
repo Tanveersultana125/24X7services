@@ -163,7 +163,7 @@ function Dispatch() {
                 return (
                   <li key={b.id}>
                     <button type="button" onClick={() => setOpen(b.id)} className="flex w-full items-center gap-3 px-5 py-2.5 text-left hover:bg-canvas/60">
-                      {t && <Avatar name={t.name} size={30} />}
+                      {t && <Avatar name={t.name} size={30} side="technician" />}
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm font-bold">{t?.name}</span>
                         <span className="block truncate text-xs font-medium text-muted">

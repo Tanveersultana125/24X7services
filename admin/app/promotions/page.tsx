@@ -31,6 +31,7 @@ export default function Promotions() {
   return (
     <Page>
       <PageHeader
+        side="customer"
         title="Promotions"
         sub="Coupons, referrals and push notifications"
         actions={
@@ -118,7 +119,7 @@ export default function Promotions() {
               <li key={c.id}>
                 <Link href={`/customers/?id=${c.id}` as Route} className="flex items-center gap-3 px-5 py-2.5 hover:bg-canvas/60">
                   <span className="num w-4 text-xs font-bold text-faint">{i + 1}</span>
-                  <Avatar name={c.name} size={30} />
+                  <Avatar name={c.name} size={30} side="customer" />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-bold">{c.name}</span>
                     <span className="block font-mono text-[11px] font-semibold text-muted">{c.referralCode}</span>

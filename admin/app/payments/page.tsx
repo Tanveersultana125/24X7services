@@ -127,6 +127,7 @@ export default function Payments() {
   return (
     <Page>
       <PageHeader
+        side="customer"
         title="Payments"
         sub="Customer payments, collections on site and refunds"
         actions={

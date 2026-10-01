@@ -4,7 +4,7 @@ import Link from 'next/link'
 import type { Route } from 'next'
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { ArrowDownRight, ArrowUpRight, Search, Star, X } from 'lucide-react'
+import { ArrowDownRight, ArrowUpRight, Search, Star, UserRound, Wrench, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { BOOKING_STATUS, PRIORITY, type Tone } from '@/lib/status'
 import type { BookingStatus, Priority } from '@/lib/types'
@@ -127,10 +127,11 @@ export function CardHeader({ title, sub, action, className }: { title: React.Rea
 }
 
 /** Title row every screen opens with: what it is, then what you can do. */
-export function PageHeader({ title, sub, actions }: { title: string; sub?: React.ReactNode; actions?: React.ReactNode }) {
+export function PageHeader({ title, sub, actions, side }: { title: string; sub?: React.ReactNode; actions?: React.ReactNode; side?: Side }) {
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
       <div className="min-w-0">
+        {side && <SideTag side={side} className="mb-2" />}
         <h1 className="text-[22px] font-extrabold tracking-tight sm:text-2xl">{title}</h1>
         {sub && <p className="mt-1 text-sm font-medium text-muted">{sub}</p>}
       </div>
@@ -476,15 +477,40 @@ export function Empty({ icon, title, body }: { icon: React.ReactNode; title: str
 
 const AVATAR_BG = ['from-[#3b5ce0] to-[#152a7a]', 'from-[#0e8f8f] to-[#0b4f5c]', 'from-[#7a4fd8] to-[#3c1f86]', 'from-[#d0702c] to-[#8a3a12]', 'from-[#2f8a4f] to-[#12502a]']
 
-export function Avatar({ name, size = 36, className }: { name: string; size?: number; className?: string }) {
+export type Side = 'customer' | 'technician'
+
+const SIDE_BG: Record<Side, string> = {
+  customer: 'from-[#0ea5e9] to-[#075985]',
+  technician: 'from-[#10b981] to-[#065f46]',
+}
+
+/** Initials in a circle: blue for a customer, green for a technician, mixed for staff. */
+export function Avatar({ name, size = 36, className, side }: { name: string; size?: number; className?: string; side?: Side }) {
   const h = [...name].reduce((s, c) => s + c.charCodeAt(0), 0)
   return (
     <span
       aria-hidden
-      className={cn('grid shrink-0 place-items-center rounded-full bg-gradient-to-br font-extrabold text-white', AVATAR_BG[h % AVATAR_BG.length], className)}
+      className={cn('grid shrink-0 place-items-center rounded-full bg-gradient-to-br font-extrabold text-white', side ? SIDE_BG[side] : AVATAR_BG[h % AVATAR_BG.length], className)}
       style={{ width: size, height: size, fontSize: size * 0.36 }}
     >
       {initials(name)}
+    </span>
+  )
+}
+
+/** Names which side of the network a record belongs to. */
+export function SideTag({ side, className, label }: { side: Side; className?: string; label?: string }) {
+  const Icon = side === 'customer' ? UserRound : Wrench
+  return (
+    <span
+      className={cn(
+        'inline-flex h-6 shrink-0 items-center gap-1 rounded-md px-2 text-[11px] font-extrabold uppercase tracking-[0.06em]',
+        side === 'customer' ? 'bg-cust-soft text-cust' : 'bg-tech-soft text-tech',
+        className
+      )}
+    >
+      <Icon className="size-3.5" strokeWidth={2.4} aria-hidden />
+      {label ?? (side === 'customer' ? 'Customer side' : 'Technician side')}
     </span>
   )
 }

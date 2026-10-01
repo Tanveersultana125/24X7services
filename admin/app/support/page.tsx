@@ -7,7 +7,7 @@ import { Suspense, useEffect, useMemo, useState } from 'react'
 import { BriefcaseBusiness, CheckCircle2, Inbox, Phone, RotateCcw, Send } from 'lucide-react'
 import { BookingDrawer } from '@/components/BookingDrawer'
 import { useToast } from '@/components/toast'
-import { Avatar, Button, Card, Chip, Drawer, Empty, Page, PageHeader, SearchInput, Segmented, Tabs, inputClass } from '@/components/ui'
+import { Avatar, Button, Card, Chip, Drawer, Empty, Page, PageHeader, SearchInput, Segmented, Tabs, inputClass, SideTag } from '@/components/ui'
 import { cn } from '@/lib/cn'
 import { ago, dateTime, matches, telHref } from '@/lib/format'
 import { TICKET_PRIORITY, TICKET_STATUS } from '@/lib/status'
@@ -123,7 +123,7 @@ function Support() {
                       className={cn('relative flex w-full gap-3 px-4 py-3 text-left transition-colors', on ? 'bg-brand-soft/60' : 'hover:bg-canvas/60')}
                     >
                       {on && <span className="absolute inset-y-0 left-0 w-0.5 bg-brand" />}
-                      <Avatar name={who(t)} size={34} />
+                      <Avatar name={who(t)} size={34} side={t.side} />
                       <span className="min-w-0 flex-1">
                         <span className="flex items-center justify-between gap-2">
                           <span className="truncate text-sm font-bold">{who(t)}</span>
@@ -131,10 +131,10 @@ function Support() {
                         </span>
                         <span className="block truncate text-[13px] font-semibold text-ink-2">{t.subject}</span>
                         <span className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                          <SideTag side={t.side} label={t.side === 'customer' ? 'Customer' : 'Technician'} className="h-5 px-1.5 text-[10px]" />
                           <Chip tone={TICKET_PRIORITY[t.priority].tone} dot={false} className="h-5 px-1.5 text-[10px]">
                             {TICKET_PRIORITY[t.priority].label}
                           </Chip>
-                          <span className="rounded bg-canvas px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted">{t.side}</span>
                           <span className="text-[11px] font-semibold text-faint">
                             {t.id} · {t.category}
                           </span>
@@ -206,13 +206,14 @@ function Conversation({ t, bare }: { t: Ticket; bare?: boolean }) {
       )}
 
       <div className="flex flex-wrap items-center gap-3 border-b border-line bg-canvas/50 px-5 py-3">
-        <Avatar name={name} size={36} />
+        <Avatar name={name} size={36} side={t.side} />
         <div className="min-w-0 flex-1">
           <Link href={href} className="text-sm font-bold hover:text-brand hover:underline">
             {name}
           </Link>
           <p className="text-xs font-semibold text-muted">
-            {t.side === 'customer' ? 'Customer' : 'Technician'} · {t.personId}
+            <SideTag side={t.side} label={t.side === 'customer' ? 'Customer' : 'Technician'} className="mr-1.5 h-5 px-1.5 text-[10px]" />
+            {t.personId}
             {person && ` · ${person.phone}`}
           </p>
         </div>

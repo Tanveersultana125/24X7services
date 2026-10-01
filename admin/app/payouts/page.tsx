@@ -71,6 +71,7 @@ export default function Payouts() {
   return (
     <Page>
       <PageHeader
+        side="technician"
         title="Payouts"
         sub={`Weekly technician settlements after ${store.settings.commissionPct}% platform commission`}
         actions={
@@ -156,7 +157,7 @@ export default function Payouts() {
                       )}
                       <td className={td}>
                         <Link href={`/technicians/?id=${p.technicianId}` as Route} className="flex items-center gap-2.5">
-                          <Avatar name={t?.name ?? '?'} size={30} />
+                          <Avatar name={t?.name ?? '?'} size={30} side="technician" />
                           <span>
                             <span className="block font-bold hover:text-brand">{t?.name}</span>
                             <span className="block text-xs font-medium text-muted">{p.technicianId}</span>
@@ -197,7 +198,7 @@ export default function Payouts() {
             <ul className="divide-y divide-line">
               {m.cash.map((t) => (
                 <li key={t.id} className="flex items-center gap-3 px-5 py-3">
-                  <Avatar name={t.name} size={32} />
+                  <Avatar name={t.name} size={32} side="technician" />
                   <Link href={`/technicians/?id=${t.id}` as Route} className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-bold hover:text-brand">{t.name}</span>
                     <span className={cn('num block text-xs font-bold', t.cashInHand > 5000 ? 'text-danger' : 'text-muted')}>{inr(t.cashInHand)} in hand</span>

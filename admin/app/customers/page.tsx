@@ -35,7 +35,7 @@ import {
 } from '@/components/ui'
 import { APPLIANCE_LABEL, BRAND_LABEL, inr } from '@/lib/catalog'
 import { cn } from '@/lib/cn'
-import { ago, dateTime, downloadCsv, longDate, matches, telHref, thisMonth } from '@/lib/format'
+import { ago, dateTime, downloadCsv, longDate, matches, telHref, withinDays } from '@/lib/format'
 import { AREAS } from '@/lib/seed'
 import { TICKET_STATUS } from '@/lib/status'
 import { useStore } from '@/lib/store'
@@ -103,6 +103,7 @@ function Customers() {
   return (
     <Page>
       <PageHeader
+        side="customer"
         title="Customers"
         sub="Everyone booking through the 24X7 customer app"
         actions={
@@ -114,7 +115,7 @@ function Customers() {
 
       <section className="grid grid-cols-2 gap-3 xl:grid-cols-4 xl:gap-4">
         <StatCard label="Total customers" value={store.customers.length} icon={<Users />} />
-        <StatCard label="New this month" value={store.customers.filter((c) => thisMonth(c.joinedAt)).length} icon={<UserPlus />} toneName="success" />
+        <StatCard label="New · last 30 days" value={store.customers.filter((c) => withinDays(c.joinedAt, 30)).length} icon={<UserPlus />} toneName="success" />
         <StatCard label="Repeat rate" value={`${repeat}%`} icon={<Repeat />} toneName="info" hint={<span>Booked more than once</span>} />
         <StatCard label="Blocked" value={store.customers.filter((c) => c.status === 'blocked').length} icon={<Ban />} toneName="danger" />
       </section>
@@ -175,7 +176,7 @@ function Customers() {
                 <tr key={c.id} className={cn(tr, 'cursor-pointer')} onClick={() => setOpen(c.id)}>
                   <td className={td}>
                     <span className="flex items-center gap-3">
-                      <Avatar name={c.name} size={32} />
+                      <Avatar name={c.name} size={32} side="customer" />
                       <span>
                         <span className="block font-bold">{c.name}</span>
                         <span className="num block text-xs font-medium text-muted">{c.id}</span>
@@ -250,7 +251,7 @@ function CustomerDrawer({ row, onClose }: { row?: Row; onClose: () => void }) {
         }
       >
         <div className="flex items-center gap-4">
-          <Avatar name={c.name} size={56} />
+          <Avatar name={c.name} size={56} side="customer" />
           <div className="min-w-0 space-y-1 text-sm font-semibold text-ink-2">
             <p className="num flex items-center gap-2">
               <Phone className="size-4 text-faint" aria-hidden /> {c.phone}

@@ -29,13 +29,13 @@ import { cn } from '@/lib/cn'
 import { ago, matches } from '@/lib/format'
 import { ADMIN, useStore, useTick } from '@/lib/store'
 import { APPLIANCE_LABEL, BRAND_LABEL } from '@/lib/catalog'
-import { Avatar } from './ui'
+import { Avatar, type Side } from './ui'
 import { Logo } from './Logo'
 import { ToastProvider } from './toast'
 
 type Item = { href: Route; label: string; icon: typeof Bell; badge?: 'emergency' | 'unassigned' | 'kyc' | 'tickets' | 'payouts' }
 
-const NAV: { group: string; items: Item[] }[] = [
+const NAV: { group: string; side?: Side; items: Item[] }[] = [
   {
     group: 'Overview',
     items: [
@@ -52,6 +52,7 @@ const NAV: { group: string; items: Item[] }[] = [
   },
   {
     group: 'Customer side',
+    side: 'customer',
     items: [
       { href: '/customers', label: 'Customers', icon: Users },
       { href: '/reviews', label: 'Reviews & Ratings', icon: Star },
@@ -60,6 +61,7 @@ const NAV: { group: string; items: Item[] }[] = [
   },
   {
     group: 'Technician side',
+    side: 'technician',
     items: [
       { href: '/technicians', label: 'Technicians', icon: UserRoundCog, badge: 'kyc' },
       { href: '/payouts', label: 'Payouts', icon: Wallet, badge: 'payouts' },
@@ -165,8 +167,16 @@ function SidebarBody() {
       <nav aria-label="Admin" className="flex-1 overflow-y-auto px-3 py-3">
         {NAV.map((g) => (
           <div key={g.group} className="mb-3 last:mb-0">
-            <p className="px-3 pb-1.5 pt-2 text-[10.5px] font-extrabold uppercase tracking-[0.14em] text-faint">{g.group}</p>
-            <ul className="space-y-0.5">
+            <p
+              className={cn(
+                'flex items-center gap-1.5 px-3 pb-1.5 pt-2 text-[10.5px] font-extrabold uppercase tracking-[0.14em]',
+                g.side === 'customer' ? 'text-cust' : g.side === 'technician' ? 'text-tech' : 'text-faint'
+              )}
+            >
+              {g.side && <span className={cn('size-1.5 rounded-full', g.side === 'customer' ? 'bg-cust' : 'bg-tech')} aria-hidden />}
+              {g.group}
+            </p>
+            <ul className={cn('space-y-0.5', g.side && 'ml-1.5 border-l-2 pl-1.5', g.side === 'customer' && 'border-cust/25', g.side === 'technician' && 'border-tech/25')}>
               {g.items.map(({ href, label, icon: Icon, badge }) => {
                 const active = pathname === href || pathname.startsWith(`${href}/`)
                 const n = badge ? badges[badge] : 0
@@ -177,10 +187,20 @@ function SidebarBody() {
                       aria-current={active ? 'page' : undefined}
                       className={cn(
                         'flex h-9 items-center gap-3 rounded-lg px-3 text-sm font-semibold transition-colors',
-                        active ? 'bg-brand-soft text-brand' : 'text-ink-2 hover:bg-canvas hover:text-ink'
+                        active
+                          ? g.side === 'customer'
+                            ? 'bg-cust-soft text-cust'
+                            : g.side === 'technician'
+                              ? 'bg-tech-soft text-tech'
+                              : 'bg-brand-soft text-brand'
+                          : 'text-ink-2 hover:bg-canvas hover:text-ink'
                       )}
                     >
-                      <Icon className="size-[18px] shrink-0" strokeWidth={active ? 2.3 : 1.9} aria-hidden />
+                      <Icon
+                        className={cn('size-[18px] shrink-0', !active && g.side === 'customer' && 'text-cust', !active && g.side === 'technician' && 'text-tech')}
+                        strokeWidth={active ? 2.3 : 1.9}
+                        aria-hidden
+                      />
                       <span className="flex-1 truncate">{label}</span>
                       {n > 0 && (
                         <span
@@ -344,11 +364,11 @@ function GlobalSearch() {
           ))}
           {!!results.customers.length && <ResultGroup label="Customers" />}
           {results.customers.map((c) => (
-            <ResultRow key={c.id} onClick={() => go(`/customers/?id=${c.id}`)} title={c.name} sub={`${c.id} · ${c.area}`} avatar={c.name} />
+            <ResultRow key={c.id} onClick={() => go(`/customers/?id=${c.id}`)} title={c.name} sub={`${c.id} · ${c.area}`} avatar={c.name} side="customer" />
           ))}
           {!!results.techs.length && <ResultGroup label="Technicians" />}
           {results.techs.map((t) => (
-            <ResultRow key={t.id} onClick={() => go(`/technicians/?id=${t.id}`)} title={t.name} sub={`${t.id} · ${t.area}`} avatar={t.name} />
+            <ResultRow key={t.id} onClick={() => go(`/technicians/?id=${t.id}`)} title={t.name} sub={`${t.id} · ${t.area}`} avatar={t.name} side="technician" />
           ))}
         </div>
       )}
@@ -360,10 +380,10 @@ function ResultGroup({ label }: { label: string }) {
   return <p className="px-3 pb-1 pt-2 text-[10.5px] font-extrabold uppercase tracking-[0.12em] text-faint">{label}</p>
 }
 
-function ResultRow({ title, sub, onClick, avatar }: { title: string; sub: string; onClick: () => void; avatar?: string }) {
+function ResultRow({ title, sub, onClick, avatar, side }: { title: string; sub: string; onClick: () => void; avatar?: string; side?: Side }) {
   return (
     <button type="button" onClick={onClick} className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left hover:bg-canvas">
-      {avatar ? <Avatar name={avatar} size={28} /> : <span className="grid size-7 place-items-center rounded-md bg-brand-soft text-brand"><BriefcaseBusiness className="size-3.5" /></span>}
+      {avatar ? <Avatar name={avatar} size={28} side={side} /> : <span className="grid size-7 place-items-center rounded-md bg-brand-soft text-brand"><BriefcaseBusiness className="size-3.5" /></span>}
       <span className="min-w-0">
         <span className="block truncate text-sm font-bold">{title}</span>
         <span className="block truncate text-xs font-medium text-muted">{sub}</span>

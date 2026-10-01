@@ -19,7 +19,7 @@ import {
 import { BookingDrawer, AssignModal } from '@/components/BookingDrawer'
 import { BarChart, Donut } from '@/components/charts'
 import { ApplianceGlyph } from '@/components/glyphs'
-import { Avatar, Button, Card, CardHeader, Chip, Page, PageHeader, PriorityTag, Rating, StatCard, StatusChip, buttonClass, tone } from '@/components/ui'
+import { Avatar, Button, Card, CardHeader, Chip, Page, PageHeader, PriorityTag, Rating, StatCard, StatusChip, buttonClass, tone, type Side } from '@/components/ui'
 import { APPLIANCES, APPLIANCE_LABEL, BRAND_LABEL, inr } from '@/lib/catalog'
 import { cn } from '@/lib/cn'
 import { ago, compact, isToday, time, withinDays } from '@/lib/format'
@@ -276,7 +276,7 @@ export default function Dashboard() {
                 <li key={t.id}>
                   <Link href={`/technicians/?id=${t.id}` as Route} className="flex items-center gap-3 px-5 py-2.5 hover:bg-canvas/60">
                     <span className="relative">
-                      <Avatar name={t.name} size={34} />
+                      <Avatar name={t.name} size={34} side="technician" />
                       <span className={cn('absolute -bottom-0.5 -right-0.5 size-3 rounded-full border-2 border-card', t.presence === 'on_job' ? 'bg-violet' : 'bg-success')} />
                     </span>
                     <span className="min-w-0 flex-1">
@@ -295,6 +295,7 @@ export default function Dashboard() {
       <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         <SideCard
           title="Customer side"
+          side="customer"
           icon={<Users />}
           href="/customers"
           rows={[
@@ -307,6 +308,7 @@ export default function Dashboard() {
         />
         <SideCard
           title="Technician side"
+          side="technician"
           icon={<UserRoundCog />}
           href="/technicians"
           rows={[
@@ -367,7 +369,7 @@ export default function Dashboard() {
                     <td className="px-5 py-2.5">
                       <Link href={`/technicians/?id=${t.id}` as Route} className="flex items-center gap-3">
                         <span className="num w-4 text-xs font-bold text-faint">{i + 1}</span>
-                        <Avatar name={t.name} size={30} />
+                        <Avatar name={t.name} size={30} side="technician" />
                         <span>
                           <span className="block font-bold hover:text-brand">{t.name}</span>
                           <span className="block text-xs font-medium text-muted">{t.area}</span>
@@ -425,12 +427,12 @@ export default function Dashboard() {
   )
 }
 
-function SideCard({ title, icon, href, rows }: { title: string; icon: React.ReactNode; href: string; rows: [string, string, boolean?][] }) {
+function SideCard({ title, icon, href, rows, side }: { title: string; icon: React.ReactNode; href: string; rows: [string, string, boolean?][]; side: Side }) {
   return (
     <Card>
       <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-4">
         <h2 className="flex items-center gap-2.5 text-[15px] font-extrabold tracking-tight">
-          <span className="grid size-8 place-items-center rounded-lg bg-brand-soft text-brand [&_svg]:size-4">{icon}</span>
+          <span className={cn('grid size-8 place-items-center rounded-lg [&_svg]:size-4', side === 'customer' ? 'bg-cust-soft text-cust' : 'bg-tech-soft text-tech')}>{icon}</span>
           {title}
         </h2>
         <Link href={href as never} className="text-xs font-bold text-brand hover:underline">

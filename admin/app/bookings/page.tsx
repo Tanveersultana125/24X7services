@@ -171,10 +171,14 @@ function Bookings() {
             <thead>
               <tr>
                 <th className={th}>Booking</th>
-                <th className={th}>Customer</th>
+                <th className={th}>
+                  <span className="inline-flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-cust" aria-hidden />Customer</span>
+                </th>
                 <th className={th}>Appliance</th>
                 <th className={th}>Slot</th>
-                <th className={th}>Technician</th>
+                <th className={th}>
+                  <span className="inline-flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-tech" aria-hidden />Technician</span>
+                </th>
                 <th className={cn(th, 'text-right')}>Amount</th>
                 <th className={th}>Status</th>
               </tr>
@@ -191,8 +195,13 @@ function Bookings() {
                       <span className="block text-xs font-medium text-faint">{ago(b.createdAt)}</span>
                     </td>
                     <td className={td}>
-                      <span className="block max-w-[160px] truncate font-semibold">{c?.name}</span>
-                      <span className="block text-xs font-medium text-muted">{b.area}</span>
+                      <span className="flex items-center gap-2.5">
+                        {c && <Avatar name={c.name} size={26} side="customer" />}
+                        <span className="min-w-0">
+                          <span className="block max-w-[150px] truncate font-semibold">{c?.name}</span>
+                          <span className="block text-xs font-medium text-muted">{b.area}</span>
+                        </span>
+                      </span>
                     </td>
                     <td className={td}>
                       <span className="flex items-center gap-2.5">
@@ -222,7 +231,7 @@ function Bookings() {
                     <td className={td}>
                       {t ? (
                         <span className="flex items-center gap-2">
-                          <Avatar name={t.name} size={26} />
+                          <Avatar name={t.name} size={26} side="technician" />
                           <span className="max-w-[130px] truncate font-semibold">{t.name}</span>
                         </span>
                       ) : canAssign ? (
