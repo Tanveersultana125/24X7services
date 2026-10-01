@@ -112,7 +112,10 @@ export function HomeHeader({
       <div
         className={cn(
           "sticky top-[var(--safe-top)] z-30 lg:hidden",
-          "transition-[box-shadow,background-color] duration-[var(--duration-base)] ease-[var(--ease-out-soft)]",
+          // The same timing as the strips above it, so the two change colour
+          // together when a slide changes rather than showing a seam between
+          // an old colour and a new one.
+          "transition-[box-shadow,background-color] duration-500",
           !painted && "bg-bg",
           // The hairline belongs to the page colour; on the banner's colour
           // it would draw a white seam across the block.
@@ -151,7 +154,12 @@ export function HomeHeader({
           <SearchBar
             readOnly
             onOpen={onSearch}
-            className={cn("min-w-0 flex-1", painted && "border-transparent")}
+            // Crisp white on the colour, as the marketplaces have it; the dark
+            // theme keeps its own field so the muted hint stays readable.
+            className={cn(
+              "min-w-0 flex-1",
+              painted && "border-transparent bg-white dark:bg-surface",
+            )}
           />
           <CartButton
             className={cn(painted && "border-white/25 bg-white/15 text-white hover:bg-white/25")}
