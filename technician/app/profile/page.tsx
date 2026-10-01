@@ -145,7 +145,7 @@ export default function ProfilePage() {
         <Card className="divide-y divide-line">
           {(
             [
-              ['/history', 'Job history', History],
+              ['/history', 'Job History', History],
               ['/settings', 'Settings', Settings],
               ['/support', 'Help & Support', Headset],
             ] as [Route, string, typeof History][]

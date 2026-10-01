@@ -25,7 +25,7 @@ import { cn } from '@/lib/cn'
 import { LANG_CODE, useT } from '@/lib/i18n'
 import { recordPath } from '@/lib/nav'
 import { useStore } from '@/lib/store'
-import { Avatar, Toggle } from './ui'
+import { Avatar } from './ui'
 import { AvailabilityToast } from './Availability'
 import { IncomingRequest } from './IncomingRequest'
 import { Logo } from './Logo'
@@ -47,7 +47,7 @@ const SIDE = [
   { href: '/ai', label: 'AI Assist', icon: Sparkles },
   { href: '/map', label: 'Map', icon: MapIcon },
   { href: '/earnings', label: 'Earnings', icon: Wallet },
-  { href: '/history', label: 'Job history', icon: History },
+  { href: '/history', label: 'Job History', icon: History },
   { href: '/notifications', label: 'Notifications', icon: Bell },
   { href: '/profile', label: 'Profile', icon: UserRound },
   { href: '/settings', label: 'Settings', icon: Settings },
@@ -177,7 +177,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
             <span className="num block text-xs font-semibold text-muted">{store.tech.id}</span>
             <span className="mt-0.5 flex items-center gap-1 text-[11px] font-bold text-muted">
               <Star className="size-3 fill-warning text-warning" aria-hidden />
-              {store.tech.rating.toFixed(2)} · {store.tech.experienceYears} yrs exp.
+              {store.tech.rating.toFixed(2)} • {store.tech.experienceYears} yrs exp.
             </span>
           </span>
           <ChevronRight className="size-4 shrink-0 text-faint transition-transform group-hover:translate-x-0.5" aria-hidden />
@@ -217,21 +217,39 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
             })}
           </ul>
         </nav>
-        <div className="border-t border-line p-4">
+        <div className="border-t border-line p-3">
           <div
             className={cn(
-              'flex items-center gap-2.5 rounded-xl border py-2 pl-3 pr-2',
-              store.online ? 'border-success/30 bg-success-soft' : 'border-line-strong bg-canvas'
+              'rounded-xl border p-2 transition-colors',
+              store.online ? 'border-success/25 bg-success-soft' : 'border-line-strong bg-canvas'
             )}
           >
-            <span className={cn('size-2.5 shrink-0 rounded-full', store.online ? 'animate-blink bg-success' : 'bg-faint')} />
-            <span className="min-w-0 flex-1">
-              <span className={cn('block text-[10.5px] font-extrabold tracking-[0.12em]', store.online ? 'text-success' : 'text-muted')}>
-                {t(store.online ? 'ONLINE' : 'OFFLINE')}
-              </span>
-              <span className="block truncate text-xs font-semibold text-ink-2">{t(store.online ? 'Receiving jobs' : 'Not receiving jobs')}</span>
-            </span>
-            <Toggle checked={store.online} onChange={store.setOnline} label="Availability" tone="success" />
+            <p className="flex items-center gap-2 px-1 pb-2 pt-0.5 text-xs font-bold" aria-live="polite">
+              <span className={cn('size-2 shrink-0 rounded-full', store.online ? 'animate-blink bg-success' : 'bg-faint')} aria-hidden />
+              <span className={store.online ? 'text-success' : 'text-muted'}>{t(store.online ? 'Online' : 'Offline')}</span>
+              <span className="text-faint" aria-hidden>•</span>
+              <span className="truncate text-ink-2">{t(store.online ? 'Receiving jobs' : 'Not receiving jobs')}</span>
+            </p>
+            <div role="radiogroup" aria-label={t('Availability')} className="grid grid-cols-2 gap-1 rounded-lg bg-card p-0.5 ring-1 ring-line">
+              {([true, false] as const).map((on) => {
+                const selected = store.online === on
+                return (
+                  <button
+                    key={String(on)}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    onClick={() => store.setOnline(on)}
+                    className={cn(
+                      'h-8 rounded-md text-[11px] font-extrabold tracking-[0.1em] transition-colors',
+                      selected ? (on ? 'bg-success text-white' : 'bg-ink-2 text-white') : 'text-muted hover:bg-canvas'
+                    )}
+                  >
+                    {t(on ? 'ONLINE' : 'OFFLINE')}
+                  </button>
+                )
+              })}
+            </div>
           </div>
           <button
             type="button"
