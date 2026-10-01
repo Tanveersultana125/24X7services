@@ -216,8 +216,9 @@ export function ServiceDetails({
   async function share(): Promise<void> {
     const url = typeof window !== "undefined" ? window.location.origin : "";
     const outcome = await shareText(
-      `${service.name} on 24X7 — ${formatPaise(service.visitFee)} visit fee, quoted before any work starts. ${url}/services/detail/?a=${service.applianceId}&s=${service.serviceKey}`,
+      `${service.name} on 24X7 — ${formatPaise(service.visitFee)} visit fee, quoted before any work starts.`,
       service.name,
+      `${url}/services/detail/?a=${service.applianceId}&s=${service.serviceKey}`,
     );
     if (outcome === "copied") toast.show("Link copied.", { tone: "success" });
     else if (outcome === "failed")

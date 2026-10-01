@@ -287,8 +287,9 @@ export function ApplianceScreen() {
     const outcome = await shareText(
       `${appliance?.name ?? 'Appliance'} repair, service and installation on 24X7${
         cheapestFee === null ? '' : ` — visits from ${formatPaise(cheapestFee)}`
-      }. ${window.location.href}`,
-      appliance?.name
+      }.`,
+      appliance?.name,
+      window.location.href
     )
     if (outcome === 'copied') toast.show('Link copied.', { tone: 'success' })
     else if (outcome === 'failed')

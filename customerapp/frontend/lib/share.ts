@@ -13,13 +13,24 @@
 
 export type ShareOutcome = 'shared' | 'copied' | 'dismissed' | 'failed'
 
+/**
+ * `url`, when given, goes to the share sheet as a link of its own rather than
+ * inside the text: WhatsApp and the rest then show it as a link with a
+ * preview, and a target that takes only links still gets one. The clipboard
+ * has no such slot, so there it follows the text.
+ */
 export async function shareText(
   text: string,
-  title?: string
+  title?: string,
+  url?: string
 ): Promise<ShareOutcome> {
   if (typeof navigator !== 'undefined' && 'share' in navigator) {
     try {
-      await navigator.share({ text, ...(title ? { title } : {}) })
+      await navigator.share({
+        text,
+        ...(title ? { title } : {}),
+        ...(url ? { url } : {}),
+      })
       return 'shared'
     } catch (error) {
       // Closing the sheet lands here, and it is not something to report.
@@ -30,7 +41,7 @@ export async function shareText(
     }
   }
 
-  return copyText(text)
+  return copyText(url ? `${text} ${url}` : text)
 }
 
 export async function copyText(text: string): Promise<'copied' | 'failed'> {
