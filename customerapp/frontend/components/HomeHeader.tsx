@@ -122,6 +122,18 @@ export function HomeHeader({
         )}
         style={painted ? { backgroundColor: tone } : undefined}
       >
+        {/* Once the banner slides up under the pinned bar, its lighter colour
+            meets the bar's solid one in a hard edge that reads as a line.
+            A short fade from the bar's colour hides the edge. */}
+        {painted && raised ? (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-full h-6"
+            style={{
+              backgroundImage: `linear-gradient(to bottom, ${tone}, transparent)`,
+            }}
+          />
+        ) : null}
         {/* The cart beside the search, so it stays in reach once the location
             row has scrolled away. */}
         <div className="mx-auto flex max-w-lg items-center gap-2 px-4 pt-3 pb-3">
