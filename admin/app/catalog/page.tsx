@@ -1,188 +1,164 @@
 'use client'
 
-import { useState } from 'react'
-import { Info, Save } from 'lucide-react'
-import { ApplianceGlyph } from '@/components/glyphs'
+import type { Route } from 'next'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { Suspense, useMemo, useState } from 'react'
+import { CircleCheck, RotateCcw, UploadCloud } from 'lucide-react'
+import { AreasTab, AvailabilityTab } from '@/components/catalog-areas'
+import { EmergencyTab, PricingTab } from '@/components/catalog-pricing'
+import { BrandsTab, ServicesTab } from '@/components/catalog-services'
+import { catalogDiff } from '@/components/catalog-shared'
 import { useToast } from '@/components/toast'
-import { Button, Card, CardHeader, Field, Page, PageHeader, Toggle, inputClass } from '@/components/ui'
-import { APPLIANCES, APPLIANCE_LABEL, BRANDS, BRAND_LABEL, inr, type Appliance } from '@/lib/catalog'
-import { useStore } from '@/lib/store'
-import { SERVICE_TYPES, type ServiceType } from '@/lib/types'
+import { Button, Modal, Page, PageHeader, Tabs } from '@/components/ui'
+import { ago } from '@/lib/format'
+import { useStore, useTick } from '@/lib/store'
 
-/** Which services make sense for which appliance — shown for reference. */
-const SERVICES: Record<Appliance, ServiceType[]> = {
-  washer: ['Repair', 'General service', 'Deep cleaning', 'Installation', 'Uninstallation'],
-  fridge: ['Repair', 'General service', 'Gas refill', 'Installation'],
-  oven: ['Repair', 'General service', 'Installation'],
-  ac: ['Repair', 'General service', 'Gas refill', 'Deep cleaning', 'Installation', 'Uninstallation'],
-  geyser: ['Repair', 'General service', 'Installation', 'Uninstallation'],
+const TABS = [
+  { value: 'services', label: 'Services' },
+  { value: 'brands', label: 'Brands' },
+  { value: 'pricing', label: 'Pricing' },
+  { value: 'emergency', label: 'Emergency Pricing' },
+  { value: 'areas', label: 'Service Areas' },
+  { value: 'availability', label: 'Availability' },
+] as const
+
+type Tab = (typeof TABS)[number]['value']
+
+export default function CatalogPage() {
+  return (
+    <Suspense>
+      <Catalog />
+    </Suspense>
+  )
 }
 
-/** What the network sells and at what price. */
-export default function Catalog() {
-  const store = useStore()
-  const toast = useToast()
-  const s = store.settings
-  const [labour, setLabour] = useState<Record<Appliance, string>>(() => Object.fromEntries(APPLIANCES.map((a) => [a, String(s.labour[a])])) as Record<Appliance, string>)
-  const [fees, setFees] = useState({ surcharge: String(s.emergencySurcharge), commission: String(s.commissionPct), gst: String(s.gstPct) })
-
-  const enabled = BRANDS.reduce((n, b) => n + APPLIANCES.filter((a) => s.matrix[b][a]).length, 0)
-  const labourDirty = APPLIANCES.some((a) => Number(labour[a]) !== s.labour[a])
-  const feesDirty = Number(fees.surcharge) !== s.emergencySurcharge || Number(fees.commission) !== s.commissionPct || Number(fees.gst) !== s.gstPct
-  const valid = (v: string, max = 100000) => v.trim() !== '' && Number(v) >= 0 && Number(v) <= max
+/**
+ * What the network sells and at what price. Services, brands and prices are
+ * edited as a draft and published to the customer app in one step; service
+ * areas and the availability matrix switch immediately.
+ */
+function Catalog() {
+  const params = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+  const raw = params.get('tab')
+  const tab: Tab = TABS.some((t) => t.value === raw) ? (raw as Tab) : 'services'
 
   return (
     <Page>
-      <PageHeader title="Services & Pricing" sub="Brands, appliances and rates offered to customers and technicians" />
-
-      <Card>
-        <CardHeader
-          title="Service availability"
-          sub={`${enabled} of ${BRANDS.length * APPLIANCES.length} brand × appliance pairs bookable`}
-        />
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[640px] text-sm">
-            <thead>
-              <tr>
-                <th className="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-[0.06em] text-faint">Brand</th>
-                {APPLIANCES.map((a) => (
-                  <th key={a} className="px-3 py-3 text-center">
-                    <span className="inline-flex flex-col items-center gap-1.5">
-                      <span className="grid size-9 place-items-center rounded-lg bg-brand-soft text-brand">
-                        <ApplianceGlyph appliance={a} />
-                      </span>
-                      <span className="text-xs font-bold text-ink-2">{APPLIANCE_LABEL[a]}</span>
-                    </span>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {BRANDS.map((b) => (
-                <tr key={b} className="border-t border-line">
-                  <td className="px-5 py-3 font-extrabold">{BRAND_LABEL[b]}</td>
-                  {APPLIANCES.map((a) => (
-                    <td key={a} className="px-3 py-3 text-center">
-                      <Toggle
-                        checked={s.matrix[b][a]}
-                        label={`${BRAND_LABEL[b]} ${APPLIANCE_LABEL[a]}`}
-                        onChange={(on) => {
-                          store.updateSettings((cur) => ({ matrix: { ...cur.matrix, [b]: { ...cur.matrix[b], [a]: on } } }))
-                          toast(`${BRAND_LABEL[b]} ${APPLIANCE_LABEL[a]} ${on ? 'enabled' : 'disabled'}`)
-                        }}
-                      />
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p className="flex items-start gap-2 border-t border-line px-5 py-3 text-xs font-medium text-muted">
-          <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden />
-          Turning a pair off hides it from customer booking and stops technicians receiving offers for it. Bookings already made are not affected.
-        </p>
-      </Card>
-
-      <div className="mt-5 grid gap-5 xl:grid-cols-2">
-        <Card>
-          <CardHeader
-            title="Visit & labour rates"
-            sub="Charged before parts, per appliance"
-            action={
-              <Button
-                size="sm"
-                disabled={!labourDirty || APPLIANCES.some((a) => !valid(labour[a]))}
-                onClick={() => {
-                  store.updateSettings({ labour: Object.fromEntries(APPLIANCES.map((a) => [a, Number(labour[a])])) as Record<Appliance, number> })
-                  toast('Labour rates saved')
-                }}
-              >
-                <Save /> Save
-              </Button>
-            }
-          />
-          <ul className="divide-y divide-line">
-            {APPLIANCES.map((a) => (
-              <li key={a} className="flex items-center gap-3 px-5 py-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-canvas text-ink-2">
-                  <ApplianceGlyph appliance={a} className="size-[18px]" />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-bold">{APPLIANCE_LABEL[a]}</span>
-                  <span className="block text-xs font-medium text-muted">Currently {inr(s.labour[a])}</span>
-                </span>
-                <label className="relative w-32">
-                  <span className="sr-only">{APPLIANCE_LABEL[a]} rate</span>
-                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-faint">₹</span>
-                  <input
-                    type="number"
-                    inputMode="numeric"
-                    min={0}
-                    value={labour[a]}
-                    onChange={(e) => setLabour((l) => ({ ...l, [a]: e.target.value }))}
-                    className={`${inputClass} num pl-7 text-right font-bold`}
-                  />
-                </label>
-              </li>
-            ))}
-          </ul>
-        </Card>
-
-        <Card className="self-start">
-          <CardHeader
-            title="Fees & taxes"
-            sub="Applied to every new booking"
-            action={
-              <Button
-                size="sm"
-                disabled={!feesDirty || !valid(fees.surcharge) || !valid(fees.commission, 100) || !valid(fees.gst, 100)}
-                onClick={() => {
-                  store.updateSettings({ emergencySurcharge: Number(fees.surcharge), commissionPct: Number(fees.commission), gstPct: Number(fees.gst) })
-                  toast('Fees & taxes saved')
-                }}
-              >
-                <Save /> Save
-              </Button>
-            }
-          />
-          <div className="grid gap-4 p-5 sm:grid-cols-3">
-            <Field label="Emergency surcharge (₹)" hint="Added to 24×7 emergency bookings">
-              <input type="number" min={0} value={fees.surcharge} onChange={(e) => setFees((f) => ({ ...f, surcharge: e.target.value }))} className={`${inputClass} num`} />
-            </Field>
-            <Field label="Platform commission (%)" hint="Deducted from technician payouts">
-              <input type="number" min={0} max={100} value={fees.commission} onChange={(e) => setFees((f) => ({ ...f, commission: e.target.value }))} className={`${inputClass} num`} />
-            </Field>
-            <Field label="GST (%)" hint="On labour and parts">
-              <input type="number" min={0} max={100} value={fees.gst} onChange={(e) => setFees((f) => ({ ...f, gst: e.target.value }))} className={`${inputClass} num`} />
-            </Field>
-          </div>
-        </Card>
-      </div>
-
-      <Card className="mt-5">
-        <CardHeader title="Services offered" sub={`${SERVICE_TYPES.length} service types across ${APPLIANCES.length} appliances`} />
-        <div className="grid gap-px bg-line sm:grid-cols-2 xl:grid-cols-5">
-          {APPLIANCES.map((a) => (
-            <div key={a} className="bg-card p-5">
-              <p className="mb-3 flex items-center gap-2 text-sm font-extrabold">
-                <ApplianceGlyph appliance={a} className="size-[18px] text-brand" />
-                {APPLIANCE_LABEL[a]}
-              </p>
-              <ul className="space-y-1.5">
-                {SERVICES[a].map((sv) => (
-                  <li key={sv} className="flex items-center justify-between gap-2 text-[13px] font-semibold text-ink-2">
-                    {sv}
-                    <span className="num text-xs font-bold text-muted">
-                      {sv === 'Installation' || sv === 'Uninstallation' ? inr(Math.round((s.labour[a] * 0.8) / 10) * 10) : sv === 'Gas refill' ? `from ${inr(s.labour[a] + 2200)}` : `from ${inr(s.labour[a])}`}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </Card>
+      <PageHeader title="Services & Pricing" sub="Services, brands, prices and where customers can book — no code changes needed." />
+      <PublishBar />
+      <Tabs
+        className="mb-5"
+        value={tab}
+        onChange={(v) => router.replace(`${pathname}?tab=${v}` as Route, { scroll: false })}
+        options={TABS.map((t) => ({ value: t.value, label: t.label }))}
+      />
+      {tab === 'services' && <ServicesTab />}
+      {tab === 'brands' && <BrandsTab />}
+      {tab === 'pricing' && <PricingTab />}
+      {tab === 'emergency' && <EmergencyTab />}
+      {tab === 'areas' && <AreasTab />}
+      {tab === 'availability' && <AvailabilityTab />}
     </Page>
+  )
+}
+
+/** Draft vs live: how many changes are waiting, and the one button that ships them. */
+function PublishBar() {
+  const store = useStore()
+  const toast = useToast()
+  useTick(60_000)
+  const [confirm, setConfirm] = useState<'publish' | 'discard' | null>(null)
+  const changes = useMemo(() => catalogDiff(store.catalog, store.catalogPublished), [store.catalog, store.catalogPublished])
+  const canPublish = store.can('catalog', 'publish')
+  const n = changes.length
+
+  return (
+    <>
+      {n === 0 ? (
+        <div className="mb-5 flex flex-wrap items-center gap-3 rounded-card border border-line bg-card px-4 py-3 shadow-card">
+          <CircleCheck className="size-5 text-success" aria-hidden />
+          <p className="text-sm font-bold">
+            Live <span className="font-semibold text-muted">· customer app matches · published {ago(store.catalogPublishedAt)}</span>
+          </p>
+        </div>
+      ) : (
+        <div className="mb-5 flex flex-wrap items-center gap-3 rounded-card border border-warning/40 bg-warning-soft px-4 py-3 shadow-card">
+          <span className="size-2.5 rounded-full bg-warning" aria-hidden />
+          <p className="min-w-0 flex-1 text-sm font-bold">
+            {n} unpublished change{n === 1 ? '' : 's'}
+            <span className="block font-semibold text-muted sm:inline"> · Customers see the live version until you publish</span>
+          </p>
+          {canPublish && (
+            <div className="flex gap-2">
+              <Button size="sm" variant="secondary" onClick={() => setConfirm('discard')}>
+                <RotateCcw /> Discard
+              </Button>
+              <Button size="sm" onClick={() => setConfirm('publish')}>
+                <UploadCloud /> Publish to customer app
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+
+      <Modal
+        open={confirm === 'publish'}
+        onClose={() => setConfirm(null)}
+        title={`Publish ${n} change${n === 1 ? '' : 's'}?`}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setConfirm(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                store.publishCatalog()
+                toast(`${n} change${n === 1 ? '' : 's'} published to the customer app`)
+                setConfirm(null)
+              }}
+            >
+              <UploadCloud /> Publish now
+            </Button>
+          </>
+        }
+      >
+        <p className="mb-3 text-sm font-medium text-muted">New bookings use these from the moment you publish. Bookings already made keep their price.</p>
+        <ul className="max-h-[45dvh] space-y-1.5 overflow-y-auto rounded-lg border border-line bg-canvas/60 p-3">
+          {changes.map((c) => (
+            <li key={c} className="flex gap-2 text-[13px] font-semibold text-ink-2">
+              <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-warning" aria-hidden />
+              {c}
+            </li>
+          ))}
+        </ul>
+      </Modal>
+
+      <Modal
+        open={confirm === 'discard'}
+        onClose={() => setConfirm(null)}
+        title="Discard the draft?"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setConfirm(null)}>
+              Keep editing
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => {
+                store.discardCatalog()
+                toast('Draft discarded — back to the live catalogue')
+                setConfirm(null)
+              }}
+            >
+              <RotateCcw /> Discard {n} change{n === 1 ? '' : 's'}
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm font-medium text-muted">Every unpublished change to services, brands and prices goes back to what customers see now.</p>
+      </Modal>
+    </>
   )
 }

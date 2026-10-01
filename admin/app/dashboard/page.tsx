@@ -135,20 +135,22 @@ export default function Dashboard() {
       />
 
       {m.emergencies.map((e) => (
-        <div key={e.id} className="mb-5 flex flex-wrap items-center gap-4 rounded-card border border-danger/30 bg-card p-4 shadow-card ring-1 ring-danger/10">
-          <span className="relative grid size-11 shrink-0 place-items-center rounded-full bg-danger-soft text-danger">
-            <span className="animate-pulse-ring absolute inset-0 rounded-full bg-danger/25" aria-hidden />
-            <Siren className="relative size-5" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-extrabold">
-              Emergency waiting for a technician <span className="font-semibold text-muted">· {ago(e.createdAt)}</span>
-            </p>
-            <p className="truncate text-sm font-medium text-ink-2">
-              {e.id} · {BRAND_LABEL[e.brand]} {APPLIANCE_LABEL[e.appliance]} — {e.issue} · {e.area}
-            </p>
+        <div key={e.id} className="mb-5 rounded-card border border-danger/30 bg-card p-4 shadow-card ring-1 ring-danger/10 sm:flex sm:items-center sm:gap-4">
+          <div className="flex min-w-0 flex-1 items-start gap-3 sm:items-center sm:gap-4">
+            <span className="relative grid size-10 shrink-0 place-items-center rounded-full bg-danger-soft text-danger sm:size-11">
+              <span className="animate-pulse-ring absolute inset-0 rounded-full bg-danger/25" aria-hidden />
+              <Siren className="relative size-5" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-extrabold">
+                Emergency waiting for a technician <span className="whitespace-nowrap font-semibold text-muted">· {ago(e.createdAt)}</span>
+              </p>
+              <p className="mt-0.5 line-clamp-2 text-[13px] font-medium text-ink-2 sm:truncate">
+                {e.id} · {BRAND_LABEL[e.brand]} {APPLIANCE_LABEL[e.appliance]} — {e.issue} · {e.area}
+              </p>
+            </div>
           </div>
-          <div className="flex gap-2">
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:mt-0 sm:flex">
             <Button variant="secondary" size="sm" onClick={() => setOpen(e.id)}>
               View
             </Button>

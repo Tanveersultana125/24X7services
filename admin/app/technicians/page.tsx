@@ -2,9 +2,9 @@
 
 import type { Route } from 'next'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Suspense, useMemo, useState } from 'react'
-import { Check, Download, FileCheck2, FileX2, IdCard, Mail, Phone, ShieldAlert, ShieldCheck, UserPlus, UserRoundCog, X } from 'lucide-react'
-import { BookingDrawer } from '@/components/BookingDrawer'
+import { Suspense, useState } from 'react'
+import { Check, Download, FileCheck2, FileX2, UserPlus, UserRoundCog, X } from 'lucide-react'
+import { DOCS, TechnicianDrawer } from '@/components/tech-drawer'
 import { ApplianceGlyph, BrandTag } from '@/components/glyphs'
 import { useToast } from '@/components/toast'
 import {
@@ -12,8 +12,6 @@ import {
   Button,
   Card,
   Chip,
-  Detail,
-  Drawer,
   Empty,
   Field,
   Modal,
@@ -22,13 +20,10 @@ import {
   Pager,
   Rating,
   SearchInput,
-  SectionLabel,
   Select,
-  StatusChip,
   TableWrap,
   Tabs,
   Toggle,
-  buttonClass,
   inputClass,
   td,
   th,
@@ -36,22 +31,14 @@ import {
 } from '@/components/ui'
 import { APPLIANCES, APPLIANCE_LABEL, BRANDS, BRAND_LABEL, inr, type Appliance, type Brand } from '@/lib/catalog'
 import { cn } from '@/lib/cn'
-import { ago, dateTime, downloadCsv, longDate, matches, telHref, thisMonth } from '@/lib/format'
-import { KYC, OPEN, PRESENCE } from '@/lib/status'
+import { ago, downloadCsv, matches } from '@/lib/format'
+import { KYC, PRESENCE } from '@/lib/status'
 import { useStore } from '@/lib/store'
 import type { Technician } from '@/lib/types'
 
 const PAGE = 25
 
 type TabKey = 'all' | 'online' | 'on_job' | 'offline' | 'applications' | 'suspended'
-
-const DOCS: { key: keyof Technician['docs']; label: string }[] = [
-  { key: 'aadhaar', label: 'Aadhaar' },
-  { key: 'pan', label: 'PAN card' },
-  { key: 'bank', label: 'Bank account' },
-  { key: 'training', label: 'Training certificate' },
-  { key: 'police', label: 'Police verification' },
-]
 
 const presenceDot = { online: 'bg-success', on_job: 'bg-violet', offline: 'bg-faint' } as const
 
@@ -262,6 +249,7 @@ function Application({ t, onOpen }: { t: Technician; onOpen: () => void }) {
   const store = useStore()
   const toast = useToast()
   const missing = DOCS.filter((d) => !t.docs[d.key])
+  const canApprove = store.can('technicians', 'approve')
   return (
     <div className="rounded-card border border-line bg-card p-4">
       <button type="button" onClick={onOpen} className="flex w-full items-center gap-3 text-left">
@@ -291,14 +279,14 @@ function Application({ t, onOpen }: { t: Technician; onOpen: () => void }) {
           <li key={d.key} className="flex items-center gap-3 px-3 py-2">
             {t.docs[d.key] ? <FileCheck2 className="size-4 text-success" aria-hidden /> : <FileX2 className="size-4 text-faint" aria-hidden />}
             <span className={cn('flex-1 text-[13px] font-semibold', t.docs[d.key] ? 'text-ink' : 'text-muted')}>{d.label}</span>
-            <Toggle size="sm" checked={t.docs[d.key]} onChange={(v) => store.setDoc(t.id, d.key, v)} label={`${d.label} verified`} />
+            <Toggle size="sm" checked={t.docs[d.key]} onChange={(v) => canApprove && store.setDoc(t.id, d.key, v)} label={`${d.label} verified`} />
           </li>
         ))}
       </ul>
       <p className={cn('mt-3 text-xs font-semibold', missing.length ? 'text-warning' : 'text-success')}>
         {missing.length ? `Missing: ${missing.map((d) => d.label).join(', ')}` : 'All documents verified — ready to approve'}
       </p>
-      <div className="mt-3 flex gap-2">
+      {canApprove && <div className="mt-3 flex gap-2">
         <Button
           variant="secondary"
           size="sm"
@@ -322,219 +310,8 @@ function Application({ t, onOpen }: { t: Technician; onOpen: () => void }) {
         >
           <Check /> Approve
         </Button>
-      </div>
+      </div>}
     </div>
-  )
-}
-
-/** One technician: profile, performance, work in hand, money held and account standing. */
-function TechnicianDrawer({ t, onClose }: { t?: Technician; onClose: () => void }) {
-  const store = useStore()
-  const toast = useToast()
-  const [booking, setBooking] = useState<string | null>(null)
-  const [confirm, setConfirm] = useState(false)
-
-  const stats = useMemo(() => {
-    if (!t) return null
-    const mine = store.bookings.filter((b) => b.technicianId === t.id)
-    const month = mine.filter((b) => b.status === 'completed' && thisMonth(b.scheduledAt))
-    return {
-      open: mine.filter((b) => OPEN.includes(b.status)).sort((a, z) => a.scheduledAt.localeCompare(z.scheduledAt)),
-      monthJobs: month.length,
-      monthRevenue: month.reduce((s, b) => s + b.amount, 0),
-    }
-  }, [store.bookings, t])
-
-  if (!t || !stats) return null
-  const reviews = store.reviews.filter((r) => r.technicianId === t.id).slice(0, 5)
-  const suspended = t.kyc === 'suspended'
-  const verified = t.kyc === 'verified'
-
-  return (
-    <>
-      <Drawer
-        open
-        onClose={onClose}
-        title={t.name}
-        sub={
-          <span className="flex flex-wrap items-center gap-2 pt-1">
-            <span className="num">{t.id}</span>
-            <Chip tone={KYC[t.kyc].tone}>{KYC[t.kyc].label}</Chip>
-            {verified && <Chip tone={PRESENCE[t.presence].tone}>{PRESENCE[t.presence].label}</Chip>}
-          </span>
-        }
-        footer={
-          <>
-            {(verified || suspended) && (
-              <Button variant="subtle" size="sm" className={cn('mr-auto', !suspended && 'text-danger hover:bg-danger-soft')} onClick={() => setConfirm(true)}>
-                {suspended ? <ShieldCheck /> : <ShieldAlert />} {suspended ? 'Reinstate' : 'Suspend'}
-              </Button>
-            )}
-            <a href={telHref(t.phone)} className={buttonClass('secondary', 'sm')}>
-              <Phone /> Call
-            </a>
-            {t.cashInHand > 0 && (
-              <Button
-                size="sm"
-                onClick={() => {
-                  store.settleCash(t.id)
-                  toast(`Deposit of ${inr(t.cashInHand)} recorded for ${t.name}`)
-                }}
-              >
-                Record deposit · {inr(t.cashInHand)}
-              </Button>
-            )}
-          </>
-        }
-      >
-        <div className="flex items-center gap-4">
-          <span className="relative">
-            <Avatar name={t.name} size={60} side="technician" />
-            <span className={cn('absolute bottom-0.5 right-0.5 size-3.5 rounded-full border-2 border-card', presenceDot[t.presence])} />
-          </span>
-          <div className="min-w-0 space-y-0.5">
-            <p className="flex items-center gap-1.5 text-sm font-bold">
-              <Rating value={t.rating} /> <span className="text-faint">•</span> {t.experienceYears} yrs exp.
-            </p>
-            <p className="num flex items-center gap-2 text-[13px] font-semibold text-ink-2">
-              <Phone className="size-3.5 text-faint" aria-hidden /> {t.phone}
-            </p>
-            <p className="flex items-center gap-2 truncate text-[13px] font-semibold text-ink-2">
-              <Mail className="size-3.5 shrink-0 text-faint" aria-hidden /> {t.email}
-            </p>
-            <p className="text-xs font-medium text-muted">
-              {t.area} · joined {longDate(t.joinedAt)}
-            </p>
-          </div>
-        </div>
-
-        <SectionLabel>Performance</SectionLabel>
-        <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {[
-            ['Rating', t.rating ? `${t.rating.toFixed(2)}★` : '—', `${t.ratingCount.toLocaleString('en-IN')} ratings`],
-            ['Completed jobs', t.completedJobs.toLocaleString('en-IN'), 'Lifetime'],
-            ['This month', String(stats.monthJobs), inr(stats.monthRevenue)],
-            ['Acceptance', t.acceptanceRate ? `${t.acceptanceRate}%` : '—', 'Offers accepted'],
-            ['On time', t.onTimeRate ? `${t.onTimeRate}%` : '—', 'Arrived in slot'],
-            ['Cash held', inr(t.cashInHand), 'Not yet deposited'],
-          ].map(([k, v, s]) => (
-            <div key={k} className="rounded-lg border border-line p-3">
-              <dt className="text-[11px] font-bold uppercase tracking-[0.06em] text-faint">{k}</dt>
-              <dd className="num mt-0.5 text-base font-extrabold">{v}</dd>
-              <dd className="text-[11px] font-medium text-muted">{s}</dd>
-            </div>
-          ))}
-        </dl>
-
-        <SectionLabel>Certified for</SectionLabel>
-        <div className="space-y-2 rounded-card border border-line p-4">
-          <div className="flex flex-wrap gap-1.5">
-            {t.brands.map((b) => (
-              <BrandTag key={b} brand={b} />
-            ))}
-          </div>
-          <div className="flex flex-wrap gap-x-4 gap-y-2">
-            {t.appliances.map((a) => (
-              <span key={a} className="flex items-center gap-1.5 text-[13px] font-semibold text-ink-2">
-                <ApplianceGlyph appliance={a} className="size-4 text-brand" /> {APPLIANCE_LABEL[a]}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <SectionLabel>Documents</SectionLabel>
-        <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {DOCS.map((d) => (
-            <li key={d.key} className="flex items-center gap-2 rounded-lg border border-line px-3 py-2 text-[13px] font-semibold">
-              {t.docs[d.key] ? <FileCheck2 className="size-4 text-success" aria-hidden /> : <IdCard className="size-4 text-faint" aria-hidden />}
-              <span className={cn('flex-1', !t.docs[d.key] && 'text-muted')}>{d.label}</span>
-              <span className={cn('text-[11px] font-bold', t.docs[d.key] ? 'text-success' : 'text-warning')}>{t.docs[d.key] ? 'Verified' : 'Missing'}</span>
-            </li>
-          ))}
-        </ul>
-
-        <SectionLabel>Current & upcoming jobs · {stats.open.length}</SectionLabel>
-        {stats.open.length === 0 ? (
-          <p className="text-sm font-medium text-muted">Nothing assigned right now.</p>
-        ) : (
-          <ul className="divide-y divide-line rounded-card border border-line">
-            {stats.open.map((b) => (
-              <li key={b.id}>
-                <button type="button" onClick={() => setBooking(b.id)} className="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-canvas/60">
-                  <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
-                    <ApplianceGlyph appliance={b.appliance} className="size-4" />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[13px] font-bold">
-                      {BRAND_LABEL[b.brand]} {APPLIANCE_LABEL[b.appliance]} · {b.area}
-                    </span>
-                    <span className="block text-xs font-medium text-muted">
-                      {b.id} · {dateTime(b.scheduledAt)}
-                    </span>
-                  </span>
-                  <StatusChip status={b.status} />
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <SectionLabel>Recent reviews</SectionLabel>
-        {reviews.length === 0 ? (
-          <p className="text-sm font-medium text-muted">No reviews yet.</p>
-        ) : (
-          <ul className="space-y-2">
-            {reviews.map((r) => (
-              <li key={r.id} className="rounded-lg border border-line px-3 py-2.5">
-                <div className="flex items-center justify-between gap-2">
-                  <Rating value={r.rating} />
-                  <span className="text-xs font-medium text-faint">
-                    {store.customer(r.customerId)?.name} · {ago(r.at)}
-                  </span>
-                </div>
-                {r.text && <p className="mt-1 text-[13px] font-medium text-ink-2">{r.text}</p>}
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <dl className="mt-6 grid grid-cols-2 gap-3 text-xs">
-          <Detail label="Base area">{t.area}</Detail>
-          <Detail label="Account">{KYC[t.kyc].label}</Detail>
-        </dl>
-      </Drawer>
-
-      <BookingDrawer id={booking} onClose={() => setBooking(null)} />
-
-      <Modal
-        open={confirm}
-        onClose={() => setConfirm(false)}
-        title={suspended ? `Reinstate ${t.name}?` : `Suspend ${t.name}?`}
-        footer={
-          <>
-            <Button variant="secondary" onClick={() => setConfirm(false)}>
-              Cancel
-            </Button>
-            <Button
-              variant={suspended ? 'success' : 'danger'}
-              onClick={() => {
-                store.setKyc(t.id, suspended ? 'verified' : 'suspended')
-                toast(`${t.name} ${suspended ? 'reinstated' : 'suspended'}`)
-                setConfirm(false)
-              }}
-            >
-              {suspended ? 'Reinstate' : 'Suspend technician'}
-            </Button>
-          </>
-        }
-      >
-        <p className="text-sm font-medium text-muted">
-          {suspended
-            ? 'They will be able to go online and receive jobs again.'
-            : `They go offline at once and stop receiving jobs.${stats.open.length ? ` ${stats.open.length} open job${stats.open.length === 1 ? '' : 's'} will need reassigning.` : ''}`}
-        </p>
-      </Modal>
-    </>
   )
 }
 

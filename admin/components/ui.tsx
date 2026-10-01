@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import type { Route } from 'next'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { ArrowDownRight, ArrowUpRight, Search, Star, UserRound, Wrench, X } from 'lucide-react'
 import { cn } from '@/lib/cn'
@@ -195,16 +195,17 @@ export function StatCard({
 
 /* ---------------------------------------------------------------- Inputs */
 
-export function Toggle({ checked, onChange, label, size = 'md' }: { checked: boolean; onChange: (v: boolean) => void; label: string; size?: 'sm' | 'md' }) {
+export function Toggle({ checked, onChange, label, size = 'md', disabled }: { checked: boolean; onChange: (v: boolean) => void; label: string; size?: 'sm' | 'md'; disabled?: boolean }) {
   return (
     <button
       type="button"
       role="switch"
       aria-checked={checked}
       aria-label={label}
+      disabled={disabled}
       onClick={() => onChange(!checked)}
       className={cn(
-        'relative inline-flex shrink-0 items-center rounded-full transition-colors duration-200',
+        'relative inline-flex shrink-0 items-center rounded-full transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50',
         size === 'sm' ? 'h-5 w-9' : 'h-6 w-11',
         checked ? 'bg-brand' : 'bg-line-strong'
       )}
@@ -377,18 +378,38 @@ export const tr = 'transition-colors hover:bg-canvas/70'
 
 /* ---------------------------------------------------------------- Overlays */
 
+/**
+ * How many overlays hold the page still. A count, not a saved "previous"
+ * value: a drawer and the modal on top of it re-run their effects in an
+ * order React does not promise, and restoring a saved value left the page
+ * stuck at overflow:hidden — no scrolling at all on a phone.
+ */
+let locks = 0
+
+function lockScroll() {
+  locks++
+  document.body.style.overflow = 'hidden'
+  return () => {
+    locks = Math.max(0, locks - 1)
+    if (locks === 0) document.body.style.overflow = ''
+  }
+}
+
 function useEscape(open: boolean, onClose: () => void) {
+  const close = useRef(onClose)
+  useEffect(() => {
+    close.current = onClose
+  })
   useEffect(() => {
     if (!open) return
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && close.current()
     document.addEventListener('keydown', onKey)
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
+    const unlock = lockScroll()
     return () => {
       document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = prev
+      unlock()
     }
-  }, [open, onClose])
+  }, [open])
 }
 
 /** A record's detail, slid in from the right so the list stays in view. */

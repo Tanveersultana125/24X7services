@@ -1,43 +1,32 @@
 'use client'
 
-import Link from 'next/link'
 import type { Route } from 'next'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useMemo, useState } from 'react'
-import { Ban, Download, Gift, Mail, MapPin, Phone, Repeat, UserPlus, Users, Wallet } from 'lucide-react'
-import { BookingDrawer } from '@/components/BookingDrawer'
-import { ApplianceGlyph } from '@/components/glyphs'
-import { useToast } from '@/components/toast'
+import { Ban, Download, Repeat, UserPlus, Users } from 'lucide-react'
+import { CustomerDrawer } from '@/components/cust-drawer'
 import {
   Avatar,
   Button,
   Card,
   Chip,
-  Detail,
-  Drawer,
   Empty,
-  Modal,
   Page,
   PageHeader,
   Pager,
-  Rating,
   SearchInput,
-  SectionLabel,
   Select,
   StatCard,
-  StatusChip,
   TableWrap,
   Tabs,
-  buttonClass,
   td,
   th,
   tr,
 } from '@/components/ui'
-import { APPLIANCE_LABEL, BRAND_LABEL, inr } from '@/lib/catalog'
+import { inr } from '@/lib/catalog'
 import { cn } from '@/lib/cn'
-import { ago, dateTime, downloadCsv, longDate, matches, telHref, withinDays } from '@/lib/format'
+import { ago, downloadCsv, longDate, matches, withinDays } from '@/lib/format'
 import { AREAS } from '@/lib/seed'
-import { TICKET_STATUS } from '@/lib/status'
 import { useStore } from '@/lib/store'
 import type { Booking, Customer } from '@/lib/types'
 
@@ -117,7 +106,7 @@ function Customers() {
         <StatCard label="Total customers" value={store.customers.length} icon={<Users />} />
         <StatCard label="New · last 30 days" value={store.customers.filter((c) => withinDays(c.joinedAt, 30)).length} icon={<UserPlus />} toneName="success" />
         <StatCard label="Repeat rate" value={`${repeat}%`} icon={<Repeat />} toneName="info" hint={<span>Booked more than once</span>} />
-        <StatCard label="Blocked" value={store.customers.filter((c) => c.status === 'blocked').length} icon={<Ban />} toneName="danger" />
+        <StatCard label="Suspended" value={store.customers.filter((c) => c.status === 'blocked').length} icon={<Ban />} toneName="danger" />
       </section>
 
       <Card className="mt-5">
@@ -131,7 +120,7 @@ function Customers() {
           options={[
             { value: 'all', label: 'All', count: rows.length },
             { value: 'active', label: 'Active', count: rows.filter((r) => r.c.status === 'active').length },
-            { value: 'blocked', label: 'Blocked', count: rows.filter((r) => r.c.status === 'blocked').length },
+            { value: 'blocked', label: 'Suspended', count: rows.filter((r) => r.c.status === 'blocked').length },
           ]}
         />
         <div className="flex flex-col gap-2 border-b border-line p-4 sm:flex-row">
@@ -193,7 +182,7 @@ function Customers() {
                   <td className={cn(td, 'text-[13px] font-medium text-muted')}>{last ? ago(last) : '—'}</td>
                   <td className={cn(td, 'num text-right font-semibold')}>{c.walletCredit ? inr(c.walletCredit) : '—'}</td>
                   <td className={td}>
-                    <Chip tone={c.status === 'active' ? 'success' : 'danger'}>{c.status === 'active' ? 'Active' : 'Blocked'}</Chip>
+                    <Chip tone={c.status === 'active' ? 'success' : 'danger'}>{c.status === 'active' ? 'Active' : 'Suspended'}</Chip>
                   </td>
                 </tr>
               ))}
@@ -203,234 +192,10 @@ function Customers() {
         <Pager page={page} pages={pages} total={filtered.length} onPage={setPage} />
       </Card>
 
-      <CustomerDrawer row={rows.find((r) => r.c.id === openId)} onClose={() => setOpen(null)} />
+      {(() => {
+        const row = rows.find((r) => r.c.id === openId)
+        return <CustomerDrawer c={row?.c} bookings={row?.bookings ?? []} spend={row?.spend ?? 0} onClose={() => setOpen(null)} />
+      })()}
     </Page>
-  )
-}
-
-/** One customer: who they are, their money with us, and every booking, ticket and review. */
-function CustomerDrawer({ row, onClose }: { row?: Row; onClose: () => void }) {
-  const store = useStore()
-  const toast = useToast()
-  const [booking, setBooking] = useState<string | null>(null)
-  const [credit, setCredit] = useState(false)
-  const [amount, setAmount] = useState(200)
-  const [blocking, setBlocking] = useState(false)
-  if (!row) return null
-  const { c, bookings, spend } = row
-  const rated = bookings.filter((b) => b.rating)
-  const tickets = store.tickets.filter((t) => t.side === 'customer' && t.personId === c.id)
-  const reviews = store.reviews.filter((r) => r.customerId === c.id)
-  const blocked = c.status === 'blocked'
-
-  return (
-    <>
-      <Drawer
-        open
-        onClose={onClose}
-        title={c.name}
-        sub={
-          <span className="flex flex-wrap items-center gap-2 pt-1">
-            <span className="num">{c.id}</span>
-            <Chip tone={blocked ? 'danger' : 'success'}>{blocked ? 'Blocked' : 'Active'}</Chip>
-            <span>Joined {longDate(c.joinedAt)}</span>
-          </span>
-        }
-        footer={
-          <>
-            <Button variant="subtle" size="sm" className={cn('mr-auto', blocked ? '' : 'text-danger hover:bg-danger-soft')} onClick={() => setBlocking(true)}>
-              <Ban /> {blocked ? 'Unblock customer' : 'Block customer'}
-            </Button>
-            <a href={telHref(c.phone)} className={buttonClass('secondary', 'sm')}>
-              <Phone /> Call
-            </a>
-            <Button size="sm" onClick={() => setCredit(true)}>
-              <Gift /> Add credit
-            </Button>
-          </>
-        }
-      >
-        <div className="flex items-center gap-4">
-          <Avatar name={c.name} size={56} side="customer" />
-          <div className="min-w-0 space-y-1 text-sm font-semibold text-ink-2">
-            <p className="num flex items-center gap-2">
-              <Phone className="size-4 text-faint" aria-hidden /> {c.phone}
-            </p>
-            <p className="flex items-center gap-2 truncate">
-              <Mail className="size-4 shrink-0 text-faint" aria-hidden /> {c.email}
-            </p>
-          </div>
-        </div>
-        <p className="mt-3 flex items-start gap-2 text-sm font-medium text-ink-2">
-          <MapPin className="mt-0.5 size-4 shrink-0 text-faint" aria-hidden /> {c.address}
-        </p>
-
-        <dl className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            ['Bookings', String(bookings.length)],
-            ['Lifetime spend', inr(spend)],
-            ['Avg rating given', rated.length ? (rated.reduce((s, b) => s + b.rating!, 0) / rated.length).toFixed(1) + '★' : '—'],
-            ['Cancellations', String(bookings.filter((b) => b.status === 'cancelled' || b.status === 'refunded').length)],
-          ].map(([k, v]) => (
-            <div key={k} className="rounded-lg border border-line p-3">
-              <dt className="text-[11px] font-bold uppercase tracking-[0.06em] text-faint">{k}</dt>
-              <dd className="num mt-0.5 text-base font-extrabold">{v}</dd>
-            </div>
-          ))}
-        </dl>
-
-        <SectionLabel>Wallet & referrals</SectionLabel>
-        <dl className="grid grid-cols-3 gap-4 rounded-card border border-line p-4">
-          <Detail label="Wallet credit">
-            <span className="num flex items-center gap-1.5">
-              <Wallet className="size-4 text-faint" aria-hidden /> {inr(c.walletCredit)}
-            </span>
-          </Detail>
-          <Detail label="Referral code">
-            <span className="font-mono text-[13px]">{c.referralCode}</span>
-          </Detail>
-          <Detail label="Friends referred">{c.referrals}</Detail>
-        </dl>
-
-        <SectionLabel>Booking history · {bookings.length}</SectionLabel>
-        {bookings.length === 0 ? (
-          <p className="text-sm font-medium text-muted">No bookings yet.</p>
-        ) : (
-          <ul className="divide-y divide-line rounded-card border border-line">
-            {bookings.map((b) => (
-              <li key={b.id}>
-                <button type="button" onClick={() => setBooking(b.id)} className="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-canvas/60">
-                  <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-brand-soft text-brand">
-                    <ApplianceGlyph appliance={b.appliance} className="size-4" />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[13px] font-bold">
-                      {BRAND_LABEL[b.brand]} {APPLIANCE_LABEL[b.appliance]} · {b.service}
-                    </span>
-                    <span className="block text-xs font-medium text-muted">
-                      {b.id} · {dateTime(b.scheduledAt)}
-                    </span>
-                  </span>
-                  <span className="hidden text-right sm:block">
-                    <span className="num block text-[13px] font-bold">{inr(b.amount)}</span>
-                  </span>
-                  <StatusChip status={b.status} />
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <SectionLabel>Support tickets · {tickets.length}</SectionLabel>
-        {tickets.length === 0 ? (
-          <p className="text-sm font-medium text-muted">No tickets raised.</p>
-        ) : (
-          <ul className="space-y-2">
-            {tickets.map((t) => (
-              <li key={t.id}>
-                <Link href={`/support/?id=${t.id}` as Route} className="flex items-center gap-3 rounded-lg border border-line px-3 py-2.5 hover:bg-canvas/60">
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[13px] font-bold">{t.subject}</span>
-                    <span className="block text-xs font-medium text-muted">
-                      {t.id} · {ago(t.createdAt)}
-                    </span>
-                  </span>
-                  <Chip tone={TICKET_STATUS[t.status].tone}>{TICKET_STATUS[t.status].label}</Chip>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <SectionLabel>Reviews written · {reviews.length}</SectionLabel>
-        {reviews.length === 0 ? (
-          <p className="text-sm font-medium text-muted">No reviews yet.</p>
-        ) : (
-          <ul className="space-y-2">
-            {reviews.map((r) => (
-              <li key={r.id} className="rounded-lg border border-line px-3 py-2.5">
-                <div className="flex items-center justify-between gap-2">
-                  <Rating value={r.rating} />
-                  <span className="text-xs font-medium text-faint">
-                    for {store.technician(r.technicianId)?.name} · {ago(r.at)}
-                  </span>
-                </div>
-                {r.text && <p className="mt-1 text-[13px] font-medium text-ink-2">{r.text}</p>}
-              </li>
-            ))}
-          </ul>
-        )}
-      </Drawer>
-
-      <BookingDrawer id={booking} onClose={() => setBooking(null)} />
-
-      <Modal
-        open={credit}
-        onClose={() => setCredit(false)}
-        title={`Add wallet credit for ${c.name}`}
-        footer={
-          <>
-            <Button variant="secondary" onClick={() => setCredit(false)}>
-              Cancel
-            </Button>
-            <Button
-              disabled={amount <= 0}
-              onClick={() => {
-                store.addWalletCredit(c.id, amount)
-                toast(`${inr(amount)} credit added for ${c.name}`)
-                setCredit(false)
-              }}
-            >
-              Add {inr(amount)}
-            </Button>
-          </>
-        }
-      >
-        <p className="mb-3 text-sm font-medium text-muted">Credit lands in the customer’s 24X7 Wallet and applies to their next booking.</p>
-        <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Amount">
-          {[100, 200, 500].map((v) => (
-            <button
-              key={v}
-              type="button"
-              role="radio"
-              aria-checked={amount === v}
-              onClick={() => setAmount(v)}
-              className={cn('num h-12 rounded-lg border text-base font-extrabold transition-colors', amount === v ? 'border-brand bg-brand-soft text-brand ring-1 ring-brand' : 'border-line-strong hover:border-ink-2')}
-            >
-              {inr(v)}
-            </button>
-          ))}
-        </div>
-      </Modal>
-
-      <Modal
-        open={blocking}
-        onClose={() => setBlocking(false)}
-        title={blocked ? `Unblock ${c.name}?` : `Block ${c.name}?`}
-        footer={
-          <>
-            <Button variant="secondary" onClick={() => setBlocking(false)}>
-              Cancel
-            </Button>
-            <Button
-              variant={blocked ? 'primary' : 'danger'}
-              onClick={() => {
-                store.setCustomerStatus(c.id, blocked ? 'active' : 'blocked')
-                toast(`${c.name} ${blocked ? 'unblocked' : 'blocked'}`)
-                setBlocking(false)
-              }}
-            >
-              {blocked ? 'Unblock' : 'Block customer'}
-            </Button>
-          </>
-        }
-      >
-        <p className="text-sm font-medium text-muted">
-          {blocked
-            ? 'They will be able to sign in and book services again.'
-            : 'They will not be able to place new bookings. Open bookings stay as they are until you cancel them.'}
-        </p>
-      </Modal>
-    </>
   )
 }

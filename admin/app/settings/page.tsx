@@ -1,59 +1,34 @@
 'use client'
 
 import { useState } from 'react'
-import { Bell, Database, MapPinned, ScrollText, Settings2, Siren, UserPlus, Users } from 'lucide-react'
+import Link from 'next/link'
+import { Bell, ChevronRight, Database, FileClock, MapPinned, Settings2, ShieldCheck, Siren } from 'lucide-react'
 import { useToast } from '@/components/toast'
-import { Avatar, Button, Card, CardHeader, Chip, Field, Modal, Page, PageHeader, Select, Toggle, inputClass } from '@/components/ui'
+import { Button, Card, CardHeader, Chip, Modal, Page, PageHeader, Toggle, inputClass } from '@/components/ui'
 import { cn } from '@/lib/cn'
-import { ago } from '@/lib/format'
-import type { Tone } from '@/lib/status'
 import { ADMIN, useStore } from '@/lib/store'
-import type { ActivityKind, TeamMember } from '@/lib/types'
 
 const SECTIONS = [
   { id: 'operations', label: 'Operations', icon: Settings2 },
   { id: 'areas', label: 'Service areas', icon: MapPinned },
-  { id: 'team', label: 'Team & roles', icon: Users },
   { id: 'notifications', label: 'Notifications', icon: Bell },
-  { id: 'audit', label: 'Audit log', icon: ScrollText },
+  { id: 'access', label: 'Access & audit', icon: ShieldCheck },
   { id: 'demo', label: 'Demo data', icon: Database },
 ] as const
 
-const ROLE_TONE: Record<TeamMember['role'], Tone> = {
-  'Super admin': 'danger',
-  Operations: 'brand',
-  Dispatcher: 'info',
-  Finance: 'success',
-  Support: 'violet',
-}
-
-const KINDS: { value: 'all' | ActivityKind; label: string }[] = [
-  { value: 'all', label: 'All activity' },
-  { value: 'booking', label: 'Bookings' },
-  { value: 'dispatch', label: 'Dispatch' },
-  { value: 'payment', label: 'Payments' },
-  { value: 'technician', label: 'Technicians' },
-  { value: 'customer', label: 'Customers' },
-  { value: 'support', label: 'Support' },
-  { value: 'system', label: 'System' },
-]
-
-/** How the console and the network behave, who can use it, and what they did. */
+/** How the console and the network behave. Staff and the audit trail live on their own pages. */
 export default function SettingsPage() {
   const store = useStore()
   const toast = useToast()
   const s = store.settings
   const [sla, setSla] = useState(String(s.emergencySlaMin))
-  const [inviting, setInviting] = useState(false)
   const [resetting, setResetting] = useState(false)
-  const [kind, setKind] = useState<'all' | ActivityKind>('all')
   const [notify, setNotify] = useState({ emergency: true, unassigned: true, kyc: true, tickets: true, payouts: false, digest: true })
   const activeAreas = s.areas.filter((a) => a.active).length
-  const log = store.activity.filter((a) => kind === 'all' || a.kind === kind)
 
   return (
     <Page>
-      <PageHeader title="Settings" sub={`Signed in as ${ADMIN.name} · ${ADMIN.role}`} />
+      <PageHeader title="Settings" sub={`Signed in as ${ADMIN.name} · ${store.as}`} />
 
       <div className="lg:grid lg:grid-cols-[200px_1fr] lg:gap-8">
         <nav aria-label="Settings sections" className="no-scrollbar -mx-4 mb-5 flex gap-1 overflow-x-auto px-4 lg:sticky lg:top-24 lg:mx-0 lg:mb-0 lg:flex-col lg:self-start lg:px-0">
@@ -137,32 +112,30 @@ export default function SettingsPage() {
             </ul>
           </Card>
 
-          <Card id="team" className="scroll-mt-24">
-            <CardHeader
-              title="Team & roles"
-              sub={`${s.team.length} staff with console access`}
-              action={
-                <Button size="sm" onClick={() => setInviting(true)}>
-                  <UserPlus /> Invite member
-                </Button>
-              }
-            />
-            <ul className="divide-y divide-line">
-              {s.team.map((m) => (
-                <li key={m.email} className="flex flex-wrap items-center gap-3 px-5 py-3">
-                  <Avatar name={m.name} size={36} />
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-bold">
-                      {m.name}
-                      {m.email === ADMIN.email && <span className="ml-2 text-xs font-semibold text-faint">(you)</span>}
-                    </span>
-                    <span className="block truncate text-xs font-medium text-muted">{m.email}</span>
-                  </span>
-                  <Chip tone={ROLE_TONE[m.role]}>{m.role}</Chip>
-                  <span className="w-24 text-right text-xs font-semibold text-faint">Active {ago(m.lastActive)}</span>
-                </li>
-              ))}
-            </ul>
+          <Card id="access" className="scroll-mt-24">
+            <CardHeader title="Access & accountability" sub="Staff, roles and the record of every change now have their own pages" />
+            <div className="grid gap-3 p-5 sm:grid-cols-2">
+              <Link href="/admins" className="flex items-center gap-3 rounded-lg border border-line p-4 transition-colors hover:border-line-strong hover:bg-canvas/60">
+                <span className="grid size-9 place-items-center rounded-lg bg-brand-soft text-brand">
+                  <ShieldCheck className="size-4" aria-hidden />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-bold">Admin Users</span>
+                  <span className="block text-xs font-medium text-muted">{store.admins.length} staff · roles & permissions</span>
+                </span>
+                <ChevronRight className="size-4 text-faint" aria-hidden />
+              </Link>
+              <Link href="/audit" className="flex items-center gap-3 rounded-lg border border-line p-4 transition-colors hover:border-line-strong hover:bg-canvas/60">
+                <span className="grid size-9 place-items-center rounded-lg bg-brand-soft text-brand">
+                  <FileClock className="size-4" aria-hidden />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-bold">Audit Logs</span>
+                  <span className="block text-xs font-medium text-muted">{store.audit.length} recorded changes · read-only</span>
+                </span>
+                <ChevronRight className="size-4 text-faint" aria-hidden />
+              </Link>
+            </div>
           </Card>
 
           <Card id="notifications" className="scroll-mt-24">
@@ -192,29 +165,6 @@ export default function SettingsPage() {
             </ul>
           </Card>
 
-          <Card id="audit" className="scroll-mt-24">
-            <CardHeader
-              title="Audit log"
-              sub="Every change made from the console and by the system"
-              action={<Select value={kind} onChange={setKind} options={KINDS} label="Filter activity" className="h-8 py-1 text-xs" />}
-            />
-            <ol className="max-h-[420px] divide-y divide-line overflow-y-auto">
-              {log.length === 0 && <li className="px-5 py-8 text-center text-sm font-semibold text-muted">No activity of this kind yet.</li>}
-              {log.map((a) => (
-                <li key={a.id} className="flex items-start gap-3 px-5 py-2.5">
-                  <Chip tone="neutral" dot={false} className="mt-0.5 w-20 justify-center capitalize">
-                    {a.kind}
-                  </Chip>
-                  <span className="min-w-0 flex-1 text-[13px] font-semibold text-ink-2">{a.text}</span>
-                  <span className="shrink-0 text-right text-[11px] font-medium text-faint">
-                    <span className="block font-semibold text-muted">{a.actor}</span>
-                    {ago(a.at)}
-                  </span>
-                </li>
-              ))}
-            </ol>
-          </Card>
-
           <Card id="demo" className="scroll-mt-24">
             <CardHeader title="Demo data" sub="This console runs on a seeded month of the Hyderabad network, saved on this device" />
             <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
@@ -226,8 +176,6 @@ export default function SettingsPage() {
           </Card>
         </div>
       </div>
-
-      <Invite open={inviting} onClose={() => setInviting(false)} />
 
       <Modal
         open={resetting}
@@ -266,54 +214,5 @@ function Line({ title, sub, children }: { title: string; sub: string; children: 
       </span>
       {children}
     </li>
-  )
-}
-
-const ROLES: TeamMember['role'][] = ['Operations', 'Dispatcher', 'Finance', 'Support', 'Super admin']
-
-function Invite({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const toast = useToast()
-  const [email, setEmail] = useState('')
-  const [role, setRole] = useState<TeamMember['role']>('Dispatcher')
-  const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
-  const close = () => {
-    setEmail('')
-    onClose()
-  }
-  return (
-    <Modal
-      open={open}
-      onClose={close}
-      title="Invite a team member"
-      footer={
-        <>
-          <Button variant="secondary" onClick={close}>
-            Cancel
-          </Button>
-          <Button
-            disabled={!ok}
-            onClick={() => {
-              toast(`Invite sent to ${email.trim()} as ${role}`)
-              close()
-            }}
-          >
-            Send invite
-          </Button>
-        </>
-      }
-    >
-      <div className="space-y-3">
-        <Field label="Work email">
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@24x7services.in" className={inputClass} />
-        </Field>
-        <Field label="Role" hint="Roles decide which sections of the console they can change.">
-          <select value={role} onChange={(e) => setRole(e.target.value as TeamMember['role'])} className={inputClass}>
-            {ROLES.map((r) => (
-              <option key={r}>{r}</option>
-            ))}
-          </select>
-        </Field>
-      </div>
-    </Modal>
   )
 }

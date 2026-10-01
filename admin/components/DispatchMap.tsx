@@ -56,13 +56,14 @@ export function DispatchMap({
 }) {
   const [hover, setHover] = useState<Pin | null>(null)
 
-  const techs = technicians.filter((t) => t.kyc === 'verified' && layers.techs && (layers.offline || t.presence !== 'offline'))
+  // Only technicians who share their location are drawn; dispatch sees the rest in the table.
+  const techs = technicians.filter((t) => t.kyc === 'verified' && t.tracking && layers.techs && (layers.offline || t.presence !== 'offline'))
   const routes = useMemo(
     () =>
       bookings
         .filter((b) => LIVE.includes(b.status) && b.technicianId)
         .map((b) => ({ b, t: technicians.find((t) => t.id === b.technicianId) }))
-        .filter((r): r is { b: Booking; t: Technician } => !!r.t),
+        .filter((r): r is { b: Booking; t: Technician } => !!r.t && r.t.tracking),
     [bookings, technicians]
   )
 

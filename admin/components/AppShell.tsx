@@ -6,6 +6,12 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   BadgePercent,
+  Bot,
+  ChevronRight,
+  FileClock,
+  Images,
+  Lock,
+  ShieldCheck,
   Bell,
   BriefcaseBusiness,
   ChartColumn,
@@ -28,6 +34,8 @@ import {
 import { cn } from '@/lib/cn'
 import { ago, matches } from '@/lib/format'
 import { ADMIN, useStore, useTick } from '@/lib/store'
+import { ROUTE_MODULE } from '@/lib/control'
+import { ADMIN_ROLES, type AdminRole } from '@/lib/types'
 import { APPLIANCE_LABEL, BRAND_LABEL } from '@/lib/catalog'
 import { Avatar, type Side } from './ui'
 import { Logo } from './Logo'
@@ -75,9 +83,21 @@ const NAV: { group: string; side?: Side; items: Item[] }[] = [
       { href: '/reports', label: 'Reports', icon: ChartColumn },
     ],
   },
+  { group: 'AI Center', items: [{ href: '/ai', label: 'AI Center', icon: Bot }] },
+  { group: 'Content', items: [{ href: '/content', label: 'Content & Media', icon: Images }] },
+  {
+    group: 'System',
+    items: [
+      { href: '/admins', label: 'Admin Users', icon: ShieldCheck },
+      { href: '/audit', label: 'Audit Logs', icon: FileClock },
+      { href: '/settings', label: 'Settings', icon: Settings },
+    ],
+  },
 ]
 
-const TITLES: Record<string, string> = Object.fromEntries(NAV.flatMap((g) => g.items.map((i) => [i.href, i.label])).concat([['/settings', 'Settings']]))
+const COLLAPSE_KEY = 'admin.nav.collapsed'
+
+const TITLES: Record<string, string> = Object.fromEntries(NAV.flatMap((g) => g.items.map((i) => [i.href, i.label])))
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -127,7 +147,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <div className="flex min-h-dvh min-w-0 flex-1 flex-col">
           <TopBar onMenu={() => setMenuOpen(true)} title={TITLES['/' + (pathname.split('/')[1] ?? '')] ?? 'Admin'} />
-          <div className="flex-1">{children}</div>
+          <div className="flex-1">
+            <Guard path={'/' + (pathname.split('/')[1] ?? '')}>{children}</Guard>
+          </div>
         </div>
       </div>
     </ToastProvider>
@@ -156,6 +178,23 @@ function SidebarBody() {
   const badges = useBadges()
   const online = store.technicians.filter((t) => t.presence !== 'offline' && t.kyc === 'verified').length
   const verified = store.technicians.filter((t) => t.kyc === 'verified').length
+  const [collapsed, setCollapsed] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem(COLLAPSE_KEY) ?? '[]') as string[]
+    } catch {
+      return []
+    }
+  })
+  const toggle = (group: string) => {
+    const next = collapsed.includes(group) ? collapsed.filter((g) => g !== group) : [...collapsed, group]
+    setCollapsed(next)
+    try {
+      localStorage.setItem(COLLAPSE_KEY, JSON.stringify(next))
+    } catch {
+      /* per-viewer convenience only */
+    }
+  }
+  const groups = NAV.map((g) => ({ ...g, items: g.items.filter((i) => store.can(ROUTE_MODULE[i.href] ?? 'dashboard')) })).filter((g) => g.items.length)
   return (
     <>
       <div className="flex h-16 shrink-0 items-center border-b border-line px-5">
@@ -165,18 +204,26 @@ function SidebarBody() {
       </div>
 
       <nav aria-label="Admin" className="flex-1 overflow-y-auto px-3 py-3">
-        {NAV.map((g) => (
-          <div key={g.group} className="mb-3 last:mb-0">
-            <p
+        {groups.map((g) => {
+          // The group holding the current page never folds away.
+          const hasActive = g.items.some((i) => pathname === i.href || pathname.startsWith(`${i.href}/`))
+          const shut = collapsed.includes(g.group) && !hasActive
+          return (
+          <div key={g.group} className="mb-2 last:mb-0">
+            <button
+              type="button"
+              onClick={() => toggle(g.group)}
+              aria-expanded={!shut}
               className={cn(
-                'flex items-center gap-1.5 px-3 pb-1.5 pt-2 text-[10.5px] font-extrabold uppercase tracking-[0.14em]',
-                g.side === 'customer' ? 'text-cust' : g.side === 'technician' ? 'text-tech' : 'text-faint'
+                'group/h flex w-full items-center gap-1.5 rounded-md px-3 pb-1.5 pt-2 text-left text-[10.5px] font-extrabold uppercase tracking-[0.14em]',
+                g.side === 'customer' ? 'text-cust' : g.side === 'technician' ? 'text-tech' : 'text-faint hover:text-muted'
               )}
             >
               {g.side && <span className={cn('size-1.5 rounded-full', g.side === 'customer' ? 'bg-cust' : 'bg-tech')} aria-hidden />}
-              {g.group}
-            </p>
-            <ul className={cn('space-y-0.5', g.side && 'ml-1.5 border-l-2 pl-1.5', g.side === 'customer' && 'border-cust/25', g.side === 'technician' && 'border-tech/25')}>
+              <span className="flex-1">{g.group}</span>
+              <ChevronDown className={cn('size-3.5 opacity-0 transition-[transform,opacity] group-hover/h:opacity-70', shut && '-rotate-90 opacity-70')} aria-hidden />
+            </button>
+            {!shut && <ul className={cn('space-y-0.5', g.side && 'ml-1.5 border-l-2 pl-1.5', g.side === 'customer' && 'border-cust/25', g.side === 'technician' && 'border-tech/25')}>
               {g.items.map(({ href, label, icon: Icon, badge }) => {
                 const active = pathname === href || pathname.startsWith(`${href}/`)
                 const n = badge ? badges[badge] : 0
@@ -218,28 +265,31 @@ function SidebarBody() {
                   </li>
                 )
               })}
-            </ul>
+            </ul>}
           </div>
-        ))}
+          )
+        })}
+        {/* A soft edge so a long menu reads as "more below", not cut off. */}
+        <div aria-hidden className="pointer-events-none sticky -bottom-3 -mx-3 -mb-3 h-8 bg-gradient-to-t from-card to-transparent" />
       </nav>
 
       <div className="shrink-0 border-t border-line p-3">
-        <div className="mb-2 flex items-center gap-2 rounded-lg bg-canvas px-3 py-2 text-xs font-bold text-ink-2">
-          <span className="size-2 rounded-full bg-success animate-blink" aria-hidden />
-          <span className="flex-1">Network live</span>
-          <span className="num text-muted">
-            {online}/{verified} technicians on
-          </span>
-        </div>
         <Link
-          href="/settings"
-          aria-current={pathname.startsWith('/settings') ? 'page' : undefined}
-          className={cn(
-            'flex h-9 items-center gap-3 rounded-lg px-3 text-sm font-semibold transition-colors',
-            pathname.startsWith('/settings') ? 'bg-brand-soft text-brand' : 'text-ink-2 hover:bg-canvas'
-          )}
+          href="/dispatch"
+          aria-label={`Network live, ${online} of ${verified} technicians online. Open Live Dispatch`}
+          className="group mb-1.5 flex items-center gap-2.5 rounded-lg bg-canvas px-3 py-2 transition-colors hover:bg-success-soft"
         >
-          <Settings className="size-[18px]" aria-hidden /> Settings
+          <span className="relative grid size-2.5 place-items-center" aria-hidden>
+            <span className="animate-blink absolute inset-0 rounded-full bg-success/40" />
+            <span className="size-2 rounded-full bg-success" />
+          </span>
+          <span className="min-w-0 flex-1 leading-tight">
+            <span className="block text-[10.5px] font-extrabold uppercase tracking-[0.12em] text-success">Network live</span>
+            <span className="num block text-xs font-bold text-ink-2">
+              {online}/{verified} technicians online
+            </span>
+          </span>
+          <ChevronRight className="size-4 text-faint transition-transform group-hover:translate-x-0.5" aria-hidden />
         </Link>
         <button
           type="button"
@@ -504,7 +554,9 @@ function AccountMenu() {
         <Avatar name={ADMIN.name} size={32} />
         <span className="hidden text-left leading-tight md:block">
           <span className="block text-[13px] font-bold">{ADMIN.name}</span>
-          <span className="block text-[11px] font-semibold text-muted">{ADMIN.role}</span>
+          <span className={cn('block text-[11px] font-semibold', store.as === ADMIN.role ? 'text-muted' : 'text-warning')}>
+            {store.as === ADMIN.role ? ADMIN.role : `Viewing as ${store.as}`}
+          </span>
         </span>
         <ChevronDown className="hidden size-4 text-faint md:block" aria-hidden />
       </button>
@@ -514,7 +566,20 @@ function AccountMenu() {
             <p className="text-sm font-bold">{ADMIN.name}</p>
             <p className="truncate text-xs text-muted">{ADMIN.email}</p>
           </div>
-          <Link href="/settings" onClick={() => setOpen(false)} className="mt-1 flex h-9 items-center gap-2.5 rounded-lg px-3 text-sm font-semibold hover:bg-canvas">
+          <label className="mt-1.5 block px-3 pb-1.5">
+            <span className="text-[10.5px] font-extrabold uppercase tracking-[0.12em] text-faint">View console as</span>
+            <select
+              value={store.as}
+              onChange={(e) => store.viewAs(e.target.value as AdminRole)}
+              className="mt-1 h-8 w-full rounded-md border border-line-strong bg-card px-2 text-[13px] font-semibold"
+            >
+              {ADMIN_ROLES.map((r) => (
+                <option key={r}>{r}</option>
+              ))}
+            </select>
+            <span className="mt-1 block text-[11px] text-muted">Preview what each role can see.</span>
+          </label>
+          <Link href="/settings" onClick={() => setOpen(false)} className="mt-1 flex h-9 items-center gap-2.5 rounded-lg border-t border-line px-3 pt-1 text-sm font-semibold hover:bg-canvas">
             <Settings className="size-4" aria-hidden /> Settings
           </Link>
           <button
@@ -528,6 +593,27 @@ function AccountMenu() {
             <LogOut className="size-4" aria-hidden /> Logout
           </button>
         </div>
+      )}
+    </div>
+  )
+}
+
+/** A page the current role has no access to. */
+function Guard({ path, children }: { path: string; children: React.ReactNode }) {
+  const store = useStore()
+  const mod = ROUTE_MODULE[path]
+  if (!mod || store.can(mod)) return <>{children}</>
+  return (
+    <div className="mx-auto flex max-w-md flex-col items-center px-6 py-24 text-center">
+      <span className="mb-4 grid size-12 place-items-center rounded-full bg-canvas text-muted">
+        <Lock className="size-5" />
+      </span>
+      <h1 className="text-lg font-extrabold">No access for {store.as}</h1>
+      <p className="mt-1 text-sm text-muted">This module isn’t part of the {store.as} role. A Super Admin can grant it in Admin Users → Permissions.</p>
+      {store.as !== ADMIN.role && (
+        <button type="button" onClick={() => store.viewAs(ADMIN.role)} className="mt-5 h-9 rounded-lg bg-brand px-4 text-sm font-bold text-white hover:bg-brand-deep">
+          Back to {ADMIN.role}
+        </button>
       )}
     </div>
   )

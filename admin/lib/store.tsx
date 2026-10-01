@@ -2,10 +2,21 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { seed, type Seed } from './seed'
+import { controlSeed, type Control } from './control'
 import type {
   Activity,
   ActivityKind,
+  AdminRole,
   AdminSettings,
+  AdminUser,
+  AiCallConfig,
+  AiChatConfig,
+  AuditEntry,
+  Catalog,
+  MediaItem,
+  Module,
+  Perm,
+  SiteContent,
   Booking,
   BookingStatus,
   Broadcast,
@@ -29,20 +40,27 @@ import type {
  * seed instead.
  */
 
-const KEY = 'admin.state.v1'
+// v2: the control centre (roles, AI, content, catalogue) joined the state.
+const KEY = 'admin.state.v2'
 
-export const ADMIN = { name: 'Aditi Rao', role: 'Super admin', email: 'aditi.rao@24x7services.in' }
+export const ADMIN = { name: 'Aditi Rao', role: 'Super Admin' as AdminRole, email: 'aditi.rao@24x7services.in' }
 
-interface Persisted extends Seed {
+interface Persisted extends Seed, Control {
   signedIn: boolean
+  /** The role the console is being viewed as — Super Admin unless switched for a preview. */
+  as: AdminRole
   seededOn: string
   /** Notification ids the admin has opened. */
   seen: string[]
 }
 
 function fresh(): Persisted {
-  return { ...seed(), signedIn: true, seededOn: new Date().toDateString(), seen: [] }
+  const base = seed()
+  return { ...base, ...controlSeed(base), signedIn: true, as: 'Super Admin', seededOn: new Date().toDateString(), seen: [] }
 }
+
+/** What an admin configured survives the nightly rebuild of the demo network. */
+const KEPT = ['settings', 'roles', 'admins', 'audit', 'aiChat', 'aiCall', 'media', 'content', 'published', 'contentPublishedAt', 'catalog', 'catalogPublished', 'catalogPublishedAt', 'coupons', 'as'] as const
 
 function load(): Persisted {
   try {
@@ -51,8 +69,10 @@ function load(): Persisted {
       const saved = JSON.parse(raw) as Persisted
       // The demo month is rebuilt each day so "today" never goes stale; the
       // console's own settings carry over.
-      if (saved.seededOn === new Date().toDateString()) return { ...saved, signedIn: true }
-      return { ...fresh(), settings: saved.settings }
+      if (saved.seededOn === new Date().toDateString()) return { ...fresh(), ...saved, signedIn: true }
+      const next = fresh()
+      for (const k of KEPT) if (saved[k] !== undefined) (next as unknown as Record<string, unknown>)[k] = saved[k]
+      return next
     }
   } catch {
     /* storage unavailable — run from the seed */
@@ -61,6 +81,16 @@ function load(): Persisted {
 }
 
 let seq = 1
+
+const KIND_MODULE: Record<ActivityKind, Module> = {
+  booking: 'bookings',
+  dispatch: 'dispatch',
+  payment: 'payments',
+  technician: 'technicians',
+  customer: 'customers',
+  support: 'support',
+  system: 'settings',
+}
 
 interface Store extends Persisted {
   ready: boolean
@@ -90,6 +120,41 @@ interface Store extends Persisted {
   updateSettings: (patch: Partial<AdminSettings> | ((s: AdminSettings) => Partial<AdminSettings>)) => void
   markSeen: (ids: string[]) => void
   resetDemo: () => void
+
+  /* ---- Control centre ---- */
+  /** Whether the current role may do `perm` in `module`. */
+  can: (module: Module, perm?: Perm) => boolean
+  /** Preview the console as another role (demo). */
+  viewAs: (role: AdminRole) => void
+  /** Record an accountable change. Every store action below already calls it. */
+  record: (e: Omit<AuditEntry, 'id' | 'at' | 'admin' | 'role'>) => void
+  updateTechnician: (id: string, patch: Partial<Technician>, note?: Change) => void
+  updateCustomer: (id: string, patch: Partial<Customer>, note?: Change) => void
+  deleteCoupon: (code: string) => void
+  updateAiChat: (patch: Partial<AiChatConfig>, note?: Change) => void
+  updateAiCall: (patch: Partial<AiCallConfig>, note?: Change) => void
+  /** Edit the customer-app content draft; nothing reaches customers until publishContent. */
+  updateContent: (fn: (c: SiteContent) => SiteContent, note: Change) => void
+  publishContent: () => void
+  discardContent: () => void
+  addMedia: (item: Omit<MediaItem, 'id' | 'uploadedAt' | 'uploadedBy'>) => MediaItem
+  replaceMedia: (id: string, patch: Partial<Pick<MediaItem, 'url' | 'size' | 'width' | 'height' | 'name' | 'alt' | 'category'>>) => void
+  deleteMedia: (id: string) => void
+  /** Edit the catalogue draft (services, brands, prices); publishCatalog makes it live. */
+  updateCatalog: (fn: (c: Catalog) => Catalog, note: Change) => void
+  publishCatalog: () => void
+  discardCatalog: () => void
+  saveAdmin: (u: AdminUser) => void
+  removeAdmin: (id: string) => void
+  setRolePerms: (role: AdminRole, module: Module, perms: Perm[]) => void
+}
+
+/** How a change reads in the audit log. */
+export interface Change {
+  action: string
+  target?: string
+  old?: string
+  new?: string
 }
 
 const Ctx = createContext<Store | null>(null)
@@ -117,10 +182,23 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }
   }, [state])
 
-  const log = useCallback((kind: ActivityKind, text: string) => {
-    const a: Activity = { id: `AC-L${Date.now()}-${seq++}`, kind, text, at: new Date().toISOString(), actor: ADMIN.name }
-    setState((s) => ({ ...s, activity: [a, ...s.activity].slice(0, 200) }))
+  const writeAudit = useCallback((module: Module, c: Change) => {
+    setState((s) => {
+      const e: AuditEntry = { id: `AU-L${Date.now()}-${seq++}`, at: new Date().toISOString(), admin: ADMIN.name, role: s.as, module, ...c }
+      return { ...s, audit: [e, ...s.audit].slice(0, 1000) }
+    })
   }, [])
+
+  /** The activity feed line plus its audit entry. */
+  const log = useCallback(
+    (kind: ActivityKind, text: string, audit?: Change & { module?: Module }) => {
+      const a: Activity = { id: `AC-L${Date.now()}-${seq++}`, kind, text, at: new Date().toISOString(), actor: ADMIN.name }
+      setState((s) => ({ ...s, activity: [a, ...s.activity].slice(0, 200) }))
+      const { module = KIND_MODULE[kind], ...change } = audit ?? { action: text }
+      writeAudit(module, change)
+    },
+    [writeAudit]
+  )
 
   const patchBooking = useCallback((id: string, fn: (b: Booking) => Booking) => {
     setState((s) => ({ ...s, bookings: s.bookings.map((b) => (b.id === id ? fn(b) : b)) }))
@@ -147,7 +225,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             timeline: [...x.timeline, { status: 'assigned', at: now(), note: first ? undefined : `Reassigned to ${tech(techId)?.name}` }],
           }
         })
-        log('dispatch', `${bookingId} ${b?.technicianId ? 'reassigned' : 'assigned'} to ${tech(techId)?.name}`)
+        log('dispatch', `${bookingId} ${b?.technicianId ? 'reassigned' : 'assigned'} to ${tech(techId)?.name}`, {
+          module: 'bookings',
+          action: b?.technicianId ? 'Reassigned technician' : 'Assigned technician',
+          target: bookingId,
+          old: tech(b?.technicianId)?.name ?? 'Unassigned',
+          new: tech(techId)?.name,
+        })
       },
       setStatus: (bookingId, status, note) => {
         patchBooking(bookingId, (x) => ({
@@ -156,11 +240,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           paid: status === 'completed' ? true : x.paid,
           timeline: [...x.timeline, { status, at: now(), note }],
         }))
-        log('booking', `${bookingId} marked ${status.replace('_', ' ')}`)
+        log('booking', `${bookingId} marked ${status.replace('_', ' ')}`, {
+          action: 'Changed booking status',
+          target: bookingId,
+          old: state.bookings.find((x) => x.id === bookingId)?.status.replace('_', ' '),
+          new: status.replace('_', ' '),
+        })
       },
       cancel: (bookingId, reason) => {
         patchBooking(bookingId, (x) => ({ ...x, status: 'cancelled', cancelReason: reason, timeline: [...x.timeline, { status: 'cancelled', at: now(), note: reason }] }))
-        log('booking', `${bookingId} cancelled — ${reason}`)
+        log('booking', `${bookingId} cancelled — ${reason}`, { action: 'Cancelled booking', target: bookingId, new: reason })
       },
       refund: (bookingId) => {
         const b = state.bookings.find((x) => x.id === bookingId)
@@ -169,7 +258,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           status: 'refunded',
           timeline: [...x.timeline, ...(x.status !== 'cancelled' ? [{ status: 'cancelled' as const, at: now() }] : []), { status: 'refunded', at: now() }],
         }))
-        log('payment', `Refund of ₹${b?.amount.toLocaleString('en-IN')} issued for ${bookingId}`)
+        log('payment', `Refund of ₹${b?.amount.toLocaleString('en-IN')} issued for ${bookingId}`, {
+          action: 'Issued refund',
+          target: bookingId,
+          old: '—',
+          new: `₹${b?.amount.toLocaleString('en-IN')}`,
+        })
       },
       reschedule: (bookingId, iso) => {
         patchBooking(bookingId, (x) => ({ ...x, scheduledAt: iso }))
@@ -177,7 +271,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       },
       setCustomerStatus: (id, status) => {
         setState((s) => ({ ...s, customers: s.customers.map((c) => (c.id === id ? { ...c, status } : c)) }))
-        log('customer', `${state.customers.find((c) => c.id === id)?.name} ${status === 'blocked' ? 'blocked' : 'unblocked'}`)
+        log('customer', `${state.customers.find((c) => c.id === id)?.name} ${status === 'blocked' ? 'blocked' : 'unblocked'}`, {
+          action: status === 'blocked' ? 'Suspended customer' : 'Activated customer',
+          target: state.customers.find((c) => c.id === id)?.name,
+          old: status === 'blocked' ? 'Active' : 'Suspended',
+          new: status === 'blocked' ? 'Suspended' : 'Active',
+        })
       },
       addWalletCredit: (id, amount) => {
         setState((s) => ({ ...s, customers: s.customers.map((c) => (c.id === id ? { ...c, walletCredit: c.walletCredit + amount } : c)) }))
@@ -189,20 +288,31 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           technicians: s.technicians.map((t) => (t.id === id ? { ...t, kyc, presence: kyc === 'verified' ? t.presence : 'offline' } : t)),
         }))
         const verb: Record<KycStatus, string> = { verified: 'approved', rejected: 'rejected', suspended: 'suspended', pending: 'moved back to review' }
-        log('technician', `${tech(id)?.name} ${verb[kyc]}`)
+        log('technician', `${tech(id)?.name} ${verb[kyc]}`, { action: `Technician ${verb[kyc]}`, target: tech(id)?.name, old: tech(id)?.kyc, new: kyc })
       },
       setDoc: (id, doc, on) =>
         setState((s) => ({ ...s, technicians: s.technicians.map((t) => (t.id === id ? { ...t, docs: { ...t.docs, [doc]: on } } : t)) })),
       settleCash: (id) => {
         const t = tech(id)
         setState((s) => ({ ...s, technicians: s.technicians.map((x) => (x.id === id ? { ...x, cashInHand: 0 } : x)) }))
-        log('payment', `Cash deposit of ₹${t?.cashInHand.toLocaleString('en-IN')} recorded for ${t?.name}`)
+        log('payment', `Cash deposit of ₹${t?.cashInHand.toLocaleString('en-IN')} recorded for ${t?.name}`, {
+          module: 'payouts',
+          action: 'Recorded cash deposit',
+          target: t?.name,
+          old: `₹${t?.cashInHand.toLocaleString('en-IN')}`,
+          new: '₹0',
+        })
       },
       payOut: (ids) => {
         const list = state.payouts.filter((p) => ids.includes(p.id) && p.status !== 'paid')
         setState((s) => ({ ...s, payouts: s.payouts.map((p): Payout => (ids.includes(p.id) ? { ...p, status: 'paid', at: now() } : p)) }))
         const total = list.reduce((sum, p) => sum + p.gross - p.commission, 0)
-        log('payment', `${list.length} payout${list.length === 1 ? '' : 's'} released · ₹${total.toLocaleString('en-IN')}`)
+        log('payment', `${list.length} payout${list.length === 1 ? '' : 's'} released · ₹${total.toLocaleString('en-IN')}`, {
+          module: 'payouts',
+          action: 'Released payouts',
+          target: `${list.length} payout${list.length === 1 ? '' : 's'}`,
+          new: `₹${total.toLocaleString('en-IN')}`,
+        })
       },
       replyTicket: (id, text) => {
         setState((s) => ({
@@ -233,17 +343,28 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       },
       setReviewStatus: (id, status) => {
         setState((s) => ({ ...s, reviews: s.reviews.map((r) => (r.id === id ? { ...r, status } : r)) }))
-        log('customer', `Review ${id} ${status}`)
+        log('customer', `Review ${id} ${status}`, { module: 'reviews', action: 'Changed review status', target: id, old: state.reviews.find((r) => r.id === id)?.status, new: status })
       },
       saveCoupon: (c) => {
         const exists = state.coupons.some((x) => x.code === c.code)
         setState((s) => ({ ...s, coupons: exists ? s.coupons.map((x) => (x.code === c.code ? c : x)) : [c, ...s.coupons] }))
-        log('system', `Coupon ${c.code} ${exists ? 'updated' : 'created'}`)
+        log('system', `Coupon ${c.code} ${exists ? 'updated' : 'created'}`, {
+          module: 'promotions',
+          action: exists ? 'Edited offer' : 'Created offer',
+          target: c.code,
+          new: `${c.kind === 'percent' ? `${c.value}%` : `₹${c.value}`} off`,
+        })
       },
       toggleCoupon: (code) => {
         const c = state.coupons.find((x) => x.code === code)
         setState((s) => ({ ...s, coupons: s.coupons.map((x) => (x.code === code ? { ...x, active: !x.active } : x)) }))
-        log('system', `Coupon ${code} ${c?.active ? 'paused' : 'activated'}`)
+        log('system', `Coupon ${code} ${c?.active ? 'paused' : 'activated'}`, {
+          module: 'promotions',
+          action: c?.active ? 'Paused offer' : 'Activated offer',
+          target: code,
+          old: c?.active ? 'Active' : 'Paused',
+          new: c?.active ? 'Paused' : 'Active',
+        })
       },
       sendBroadcast: (b) => {
         const reach =
@@ -253,15 +374,108 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
               ? state.technicians.filter((t) => t.kyc === 'verified').length
               : state.customers.filter((c) => c.status === 'active').length + state.technicians.filter((t) => t.kyc === 'verified').length
         setState((s) => ({ ...s, broadcasts: [{ ...b, id: `BC-${42 + s.broadcasts.length}`, at: now(), reach }, ...s.broadcasts] }))
-        log('system', `Push sent to ${b.audience}: “${b.title}”`)
+        log('system', `Push sent to ${b.audience}: “${b.title}”`, { module: 'promotions', action: 'Sent push notification', target: b.audience, new: b.title })
       },
       updateSettings: (patch) => {
         setState((s) => ({ ...s, settings: { ...s.settings, ...(typeof patch === 'function' ? patch(s.settings) : patch) } }))
       },
       markSeen: (ids) => setState((s) => ({ ...s, seen: [...new Set([...s.seen, ...ids])] })),
       resetDemo: () => setState(fresh()),
+
+      can: (module, perm = 'view') => !!state.roles[state.as]?.[module]?.includes(perm),
+      viewAs: (role) => setState((s) => ({ ...s, as: role })),
+      record: ({ module, ...change }) => writeAudit(module, change),
+      updateTechnician: (id, patch, note) => {
+        setState((s) => ({ ...s, technicians: s.technicians.map((t) => (t.id === id ? { ...t, ...patch } : t)) }))
+        writeAudit('technicians', note ?? { action: 'Edited technician', target: tech(id)?.name })
+      },
+      updateCustomer: (id, patch, note) => {
+        setState((s) => ({ ...s, customers: s.customers.map((c) => (c.id === id ? { ...c, ...patch } : c)) }))
+        writeAudit('customers', note ?? { action: 'Edited customer', target: state.customers.find((c) => c.id === id)?.name })
+      },
+      deleteCoupon: (code) => {
+        setState((s) => ({ ...s, coupons: s.coupons.filter((c) => c.code !== code) }))
+        writeAudit('promotions', { action: 'Deleted offer', target: code })
+      },
+      updateAiChat: (patch, note) => {
+        setState((s) => ({ ...s, aiChat: { ...s.aiChat, ...patch } }))
+        writeAudit('ai', note ?? { action: 'Updated AI chat agent', target: Object.keys(patch).join(', ') })
+      },
+      updateAiCall: (patch, note) => {
+        setState((s) => ({ ...s, aiCall: { ...s.aiCall, ...patch } }))
+        writeAudit('ai', note ?? { action: 'Updated AI call agent', target: Object.keys(patch).join(', ') })
+      },
+      updateContent: (fn, note) => {
+        setState((s) => ({ ...s, content: fn(structuredClone(s.content)) }))
+        writeAudit('content', note)
+      },
+      publishContent: () => {
+        setState((s) => ({ ...s, published: structuredClone(s.content), contentPublishedAt: now() }))
+        writeAudit('content', { action: 'Published content', target: 'Customer app', old: 'Draft', new: 'Live' })
+      },
+      discardContent: () => {
+        setState((s) => ({ ...s, content: structuredClone(s.published) }))
+        writeAudit('content', { action: 'Discarded content draft' })
+      },
+      addMedia: (item) => {
+        const m: MediaItem = { ...item, id: `MD-${Date.now().toString(36).toUpperCase()}${seq++}`, uploadedAt: now(), uploadedBy: ADMIN.name }
+        setState((s) => ({ ...s, media: [m, ...s.media] }))
+        writeAudit('content', { action: 'Uploaded media', target: m.name, new: m.category })
+        return m
+      },
+      replaceMedia: (id, patch) => {
+        const before = state.media.find((m) => m.id === id)
+        setState((s) => ({ ...s, media: s.media.map((m) => (m.id === id ? { ...m, ...patch, uploadedAt: patch.url ? now() : m.uploadedAt } : m)) }))
+        writeAudit('content', {
+          action: patch.url ? 'Replaced media file' : 'Edited media details',
+          target: before?.name,
+          old: patch.url ? before?.name : undefined,
+          new: patch.name ?? (patch.url ? 'new file' : undefined),
+        })
+      },
+      deleteMedia: (id) => {
+        const before = state.media.find((m) => m.id === id)
+        setState((s) => ({ ...s, media: s.media.filter((m) => m.id !== id) }))
+        writeAudit('content', { action: 'Deleted media', target: before?.name })
+      },
+      updateCatalog: (fn, note) => {
+        setState((s) => ({ ...s, catalog: fn(structuredClone(s.catalog)) }))
+        writeAudit('catalog', note)
+      },
+      publishCatalog: () => {
+        setState((s) => ({ ...s, catalogPublished: structuredClone(s.catalog), catalogPublishedAt: now() }))
+        writeAudit('catalog', { action: 'Published catalogue', target: 'Services & Pricing', old: 'Draft', new: 'Live' })
+      },
+      discardCatalog: () => {
+        setState((s) => ({ ...s, catalog: structuredClone(s.catalogPublished) }))
+        writeAudit('catalog', { action: 'Discarded catalogue draft' })
+      },
+      saveAdmin: (u) => {
+        const before = state.admins.find((a) => a.id === u.id)
+        setState((s) => ({ ...s, admins: before ? s.admins.map((a) => (a.id === u.id ? u : a)) : [...s.admins, u] }))
+        writeAudit(
+          'admins',
+          !before
+            ? { action: 'Invited admin', target: u.name, new: u.role }
+            : before.role !== u.role
+              ? { action: 'Changed role', target: u.name, old: before.role, new: u.role }
+              : before.status !== u.status
+                ? { action: u.status === 'disabled' ? 'Disabled admin' : 'Enabled admin', target: u.name, old: before.status, new: u.status }
+                : { action: 'Edited admin', target: u.name }
+        )
+      },
+      removeAdmin: (id) => {
+        const before = state.admins.find((a) => a.id === id)
+        setState((s) => ({ ...s, admins: s.admins.filter((a) => a.id !== id) }))
+        writeAudit('admins', { action: 'Removed admin', target: before?.name, old: before?.role })
+      },
+      setRolePerms: (role, module, perms) => {
+        const before = state.roles[role]?.[module] ?? []
+        setState((s) => ({ ...s, roles: { ...s.roles, [role]: { ...s.roles[role], [module]: perms } } }))
+        writeAudit('admins', { action: 'Changed permissions', target: `${role} · ${module}`, old: before.join(', ') || 'none', new: perms.join(', ') || 'none' })
+      },
     }
-  }, [state, ready, patchBooking, log])
+  }, [state, ready, patchBooking, log, writeAudit])
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

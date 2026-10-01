@@ -290,7 +290,7 @@ function Conversation({ t, bare }: { t: Ticket; bare?: boolean }) {
               <option value="" disabled>
                 Unassigned
               </option>
-              {store.settings.team.map((m) => (
+              {store.admins.filter((m) => m.status === 'active').map((m) => (
                 <option key={m.email} value={m.name}>
                   {m.name}
                   {m.name === ADMIN.name ? ' (you)' : ''} · {m.role}

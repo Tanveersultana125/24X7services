@@ -155,14 +155,20 @@ export function seed(nowMs = Date.now()): Seed {
       phone: phone(r),
       email: `${slug(name)}@${pick(r, ['gmail.com', 'outlook.com', 'yahoo.in'])}`,
       area: a.area,
-      address: `${Math.floor(r() * 900) + 100}, ${pick(r, STREETS)}, ${a.area}, Hyderabad ${a.pincode}`,
+      address: '',
       joinedAt: at(i % 9 === 0 ? -Math.floor(r() * 28) - 1 : -Math.floor(r() * 420) - 30, 10),
       status: i === 23 || i === 41 ? 'blocked' : 'active',
+      addresses: [
+        { label: 'Home', line: `${Math.floor(r() * 900) + 100}, ${pick(r, STREETS)}, ${a.area}, Hyderabad ${a.pincode}` },
+        ...(r() < 0.35 ? [{ label: 'Office', line: `${pick(r, ['Cyber Towers', 'Mindspace', 'DLF Cyber City', 'Raheja IT Park'])}, ${pick(r, AREAS).area}, Hyderabad` }] : []),
+      ],
       referralCode: `${name.split(' ')[0]!.toUpperCase().slice(0, 5)}${Math.floor(r() * 90) + 10}`,
       referrals: r() < 0.3 ? Math.floor(r() * 6) + 1 : 0,
       walletCredit: r() < 0.25 ? round10(r() * 400 + 100) : 0,
     }
   })
+
+  for (const c of customers) c.address = c.addresses[0]!.line
 
   /* -------------------------------------------------------- Technicians */
   const techAreas = [AREAS[0], ...AREAS.slice(1)]
@@ -194,6 +200,9 @@ export function seed(nowMs = Date.now()): Seed {
       acceptanceRate: applicant ? 0 : Math.round(82 + r() * 17),
       onTimeRate: applicant ? 0 : Math.round(86 + r() * 13),
       cashInHand: 0,
+      tracking: applicant ? false : r() < 0.9,
+      workingHours: r() < 0.5 ? { days: 'Mon–Sat', start: '08:00', end: '20:00' } : { days: 'All days', start: '07:00', end: '22:00' },
+      radiusKm: pick(r, [8, 10, 12, 15]),
       docs: applicant
         ? { aadhaar: true, pan: i % 2 === 0, bank: true, training: i % 3 !== 0, police: false }
         : { aadhaar: true, pan: true, bank: true, training: true, police: true },
@@ -447,11 +456,12 @@ export function seed(nowMs = Date.now()): Seed {
 
   /* -------------------------------------------------- Coupons, messages */
   const coupons: Coupon[] = [
-    { code: 'FIRST150', description: '₹150 off the first booking', kind: 'flat', value: 150, minOrder: 499, used: 412, limit: 1000, active: true, expires: at(45, 23, 59) },
-    { code: 'MONSOON20', description: '20% off AC & fridge gas refill', kind: 'percent', value: 20, minOrder: 999, used: 238, limit: 500, active: true, expires: at(12, 23, 59) },
-    { code: 'REFER100', description: 'Referral reward for both friends', kind: 'flat', value: 100, minOrder: 0, used: 167, limit: 5000, active: true, expires: at(180, 23, 59) },
-    { code: 'GEYSER99', description: 'Geyser service at ₹99 visit fee', kind: 'flat', value: 350, minOrder: 449, used: 89, limit: 300, active: false, expires: at(-4, 23, 59) },
-    { code: 'BOSCH10', description: '10% off Bosch washing machine repair', kind: 'percent', value: 10, minOrder: 699, used: 31, limit: 200, active: true, expires: at(30, 23, 59) },
+    { code: 'FIRST150', title: 'First booking offer', description: '₹150 off the first booking', type: 'first_booking', kind: 'flat', value: 150, minOrder: 499, maxDiscount: 150, used: 412, limit: 1000, active: true, start: at(-60, 0), expires: at(45, 23, 59), brand: 'all', appliance: 'all', image: '/media/promo-washer.jpg' },
+    { code: 'MONSOON20', title: 'Monsoon cooling care', description: '20% off AC & fridge gas refill', type: 'seasonal', kind: 'percent', value: 20, minOrder: 999, maxDiscount: 500, used: 238, limit: 500, active: true, start: at(-20, 0), expires: at(12, 23, 59), brand: 'all', appliance: 'ac', image: '/media/promo-ac-gas.jpg' },
+    { code: 'REFER100', title: 'Refer a friend', description: 'Referral reward for both friends', type: 'fixed', kind: 'flat', value: 100, minOrder: 0, maxDiscount: 100, used: 167, limit: 5000, active: true, start: at(-120, 0), expires: at(180, 23, 59), brand: 'all', appliance: 'all' },
+    { code: 'GEYSER99', title: 'Winter geyser check', description: 'Geyser service at ₹99 visit fee', type: 'service', kind: 'flat', value: 350, minOrder: 449, maxDiscount: 350, used: 89, limit: 300, active: false, start: at(-40, 0), expires: at(-4, 23, 59), brand: 'all', appliance: 'geyser' },
+    { code: 'BOSCH10', title: 'Bosch washer week', description: '10% off Bosch washing machine repair', type: 'brand', kind: 'percent', value: 10, minOrder: 699, maxDiscount: 300, used: 31, limit: 200, active: true, start: at(-5, 0), expires: at(30, 23, 59), brand: 'bosch', appliance: 'washer' },
+    { code: 'NIGHT24', title: 'Night emergency relief', description: '₹100 off emergency visits after 10 PM', type: 'emergency', kind: 'flat', value: 100, minOrder: 699, maxDiscount: 100, used: 54, limit: 400, active: true, start: at(-10, 0), expires: at(50, 23, 59), brand: 'all', appliance: 'all' },
   ]
 
   const broadcasts: Broadcast[] = [
