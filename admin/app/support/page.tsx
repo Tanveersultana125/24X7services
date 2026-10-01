@@ -7,7 +7,7 @@ import { Suspense, useEffect, useMemo, useState } from 'react'
 import { BriefcaseBusiness, CheckCircle2, Inbox, Phone, RotateCcw, Send } from 'lucide-react'
 import { BookingDrawer } from '@/components/BookingDrawer'
 import { useToast } from '@/components/toast'
-import { Avatar, Button, Card, Chip, Drawer, Empty, Page, PageHeader, SearchInput, Segmented, Tabs, inputClass, SideTag } from '@/components/ui'
+import { Avatar, Button, Card, Chip, Drawer, Empty, Page, PageHeader, SearchInput, Segmented, Tabs, inputClass, SideTag, Select } from '@/components/ui'
 import { cn } from '@/lib/cn'
 import { ago, dateTime, matches, telHref } from '@/lib/format'
 import { TICKET_PRIORITY, TICKET_STATUS } from '@/lib/status'
@@ -277,27 +277,24 @@ function Conversation({ t, bare }: { t: Ticket; bare?: boolean }) {
           </>
         )}
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <label className="flex items-center gap-2 text-xs font-bold text-muted">
+          <div className="flex items-center gap-2 text-xs font-bold text-muted">
             Assignee
-            <select
+            <Select
+              label="Assignee"
               value={t.assignee ?? ''}
-              onChange={(e) => {
-                store.assignTicket(t.id, e.target.value)
-                toast(`${t.id} assigned to ${e.target.value}`)
+              onChange={(v) => {
+                store.assignTicket(t.id, v)
+                toast(`${t.id} assigned to ${v}`)
               }}
-              className={cn(inputClass, 'h-8 w-auto py-0 text-[13px] font-semibold')}
-            >
-              <option value="" disabled>
-                Unassigned
-              </option>
-              {store.admins.filter((m) => m.status === 'active').map((m) => (
-                <option key={m.email} value={m.name}>
-                  {m.name}
-                  {m.name === ADMIN.name ? ' (you)' : ''} · {m.role}
-                </option>
-              ))}
-            </select>
-          </label>
+              className="h-8 py-0 text-[13px]"
+              options={[
+                ...(t.assignee ? [] : [{ value: '', label: 'Unassigned' }]),
+                ...store.admins
+                  .filter((m) => m.status === 'active')
+                  .map((m) => ({ value: m.name, label: `${m.name}${m.name === ADMIN.name ? ' (you)' : ''} · ${m.role}` })),
+              ]}
+            />
+          </div>
           <span className="flex-1" />
           {t.status === 'resolved' ? (
             <Button

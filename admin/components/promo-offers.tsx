@@ -348,13 +348,7 @@ function OfferModal({ coupon, preset, onClose }: { coupon?: Coupon; preset: 'off
             </button>
           </div>
           <Field label="Offer type" className="col-span-2">
-            <select value={f.type} onChange={(e) => pickType(e.target.value as OfferType)} className={inputClass}>
-              {OFFER_TYPES.map((t) => (
-                <option key={t} value={t}>
-                  {OFFER_LABEL[t]}
-                </option>
-              ))}
-            </select>
+            <Select full label="Offer type" value={f.type} onChange={(v) => pickType(v)} options={OFFER_TYPES.map((t) => ({ value: t, label: OFFER_LABEL[t] }))} />
           </Field>
           <Field label="Title" className="col-span-2">
             <input value={f.title} onChange={(e) => set('title', e.target.value)} placeholder="Monsoon cooling care" className={inputClass} />
@@ -372,10 +366,16 @@ function OfferModal({ coupon, preset, onClose }: { coupon?: Coupon; preset: 'off
             />
           </Field>
           <Field label="Discount type">
-            <select value={f.kind} onChange={(e) => set('kind', e.target.value as Coupon['kind'])} className={inputClass}>
-              <option value="flat">Fixed ₹ off</option>
-              <option value="percent">Percent off</option>
-            </select>
+            <Select
+              full
+              label="Discount type"
+              value={f.kind}
+              onChange={(v) => set('kind', v)}
+              options={[
+                { value: 'flat' as Coupon['kind'], label: 'Fixed ₹ off' },
+                { value: 'percent' as Coupon['kind'], label: 'Percent off' },
+              ]}
+            />
           </Field>
           <Field label={f.kind === 'flat' ? 'Discount (₹)' : 'Discount (%)'}>
             <input type="number" min={1} value={f.value} onChange={(e) => set('value', e.target.value)} className={`${inputClass} num`} />
@@ -396,24 +396,22 @@ function OfferModal({ coupon, preset, onClose }: { coupon?: Coupon; preset: 'off
             <input type="number" min={1} value={f.limit} onChange={(e) => set('limit', e.target.value)} className={`${inputClass} num`} />
           </Field>
           <Field label="Applicable brand">
-            <select value={f.brand} onChange={(e) => set('brand', e.target.value as typeof f.brand)} className={inputClass}>
-              <option value="all">All brands</option>
-              {BRANDS.map((b) => (
-                <option key={b} value={b}>
-                  {BRAND_LABEL[b]}
-                </option>
-              ))}
-            </select>
+            <Select
+              full
+              label="Applicable brand"
+              value={f.brand}
+              onChange={(v) => set('brand', v)}
+              options={[{ value: 'all' as typeof f.brand, label: 'All brands' }, ...BRANDS.map((b) => ({ value: b as typeof f.brand, label: BRAND_LABEL[b] }))]}
+            />
           </Field>
           <Field label="Applicable service" className="col-span-2">
-            <select value={f.appliance} onChange={(e) => set('appliance', e.target.value as typeof f.appliance)} className={inputClass}>
-              <option value="all">All services</option>
-              {APPLIANCES.map((a) => (
-                <option key={a} value={a}>
-                  {APPLIANCE_LABEL[a]}
-                </option>
-              ))}
-            </select>
+            <Select
+              full
+              label="Applicable service"
+              value={f.appliance}
+              onChange={(v) => set('appliance', v)}
+              options={[{ value: 'all' as typeof f.appliance, label: 'All services' }, ...APPLIANCES.map((a) => ({ value: a as typeof f.appliance, label: APPLIANCE_LABEL[a] }))]}
+            />
           </Field>
         </div>
         {errors.length > 0 && (

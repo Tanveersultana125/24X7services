@@ -7,7 +7,7 @@ import { Ban, Gift, Home, Mail, MapPin, Pencil, Phone, Plus, ShieldCheck, Trash2
 import { BookingDrawer } from './BookingDrawer'
 import { ApplianceGlyph } from './glyphs'
 import { useToast } from './toast'
-import { Avatar, Button, Chip, Detail, Drawer, Field, Modal, Rating, SectionLabel, StatusChip, Tabs, buttonClass, inputClass } from './ui'
+import { Avatar, Button, Chip, Detail, Drawer, Field, Modal, Rating, SectionLabel, StatusChip, Tabs, buttonClass, inputClass, Select } from './ui'
 import { APPLIANCE_LABEL, BRAND_LABEL, inr } from '@/lib/catalog'
 import { cn } from '@/lib/cn'
 import { ago, dateTime, longDate, telHref } from '@/lib/format'
@@ -452,11 +452,7 @@ function EditModal({ c, onClose }: { c: Customer; onClose: () => void }) {
           <input value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} inputMode="tel" className={inputClass} />
         </Field>
         <Field label="Area">
-          <select value={f.area} onChange={(e) => setF({ ...f, area: e.target.value })} className={inputClass}>
-            {AREAS.map((a) => (
-              <option key={a.area}>{a.area}</option>
-            ))}
-          </select>
+          <Select full label="Area" value={f.area} onChange={(v) => setF({ ...f, area: v })} options={AREAS.map((a) => ({ value: a.area, label: a.area }))} />
         </Field>
         <Field label="Email" className="sm:col-span-2">
           <input value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} type="email" className={inputClass} />

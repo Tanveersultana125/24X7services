@@ -20,7 +20,6 @@ import {
   Headset,
   LayoutDashboard,
   LogOut,
-  ArrowLeft,
   Menu,
   RadioTower,
   Search,
@@ -98,18 +97,6 @@ const NAV: { group: string; side?: Side; items: Item[] }[] = [
 
 const COLLAPSE_KEY = 'admin.nav.collapsed'
 
-/**
- * The pages walked through this session, so Back returns to the page the
- * admin came from. In memory only: after a reload or a deep link Back falls
- * back to the dashboard.
- */
-const trail: string[] = []
-
-function recordPath(path: string) {
-  if (trail.length >= 2 && trail[trail.length - 2] === path) trail.pop()
-  else if (trail[trail.length - 1] !== path) trail.push(path)
-}
-
 const TITLES: Record<string, string> = Object.fromEntries(NAV.flatMap((g) => g.items.map((i) => [i.href, i.label])))
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -122,10 +109,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (store.ready && !store.signedIn && !bare) router.replace('/login')
   }, [store.ready, store.signedIn, bare, router])
-
-  useEffect(() => {
-    if (!bare) recordPath(pathname)
-  }, [pathname, bare])
 
   // A route change closes the phone drawer.
   const [lastPath, setLastPath] = useState(pathname)
@@ -166,11 +149,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <TopBar
             onMenu={() => setMenuOpen(true)}
             title={TITLES['/' + (pathname.split('/')[1] ?? '')] ?? 'Admin'}
-            onBack={
-              pathname.startsWith('/dashboard')
-                ? undefined
-                : () => (trail.length >= 2 ? router.back() : router.push('/dashboard'))
-            }
           />
           <div className="flex-1">
             <Guard path={'/' + (pathname.split('/')[1] ?? '')}>{children}</Guard>
@@ -333,24 +311,14 @@ function SidebarBody() {
 
 /* -------------------------------------------------------------- Top bar */
 
-function TopBar({ onMenu, title, onBack }: { onMenu: () => void; title: string; onBack?: () => void }) {
+function TopBar({ onMenu, title }: { onMenu: () => void; title: string }) {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-card/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-[1440px] items-center gap-1 px-2 sm:gap-3 sm:px-6 lg:px-8">
         <button type="button" aria-label="Open menu" onClick={onMenu} className="grid size-10 shrink-0 place-items-center rounded-lg text-ink hover:bg-canvas lg:hidden">
           <Menu className="size-5" />
         </button>
-        {onBack && (
-          <button
-            type="button"
-            aria-label="Back"
-            title="Back"
-            onClick={onBack}
-            className="grid size-10 shrink-0 place-items-center rounded-lg text-ink hover:bg-canvas lg:size-9 lg:border lg:border-line"
-          >
-            <ArrowLeft className="size-5 lg:size-[18px]" />
-          </button>
-        )}
+
         <p className="truncate text-[15px] font-extrabold sm:hidden">{title}</p>
         <GlobalSearch />
         <div className="ml-auto flex items-center gap-1 sm:gap-2">

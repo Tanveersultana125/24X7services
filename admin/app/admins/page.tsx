@@ -406,11 +406,7 @@ function AdminForm({ onClose, user }: { onClose: () => void; user?: AdminUser })
           <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={inputClass} />
         </Field>
         <Field label="Role" hint={me ? 'You can’t change your own role.' : ROLE_NOTE[role]}>
-          <select value={role} disabled={me} onChange={(e) => setRole(e.target.value as AdminRole)} className={inputClass}>
-            {ADMIN_ROLES.map((r) => (
-              <option key={r}>{r}</option>
-            ))}
-          </select>
+          <Select full label="Role" value={role} disabled={me} onChange={setRole} options={ADMIN_ROLES.map((r) => ({ value: r, label: r }))} />
         </Field>
         <div className="flex items-center justify-between gap-3 rounded-lg border border-line px-3 py-2.5">
           <span>

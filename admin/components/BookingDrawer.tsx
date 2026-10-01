@@ -13,7 +13,7 @@ import { useStore } from '@/lib/store'
 import { BOOKING_FLOW, type Booking, type BookingStatus } from '@/lib/types'
 import { ApplianceGlyph } from './glyphs'
 import { useToast } from './toast'
-import { Avatar, Button, Chip, Detail, Drawer, Field, inputClass, Modal, PriorityTag, Rating, SectionLabel, SideTag, StatusChip } from './ui'
+import { Avatar, Button, Chip, Detail, Drawer, Field, inputClass, Modal, PriorityTag, Rating, SectionLabel, SideTag, StatusChip, Select } from './ui'
 
 const METHOD: Record<string, string> = { upi: 'UPI', card: 'Card', cash: 'Cash on service', wallet: '24X7 Wallet' }
 
@@ -314,11 +314,7 @@ export function CancelModal({ open, onClose, onConfirm }: { open: boolean; onClo
       <p className="mb-4 text-sm font-medium text-muted">The customer and the technician are both notified. A paid booking can be refunded afterwards.</p>
       <div className="space-y-3">
         <Field label="Reason">
-          <select value={reason} onChange={(e) => setReason(e.target.value)} className={inputClass}>
-            {REASONS.map((r) => (
-              <option key={r}>{r}</option>
-            ))}
-          </select>
+          <Select full label="Reason" value={reason} onChange={setReason} options={REASONS.map((r) => ({ value: r, label: r }))} />
         </Field>
         <Field label="Note (optional)">
           <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} className={inputClass} />

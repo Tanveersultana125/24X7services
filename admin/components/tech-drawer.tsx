@@ -6,7 +6,7 @@ import { AssignModal, BookingDrawer } from './BookingDrawer'
 import { ApplianceGlyph } from './glyphs'
 import { AssignJobModal } from './tech-assign'
 import { useToast } from './toast'
-import { Avatar, Button, Chip, Drawer, Field, Modal, Rating, SectionLabel, StatusChip, Tabs, Toggle, buttonClass, inputClass } from './ui'
+import { Avatar, Button, Chip, Drawer, Field, Modal, Rating, SectionLabel, StatusChip, Tabs, Toggle, buttonClass, inputClass, Select } from './ui'
 import { APPLIANCES, APPLIANCE_LABEL, BRANDS, BRAND_LABEL, inr, type Appliance, type Brand } from '@/lib/catalog'
 import { cn } from '@/lib/cn'
 import { ago, dateTime, longDate, telHref, thisMonth, withinDays } from '@/lib/format'
@@ -515,11 +515,14 @@ function Availability({ t, canEdit }: { t: Technician; canEdit: boolean }) {
       <SectionLabel>Working hours</SectionLabel>
       <div className="grid grid-cols-1 gap-3 rounded-card border border-line p-4 sm:grid-cols-[1.4fr_1fr_1fr_auto] sm:items-end">
         <Field label="Days">
-          <select disabled={!canEdit} value={hours.days} onChange={(e) => setHours({ ...hours, days: e.target.value })} className={inputClass}>
-            {[...new Set([hours.days, ...DAY_SETS])].map((d) => (
-              <option key={d}>{d}</option>
-            ))}
-          </select>
+          <Select
+            full
+            label="Days"
+            disabled={!canEdit}
+            value={hours.days}
+            onChange={(v) => setHours({ ...hours, days: v })}
+            options={[...new Set([hours.days, ...DAY_SETS])].map((d) => ({ value: d, label: d }))}
+          />
         </Field>
         <Field label="From">
           <input disabled={!canEdit} type="time" value={hours.start} onChange={(e) => setHours({ ...hours, start: e.target.value })} className={inputClass} />
@@ -624,11 +627,7 @@ function EditModal({ t, onClose }: { t: Technician; onClose: () => void }) {
           <input value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} type="email" className={inputClass} />
         </Field>
         <Field label="Base area" className="sm:col-span-2">
-          <select value={f.area} onChange={(e) => setF({ ...f, area: e.target.value })} className={inputClass}>
-            {AREAS.map((a) => (
-              <option key={a.area}>{a.area}</option>
-            ))}
-          </select>
+          <Select full label="Area" value={f.area} onChange={(v) => setF({ ...f, area: v })} options={AREAS.map((a) => ({ value: a.area, label: a.area }))} />
         </Field>
       </div>
     </Modal>
