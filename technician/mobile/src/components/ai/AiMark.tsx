@@ -1,12 +1,15 @@
 import { View } from 'react-native'
 import Svg, { Circle, Path } from 'react-native-svg'
 import { cn } from '@/lib/cn'
+import { useColor } from '../base/Icon'
 
 /**
  * The assistant's mark: a four-point spark on the brand's deep navy. Small and
  * square so it sits beside a chat bubble like an avatar, not a mascot.
  */
 export function AiMark({ size = 32, className }: { size?: number; className?: string }) {
+  // The glyph takes the text colour in className (white by default), as currentColor did on the web.
+  const ink = useColor(cn('text-white', className))
   return (
     <View
       accessibilityElementsHidden
@@ -14,7 +17,7 @@ export function AiMark({ size = 32, className }: { size?: number; className?: st
       className={cn('shrink-0 items-center justify-center bg-brand-ink', className)}
       style={{ width: size, height: size, borderRadius: size * 0.3 }}
     >
-      <Svg viewBox="0 0 24 24" width={size * 0.58} height={size * 0.58} fill="#fff">
+      <Svg viewBox="0 0 24 24" width={size * 0.58} height={size * 0.58} fill={ink}>
         <Path d="M11 2.5c.3 0 .55.2.62.49l.86 3.44a5 5 0 0 0 3.64 3.64l3.44.86a.64.64 0 0 1 0 1.24l-3.44.86a5 5 0 0 0-3.64 3.64l-.86 3.44a.64.64 0 0 1-1.24 0l-.86-3.44a5 5 0 0 0-3.64-3.64l-3.44-.86a.64.64 0 0 1 0-1.24l3.44-.86a5 5 0 0 0 3.64-3.64l.86-3.44A.64.64 0 0 1 11 2.5Z" />
         <Circle cx="19" cy="5" r="1.6" opacity={0.7} />
       </Svg>
@@ -24,6 +27,7 @@ export function AiMark({ size = 32, className }: { size?: number; className?: st
 
 /** A phone handset on the same tile, for the call agent. */
 export function CallMark({ size = 32, className }: { size?: number; className?: string }) {
+  const ink = useColor(cn('text-white', className))
   return (
     <View
       accessibilityElementsHidden
@@ -36,7 +40,7 @@ export function CallMark({ size = 32, className }: { size?: number; className?: 
         width={size * 0.5}
         height={size * 0.5}
         fill="none"
-        stroke="#fff"
+        stroke={ink}
         strokeWidth={2}
         strokeLinecap="round"
         strokeLinejoin="round"

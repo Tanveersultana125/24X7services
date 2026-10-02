@@ -4,7 +4,7 @@ import type { Appliance, Brand } from '@/lib/catalog'
 import { BRAND_LABEL } from '@/lib/catalog'
 import { useResolveClassNames } from 'uniwind'
 import { cn } from '@/lib/cn'
-import { useColor } from './base/Icon'
+import { toPx, useColor } from './base/Icon'
 import { useInherited } from './base/Text'
 import { Text } from './base/Text'
 
@@ -100,6 +100,6 @@ export function BrandTag({ brand, className }: { brand: Brand; className?: strin
 }
 
 function useSize(classes: string): number {
-  const style = useResolveClassNames(classes) as { width?: number }
-  return typeof style.width === 'number' ? style.width : 20
+  const style = useResolveClassNames(classes) as { width?: number | string }
+  return toPx(style.width) ?? 20
 }

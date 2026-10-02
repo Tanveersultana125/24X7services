@@ -55,7 +55,13 @@ const EASE = Easing.bezier(0.22, 0.61, 0.36, 1)
 export function IncomingRequest() {
   const { jobs, online, settings } = useStore()
   const pathname = usePathname()
-  const [, force] = useState(0)
+  // Mirrored into state: the React Compiler memoises what this renders from
+  // its inputs, and a mutation of the module Set alone is not an input.
+  const [seen, setSeen] = useState<ReadonlySet<string>>(() => new Set(shown))
+  const see = (ids: string[]) => {
+    ids.forEach(remember)
+    setSeen(new Set(shown))
+  }
   // Re-check each minute so a shift starting mid-session starts the alerts.
   const now = useTick(60_000)
 
@@ -69,7 +75,7 @@ export function IncomingRequest() {
   useEffect(() => {
     if (session.primed || !jobs.length) return
     session.primed = true
-    jobs.filter((j) => j.status === 'request').sort(byUrgency).slice(1).forEach((j) => remember(j.id))
+    see(jobs.filter((j) => j.status === 'request').sort(byUrgency).slice(1).map((j) => j.id))
   }, [jobs])
 
   // Settings decide what may interrupt: each kind needs its notification
@@ -79,7 +85,7 @@ export function IncomingRequest() {
   const at = new Date(now)
   const interrupts = (j: Job) =>
     j.priority === 'emergency' ? settings.notify.emergency && mayAlert(settings, online, true, at) : settings.notify.requests && mayAlert(settings, online, false, at)
-  const pending = jobs.filter((j) => j.status === 'request' && !shown.has(j.id) && interrupts(j)).sort(byUrgency)
+  const pending = jobs.filter((j) => j.status === 'request' && !seen.has(j.id) && interrupts(j)).sort(byUrgency)
   const job = online && !pathname.startsWith('/request') ? pending[0] : undefined
   if (!job) return null
 
@@ -87,10 +93,7 @@ export function IncomingRequest() {
     <Takeover
       key={job.id}
       job={job}
-      onDone={() => {
-        remember(job.id)
-        force((n) => n + 1)
-      }}
+      onDone={() => see([job.id])}
     />
   )
 }

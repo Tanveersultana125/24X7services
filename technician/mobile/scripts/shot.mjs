@@ -1,7 +1,9 @@
 // Renders screens of the web export (dist-web) in headless Chrome and saves
 // phone-sized screenshots, so a change can be looked at rather than assumed.
 //
-//   node scripts/shot.mjs <outDir> <path> [<path> …] [--dark] [--width=390]
+//   node scripts/shot.mjs <outDir> <path> [<path> …] [--width=390] [--full]
+//     [--click='[aria-label="Decide later"]']  a real mouse tap on each page
+//     [--eval='js'] [--seed='js']
 //
 // Serves dist-web itself on a free port, starts from a fresh demo (cleared
 // storage, or --seed='js' to set one up), and reports console errors and
@@ -81,6 +83,7 @@ const send = (method, params = {}) => new Promise((r) => { const n = ++id; pendi
 
 await send('Runtime.enable')
 await send('Page.enable')
+await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 })
 await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 2, mobile: true })
 await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: dark ? 'dark' : 'light' }] })
 
@@ -93,6 +96,23 @@ for (const path of paths) {
   problems.length = 0
   await send('Page.navigate', { url: origin + path })
   await sleep(wait)
+  if (typeof flags.click === 'string') {
+    // A real touch through the browser's input pipeline — React Native Web's
+    // Pressable ignores a scripted element.click().
+    const { result } = await send('Runtime.evaluate', {
+      expression: `(() => { const r = document.querySelector(${JSON.stringify(flags.click)})?.getBoundingClientRect(); return r ? [r.x + r.width / 2, r.y + r.height / 2] : null })()`,
+      returnByValue: true,
+    })
+    const at = result.result.value
+    if (!at) problems.push(`click: nothing matches ${flags.click}`)
+    else {
+      const point = [{ x: at[0], y: at[1] }]
+      await send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: point })
+      await sleep(80)
+      await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+      await sleep(1200)
+    }
+  }
   if (flags.eval) await send('Runtime.evaluate', { expression: flags.eval })
   if (flags.eval) await sleep(1500)
   let clip

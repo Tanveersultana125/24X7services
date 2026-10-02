@@ -35,5 +35,21 @@ export function useInherited(): string {
 
 export function Text({ className, ...props }: TextProps) {
   const inherited = useContext(Inherited)
-  return <RNText className={cn('font-normal text-base text-ink', inherited, className)} {...props} />
+  const own = cn(inherited, className)
+  // A Text inside a Text takes the outer one's type and colour, as an inline
+  // <span> does on the web. Only those classes travel; margins and flex stay.
+  return (
+    <Inherited.Provider value={typography(own)}>
+      <RNText className={cn('font-normal text-base text-ink', own)} {...props} />
+    </Inherited.Provider>
+  )
+}
+
+const TYPE = /^(text-|font-|leading-|tracking-|uppercase$|lowercase$|capitalize$|normal-case$|italic$|not-italic$|num$|underline$|line-through$|no-underline$|opacity-)/
+
+function typography(classes: string): string {
+  return classes
+    .split(/\s+/)
+    .filter((c) => TYPE.test(c) && !/^text-(left|center|right|justify)$/.test(c))
+    .join(' ')
 }

@@ -25,15 +25,15 @@ export function Icon({
 }) {
   const inherited = useInherited()
   const style = useResolveClassNames(cn('size-5 text-ink', inherited, className)) as {
-    width?: number
-    height?: number
+    width?: number | string
+    height?: number | string
     color?: string
     opacity?: number
     marginTop?: number
     marginLeft?: number
     marginRight?: number
   }
-  const size = typeof style.width === 'number' ? style.width : 20
+  const size = toPx(style.width) ?? 20
   return (
     <Component
       size={size}
@@ -56,4 +56,16 @@ export function Icon({
 export function useColor(className: string): string {
   const style = useResolveClassNames(className) as { color?: string }
   return style.color ?? '#111827'
+}
+
+/**
+ * A resolved length in px. Native resolves classes to numbers; the web build
+ * reads the browser's computed style, which comes back as a string ("16px").
+ */
+export function toPx(v: number | string | undefined): number | undefined {
+  if (typeof v === 'number') return v
+  if (typeof v !== 'string') return undefined
+  const n = parseFloat(v)
+  if (Number.isNaN(n)) return undefined
+  return v.endsWith('rem') ? n * 16 : n
 }
