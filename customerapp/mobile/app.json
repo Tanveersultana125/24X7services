@@ -1,0 +1,72 @@
+{
+  "expo": {
+    "name": "24X7 Services",
+    "slug": "twentyfourseven-customer",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/public/icons/icon-512.png",
+    "scheme": "twentyfourseven",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#ffffff",
+    "ios": {
+      "bundleIdentifier": "com.twentyfourseven.services",
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "com.twentyfourseven.services",
+      "adaptiveIcon": {
+        "backgroundColor": "#2547d0",
+        "foregroundImage": "./assets/public/icons/icon-maskable-512.png"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "CAMERA"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/public/icons/icon-48.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#ffffff",
+          "image": "./assets/public/icons/icon-512.png",
+          "imageWidth": 120,
+          "dark": {
+            "backgroundColor": "#121110",
+            "image": "./assets/public/icons/icon-512.png"
+          }
+        }
+      ],
+      "expo-sqlite",
+      "expo-video",
+      "expo-web-browser",
+      "expo-sharing",
+      "expo-asset",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "24X7 uses your location to check that we cover your area and to fill in your address."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Add photos of your appliance so the technician knows what to bring.",
+          "cameraPermission": "Take a photo of your appliance so the technician knows what to bring."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

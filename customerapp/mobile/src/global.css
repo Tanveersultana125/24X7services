@@ -1,0 +1,120 @@
+@import 'tailwindcss';
+@import 'uniwind';
+
+/* ===========================================================================
+   Design tokens — the same ones the web app wears (frontend/app/globals.css),
+   so a className copied across from a web component means the same thing
+   here. Brand blue is the app talking: anything tappable, anything chosen.
+   The three semantic hues are the job talking and stay on badges, dots and
+   alerts.
+   =========================================================================== */
+
+@theme {
+  /* Fixed, whatever the theme. `night` is the scrim over a photo; `royal` is
+     brand blue for text on a white pill that sits on a coloured card. */
+  --color-night: #17150f;
+  --color-royal: #2547d0;
+
+  /* Manrope, one family per weight: Android cannot pick a weight out of a
+     family on its own, so each weight utility names its file (below). */
+  --font-sans: 'Manrope_400Regular';
+
+  /* The seven-step scale. Anything not on it is a mistake, not a decision. */
+  --text-xs: 12px;
+  --text-xs--line-height: 18px;
+  --text-sm: 14px;
+  --text-sm--line-height: 20px;
+  --text-base: 16px;
+  --text-base--line-height: 24px;
+  --text-lg: 18px;
+  --text-lg--line-height: 26px;
+  --text-xl: 22px;
+  --text-xl--line-height: 30px;
+  --text-2xl: 28px;
+  --text-2xl--line-height: 34px;
+  --text-3xl: 34px;
+  --text-3xl--line-height: 40px;
+
+  --radius-card: 12px;
+  --radius-pill: 999px;
+}
+
+/* Light and dark, following the phone. The dark palette is the warm one turned
+   down rather than inverted, with a brighter brand blue so links still read.
+   Photographs keep a light plate in both, or cut-outs become black shapes. */
+@layer theme {
+  :root {
+    @variant light {
+      --color-ink: #17150f;
+      --color-bg: #ffffff;
+      --color-surface: #f4f2ec;
+      --color-border: #e6e2d8;
+      --color-muted: #6b665a;
+
+      --color-brand: #2547d0;
+      --color-brand-deep: #1e3a8a;
+      --color-brand-soft: #eef2fe;
+
+      --color-success: #0b9a63;
+      --color-warning: #d9821b;
+      --color-error: #d64545;
+      --color-success-soft: #e9f7f1;
+      --color-warning-soft: #fdf4e7;
+      --color-error-soft: #fcefef;
+
+      --color-plate: #f4f2ec;
+      --color-plate-deep: #e6e2d8;
+      --color-logo: #ffffff;
+    }
+
+    @variant dark {
+      --color-ink: #f1ede4;
+      --color-bg: #121110;
+      --color-surface: #1c1a17;
+      --color-border: #2f2c27;
+      --color-muted: #a8a193;
+
+      --color-brand: #4d6ef0;
+      --color-brand-deep: #2c47b8;
+      --color-brand-soft: #1b2344;
+
+      --color-success: #1fb57a;
+      --color-warning: #e39a3b;
+      --color-error: #e5605f;
+      --color-success-soft: #10281e;
+      --color-warning-soft: #2c2113;
+      --color-error-soft: #2d1616;
+
+      --color-plate: #ece8e0;
+      --color-plate-deep: #ded9cf;
+      --color-logo: #ece8e0;
+    }
+  }
+}
+
+/* Each weight utility carries its own Manrope file. */
+@utility font-normal {
+  font-family: 'Manrope_400Regular';
+  font-weight: 400;
+}
+@utility font-medium {
+  font-family: 'Manrope_500Medium';
+  font-weight: 500;
+}
+@utility font-semibold {
+  font-family: 'Manrope_600SemiBold';
+  font-weight: 600;
+}
+@utility font-bold {
+  font-family: 'Manrope_700Bold';
+  font-weight: 700;
+}
+@utility font-extrabold {
+  font-family: 'Manrope_800ExtraBold';
+  font-weight: 800;
+}
+
+/* The one elevation level. */
+@utility shadow-raised {
+  box-shadow: 0 1px 2px rgba(10, 10, 10, 0.04), 0 8px 24px -12px rgba(10, 10, 10, 0.18);
+}
