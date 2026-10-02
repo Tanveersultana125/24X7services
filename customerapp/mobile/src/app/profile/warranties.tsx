@@ -1,11 +1,27 @@
-// PORT-PENDING: /profile/warranties — port of frontend/app/profile/warranties/page.tsx
-import { Screen, Header } from '@/components/Screen'
-import { Text } from '@/components/ui/Text'
+import { ShieldCheck } from 'lucide-react-native'
+import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
+import { WarrantyList } from '@/screens/profile/warranties/WarrantyList'
 
-export default function Placeholder() {
+/**
+ * Every service warranty, soonest to lapse first.
+ *
+ * Ordered by expiry rather than by date issued, because the only question this
+ * screen answers is "is this still covered" — and the one about to run out is
+ * the one worth acting on today.
+ */
+export default function WarrantiesScreen() {
   return (
-    <Screen tab={false} header={<Header title="Warranties" showBack />}>
-      <Text className="mt-6 text-muted">/profile/warranties</Text>
-    </Screen>
+    <ProfileShell
+      title="Warranties"
+      signedOut={
+        <SignInPrompt
+          icon={ShieldCheck}
+          title="Your warranties"
+          description="Every completed repair carries a service warranty. Log in to see what is still covered."
+        />
+      }
+    >
+      {(user) => <WarrantyList uid={user.uid} />}
+    </ProfileShell>
   )
 }

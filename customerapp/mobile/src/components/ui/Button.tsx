@@ -1,3 +1,4 @@
+import { Children } from 'react'
 import { ActivityIndicator, View } from 'react-native'
 import type { Href } from 'expo-router'
 import { cn } from '@/lib/cn'
@@ -59,6 +60,16 @@ const sizes: Record<Size, { box: string; text: string }> = {
   lg: { box: 'h-14 px-6', text: 'text-base' },
 }
 
+/**
+ * A label made only of text — `"Pay"`, or `Buy for {price}`, which JSX hands
+ * over as an array of strings. Either way it goes inside one <Text>; bare
+ * strings in a View crash on a phone.
+ */
+function isText(children: React.ReactNode): boolean {
+  const parts = Children.toArray(children)
+  return parts.length > 0 && parts.every((part) => typeof part === 'string' || typeof part === 'number')
+}
+
 export function Button({
   variant = 'primary',
   size = 'md',
@@ -99,7 +110,7 @@ export function Button({
       {/* The label stays laid out while loading so the width holds. */}
       <View className={cn('flex-row items-center gap-2', loading && 'opacity-0')}>
         {iconLeft}
-        {typeof children === 'string' || typeof children === 'number' ? (
+        {isText(children) ? (
           <Text
             numberOfLines={1}
             className={cn('font-semibold', sizes[size].text, look.text, textClassName)}

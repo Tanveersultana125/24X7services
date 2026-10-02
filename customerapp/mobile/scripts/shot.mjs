@@ -22,11 +22,14 @@ const WebSocket = require(join(root, '..', 'node_modules', 'ws'))
 const args = process.argv.slice(2)
 const flags = Object.fromEntries(
   args.filter((a) => a.startsWith('--')).map((a) => {
-    const [k, v] = a.slice(2).split('=')
+    const [, k, v] = a.slice(2).match(/^([^=]*)(?:=([\s\S]*))?$/)
     return [k, v ?? true]
   })
 )
-const [outDir, ...paths] = args.filter((a) => !a.startsWith('--'))
+const [rawOutDir, ...paths] = args.filter((a) => !a.startsWith('--'))
+// With MSYS_NO_PATHCONV=1, Git Bash hands over '/c/Users/...' untranslated,
+// which Node would write under C:\c\. Turn it back into a drive path.
+const outDir = rawOutDir.replace(/^\/([a-z])\//i, (_, drive) => `${drive.toUpperCase()}:/`)
 const width = Number(flags.width ?? 390)
 const height = Number(flags.height ?? 844)
 const dark = Boolean(flags.dark)

@@ -9,6 +9,9 @@ import {
   query,
   where,
 } from 'firebase/firestore'
+import { Platform } from 'react-native'
+import { File, Paths } from 'expo-file-system'
+import * as Sharing from 'expo-sharing'
 import { COL, SUB } from '@app/shared'
 import { db } from './firebase'
 
@@ -184,20 +187,44 @@ export async function collectMyData(uid: string): Promise<ExportedData> {
 /**
  * Hand the file over.
  *
- * An object URL and a synthetic click, revoked on the next tick — the same
- * three lines every download in a browser is, and the only way to name a file
- * the customer will recognise a month later.
+ * On a phone there is no downloads folder to drop a file into, so the file is
+ * written to the app's cache under the name the customer will recognise a
+ * month later, and the system share sheet takes it from there — Save to Files,
+ * Drive, mail it to themselves. The web build keeps the browser download.
+ *
+ * The signature stays fire-and-forget like the web's: a customer closing the
+ * share sheet is not an error, and a failed write has nothing useful to say.
  */
 export function downloadJson(data: unknown, filename: string): void {
-  const blob = new Blob([JSON.stringify(data, null, 2)], {
-    type: 'application/json',
-  })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  document.body.appendChild(link)
-  link.click()
-  link.remove()
-  setTimeout(() => URL.revokeObjectURL(url), 0)
+  const text = JSON.stringify(data, null, 2)
+
+  if (Platform.OS === 'web') {
+    const blob = new Blob([text], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    setTimeout(() => URL.revokeObjectURL(url), 0)
+    return
+  }
+
+  void (async () => {
+    try {
+      const file = new File(Paths.cache, filename)
+      file.create({ overwrite: true })
+      file.write(text)
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(file.uri, {
+          mimeType: 'application/json',
+          UTI: 'public.json',
+          dialogTitle: filename,
+        })
+      }
+    } catch {
+      // Nothing to recover: the sheet was closed or the cache would not take it.
+    }
+  })()
 }

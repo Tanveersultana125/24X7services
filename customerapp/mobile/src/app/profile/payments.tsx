@@ -1,11 +1,3 @@
-// PORT-PENDING: /profile/payments — port of frontend/app/profile/payments/page.tsx
-import { Screen, Header } from '@/components/Screen'
-import { Text } from '@/components/ui/Text'
+import { PaymentsScreen } from '@/screens/profile/payments/PaymentsScreen'
 
-export default function Placeholder() {
-  return (
-    <Screen tab={false} header={<Header title="Payments" showBack />}>
-      <Text className="mt-6 text-muted">/profile/payments</Text>
-    </Screen>
-  )
-}
+export default PaymentsScreen
