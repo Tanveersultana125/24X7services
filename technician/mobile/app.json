@@ -15,7 +15,7 @@
     "android": {
       "package": "com.twentyfourseven.partner",
       "adaptiveIcon": {
-        "backgroundColor": "#2547d0",
+        "backgroundColor": "#0f1d57",
         "foregroundImage": "./assets/adaptive-icon.png"
       },
       "predictiveBackGestureEnabled": false,
@@ -34,8 +34,8 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#0f1d57",
-          "image": "./assets/icon.png",
-          "imageWidth": 120
+          "image": "./assets/adaptive-icon.png",
+          "imageWidth": 160
         }
       ],
       "expo-sqlite",
