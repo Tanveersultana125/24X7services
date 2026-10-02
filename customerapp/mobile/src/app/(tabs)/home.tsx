@@ -1,11 +1,6 @@
-// PORT-PENDING: /home — port of frontend/app/home/page.tsx
-import { Screen, Header } from '@/components/Screen'
-import { Text } from '@/components/ui/Text'
+import { HomeScreen } from '@/screens/home/HomeScreen'
 
-export default function Placeholder() {
-  return (
-    <Screen tab={true} header={<Header title="Home" />}>
-      <Text className="mt-6 text-muted">/home</Text>
-    </Screen>
-  )
+/** Home — port of frontend/app/home/page.tsx. The screen body is in screens/home. */
+export default function Page() {
+  return <HomeScreen />
 }
