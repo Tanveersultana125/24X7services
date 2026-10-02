@@ -1,3 +1,5 @@
+import * as ImagePicker from 'expo-image-picker'
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator'
 import type { MediaLimits } from '@app/shared'
 
 /**
@@ -8,7 +10,25 @@ import type { MediaLimits } from '@app/shared'
  * Compression happens here rather than server-side because the cost falls on
  * the customer either way, and a 4MB phone photo on a patchy connection is the
  * difference between a booking completing and a booking being abandoned.
+ *
+ * On the phone there is no File object: the picker hands back a local uri with
+ * what it knows about the file, and that record (PickedMedia) stands in for a
+ * File everywhere the web version took one.
  */
+
+/** A photo or video picked on the device, by uri. */
+export interface PickedMedia {
+  uri: string
+  name: string
+  /** MIME type. */
+  type: string
+  /** Bytes. 0 when the platform could not say. */
+  size: number
+  width?: number
+  height?: number
+  /** Seconds, for a video the picker could measure. */
+  duration?: number
+}
 
 export interface MediaValidationError {
   code:
@@ -23,17 +43,106 @@ export interface MediaValidationError {
 const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']
 const VIDEO_TYPES = ['video/mp4', 'video/quicktime', 'video/webm']
 
-export function isPhoto(file: File): boolean {
+export function isPhoto(file: PickedMedia): boolean {
   return PHOTO_TYPES.includes(file.type)
 }
 
-export function isVideo(file: File): boolean {
+export function isVideo(file: PickedMedia): boolean {
   return VIDEO_TYPES.includes(file.type)
 }
 
+const EXTENSION_TYPES: Record<string, string> = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+  heic: 'image/heic',
+  heif: 'image/heif',
+  mp4: 'video/mp4',
+  mov: 'video/quicktime',
+  webm: 'video/webm',
+}
+
+function extensionOf(value: string | null | undefined): string {
+  const match = /\.([a-z0-9]+)(?:\?.*)?$/i.exec(value ?? '')
+  return match?.[1]?.toLowerCase() ?? ''
+}
+
+/** Bytes in the file at `uri`, read back rather than trusted from the picker. */
+async function sizeOf(uri: string): Promise<number> {
+  try {
+    const blob = await (await fetch(uri)).blob()
+    return blob.size
+  } catch {
+    return 0
+  }
+}
+
 /**
- * Draw the image onto a canvas no larger than `maxDimension` on its long edge,
- * then step the JPEG quality down until it fits the byte budget.
+ * The picker's asset as a PickedMedia. Android does not always report a MIME
+ * type, so it is worked out from the name, then from the kind of asset.
+ */
+export async function fromPickerAsset(asset: ImagePicker.ImagePickerAsset): Promise<PickedMedia> {
+  const name = asset.fileName ?? asset.uri.split('/').pop() ?? 'media'
+  const type =
+    asset.mimeType ??
+    EXTENSION_TYPES[extensionOf(name)] ??
+    EXTENSION_TYPES[extensionOf(asset.uri)] ??
+    (asset.type === 'video' ? 'video/mp4' : asset.type === 'image' ? 'image/jpeg' : '')
+  const size = asset.fileSize ?? (await sizeOf(asset.uri))
+  return {
+    uri: asset.uri,
+    name,
+    type,
+    size,
+    width: asset.width,
+    height: asset.height,
+    ...(asset.duration ? { duration: asset.duration / 1000 } : {}),
+  }
+}
+
+/**
+ * Open the camera or the gallery for a photo or a video. Resolves to nothing
+ * when the customer backs out, and throws when permission was refused, with a
+ * message that says where to turn it on.
+ */
+export async function pickMedia(
+  kind: 'image' | 'video',
+  source: 'camera' | 'library',
+  options: { multiple?: boolean; limit?: number; maxVideoSeconds?: number } = {}
+): Promise<PickedMedia[]> {
+  const common: ImagePicker.ImagePickerOptions = {
+    mediaTypes: kind === 'image' ? 'images' : 'videos',
+    // The picker's own JPEG step; compressPhoto does the sizing afterwards.
+    quality: 1,
+    ...(kind === 'video' && options.maxVideoSeconds ? { videoMaxDuration: options.maxVideoSeconds } : {}),
+  }
+
+  let result: ImagePicker.ImagePickerResult
+  if (source === 'camera') {
+    const permission = await ImagePicker.requestCameraPermissionsAsync()
+    if (!permission.granted) {
+      throw new Error('Allow camera access in your phone settings to take one here.')
+    }
+    result = await ImagePicker.launchCameraAsync({
+      ...common,
+      cameraType: ImagePicker.CameraType.back,
+    })
+  } else {
+    result = await ImagePicker.launchImageLibraryAsync({
+      ...common,
+      allowsMultipleSelection: Boolean(options.multiple),
+      ...(options.limit ? { selectionLimit: options.limit } : {}),
+    })
+  }
+
+  if (result.canceled) return []
+  return Promise.all(result.assets.map(fromPickerAsset))
+}
+
+/**
+ * Scale the photo to no larger than `maxDimension` on its long edge, then step
+ * the JPEG quality down until it fits the byte budget.
  *
  * Quality is stepped rather than solved because the relationship between
  * quality and size depends on the picture. A flat wall compresses to nothing at
@@ -41,73 +150,60 @@ export function isVideo(file: File): boolean {
  * customer sends of a leaking washing machine.
  */
 export async function compressPhoto(
-  file: File,
+  file: PickedMedia,
   limits: Pick<MediaLimits, 'maxPhotoBytes' | 'maxPhotoDimension'>
-): Promise<File> {
+): Promise<PickedMedia> {
   if (!isPhoto(file)) return file
 
-  const bitmap = await createImageBitmap(file)
-  const scale = Math.min(
-    1,
-    limits.maxPhotoDimension / Math.max(bitmap.width, bitmap.height)
-  )
-  const width = Math.round(bitmap.width * scale)
-  const height = Math.round(bitmap.height * scale)
+  try {
+    const context = ImageManipulator.manipulate(file.uri)
+    const long = Math.max(file.width ?? 0, file.height ?? 0)
+    if (long > limits.maxPhotoDimension) {
+      const landscape = (file.width ?? 0) >= (file.height ?? 0)
+      context.resize(
+        landscape ? { width: limits.maxPhotoDimension } : { height: limits.maxPhotoDimension }
+      )
+    }
+    const image = await context.renderAsync()
 
-  const canvas = document.createElement('canvas')
-  canvas.width = width
-  canvas.height = height
-  const ctx = canvas.getContext('2d')
-  if (!ctx) {
-    bitmap.close()
+    let best: { uri: string; size: number; width: number; height: number } | null = null
+    for (const quality of [0.82, 0.7, 0.6, 0.5, 0.4]) {
+      const saved = await image.saveAsync({ compress: quality, format: SaveFormat.JPEG })
+      const size = await sizeOf(saved.uri)
+      best = { uri: saved.uri, size, width: saved.width, height: saved.height }
+      if (size > 0 && size <= limits.maxPhotoBytes) break
+    }
+
+    // Even at the lowest quality it may not fit. Sending the smallest version
+    // we managed beats refusing a photo the technician would find useful.
+    if (!best) return file
+
+    return {
+      uri: best.uri,
+      name: file.name.replace(/\.[^.]+$/, '') + '.jpg',
+      type: 'image/jpeg',
+      size: best.size,
+      width: best.width,
+      height: best.height,
+    }
+  } catch {
+    // A photo the manipulator cannot read is sent as it is.
     return file
   }
-  ctx.drawImage(bitmap, 0, 0, width, height)
-  bitmap.close()
-
-  let blob: Blob | null = null
-  for (const quality of [0.82, 0.7, 0.6, 0.5, 0.4]) {
-    blob = await canvasToBlob(canvas, quality)
-    if (blob && blob.size <= limits.maxPhotoBytes) break
-  }
-
-  // Even at the lowest quality it may not fit. Sending the smallest version we
-  // managed beats refusing a photo the technician would find useful.
-  if (!blob) return file
-
-  const name = file.name.replace(/\.[^.]+$/, '') + '.jpg'
-  return new File([blob], name, { type: 'image/jpeg', lastModified: Date.now() })
 }
 
-function canvasToBlob(
-  canvas: HTMLCanvasElement,
-  quality: number
-): Promise<Blob | null> {
-  return new Promise((resolve) => {
-    canvas.toBlob((blob) => resolve(blob), 'image/jpeg', quality)
-  })
-}
-
-/** Read a video's duration without uploading it. */
-export function videoDuration(file: File): Promise<number> {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file)
-    const video = document.createElement('video')
-    video.preload = 'metadata'
-    video.onloadedmetadata = () => {
-      URL.revokeObjectURL(url)
-      resolve(video.duration)
-    }
-    video.onerror = () => {
-      URL.revokeObjectURL(url)
-      reject(new Error('Could not read the video'))
-    }
-    video.src = url
-  })
+/**
+ * A video's duration, without uploading it. The picker measures it; when it
+ * could not, the duration is unknown and the check is skipped.
+ */
+export function videoDuration(file: PickedMedia): Promise<number> {
+  return file.duration !== undefined
+    ? Promise.resolve(file.duration)
+    : Promise.reject(new Error('Could not read the video'))
 }
 
 export async function validateMedia(
-  file: File,
+  file: PickedMedia,
   limits: MediaLimits,
   existing: { photos: number; videos: number }
 ): Promise<MediaValidationError | null> {
