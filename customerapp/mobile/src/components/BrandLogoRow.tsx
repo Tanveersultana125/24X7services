@@ -36,7 +36,9 @@ export function BrandLogoRow({ brands }: { brands: readonly CatalogBrand[] }) {
           {brand.logo ? (
             <Img src={brand.logo} alt={brand.name} contentFit="contain" className="h-6 w-full" />
           ) : (
-            <Text className="text-center text-sm font-bold uppercase tracking-[1.1px] text-ink">{brand.wordmark}</Text>
+            <Text numberOfLines={1} className="text-center text-sm font-bold uppercase tracking-[1.1px] text-night">
+              {brand.wordmark}
+            </Text>
           )}
         </View>
       ))}

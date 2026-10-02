@@ -1,11 +1,5 @@
-// PORT-PENDING: /services/appliance — port of frontend/app/services/appliance/page.tsx
-import { Screen, Header } from '@/components/Screen'
-import { Text } from '@/components/ui/Text'
+import { ApplianceScreen } from '@/screens/services/ApplianceScreen'
 
-export default function Placeholder() {
-  return (
-    <Screen tab={false} header={<Header title="Appliance" showBack />}>
-      <Text className="mt-6 text-muted">/services/appliance</Text>
-    </Screen>
-  )
+export default function Page() {
+  return <ApplianceScreen />
 }

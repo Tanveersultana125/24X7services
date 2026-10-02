@@ -18,7 +18,6 @@
         "backgroundColor": "#2547d0",
         "foregroundImage": "./assets/public/icons/icon-maskable-512.png"
       },
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "ACCESS_COARSE_LOCATION",
