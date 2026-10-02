@@ -1,0 +1,262 @@
+import { ScrollView, View } from 'react-native'
+import type { Href } from 'expo-router'
+import { Check } from 'lucide-react-native'
+import type { ApplianceId, ServiceKey } from '@app/shared'
+import { formatPaise } from '@/lib/format'
+import { ServiceClip } from '@/components/ServiceClip'
+import { ServiceScore, scoreLabel } from '@/components/ServiceScore'
+import { cn } from '@/lib/cn'
+import {
+  addToCart,
+  countForService,
+  inCart,
+  removeFromCart,
+  useCart,
+} from '@/lib/cart'
+import { Icon } from '@/components/ui/Icon'
+import { Tappable } from '@/components/ui/Tappable'
+import { Text } from '@/components/ui/Text'
+
+/**
+ * A sideways row of bookable things: what people book most, and then one row
+ * per appliance.
+ *
+ * A rail rather than a grid because these rows are browsable, not a decision —
+ * a customer who already knows they want an AC service taps it from here, and
+ * everyone else keeps scrolling down past it. A grid of four services per
+ * appliance would push the fifth appliance two screens down.
+ *
+ * Each card carries two separate targets, side by side rather than nested: the
+ * picture and the name open the appliance, where the full description and the
+ * warranty live, and the button puts it in the cart. Nesting the second inside
+ * the first is the usual way this is built and it leaves a screen reader with
+ * one control that does two things.
+ *
+ * The score sits under the name, so a rail says the same three things the
+ * card on the appliance page says — what it looks like, what people made of
+ * it, what it costs.
+ *
+ * The picture is a photograph, not a frame of the service's clip. A clip is
+ * drawn at card width with a line of its own along the foot; at the 160px a
+ * rail card gets, that line is a smudge and the whole thing reads as a blue
+ * rectangle. The photograph is the only picture that still says "washing
+ * machine" at this size. The clips keep the appliance page, where they are
+ * full width and where what they say can be read.
+ *
+ * Nothing here moves, for the same reason: a card cannot show a photograph
+ * and play an illustrated clip over it without the picture changing under
+ * the reader a second after they look at it.
+ */
+
+export interface ServiceRailItem {
+  id: string
+  name: string
+  /** The appliance photo. These rails are never about a specific unit. */
+  image?: string
+  /**
+   * A photograph of the appliance. Falls back to `image`, which on an
+   * appliance without one is a drawing on a plate and so is contained rather
+   * than cropped.
+   */
+  photo?: string
+  /** Out of five, and how many said so. Both or neither — see `ServiceScore`. */
+  rating?: number
+  reviewCount?: number
+  /** Where the name and the picture go — the appliance page. */
+  href: Href
+  /** "About 1 hr", or whatever else is worth knowing before a slot is picked. */
+  note?: string
+  /** What the number underneath is: "Visit fee", "From". */
+  priceLabel: string
+  /** Paise. Formatted here so no caller has to remember to. */
+  price: number
+  /** What "Add" puts in the cart. */
+  applianceId: ApplianceId
+  serviceKey: ServiceKey
+  /**
+   * How many options the service has — the problems a repair is booked for.
+   * With any, "Add" says so underneath and opens them (`onOptions`) instead
+   * of adding the service outright.
+   */
+  options?: number
+  onOptions?: () => void
+  /**
+   * Opens the service in a sheet over the page instead of following `href`,
+   * where the page has one to open.
+   */
+  onOpen?: () => void
+}
+
+export function ServiceRail({
+  items,
+  className,
+}: {
+  items: readonly ServiceRailItem[]
+  className?: string
+}) {
+  if (items.length === 0) return null
+
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      className={cn('-mx-4 -my-1', className)}
+      contentContainerClassName="gap-3 px-4 py-1"
+    >
+      {items.map((item) => (
+        <View key={item.id} className="w-40 flex-col">
+          <CardLink
+            item={item}
+            label={[item.name, scoreLabel(item.rating, item.reviewCount)]
+              .filter(Boolean)
+              .join(', ')}
+          >
+            <ServiceClip
+              still={item.photo ?? item.image}
+              cover={Boolean(item.photo)}
+              motion={false}
+              sizes="160px"
+              containClassName="p-5"
+              // A photograph is cropped square, which is the shape the rail
+              // was laid out on. A drawing keeps that square too, with the
+              // room around it it was drawn with.
+              className="aspect-square rounded-card"
+            />
+            <Text numberOfLines={2} className="mt-2.5 text-sm font-semibold text-ink">
+              {item.name}
+            </Text>
+          </CardLink>
+
+          <ServiceScore
+            rating={item.rating}
+            reviewCount={item.reviewCount}
+            variant="compact"
+            className="mt-1"
+          />
+
+          {item.note ? <Text className="mt-1 text-xs text-muted">{item.note}</Text> : null}
+
+          {/* Pushed to the bottom so the prices line up across cards whose
+              names ran to one line and cards whose names ran to two. The
+              bottom padding is room for the "6 options" caption hanging
+              across the foot of Add: a sideways-scrolling list clips what
+              spills out of it downwards too. */}
+          <View className="mt-auto flex-row items-end justify-between gap-2 pb-2.5 pt-2">
+            <View className="min-w-0 shrink">
+              <Text className="text-[11px] leading-[11px] text-muted">{item.priceLabel}</Text>
+              <Text className="mt-1 text-sm font-bold text-ink">{formatPaise(item.price)}</Text>
+            </View>
+            <AddButton item={item} />
+          </View>
+        </View>
+      ))}
+    </ScrollView>
+  )
+}
+
+/** The picture and the name: a sheet over the page where there is one, else a link. */
+function CardLink({
+  item,
+  label,
+  children,
+}: {
+  item: ServiceRailItem
+  label: string
+  children: React.ReactNode
+}) {
+  if (item.onOpen) {
+    return (
+      <Tappable onPress={item.onOpen} accessibilityLabel={label} className="w-full">
+        {children}
+      </Tappable>
+    )
+  }
+  return (
+    <Tappable href={item.href} accessibilityLabel={label}>
+      {children}
+    </Tappable>
+  )
+}
+
+/**
+ * "Add", and once added, "Added" — tapped again, it takes the service back
+ * out. A service with options says how many under the label, the way the
+ * marketplaces do, and opens them instead: which problem a repair is for is
+ * part of what is being added. The count and the way to the cart are
+ * CartBar's, under the page.
+ *
+ * Shared with the service cards on the appliance page, so "Add" is the same
+ * button, with the same states, wherever a service is listed.
+ */
+export function AddButton({
+  item,
+}: {
+  item: Pick<
+    ServiceRailItem,
+    'name' | 'applianceId' | 'serviceKey' | 'options' | 'onOptions'
+  > & {
+    /** The kind of machine already chosen on the page, carried into the cart. */
+    applianceType?: string
+  }
+}) {
+  const cart = useCart()
+  const entry = {
+    applianceId: item.applianceId,
+    serviceKey: item.serviceKey,
+    ...(item.applianceType ? { applianceType: item.applianceType } : {}),
+  }
+  const withOptions = Boolean(item.options && item.onOptions)
+  const added = withOptions
+    ? countForService(cart, entry) > 0
+    : inCart(cart, entry)
+
+  function press(): void {
+    if (withOptions) item.onOptions?.()
+    else if (added) removeFromCart(entry)
+    else addToCart(entry)
+  }
+
+  return (
+    <Tappable
+      onPress={press}
+      accessibilityState={withOptions ? undefined : { selected: added }}
+      accessibilityLabel={
+        withOptions
+          ? `Add ${item.name}, ${item.options} options`
+          : added
+            ? `Remove ${item.name} from cart`
+            : `Add ${item.name} to cart`
+      }
+      className={cn(
+        'relative h-11 w-[5.5rem] shrink-0 flex-row items-center justify-center gap-1 rounded-card border',
+        added ? 'border-brand bg-brand-soft' : 'border-border bg-bg active:border-brand'
+      )}
+    >
+      {added ? <Icon as={Check} className="size-4 text-brand" /> : null}
+      <Text className="text-sm font-semibold text-brand">{added ? 'Added' : 'Add'}</Text>
+      {withOptions ? (
+        // Sits across the bottom edge, on the page colour, so it reads as a
+        // caption of the button rather than a second line crammed inside it.
+        <View
+          pointerEvents="none"
+          importantForAccessibility="no-hide-descendants"
+          className="absolute inset-x-0 -bottom-2 items-center"
+        >
+          <Text numberOfLines={1} className="bg-bg px-1 text-[11px] leading-[11px] text-muted">
+            {item.options} options
+          </Text>
+        </View>
+      ) : null}
+    </Tappable>
+  )
+}
+
+/** "About 1 hr 30 mins" — the line under a rail card's name. */
+export function durationNote(minutes: number | undefined): string | undefined {
+  if (minutes === undefined || minutes <= 0) return undefined
+  const hours = Math.floor(minutes / 60)
+  const rest = minutes % 60
+  if (hours === 0) return `About ${rest} mins`
+  const hourPart = `${hours} hr${hours > 1 ? 's' : ''}`
+  return rest === 0 ? `About ${hourPart}` : `About ${hourPart} ${rest} mins`
+}

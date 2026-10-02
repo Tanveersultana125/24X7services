@@ -34,7 +34,7 @@ const full = Boolean(flags.full)
 const wait = Number(flags.wait ?? 3500)
 mkdirSync(outDir, { recursive: true })
 
-const dist = join(root, 'dist-web')
+const dist = join(root, typeof flags.dist === 'string' ? flags.dist : 'dist-web')
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.ttf': 'font/ttf', '.json': 'application/json', '.mp4': 'video/mp4' }
 const server = createServer((req, res) => {
   const url = decodeURIComponent(req.url.split('?')[0])

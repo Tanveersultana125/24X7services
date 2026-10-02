@@ -45,5 +45,6 @@ example
 # Copied from ../frontend/public by scripts/sync-public.mjs (runs on postinstall)
 /assets/public/
 /src/lib/publicAssets.generated.ts
-/dist-web/
+
 /src/uniwind-types.d.ts
+/dist-web*/
