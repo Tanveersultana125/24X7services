@@ -1,0 +1,90 @@
+@import 'tailwindcss';
+@import 'uniwind';
+
+/* ===========================================================================
+   Design tokens — the same ones the technician web app wears
+   (technician/app/globals.css), so a className copied across from a web
+   component means the same thing here.
+
+   Same brand blue and typeface as the customer app, so the two read as one
+   company. The neutrals are cooler: this is a work tool used in sunlight on a
+   cheap phone, and a crisp white card on a pale slate canvas holds contrast
+   better outdoors than warm paper does. Light only, like the web app.
+
+   Colour has two jobs and they never mix. Blue is the app: anything tappable,
+   anything chosen. The status hues are the job: they live on chips, rails and
+   dots, and every one of them also carries a word.
+   =========================================================================== */
+
+@theme {
+  --color-ink: #111827;
+  --color-ink-2: #374151;
+  --color-muted: #5b6475;
+  --color-faint: #8a93a3;
+  --color-canvas: #f3f5f8;
+  --color-card: #ffffff;
+  --color-line: #e3e7ee;
+  --color-line-strong: #cfd5df;
+
+  --color-brand: #2547d0;
+  --color-brand-deep: #1a3499;
+  --color-brand-ink: #0f1d57;
+  --color-brand-soft: #eef2fe;
+
+  --color-success: #0a8f5c;
+  --color-success-soft: #e7f6ef;
+  --color-warning: #c9730f;
+  --color-warning-soft: #fdf3e4;
+  --color-danger: #d0342c;
+  --color-danger-soft: #fdeeed;
+  --color-info: #0e7490;
+  --color-info-soft: #e6f5f8;
+  --color-violet: #6d3fd1;
+  --color-violet-soft: #f1ecfd;
+
+  /* Manrope, one family per weight: Android cannot pick a weight out of a
+     family on its own, so each weight utility names its file (below). */
+  --font-sans: 'Manrope_400Regular';
+
+  --text-2xs: 11px;
+  --text-2xs--line-height: 16px;
+
+  --radius-card: 14px;
+  --radius-pill: 999px;
+}
+
+/* Each weight utility carries its own Manrope file. */
+@utility font-normal {
+  font-family: 'Manrope_400Regular';
+  font-weight: 400;
+}
+@utility font-medium {
+  font-family: 'Manrope_500Medium';
+  font-weight: 500;
+}
+@utility font-semibold {
+  font-family: 'Manrope_600SemiBold';
+  font-weight: 600;
+}
+@utility font-bold {
+  font-family: 'Manrope_700Bold';
+  font-weight: 700;
+}
+@utility font-extrabold {
+  font-family: 'Manrope_800ExtraBold';
+  font-weight: 800;
+}
+
+/* Numbers that must line up in a column — money, times, counts. */
+@utility num {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.12px;
+}
+
+/* The two elevation levels the web app uses. */
+@utility shadow-card {
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.05);
+}
+@utility shadow-float {
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.06), 0 12px 32px -12px rgba(17, 24, 39, 0.22);
+}
