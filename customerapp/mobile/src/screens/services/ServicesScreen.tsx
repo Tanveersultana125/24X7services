@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { ScrollView, View } from 'react-native'
+import { View } from 'react-native'
 import { PackageOpen, TrendingUp } from 'lucide-react-native'
 import { router } from 'expo-router'
 import type { CatalogAppliance, CatalogService } from '@app/shared'
@@ -12,7 +12,7 @@ import { ServicesHero } from '@/components/ServicesHero'
 import { Icon } from '@/components/ui/Icon'
 import { Tappable } from '@/components/ui/Tappable'
 import { Text } from '@/components/ui/Text'
-import { TRENDING_SEARCHES } from '@/lib/trending'
+import { SERVICES_SEARCH_CHIPS } from '@/lib/trending'
 import { ApplianceCard } from '@/components/ApplianceCard'
 import { TrustPoints } from '@/components/TrustPoints'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
@@ -74,24 +74,24 @@ export function ServicesScreen() {
           a search that is known to land. */}
       <View className="mt-3">
         <SearchBar readOnly prominent onOpen={() => router.push('/search')} />
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          accessibilityLabel="Popular searches"
-          className="-mx-4 mt-2.5"
-          contentContainerClassName="gap-2 px-4"
-        >
-          {TRENDING_SEARCHES.map((term) => (
-            <Tappable
-              key={term}
-              href={{ pathname: '/search', params: { q: term } }}
-              className="min-h-10 flex-row items-center gap-1.5 rounded-pill border border-border bg-bg px-3 active:border-brand active:opacity-100"
-            >
-              <Icon as={TrendingUp} className="size-3.5 text-brand" />
-              <Text className="text-[13px] font-medium text-ink">{term}</Text>
-            </Tappable>
+        <View accessibilityLabel="Popular searches" className="mt-2.5 gap-2">
+          {[SERVICES_SEARCH_CHIPS.slice(0, 2), SERVICES_SEARCH_CHIPS.slice(2, 4)].map((row) => (
+            <View key={row[0].label} className="flex-row gap-2">
+              {row.map((chip) => (
+                <Tappable
+                  key={chip.label}
+                  href={{ pathname: '/search', params: { q: chip.query } }}
+                  className="min-h-10 flex-1 flex-row items-center justify-center gap-1.5 rounded-pill border border-border bg-bg px-3 active:border-brand active:opacity-100"
+                >
+                  <Icon as={TrendingUp} className="size-3.5 text-brand" />
+                  <Text numberOfLines={1} className="shrink text-[13px] font-medium text-ink">
+                    {chip.label}
+                  </Text>
+                </Tappable>
+              ))}
+            </View>
           ))}
-        </ScrollView>
+        </View>
       </View>
 
       <ServicesHero applianceCount={all.data?.appliances.length} fromPaise={lowest} rating={overall} />

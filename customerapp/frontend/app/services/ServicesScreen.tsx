@@ -11,7 +11,7 @@ import { Header } from '@/components/Header'
 import { CartButton } from '@/components/CartButton'
 import { SearchBar } from '@/components/SearchBar'
 import { ServicesHero } from '@/components/ServicesHero'
-import { TRENDING_SEARCHES } from '@/lib/trending'
+import { SERVICES_SEARCH_CHIPS } from '@/lib/trending'
 import { ApplianceCard } from '@/components/ApplianceCard'
 import { TrustPoints } from '@/components/TrustPoints'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
@@ -93,16 +93,16 @@ export function ServicesScreen() {
         />
         <ul
           aria-label="Popular searches"
-          className="no-scrollbar -mx-4 mt-2.5 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:flex-wrap lg:px-0"
+          className="mt-2.5 grid grid-cols-2 gap-2 lg:flex lg:flex-wrap"
         >
-          {TRENDING_SEARCHES.map((term) => (
-            <li key={term} className="shrink-0">
+          {SERVICES_SEARCH_CHIPS.map((chip) => (
+            <li key={chip.label}>
               <Link
-                href={`/search?q=${encodeURIComponent(term)}` as Route}
-                className="inline-flex min-h-10 items-center gap-1.5 rounded-pill border border-border bg-bg px-3 text-[13px] font-medium text-ink hover:border-brand"
+                href={`/search?q=${encodeURIComponent(chip.query)}` as Route}
+                className="flex min-h-10 items-center justify-center gap-1.5 rounded-pill border border-border bg-bg px-3 text-[13px] font-medium text-ink hover:border-brand lg:inline-flex"
               >
-                <TrendingUp className="size-3.5 text-brand" aria-hidden="true" />
-                {term}
+                <TrendingUp className="size-3.5 shrink-0 text-brand" aria-hidden="true" />
+                <span className="truncate">{chip.label}</span>
               </Link>
             </li>
           ))}
