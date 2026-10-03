@@ -94,7 +94,7 @@ export function ServicesScreen() {
         </View>
       </View>
 
-      <ServicesHero applianceCount={all.data?.appliances.length} fromPaise={lowest} rating={overall} />
+      <ServicesHero appliances={all.data?.appliances} fromPaise={lowest} rating={overall} />
 
       <Section
         className="mt-5"

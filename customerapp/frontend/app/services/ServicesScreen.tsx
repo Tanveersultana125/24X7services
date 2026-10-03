@@ -110,7 +110,7 @@ export function ServicesScreen() {
       </div>
 
       <ServicesHero
-        applianceCount={all.data?.appliances.length}
+        appliances={all.data?.appliances}
         fromPaise={lowest}
         rating={overall}
       />
