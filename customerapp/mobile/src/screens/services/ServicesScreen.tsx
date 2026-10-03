@@ -1,11 +1,17 @@
 import { useCallback } from 'react'
-import { View } from 'react-native'
-import { PackageOpen } from 'lucide-react-native'
+import { ScrollView, View } from 'react-native'
+import { PackageOpen, TrendingUp } from 'lucide-react-native'
+import { router } from 'expo-router'
 import type { CatalogAppliance, CatalogService } from '@app/shared'
 
 import { AppShell, Section } from '@/components/AppShell'
 import { Header } from '@/components/Screen'
 import { CartButton } from '@/components/CartButton'
+import { SearchBar } from '@/components/SearchBar'
+import { Icon } from '@/components/ui/Icon'
+import { Tappable } from '@/components/ui/Tappable'
+import { Text } from '@/components/ui/Text'
+import { TRENDING_SEARCHES } from '@/lib/trending'
 import { ApplianceCard } from '@/components/ApplianceCard'
 import { TrustPoints } from '@/components/TrustPoints'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
@@ -58,6 +64,32 @@ export function ServicesScreen() {
       onRefresh={all.reload}
       refreshing={all.refreshing}
     >
+      {/* The search field, first: someone who came here to find a thing by
+          name should not have to scan a grid for it. It opens the search
+          screen rather than searching in place, and the chips under it start
+          a search that is known to land. */}
+      <View className="mt-4">
+        <SearchBar readOnly prominent onOpen={() => router.push('/search')} />
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          accessibilityLabel="Popular searches"
+          className="-mx-4 mt-3"
+          contentContainerClassName="gap-2 px-4"
+        >
+          {TRENDING_SEARCHES.map((term) => (
+            <Tappable
+              key={term}
+              href={{ pathname: '/search', params: { q: term } }}
+              className="min-h-10 flex-row items-center gap-1.5 rounded-pill border border-border bg-bg px-3.5 active:border-brand active:opacity-100"
+            >
+              <Icon as={TrendingUp} className="size-4 text-brand" />
+              <Text className="text-sm font-medium text-ink">{term}</Text>
+            </Tappable>
+          ))}
+        </ScrollView>
+      </View>
+
       <Section
         className="mt-5"
         title="What we service"

@@ -1,7 +1,7 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { router, type Href } from 'expo-router'
+import { router, useLocalSearchParams, type Href } from 'expo-router'
 import { ArrowLeft, Check, ChevronRight, History, SearchX, Sparkles, TrendingUp, X } from 'lucide-react-native'
 import type { CatalogAppliance, CatalogIssue, CatalogService, SearchHit } from '@app/shared'
 
@@ -27,6 +27,7 @@ import { addToCart, countForService, inCart, removeFromCart, useCart } from '@/l
 import { CartBar } from '@/components/CartBar'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/cn'
+import { TRENDING_SEARCHES } from '@/lib/trending'
 
 /**
  * Search across appliances, services and the problems people describe.
@@ -62,7 +63,10 @@ const DEBOUNCE_MS = 250
 export function SearchScreen() {
   const insets = useSafeAreaInsets()
 
-  const [term, setTerm] = useState('')
+  // `?q=` arrives from a suggestion tapped elsewhere (the chips on Services),
+  // and starts the search as if it had been typed.
+  const { q } = useLocalSearchParams<{ q?: string }>()
+  const [term, setTerm] = useState(() => (typeof q === 'string' ? q : ''))
   const [result, setResult] = useState<{ query: string; hits: SearchHit[] } | null>(null)
   const [failure, setFailure] = useState<{ query: string; message: string } | null>(null)
   // Bumped by "Try again", which has to re-run a search for a term that has not
@@ -448,19 +452,6 @@ function HitRows({
 }
 
 /**
- * Searches that land on something every time: each one is a word the index
- * holds, so a tap never ends on "nothing matched".
- */
-const TRENDING = [
-  'AC service',
-  'Washing machine repair',
-  'Refrigerator repair',
-  'AC deep clean',
-  'Geyser installation',
-  'Microwave repair',
-] as const
-
-/**
  * Problems in the words a customer would use, each one a question the
  * assistant has a full answer for. Tapping opens the chat with it already sent.
  */
@@ -512,7 +503,7 @@ function Suggestions({
       <View>
         <Heading className="mb-4">Trending searches</Heading>
         <View className="flex-row flex-wrap gap-2.5">
-          {TRENDING.map((item) => (
+          {TRENDING_SEARCHES.map((item) => (
             <Tappable
               key={item}
               onPress={() => onPick(item)}

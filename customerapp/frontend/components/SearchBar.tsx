@@ -25,6 +25,12 @@ export interface SearchBarProps {
   autoFocus?: boolean
   /** For the ink header on Home, where the default grey fill disappears. */
   onDark?: boolean
+  /**
+   * The search field as the first thing on a page (Services): a raised white
+   * card with a brand icon and a Search button, rather than a quiet grey pill.
+   * Read-only only.
+   */
+  prominent?: boolean
   className?: string
 }
 
@@ -44,6 +50,7 @@ export function SearchBar({
   onOpen,
   autoFocus = false,
   onDark = false,
+  prominent = false,
   className,
 }: SearchBarProps) {
   const [index, setIndex] = useState(0)
@@ -67,6 +74,31 @@ export function SearchBar({
 
   const shell =
     'flex min-h-12 w-full items-center gap-2.5 rounded-pill border px-4 text-left'
+
+  if (readOnly && prominent) {
+    return (
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-label="Search services, appliances and issues"
+        className={cn(
+          'flex min-h-14 w-full items-center gap-3 rounded-pill border border-border bg-bg py-1.5 pl-1.5 pr-1.5 text-left shadow-raised',
+          'transition-colors duration-[var(--duration-fast)] hover:border-brand',
+          className
+        )}
+      >
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-brand-soft">
+          <Search className="size-5 text-brand" aria-hidden="true" />
+        </span>
+        <span className="min-w-0 flex-1 truncate text-sm text-muted">
+          {placeholder.replace(/^Search /, 'Try ')}
+        </span>
+        <span className="inline-flex h-11 shrink-0 items-center rounded-pill bg-brand px-5 text-sm font-semibold text-white">
+          Search
+        </span>
+      </button>
+    )
+  }
 
   if (readOnly) {
     return (

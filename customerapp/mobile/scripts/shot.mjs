@@ -46,8 +46,10 @@ const server = createServer((req, res) => {
   res.writeHead(200, { 'content-type': types[extname(file)] ?? 'application/octet-stream' })
   res.end(readFileSync(file))
 })
-await new Promise((r) => server.listen(0, '127.0.0.1', r))
-const origin = `http://127.0.0.1:${server.address().port}`
+// --origin=http://localhost:3310 shoots an already-running server (the web
+// app's dev server, say) instead of serving dist-web.
+if (!flags.origin) await new Promise((r) => server.listen(0, '127.0.0.1', r))
+const origin = typeof flags.origin === 'string' ? flags.origin : `http://127.0.0.1:${server.address().port}`
 
 const debugPort = 9555 + Math.floor(Math.random() * 300)
 const chrome = spawn('C:/Program Files/Google/Chrome/Application/chrome.exe', [
@@ -113,5 +115,5 @@ for (const path of paths) {
 
 ws.close()
 chrome.kill()
-server.close()
+if (!flags.origin) server.close()
 process.exit(0)

@@ -1,11 +1,16 @@
 'use client'
 
 import { useCallback } from 'react'
+import Link from 'next/link'
+import type { Route } from 'next'
+import { useRouter } from 'next/navigation'
 import type { CatalogAppliance, CatalogService } from '@app/shared'
 
 import { AppShell, Section } from '@/components/AppShell'
 import { Header } from '@/components/Header'
 import { CartButton } from '@/components/CartButton'
+import { SearchBar } from '@/components/SearchBar'
+import { TRENDING_SEARCHES } from '@/lib/trending'
 import { ApplianceCard } from '@/components/ApplianceCard'
 import { TrustPoints } from '@/components/TrustPoints'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
@@ -21,7 +26,7 @@ import {
 } from '@/lib/catalog'
 import { formatPaise } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
-import { PackageOpen } from 'lucide-react'
+import { PackageOpen, TrendingUp } from 'lucide-react'
 
 /**
  * Everything we service, and what happens after someone books it.
@@ -38,6 +43,7 @@ interface ServicesData {
 }
 
 export function ServicesScreen() {
+  const router = useRouter()
   const load = useCallback(async (): Promise<ServicesData> => {
     const [appliances, services] = await Promise.all([
       fetchAppliances(),
@@ -71,6 +77,34 @@ export function ServicesScreen() {
         />
       }
     >
+      {/* The search field, first: someone who came here to find a thing by
+          name should not have to scan a grid for it. It opens the search
+          screen rather than searching in place, and the chips under it start
+          a search that is known to land. */}
+      <div className="mt-4">
+        <SearchBar
+          readOnly
+          prominent
+          onOpen={() => router.push('/search')}
+        />
+        <ul
+          aria-label="Popular searches"
+          className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:flex-wrap lg:px-0"
+        >
+          {TRENDING_SEARCHES.map((term) => (
+            <li key={term} className="shrink-0">
+              <Link
+                href={`/search?q=${encodeURIComponent(term)}` as Route}
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-pill border border-border bg-bg px-3.5 text-sm font-medium text-ink hover:border-brand"
+              >
+                <TrendingUp className="size-4 text-brand" aria-hidden="true" />
+                {term}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+
       <Section
         className="mt-5"
         title="What we service"

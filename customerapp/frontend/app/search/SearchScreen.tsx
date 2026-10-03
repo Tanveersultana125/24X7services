@@ -1,7 +1,7 @@
 'use client'
 
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Route } from 'next'
@@ -54,6 +54,7 @@ import {
 import { CartBar } from '@/components/CartBar'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/cn'
+import { TRENDING_SEARCHES } from '@/lib/trending'
 
 /**
  * Search across appliances, services and the problems people describe.
@@ -90,8 +91,11 @@ const DEBOUNCE_MS = 250
 
 export function SearchScreen() {
   const router = useRouter()
+  const params = useSearchParams()
 
-  const [term, setTerm] = useState('')
+  // `?q=` arrives from a suggestion tapped elsewhere (the chips on Services),
+  // and starts the search as if it had been typed.
+  const [term, setTerm] = useState(() => params.get('q') ?? '')
   const [result, setResult] = useState<{
     query: string
     hits: SearchHit[]
@@ -548,19 +552,6 @@ function HitRows({
 }
 
 /**
- * Searches that land on something every time: each one is a word the index
- * holds, so a tap never ends on "nothing matched".
- */
-const TRENDING = [
-  'AC service',
-  'Washing machine repair',
-  'Refrigerator repair',
-  'AC deep clean',
-  'Geyser installation',
-  'Microwave repair',
-] as const
-
-/**
  * Problems in the words a customer would use, each one a question the
  * assistant has a full answer for. Tapping opens the chat with it already sent.
  */
@@ -618,7 +609,7 @@ function Suggestions({
           Trending searches
         </h2>
         <ul className="flex flex-wrap gap-2.5">
-          {TRENDING.map((item) => (
+          {TRENDING_SEARCHES.map((item) => (
             <li key={item}>
               <button
                 type="button"
