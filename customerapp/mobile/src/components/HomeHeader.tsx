@@ -13,8 +13,8 @@ import { Text } from '@/components/ui/Text'
 import { signOut, useAuth } from '@/lib/auth'
 import { cn } from '@/lib/cn'
 import { formatPhone } from '@/lib/format'
-import { HomeCartButton } from '@/screens/home/HomeCartButton'
-import { LocationSelector } from '@/screens/home/LocationSelector'
+import { CartButton } from '@/components/CartButton'
+import { LocationSelector } from '@/components/LocationSelector'
 
 /**
  * The top of Home: where the customer is, and what they are looking for.
@@ -155,7 +155,7 @@ export function HomeHeaderSearch({
           // theme keeps its own field so the muted hint stays readable.
           className={cn('min-w-0 flex-1', painted && 'border-transparent bg-white dark:bg-surface')}
         />
-        <HomeCartButton onDark={painted} />
+        <CartButton onDark={painted} />
       </View>
     </View>
   )
