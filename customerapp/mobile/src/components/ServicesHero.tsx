@@ -4,19 +4,16 @@ import { formatPaise } from '@/lib/format'
 import { brand } from '@/config/brand'
 import { countNote } from '@/components/ServiceScore'
 import { Icon } from '@/components/ui/Icon'
-import { Img } from '@/components/ui/Img'
-import { hasPublicAsset } from '@/lib/publicAsset'
 import { Text } from '@/components/ui/Text'
 
 /**
  * The top of the Services screen: what this place is, in one look.
  *
- * A brand-blue card with a line that says what we do, the appliances we
- * service as a row of product tiles, and three facts taken from the catalog
- * itself — how many appliances, the lowest visit fee, the rating across every
- * review. Nothing on it is typed in by hand, so it cannot say something the
- * catalog does not; while the catalog is loading the tiles and the facts are
- * simply left off rather than guessed.
+ * A brand-blue card with a line that says what we do, and three facts taken
+ * from the catalog itself — how many appliances, the lowest visit fee, the
+ * rating across every review. Nothing on it is typed in by hand, so it cannot
+ * say something the catalog does not; while the catalog is loading the facts
+ * are simply left off rather than guessed.
  */
 export function ServicesHero({
   appliances = [],
@@ -59,15 +56,6 @@ export function ServicesHero({
           You approve the price before any work starts.
         </Text>
 
-        {appliances.length > 0 ? (
-          <View accessibilityLabel="Appliances we service" className="mt-3.5 flex-row gap-2">
-            {appliances.map((appliance) => (
-              <View key={appliance.id} className="size-11 overflow-hidden rounded-xl bg-white shadow-raised">
-                <Img src={applianceIcon(appliance)} alt={appliance.name} contentFit="contain" className="absolute inset-0.5" />
-              </View>
-            ))}
-          </View>
-        ) : null}
       </View>
 
       {facts.length > 0 ? (
@@ -90,15 +78,4 @@ export function ServicesHero({
       ) : null}
     </View>
   )
-}
-
-/**
- * The drawn icon for an appliance (`assets/public/appliances/<id>.svg`), not
- * its product photo: on a row of small tiles the photos, each shot on its own
- * background, read as five different things; the icons read as one set. An
- * appliance with no icon falls back to its photo.
- */
-function applianceIcon(appliance: { id: string; image: string }): string {
-  const icon = `/appliances/${appliance.id}.svg`
-  return hasPublicAsset(icon) ? icon : appliance.image
 }

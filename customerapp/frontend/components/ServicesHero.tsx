@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import { BadgeCheck, Star } from 'lucide-react'
 import { formatPaise } from '@/lib/format'
 import { countNote } from '@/components/ServiceScore'
@@ -7,12 +6,11 @@ import { brand } from '@/config/brand'
 /**
  * The top of the Services screen: what this place is, in one look.
  *
- * A brand-blue card with a line that says what we do, the appliances we
- * service as a row of product tiles, and three facts taken from the catalog
- * itself — how many appliances, the lowest visit fee, the rating across every
- * review. Nothing on it is typed in by hand, so it cannot say something the
- * catalog does not; while the catalog is loading the tiles and the facts are
- * simply left off rather than guessed.
+ * A brand-blue card with a line that says what we do, and three facts taken
+ * from the catalog itself — how many appliances, the lowest visit fee, the
+ * rating across every review. Nothing on it is typed in by hand, so it cannot
+ * say something the catalog does not; while the catalog is loading the facts
+ * are simply left off rather than guessed.
  */
 export function ServicesHero({
   appliances = [],
@@ -63,25 +61,6 @@ export function ServicesHero({
           You approve the price before any work starts.
         </p>
 
-        {appliances.length > 0 ? (
-          <ul aria-label="Appliances we service" className="mt-3.5 flex gap-2">
-            {appliances.map((appliance) => (
-              <li
-                key={appliance.id}
-                title={appliance.name}
-                className="relative size-11 shrink-0 overflow-hidden rounded-xl bg-white shadow-raised"
-              >
-                <Image
-                  src={applianceIcon(appliance.id)}
-                  alt={appliance.name}
-                  fill
-                  sizes="44px"
-                  className="object-contain p-0.5"
-                />
-              </li>
-            ))}
-          </ul>
-        ) : null}
       </div>
 
       {facts.length > 0 ? (
@@ -102,13 +81,4 @@ export function ServicesHero({
       ) : null}
     </section>
   )
-}
-
-/**
- * The drawn icon for an appliance (`public/appliances/<id>.svg`), not its
- * product photo: on a row of small tiles the photos, each shot on its own
- * background, read as five different things; the icons read as one set.
- */
-function applianceIcon(id: string): string {
-  return `/appliances/${id}.svg`
 }
