@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { View } from 'react-native'
+import { ScrollView, View, useWindowDimensions } from 'react-native'
 import { PackageOpen, TrendingUp } from 'lucide-react-native'
 import { router } from 'expo-router'
 import type { CatalogAppliance, CatalogService } from '@app/shared'
@@ -13,7 +13,7 @@ import { Icon } from '@/components/ui/Icon'
 import { Tappable } from '@/components/ui/Tappable'
 import { Text } from '@/components/ui/Text'
 import { SERVICES_SEARCH_CHIPS } from '@/lib/trending'
-import { ApplianceCard } from '@/components/ApplianceCard'
+import { ApplianceSpaceCard } from '@/components/ApplianceSpaceCard'
 import { TrustPoints } from '@/components/TrustPoints'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
 import { Card } from '@/components/ui/Card'
@@ -23,7 +23,6 @@ import { ApplianceGridSkeleton } from '@/components/SkeletonLoader'
 import { cheapestByAppliance, fetchAllServices, fetchAppliances, summaryByAppliance } from '@/lib/catalog'
 import { formatPaise } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
-import { cn } from '@/lib/cn'
 
 /**
  * Everything we service, and what happens after someone books it.
@@ -50,8 +49,10 @@ export function ServicesScreen() {
   // An appliance carries no clip and no score of its own — both are worked
   // out from the services under it, and so is how many there are.
   const summaries = all.data ? summaryByAppliance(all.data.services) : null
-  const overall = summaries ? overallRating([...summaries.values()]) : undefined
-  const lowest = fromPrices && fromPrices.size > 0 ? Math.min(...fromPrices.values()) : undefined
+  // Two cards and a sliver of the third on screen, so the rail reads as one
+  // that scrolls.
+  const { width } = useWindowDimensions()
+  const cardWidth = Math.round((width - 32) * 0.46)
 
   const countFor = (applianceId: string): number =>
     all.data?.services.filter((service) => service.applianceId === applianceId).length ?? 0
@@ -68,13 +69,15 @@ export function ServicesScreen() {
       onRefresh={all.reload}
       refreshing={all.refreshing}
     >
-      {/* The search field, first: someone who came here to find a thing by
-          name should not have to scan a grid for it. It opens the search
-          screen rather than searching in place, and the chips under it start
-          a search that is known to land. */}
-      <View className="mt-3">
+      <ServicesHero />
+
+      {/* The search field floats over the foot of the photograph: the first
+          thing to reach for, and it ties the picture to the page. It opens
+          the search screen rather than searching in place, and the chips
+          under it start a search that is known to land. */}
+      <View className="-mt-8">
         <SearchBar readOnly prominent onOpen={() => router.push('/search')} />
-        <View accessibilityLabel="Popular searches" className="mt-2.5 gap-2">
+        <View accessibilityLabel="Popular searches" className="mt-3 gap-2">
           {[SERVICES_SEARCH_CHIPS.slice(0, 2), SERVICES_SEARCH_CHIPS.slice(2, 4)].map((row) => (
             <View key={row[0].label} className="flex-row gap-2">
               {row.map((chip) => (
@@ -94,13 +97,10 @@ export function ServicesScreen() {
         </View>
       </View>
 
-      <ServicesHero appliances={all.data?.appliances} fromPaise={lowest} rating={overall} />
-
-      <Section
-        className="mt-5"
-        title="What we service"
-        subtitle="Tap an appliance for its repairs, service and installation, with the visit fee shown before you book."
-      >
+      {/* The appliances as tall photographs on a rail, the way a catalogue
+          of rooms is browsed: the picture says what it is before the name
+          does. */}
+      <Section className="mt-8" title="What we service">
         {all.status === 'loading' ? (
           <ApplianceGridSkeleton />
         ) : all.status === 'error' ? (
@@ -112,37 +112,29 @@ export function ServicesScreen() {
             description="The catalog is being set up. Please check back shortly."
           />
         ) : (
-          <View className="flex-row flex-wrap justify-between gap-y-3">
-            {all.data?.appliances.map((appliance, index, appliances) => {
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            snapToInterval={cardWidth + 12}
+            decelerationRate="fast"
+            className="-mx-4"
+            contentContainerClassName="gap-3 px-4"
+          >
+            {all.data?.appliances.map((appliance, index) => {
               const from = fromPrices?.get(appliance.id)
-              const summary = summaries?.get(appliance.id)
-              // The last one, when it would otherwise sit alone in a row.
-              const wide = appliances.length % 2 === 1 && index === appliances.length - 1
               return (
-                <ApplianceCard
-                  key={appliance.id}
-                  className={cn(wide ? 'w-full' : 'w-[48.5%]')}
-                  appliance={appliance}
-                  serviceCount={countFor(appliance.id)}
-                  // The photograph of a technician on this appliance, when
-                  // there is one, and then nothing moves: a grid of people at
-                  // work reads as the service, where a drawing reads as a
-                  // diagram of it. The clip is the fallback for an appliance
-                  // nobody has photographed, and only the first tile plays —
-                  // five clips in a grid is a page that twitches.
-                  motion={!appliance.heroImage && index === 0}
-                  video={appliance.heroImage ? undefined : summary?.video}
-                  poster={appliance.heroImage ?? summary?.poster}
-                  rating={summary?.rating}
-                  reviewCount={summary?.reviewCount}
-                  // The tiles on screen before any scrolling.
-                  priority={index < 2}
-                  wide={wide}
-                  from={from === undefined ? undefined : formatPaise(from)}
-                />
+                <View key={appliance.id} style={{ width: cardWidth }}>
+                  <ApplianceSpaceCard
+                    appliance={appliance}
+                    serviceCount={countFor(appliance.id)}
+                    from={from === undefined ? undefined : formatPaise(from)}
+                    rating={summaries?.get(appliance.id)?.rating}
+                    priority={index < 2}
+                  />
+                </View>
               )
             })}
-          </View>
+          </ScrollView>
         )}
       </Section>
 
@@ -157,18 +149,4 @@ export function ServicesScreen() {
       </Section>
     </AppShell>
   )
-}
-
-/** Every appliance's score, weighted by how many reviews stand behind it. */
-function overallRating(
-  summaries: readonly { rating?: number; reviewCount?: number }[]
-): { average: number; count: number } | undefined {
-  let score = 0
-  let count = 0
-  for (const each of summaries) {
-    if (each.rating === undefined || each.reviewCount === undefined) continue
-    score += each.rating * each.reviewCount
-    count += each.reviewCount
-  }
-  return count > 0 ? { average: score / count, count } : undefined
 }

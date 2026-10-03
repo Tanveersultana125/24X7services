@@ -1,81 +1,49 @@
 import { View } from 'react-native'
-import { BadgeCheck, Star } from 'lucide-react-native'
-import { formatPaise } from '@/lib/format'
+import { LinearGradient } from 'expo-linear-gradient'
 import { brand } from '@/config/brand'
-import { countNote } from '@/components/ServiceScore'
-import { Icon } from '@/components/ui/Icon'
+import { Img } from '@/components/ui/Img'
 import { Text } from '@/components/ui/Text'
 
 /**
- * The top of the Services screen: what this place is, in one look.
+ * The top of the Services screen: a home, not a diagram.
  *
- * A brand-blue card with a line that says what we do, and three facts taken
- * from the catalog itself — how many appliances, the lowest visit fee, the
- * rating across every review. Nothing on it is typed in by hand, so it cannot
- * say something the catalog does not; while the catalog is loading the facts
- * are simply left off rather than guessed.
+ * A full-bleed photograph of a lived-in room with the promise written across
+ * the top of it, the way a magazine cover would set it. The wordmark sits
+ * above the line so the page says whose it is without a logo. A dark wash at
+ * the top keeps the white type readable whatever the light in the picture,
+ * and a shorter one at the foot gives the search card that overlaps it
+ * something calm to sit on.
  */
-export function ServicesHero({
-  appliances = [],
-  fromPaise,
-  rating,
-}: {
-  /** In catalog order; each one's `image` is its product shot. */
-  appliances?: readonly { id: string; name: string; image: string }[]
-  fromPaise?: number
-  rating?: { average: number; count: number }
-}) {
-  const facts = [
-    appliances.length > 0 ? { value: String(appliances.length), label: 'appliances', star: false } : null,
-    fromPaise !== undefined ? { value: formatPaise(fromPaise), label: 'visit from', star: false } : null,
-    rating
-      ? { value: rating.average.toFixed(1), label: `${countNote(rating.count)} reviews`, star: true }
-      : null,
-  ].filter((fact) => fact !== null)
-
+export function ServicesHero() {
   return (
-    <View
-      accessibilityLabel="24X7 services"
-      className="mt-5 overflow-hidden rounded-card bg-brand-deep shadow-raised"
-    >
-      {/* Two soft rings in the corner, so the blue is not a flat slab. */}
-      <View pointerEvents="none" className="absolute -right-10 -top-12 size-44 rounded-full bg-white/[0.06]" />
-      <View pointerEvents="none" className="absolute -right-4 top-10 size-24 rounded-full bg-white/[0.05]" />
+    <View accessibilityLabel={`${brand.name} services`} className="-mx-4 h-[336px] overflow-hidden">
+      <Img
+        src="/photos/laundry-room.jpg"
+        alt=""
+        priority="high"
+        contentPosition={{ left: '60%', top: '50%' }}
+        className="absolute inset-0"
+      />
+      <LinearGradient
+        colors={['rgba(23,21,15,0.75)', 'rgba(23,21,15,0.35)', 'rgba(23,21,15,0)']}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '66%' }}
+        pointerEvents="none"
+      />
+      <LinearGradient
+        colors={['rgba(23,21,15,0)', 'rgba(23,21,15,0.4)']}
+        style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '25%' }}
+        pointerEvents="none"
+      />
 
-      <View className="px-4 pb-4 pt-4">
-        <View className="flex-row items-center gap-1 self-start rounded-pill bg-white/15 px-2 py-0.5">
-          <Icon as={BadgeCheck} className="size-3 text-white" />
-          <Text className="text-[10px] font-semibold uppercase tracking-[0.5px] text-white">
-            Verified technicians
-          </Text>
-        </View>
-        <Text accessibilityRole="header" className="mt-2.5 max-w-[240px] text-lg font-extrabold leading-[24px] text-white">
+      <View className="px-5 pt-7">
+        <Text className="text-xl font-extrabold tracking-tight text-white">{brand.wordmark}</Text>
+        <Text accessibilityRole="header" className="mt-2 max-w-[272px] text-[28px] font-bold leading-[34px] text-white">
           {brand.tagline}
         </Text>
-        <Text className="mt-1 text-xs leading-[18px] text-white/80">
-          You approve the price before any work starts.
+        <Text className="mt-2 max-w-[256px] text-sm text-white/85">
+          Repair, service and installation. You approve the price first.
         </Text>
-
       </View>
-
-      {facts.length > 0 ? (
-        <View className="flex-row border-t border-white/15 bg-night/20">
-          {facts.map((fact, index) => (
-            <View
-              key={fact.label}
-              accessible
-              accessibilityLabel={`${fact.value} ${fact.label}`}
-              className={`flex-1 items-center px-2 py-2 ${index > 0 ? 'border-l border-white/15' : ''}`}
-            >
-              <View className="flex-row items-center gap-1">
-                {fact.star ? <Icon as={Star} className="size-3 text-white" fill="#ffffff" /> : null}
-                <Text className="text-sm font-bold text-white">{fact.value}</Text>
-              </View>
-              <Text className="text-[10px] text-white/75">{fact.label}</Text>
-            </View>
-          ))}
-        </View>
-      ) : null}
     </View>
   )
 }

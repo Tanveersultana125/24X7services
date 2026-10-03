@@ -1,84 +1,50 @@
-import { BadgeCheck, Star } from 'lucide-react'
-import { formatPaise } from '@/lib/format'
-import { countNote } from '@/components/ServiceScore'
+import Image from 'next/image'
 import { brand } from '@/config/brand'
 
 /**
- * The top of the Services screen: what this place is, in one look.
+ * The top of the Services screen: a home, not a diagram.
  *
- * A brand-blue card with a line that says what we do, and three facts taken
- * from the catalog itself — how many appliances, the lowest visit fee, the
- * rating across every review. Nothing on it is typed in by hand, so it cannot
- * say something the catalog does not; while the catalog is loading the facts
- * are simply left off rather than guessed.
+ * A full-bleed photograph of a lived-in room with the promise written across
+ * the top of it, the way a magazine cover would set it. The wordmark sits
+ * above the line so the page says whose it is without a logo. A dark wash at
+ * the top keeps the white type readable whatever the light in the picture,
+ * and a shorter one at the foot gives the search card that overlaps it
+ * something calm to sit on.
  */
-export function ServicesHero({
-  appliances = [],
-  fromPaise,
-  rating,
-}: {
-  /** In catalog order. */
-  appliances?: readonly { id: string; name: string }[]
-  fromPaise?: number
-  rating?: { average: number; count: number }
-}) {
-  const facts = [
-    appliances.length > 0 ? { value: String(appliances.length), label: 'appliances' } : null,
-    fromPaise !== undefined ? { value: formatPaise(fromPaise), label: 'visit from' } : null,
-    rating
-      ? {
-          value: rating.average.toFixed(1),
-          label: `${countNote(rating.count)} reviews`,
-          star: true,
-        }
-      : null,
-  ].filter((fact) => fact !== null)
-
+export function ServicesHero() {
   return (
     <section
-      aria-label="24X7 services"
-      className="relative mt-5 overflow-hidden rounded-card bg-brand-deep text-white shadow-raised"
+      aria-label={`${brand.name} services`}
+      className="relative -mx-4 h-[21rem] overflow-hidden lg:mx-0 lg:mt-4 lg:rounded-card"
     >
-      {/* Two soft rings in the corner, so the blue is not a flat slab. */}
-      <span
-        aria-hidden="true"
-        className="absolute -right-10 -top-12 size-44 rounded-full bg-white/[0.06]"
+      <Image
+        src="/photos/laundry-room.jpg"
+        alt=""
+        fill
+        priority
+        sizes="(min-width: 1024px) 1024px, 100vw"
+        className="object-cover object-[60%_center]"
       />
-      <span
+      <div
         aria-hidden="true"
-        className="absolute -right-4 top-10 size-24 rounded-full bg-white/[0.05]"
+        className="absolute inset-x-0 top-0 h-2/3 bg-linear-to-b from-night/75 via-night/35 to-transparent"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 bottom-0 h-1/4 bg-linear-to-t from-night/40 to-transparent"
       />
 
-      <div className="relative px-4 pb-4 pt-4">
-        <span className="inline-flex items-center gap-1 rounded-pill bg-white/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
-          <BadgeCheck className="size-3" aria-hidden="true" />
-          Verified technicians
-        </span>
-        <h2 className="mt-2.5 max-w-[15rem] text-lg font-extrabold leading-snug">
+      <div className="relative px-5 pt-7">
+        <p className="text-xl font-extrabold tracking-tight text-white">
+          {brand.wordmark}
+        </p>
+        <h2 className="mt-2 max-w-[17rem] text-[1.75rem] font-bold leading-[2.125rem] text-white">
           {brand.tagline}
         </h2>
-        <p className="mt-1 text-xs leading-relaxed text-white/80">
-          You approve the price before any work starts.
+        <p className="mt-2 max-w-[16rem] text-sm text-white/85">
+          Repair, service and installation. You approve the price first.
         </p>
-
       </div>
-
-      {facts.length > 0 ? (
-        <dl className="relative flex divide-x divide-white/15 border-t border-white/15 bg-night/20">
-          {facts.map((fact) => (
-            <div key={fact.label} className="flex-1 px-2 py-2 text-center">
-              <dt className="sr-only">{fact.label}</dt>
-              <dd className="flex items-center justify-center gap-1 text-sm font-bold">
-                {'star' in fact ? (
-                  <Star className="size-3 fill-white" aria-hidden="true" />
-                ) : null}
-                {fact.value}
-              </dd>
-              <dd className="text-[10px] text-white/75">{fact.label}</dd>
-            </div>
-          ))}
-        </dl>
-      ) : null}
     </section>
   )
 }
