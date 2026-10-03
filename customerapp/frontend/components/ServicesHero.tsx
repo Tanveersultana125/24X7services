@@ -37,11 +37,11 @@ export function ServicesHero({
   return (
     <section
       aria-label="24X7 services"
-      className="relative mt-4 overflow-hidden rounded-card bg-brand-deep text-white"
+      className="relative mt-5 overflow-hidden rounded-card bg-brand-deep text-white shadow-raised"
     >
       {/* The technician sits on the right, faded into the blue so the words
           on the left always have a plain ground to sit on. */}
-      <div className="absolute inset-y-0 right-0 w-[52%]" aria-hidden="true">
+      <div className="absolute inset-y-0 right-0 w-[46%]" aria-hidden="true">
         <Image
           src="/photos/technician/ac-service.jpg"
           alt=""
@@ -53,32 +53,31 @@ export function ServicesHero({
         <div className="absolute inset-0 bg-linear-to-r from-brand-deep via-brand-deep/50 to-transparent" />
       </div>
 
-      <div className="relative w-[62%] px-5 pb-5 pt-5">
-        <span className="inline-flex items-center gap-1 rounded-pill bg-white/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide">
-          <BadgeCheck className="size-3.5" aria-hidden="true" />
+      <div className="relative w-[68%] px-4 pb-4 pt-4">
+        <span className="inline-flex items-center gap-1 rounded-pill bg-white/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+          <BadgeCheck className="size-3" aria-hidden="true" />
           Verified technicians
         </span>
-        <h2 className="mt-3 text-xl font-extrabold leading-tight">
+        <h2 className="mt-2.5 text-lg font-extrabold leading-snug">
           {brand.tagline}
         </h2>
-        <p className="mt-1.5 text-sm text-white/80">
-          Repair, service and installation. You approve the price before any
-          work starts.
+        <p className="mt-1 text-xs leading-relaxed text-white/80">
+          You approve the price before any work starts.
         </p>
       </div>
 
       {facts.length > 0 ? (
         <dl className="relative flex divide-x divide-white/15 border-t border-white/15 bg-night/20">
           {facts.map((fact) => (
-            <div key={fact.label} className="flex-1 px-3 py-2.5 text-center">
+            <div key={fact.label} className="flex-1 px-2 py-2 text-center">
               <dt className="sr-only">{fact.label}</dt>
-              <dd className="flex items-center justify-center gap-1 text-base font-bold">
+              <dd className="flex items-center justify-center gap-1 text-sm font-bold">
                 {'star' in fact ? (
-                  <Star className="size-3.5 fill-white" aria-hidden="true" />
+                  <Star className="size-3 fill-white" aria-hidden="true" />
                 ) : null}
                 {fact.value}
               </dd>
-              <dd className="text-[11px] text-white/75">{fact.label}</dd>
+              <dd className="text-[10px] text-white/75">{fact.label}</dd>
             </div>
           ))}
         </dl>

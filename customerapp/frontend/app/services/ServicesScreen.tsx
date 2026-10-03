@@ -85,13 +85,7 @@ export function ServicesScreen() {
           name should not have to scan a grid for it. It opens the search
           screen rather than searching in place, and the chips under it start
           a search that is known to land. */}
-      <ServicesHero
-        applianceCount={all.data?.appliances.length}
-        fromPaise={lowest}
-        rating={overall}
-      />
-
-      <div className="mt-4">
+      <div className="mt-3">
         <SearchBar
           readOnly
           prominent
@@ -99,21 +93,27 @@ export function ServicesScreen() {
         />
         <ul
           aria-label="Popular searches"
-          className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:flex-wrap lg:px-0"
+          className="no-scrollbar -mx-4 mt-2.5 flex gap-2 overflow-x-auto px-4 lg:mx-0 lg:flex-wrap lg:px-0"
         >
           {TRENDING_SEARCHES.map((term) => (
             <li key={term} className="shrink-0">
               <Link
                 href={`/search?q=${encodeURIComponent(term)}` as Route}
-                className="inline-flex min-h-10 items-center gap-1.5 rounded-pill border border-border bg-bg px-3.5 text-sm font-medium text-ink hover:border-brand"
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-pill border border-border bg-bg px-3 text-[13px] font-medium text-ink hover:border-brand"
               >
-                <TrendingUp className="size-4 text-brand" aria-hidden="true" />
+                <TrendingUp className="size-3.5 text-brand" aria-hidden="true" />
                 {term}
               </Link>
             </li>
           ))}
         </ul>
       </div>
+
+      <ServicesHero
+        applianceCount={all.data?.appliances.length}
+        fromPaise={lowest}
+        rating={overall}
+      />
 
       <Section
         className="mt-5"

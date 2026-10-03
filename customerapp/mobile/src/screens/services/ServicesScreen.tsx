@@ -72,29 +72,29 @@ export function ServicesScreen() {
           name should not have to scan a grid for it. It opens the search
           screen rather than searching in place, and the chips under it start
           a search that is known to land. */}
-      <ServicesHero applianceCount={all.data?.appliances.length} fromPaise={lowest} rating={overall} />
-
-      <View className="mt-4">
+      <View className="mt-3">
         <SearchBar readOnly prominent onOpen={() => router.push('/search')} />
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           accessibilityLabel="Popular searches"
-          className="-mx-4 mt-3"
+          className="-mx-4 mt-2.5"
           contentContainerClassName="gap-2 px-4"
         >
           {TRENDING_SEARCHES.map((term) => (
             <Tappable
               key={term}
               href={{ pathname: '/search', params: { q: term } }}
-              className="min-h-10 flex-row items-center gap-1.5 rounded-pill border border-border bg-bg px-3.5 active:border-brand active:opacity-100"
+              className="min-h-10 flex-row items-center gap-1.5 rounded-pill border border-border bg-bg px-3 active:border-brand active:opacity-100"
             >
-              <Icon as={TrendingUp} className="size-4 text-brand" />
-              <Text className="text-sm font-medium text-ink">{term}</Text>
+              <Icon as={TrendingUp} className="size-3.5 text-brand" />
+              <Text className="text-[13px] font-medium text-ink">{term}</Text>
             </Tappable>
           ))}
         </ScrollView>
       </View>
+
+      <ServicesHero applianceCount={all.data?.appliances.length} fromPaise={lowest} rating={overall} />
 
       <Section
         className="mt-5"

@@ -38,11 +38,11 @@ export function ServicesHero({
   return (
     <View
       accessibilityLabel="24X7 services"
-      className="mt-4 overflow-hidden rounded-card bg-brand-deep"
+      className="mt-5 overflow-hidden rounded-card bg-brand-deep shadow-raised"
     >
       {/* The technician sits on the right, faded into the blue so the words
           on the left always have a plain ground to sit on. */}
-      <View className="absolute inset-y-0 right-0 w-[52%]" pointerEvents="none">
+      <View className="absolute inset-y-0 right-0 w-[46%]" pointerEvents="none">
         <Img
           src="/photos/technician/ac-service.jpg"
           alt=""
@@ -57,18 +57,18 @@ export function ServicesHero({
         />
       </View>
 
-      <View className="w-[62%] px-5 pb-5 pt-5">
-        <View className="flex-row items-center gap-1 self-start rounded-pill bg-white/15 px-2.5 py-1">
-          <Icon as={BadgeCheck} className="size-3.5 text-white" />
-          <Text className="text-[11px] font-semibold uppercase tracking-[0.5px] text-white">
+      <View className="w-[68%] px-4 pb-4 pt-4">
+        <View className="flex-row items-center gap-1 self-start rounded-pill bg-white/15 px-2 py-0.5">
+          <Icon as={BadgeCheck} className="size-3 text-white" />
+          <Text className="text-[10px] font-semibold uppercase tracking-[0.5px] text-white">
             Verified technicians
           </Text>
         </View>
-        <Text accessibilityRole="header" className="mt-3 text-xl font-extrabold leading-[26px] text-white">
+        <Text accessibilityRole="header" className="mt-2.5 text-lg font-extrabold leading-[24px] text-white">
           {brand.tagline}
         </Text>
-        <Text className="mt-1.5 text-sm text-white/80">
-          Repair, service and installation. You approve the price before any work starts.
+        <Text className="mt-1 text-xs leading-[18px] text-white/80">
+          You approve the price before any work starts.
         </Text>
       </View>
 
@@ -79,13 +79,13 @@ export function ServicesHero({
               key={fact.label}
               accessible
               accessibilityLabel={`${fact.value} ${fact.label}`}
-              className={`flex-1 items-center px-3 py-2.5 ${index > 0 ? 'border-l border-white/15' : ''}`}
+              className={`flex-1 items-center px-2 py-2 ${index > 0 ? 'border-l border-white/15' : ''}`}
             >
               <View className="flex-row items-center gap-1">
-                {fact.star ? <Icon as={Star} className="size-3.5 text-white" fill="#ffffff" /> : null}
-                <Text className="text-base font-bold text-white">{fact.value}</Text>
+                {fact.star ? <Icon as={Star} className="size-3 text-white" fill="#ffffff" /> : null}
+                <Text className="text-sm font-bold text-white">{fact.value}</Text>
               </View>
-              <Text className="text-[11px] text-white/75">{fact.label}</Text>
+              <Text className="text-[10px] text-white/75">{fact.label}</Text>
             </View>
           ))}
         </View>
