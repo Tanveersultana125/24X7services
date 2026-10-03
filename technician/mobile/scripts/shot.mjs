@@ -3,7 +3,7 @@
 //
 //   node scripts/shot.mjs <outDir> <path> [<path> …] [--width=390] [--full]
 //     [--click='[aria-label="Decide later"]']  a real mouse tap on each page
-//     [--eval='js'] [--seed='js']
+//     [--eval='js'] [--seed='js'] [--origin=https://… to shoot a live site]
 //
 // Serves dist-web itself on a free port, starts from a fresh demo (cleared
 // storage, or --seed='js' to set one up), and reports console errors and
@@ -49,7 +49,7 @@ const server = createServer((req, res) => {
   res.end(readFileSync(file))
 })
 await new Promise((r) => server.listen(0, '127.0.0.1', r))
-const origin = `http://127.0.0.1:${server.address().port}`
+const origin = typeof flags.origin === "string" ? flags.origin : `http://127.0.0.1:${server.address().port}`
 
 const debugPort = 9555 + Math.floor(Math.random() * 300)
 const chrome = spawn('C:/Program Files/Google/Chrome/Application/chrome.exe', [

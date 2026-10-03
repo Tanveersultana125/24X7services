@@ -12,3 +12,14 @@ npm run typecheck
 ```
 
 Rules for porting a screen: see `PORTING.md`.
+
+## Web preview on Vercel
+
+Live at https://24x7-technician-app.vercel.app (Vercel project
+`24x7-technician-app`, deployed by hand — pushes do not deploy).
+
+```bash
+node scripts/web-deploy.mjs <outDir>     # export + fixes for Vercel
+cd <outDir> && npx vercel@latest link --project 24x7-technician-app --yes
+npx vercel@latest deploy --prod
+```
