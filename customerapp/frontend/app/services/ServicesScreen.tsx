@@ -10,6 +10,7 @@ import { AppShell, Section } from '@/components/AppShell'
 import { Header } from '@/components/Header'
 import { CartButton } from '@/components/CartButton'
 import { SearchBar } from '@/components/SearchBar'
+import { ServicesHero } from '@/components/ServicesHero'
 import { TRENDING_SEARCHES } from '@/lib/trending'
 import { ApplianceCard } from '@/components/ApplianceCard'
 import { TrustPoints } from '@/components/TrustPoints'
@@ -57,6 +58,9 @@ export function ServicesScreen() {
   // An appliance carries no clip and no score of its own — both are worked
   // out from the services under it, and so is how many there are.
   const summaries = all.data ? summaryByAppliance(all.data.services) : null
+  const overall = summaries ? overallRating([...summaries.values()]) : undefined
+  const lowest = fromPrices && fromPrices.size > 0 ? Math.min(...fromPrices.values()) : undefined
+
   const countFor = (applianceId: string): number =>
     all.data?.services.filter(
       (service) => service.applianceId === applianceId
@@ -81,6 +85,12 @@ export function ServicesScreen() {
           name should not have to scan a grid for it. It opens the search
           screen rather than searching in place, and the chips under it start
           a search that is known to land. */}
+      <ServicesHero
+        applianceCount={all.data?.appliances.length}
+        fromPaise={lowest}
+        rating={overall}
+      />
+
       <div className="mt-4">
         <SearchBar
           readOnly
@@ -167,4 +177,18 @@ export function ServicesScreen() {
       </Section>
     </AppShell>
   )
+}
+
+/** Every appliance's score, weighted by how many reviews stand behind it. */
+function overallRating(
+  summaries: readonly { rating?: number; reviewCount?: number }[]
+): { average: number; count: number } | undefined {
+  let score = 0
+  let count = 0
+  for (const each of summaries) {
+    if (each.rating === undefined || each.reviewCount === undefined) continue
+    score += each.rating * each.reviewCount
+    count += each.reviewCount
+  }
+  return count > 0 ? { average: score / count, count } : undefined
 }
