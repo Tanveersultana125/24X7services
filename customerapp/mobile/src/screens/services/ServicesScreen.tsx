@@ -16,7 +16,6 @@ import { SERVICES_QUICK_LINKS } from '@/lib/trending'
 import { ApplianceSpaceCard } from '@/components/ApplianceSpaceCard'
 import { TrustPoints } from '@/components/TrustPoints'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
-import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
 import { ApplianceGridSkeleton } from '@/components/SkeletonLoader'
@@ -49,10 +48,9 @@ export function ServicesScreen() {
   // An appliance carries no clip and no score of its own — both are worked
   // out from the services under it, and so is how many there are.
   const summaries = all.data ? summaryByAppliance(all.data.services) : null
-  // Two cards and a sliver of the third on screen, so the rail reads as one
-  // that scrolls.
+  // One and a half cards on screen, so the rail reads as one that scrolls.
   const { width } = useWindowDimensions()
-  const cardWidth = Math.round((width - 32) * 0.46)
+  const cardWidth = Math.min(256, Math.round((width - 32) * 0.6))
 
   const countFor = (applianceId: string): number =>
     all.data?.services.filter((service) => service.applianceId === applianceId).length ?? 0
@@ -143,9 +141,7 @@ export function ServicesScreen() {
       </Section>
 
       <Section title="What you get either way">
-        <Card className="p-4">
-          <TrustPoints />
-        </Card>
+        <TrustPoints tiles />
       </Section>
     </AppShell>
   )

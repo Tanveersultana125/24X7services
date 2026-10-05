@@ -54,22 +54,19 @@ export function ApplianceSpaceCard({
         pointerEvents="none"
       />
       <View className="absolute inset-x-0 bottom-0 p-3.5">
-        <Text numberOfLines={2} className="text-lg font-bold leading-[22px] text-white">
+        <Text numberOfLines={2} className="text-xl font-bold leading-[26px] text-white">
           {appliance.name}
         </Text>
-        <View className="mt-1 flex-row flex-wrap items-center gap-x-1.5">
-          {rating !== undefined ? (
-            <>
-              <Icon as={Star} className="size-3 text-white" fill="#ffffff" />
-              <Text className="text-xs font-semibold text-white">{rating.toFixed(1)}</Text>
-              <Text className="text-xs text-white/85">·</Text>
-            </>
-          ) : null}
-          <Text className="text-xs text-white/85">
-            {serviceCount} {serviceCount === 1 ? 'service' : 'services'}
-            {from ? ` · from ${from}` : ''}
-          </Text>
-        </View>
+        {rating !== undefined ? (
+          <View className="mt-1 flex-row items-center gap-1">
+            <Icon as={Star} className="size-3 text-white" fill="#ffffff" />
+            <Text className="text-xs font-semibold text-white">{rating.toFixed(1)}</Text>
+          </View>
+        ) : null}
+        <Text className="mt-0.5 text-xs text-white/85">
+          {serviceCount} {serviceCount === 1 ? 'service' : 'services'}
+          {from ? ` · from ${from}` : ''}
+        </Text>
       </View>
     </Tappable>
   )

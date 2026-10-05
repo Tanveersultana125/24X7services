@@ -39,7 +39,7 @@ export function ApplianceSpaceCard({
         alt=""
         fill
         priority={priority}
-        sizes="(min-width: 1024px) 220px, 46vw"
+        sizes="(min-width: 1024px) 220px, 60vw"
         className={
           photo
             ? 'object-cover transition-transform duration-[var(--duration-slow)] group-hover:scale-[1.03]'
@@ -51,21 +51,18 @@ export function ApplianceSpaceCard({
         className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-night/85 via-night/40 to-transparent"
       />
       <div className="absolute inset-x-0 bottom-0 p-3.5">
-        <p className="text-lg font-bold leading-tight text-white">
+        <p className="text-xl font-bold leading-tight text-white">
           {appliance.name}
         </p>
-        <p className="mt-1 flex items-center gap-1.5 text-xs text-white/85">
-          {rating !== undefined ? (
-            <>
-              <Star className="size-3 fill-white text-white" aria-hidden="true" />
-              <span className="font-semibold text-white">{rating.toFixed(1)}</span>
-              <span aria-hidden="true">·</span>
-            </>
-          ) : null}
-          <span>
-            {serviceCount} {serviceCount === 1 ? 'service' : 'services'}
-            {from ? ` · from ${from}` : ''}
-          </span>
+        {rating !== undefined ? (
+          <p className="mt-1 flex items-center gap-1 text-xs font-semibold text-white">
+            <Star className="size-3 fill-white text-white" aria-hidden="true" />
+            {rating.toFixed(1)}
+          </p>
+        ) : null}
+        <p className="mt-0.5 text-xs text-white/85">
+          {serviceCount} {serviceCount === 1 ? 'service' : 'services'}
+          {from ? ` · from ${from}` : ''}
         </p>
       </div>
     </Link>

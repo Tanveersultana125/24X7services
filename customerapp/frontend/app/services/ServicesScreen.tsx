@@ -15,7 +15,6 @@ import { SERVICES_QUICK_LINKS } from '@/lib/trending'
 import { ApplianceSpaceCard } from '@/components/ApplianceSpaceCard'
 import { TrustPoints } from '@/components/TrustPoints'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
-import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
 import { ApplianceGridSkeleton } from '@/components/SkeletonLoader'
@@ -77,6 +76,9 @@ export function ServicesScreen() {
           right={<CartButton className="mr-2 size-11" />}
         />
       }
+      // The photo and the rail run to the screen edges; nothing may push the
+      // page itself sideways.
+      className="overflow-x-clip"
     >
       <ServicesHero />
 
@@ -128,7 +130,7 @@ export function ServicesScreen() {
             {all.data?.appliances.map((appliance, index) => {
               const from = fromPrices?.get(appliance.id)
               return (
-                <li key={appliance.id} className="w-[46%] shrink-0 snap-start lg:w-auto">
+                <li key={appliance.id} className="w-[60%] max-w-64 shrink-0 snap-start lg:w-auto lg:max-w-none">
                   <ApplianceSpaceCard
                     appliance={appliance}
                     serviceCount={countFor(appliance.id)}
@@ -148,9 +150,7 @@ export function ServicesScreen() {
       </Section>
 
       <Section title="What you get either way">
-        <Card className="p-4">
-          <TrustPoints />
-        </Card>
+        <TrustPoints tiles />
       </Section>
     </AppShell>
   )
