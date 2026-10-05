@@ -15,6 +15,8 @@ const config = [
       '.next/**',
       '.next-verify/**',
       'out/**',
+      // The React Native app has its own toolchain (technician/mobile).
+      'mobile/**',
       
       'next-env.d.ts',
     ],
