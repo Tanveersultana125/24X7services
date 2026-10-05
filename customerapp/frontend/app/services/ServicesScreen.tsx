@@ -11,7 +11,7 @@ import { Header } from '@/components/Header'
 import { CartButton } from '@/components/CartButton'
 import { SearchBar } from '@/components/SearchBar'
 import { ServicesHero } from '@/components/ServicesHero'
-import { SERVICES_SEARCH_CHIPS } from '@/lib/trending'
+import { SERVICES_QUICK_LINKS } from '@/lib/trending'
 import { ApplianceSpaceCard } from '@/components/ApplianceSpaceCard'
 import { TrustPoints } from '@/components/TrustPoints'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
@@ -82,8 +82,8 @@ export function ServicesScreen() {
 
       {/* The search field floats over the foot of the photograph: the first
           thing to reach for, and it ties the picture to the page. It opens
-          the search screen rather than searching in place, and the chips
-          under it start a search that is known to land. */}
+          the search screen rather than searching in place; the chips under it
+          open their service on the appliance page directly. */}
       <div className="relative z-10 -mt-8">
         <SearchBar
           readOnly
@@ -91,13 +91,14 @@ export function ServicesScreen() {
           onOpen={() => router.push('/search')}
         />
         <ul
-          aria-label="Popular searches"
+          aria-label="Popular services"
           className="mt-3 grid grid-cols-2 gap-2 lg:flex lg:flex-wrap"
         >
-          {SERVICES_SEARCH_CHIPS.map((chip) => (
+          {SERVICES_QUICK_LINKS.map((chip) => (
             <li key={chip.label}>
               <Link
-                href={`/search?q=${encodeURIComponent(chip.query)}` as Route}
+                // The trailing slash: the static export serves the folder's index.html.
+                href={`/services/appliance/?a=${chip.applianceId}&s=${chip.serviceKey}` as Route}
                 className="flex min-h-10 items-center justify-center gap-1.5 rounded-pill border border-border bg-bg px-3 text-[13px] font-medium text-ink hover:border-brand lg:inline-flex"
               >
                 <TrendingUp className="size-3.5 shrink-0 text-brand" aria-hidden="true" />

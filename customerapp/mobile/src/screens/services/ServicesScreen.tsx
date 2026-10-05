@@ -12,7 +12,7 @@ import { ServicesHero } from '@/components/ServicesHero'
 import { Icon } from '@/components/ui/Icon'
 import { Tappable } from '@/components/ui/Tappable'
 import { Text } from '@/components/ui/Text'
-import { SERVICES_SEARCH_CHIPS } from '@/lib/trending'
+import { SERVICES_QUICK_LINKS } from '@/lib/trending'
 import { ApplianceSpaceCard } from '@/components/ApplianceSpaceCard'
 import { TrustPoints } from '@/components/TrustPoints'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
@@ -73,17 +73,17 @@ export function ServicesScreen() {
 
       {/* The search field floats over the foot of the photograph: the first
           thing to reach for, and it ties the picture to the page. It opens
-          the search screen rather than searching in place, and the chips
-          under it start a search that is known to land. */}
+          the search screen rather than searching in place; the chips under it
+          open their service on the appliance page directly. */}
       <View className="-mt-8">
         <SearchBar readOnly prominent onOpen={() => router.push('/search')} />
-        <View accessibilityLabel="Popular searches" className="mt-3 gap-2">
-          {[SERVICES_SEARCH_CHIPS.slice(0, 2), SERVICES_SEARCH_CHIPS.slice(2, 4)].map((row) => (
+        <View accessibilityLabel="Popular services" className="mt-3 gap-2">
+          {[SERVICES_QUICK_LINKS.slice(0, 2), SERVICES_QUICK_LINKS.slice(2, 4)].map((row) => (
             <View key={row[0].label} className="flex-row gap-2">
               {row.map((chip) => (
                 <Tappable
                   key={chip.label}
-                  href={{ pathname: '/search', params: { q: chip.query } }}
+                  href={{ pathname: '/services/appliance', params: { a: chip.applianceId, s: chip.serviceKey } }}
                   className="min-h-10 flex-1 flex-row items-center justify-center gap-1.5 rounded-pill border border-border bg-bg px-3 active:border-brand active:opacity-100"
                 >
                   <Icon as={TrendingUp} className="size-3.5 text-brand" />

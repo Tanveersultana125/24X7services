@@ -13,13 +13,15 @@ export const TRENDING_SEARCHES = [
 ] as const
 
 /**
- * The four under the search field on Services, as a two-by-two grid. The
- * label is short enough to sit whole in half of the narrowest phone; the
- * query is the full term from the list above, so a tap still lands.
+ * The four shortcuts under the search field on Services, as a two-by-two
+ * grid. Each one opens its service on the appliance page — no search in
+ * between, so a tap lands on the right page every time, with or without a
+ * connection to the search function. Labels are short enough to sit whole in
+ * half of the narrowest phone.
  */
-export const SERVICES_SEARCH_CHIPS = [
-  { label: 'AC service', query: 'AC service' },
-  { label: 'Washer repair', query: 'Washing machine repair' },
-  { label: 'Fridge repair', query: 'Refrigerator repair' },
-  { label: 'AC deep clean', query: 'AC deep clean' },
+export const SERVICES_QUICK_LINKS = [
+  { label: 'AC service', applianceId: 'air-conditioner', serviceKey: 'service' },
+  { label: 'Washer repair', applianceId: 'washing-machine', serviceKey: 'repair' },
+  { label: 'Fridge repair', applianceId: 'refrigerator', serviceKey: 'repair' },
+  { label: 'AC deep clean', applianceId: 'air-conditioner', serviceKey: 'deep-clean' },
 ] as const
