@@ -1,8 +1,5 @@
 {
-  "framework": null,
-  "installCommand": "npm install",
-  "buildCommand": "node scripts/web-deploy.mjs dist-vercel",
-  "outputDirectory": "dist-vercel",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
-  "git": { "deploymentEnabled": false }
+  "git": {
+    "deploymentEnabled": false
+  }
 }

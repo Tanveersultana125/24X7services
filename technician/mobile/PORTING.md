@@ -1,25 +1,24 @@
-# Writing a screen in the technician app
+# Porting a technician web screen to the native app
 
-The app (`technician/`, Expo SDK 57 + Expo Router + Uniwind) began as a port
-of the Next.js technician web app, which was retired on 2026-10-05 (in git up
-to 58082da). The kit keeps the web's names, so the rules below are written as
-web → native translations; follow them for every new screen too.
+The native app (`technician/mobile`, Expo SDK 57 + Expo Router + Uniwind) is a
+port of the Next.js technician app (`technician/`). Same copy, same design
+tokens, same on-device store. These are the rules every ported file follows.
 
 ## Where things go
 
 | Web | Native |
 | --- | --- |
-| web `app/<tab>/page.tsx` for home, jobs, ai, earnings, profile | `src/app/(tabs)/<tab>.tsx` |
-| any other web `app/<path>/page.tsx` | `src/app/<path>.tsx` (e.g. `jobs/detail.tsx`, `ai/chat.tsx`) |
-| web `components/X.tsx` | `src/components/X.tsx` — same name, same exports, same props where they make sense |
-| web `lib/*` | `src/lib/*` — import from `@/lib/...` |
+| `technician/app/<tab>/page.tsx` for home, jobs, ai, earnings, profile | `mobile/src/app/(tabs)/<tab>.tsx` |
+| any other `technician/app/<path>/page.tsx` | `mobile/src/app/<path>.tsx` (e.g. `jobs/detail.tsx`, `ai/chat.tsx`) |
+| `technician/components/X.tsx` | `mobile/src/components/X.tsx` — same name, same exports, same props where they make sense |
+| `technician/lib/*` | `mobile/src/lib/*` — already ported; import from `@/lib/...` exactly as the web does |
 
 Keep the web file's comments that explain *why*; drop ones about DOM/browser
 details that no longer apply. Keep every user-facing string identical.
 
 ## The kit — `@/components/ui`
 
-Same names as the web app's `components/ui.tsx`: `Button`, `Chip`, `StatusChip`,
+Same names as the web's `components/ui.tsx`: `Button`, `Chip`, `StatusChip`,
 `PriorityBadge`, `Card`, `SectionTitle`, `Label`, `Toggle`, `inputClass`,
 `Field`, `Segmented`, `FilterChip`, `ScreenHeader`, `Page`, `ActionDock`,
 `Sheet`, `Empty`, `Avatar`, `toneRail`, plus native extras:
