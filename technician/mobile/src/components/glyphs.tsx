@@ -4,7 +4,7 @@ import type { Appliance, Brand } from '@/lib/catalog'
 import { BRAND_LABEL } from '@/lib/catalog'
 import { useResolveClassNames } from 'uniwind'
 import { cn } from '@/lib/cn'
-import { toPx, useColor } from './base/Icon'
+import { hiddenFromA11y, toPx, useColor } from './base/Icon'
 import { useInherited } from './base/Text'
 import { Text } from './base/Text'
 
@@ -28,8 +28,7 @@ export function ApplianceGlyph({ appliance, className }: { appliance: Appliance;
     strokeWidth: 1.75,
     strokeLinecap: 'round' as const,
     strokeLinejoin: 'round' as const,
-    accessibilityElementsHidden: true,
-    importantForAccessibility: 'no' as const,
+    ...hiddenFromA11y,
   }
   switch (appliance) {
     case 'washer':

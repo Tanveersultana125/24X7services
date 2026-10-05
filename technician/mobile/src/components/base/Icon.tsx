@@ -1,3 +1,4 @@
+import { Platform } from 'react-native'
 import type { LucideIcon } from 'lucide-react-native'
 import { useResolveClassNames } from 'uniwind'
 import { cn } from '@/lib/cn'
@@ -46,8 +47,7 @@ export function Icon({
         ...(style.marginLeft === undefined ? {} : { marginLeft: style.marginLeft }),
         ...(style.marginRight === undefined ? {} : { marginRight: style.marginRight }),
       }}
-      accessibilityElementsHidden
-      importantForAccessibility="no"
+      {...hiddenFromA11y}
     />
   )
 }
@@ -69,3 +69,13 @@ export function toPx(v: number | string | undefined): number | undefined {
   if (Number.isNaN(n)) return undefined
   return v.endsWith('rem') ? n * 16 : n
 }
+
+/**
+ * Props that keep a decorative SVG away from screen readers. On the web an SVG
+ * passes RN's accessibility props straight to the DOM, where React rejects
+ * them, so it gets aria-hidden instead.
+ */
+export const hiddenFromA11y =
+  Platform.OS === 'web'
+    ? ({ 'aria-hidden': true } as object)
+    : ({ accessibilityElementsHidden: true, importantForAccessibility: 'no' } as const)
