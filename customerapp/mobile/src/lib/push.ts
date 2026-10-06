@@ -1,4 +1,4 @@
-import * as Notifications from 'expo-notifications'
+import Constants, { ExecutionEnvironment } from 'expo-constants'
 import { demoMode } from './firebase'
 
 /**
@@ -16,7 +16,18 @@ import { demoMode } from './firebase'
 
 const EAS_PROJECT_ID = process.env.EXPO_PUBLIC_EAS_PROJECT_ID
 
-export const PUSH_IS_CONFIGURED = !demoMode && Boolean(EAS_PROJECT_ID)
+// Expo Go dropped remote push on Android in SDK 53, and merely importing
+// expo-notifications there throws — so the module is only loaded when push
+// can actually work, never at the top of a file every screen pulls in.
+const IN_EXPO_GO =
+  Constants.executionEnvironment === ExecutionEnvironment.StoreClient
+
+export const PUSH_IS_CONFIGURED =
+  !demoMode && Boolean(EAS_PROJECT_ID) && !IN_EXPO_GO
+
+function notifications(): typeof import('expo-notifications') {
+  return require('expo-notifications')
+}
 
 export type PushOutcome =
   | { kind: 'enabled'; token: string }
@@ -31,11 +42,11 @@ export async function enablePushNotifications(): Promise<PushOutcome> {
     }
   }
 
-  const { status } = await Notifications.requestPermissionsAsync()
+  const { status } = await notifications().requestPermissionsAsync()
   if (status !== 'granted') return { kind: 'denied' }
 
   try {
-    const { data } = await Notifications.getDevicePushTokenAsync()
+    const { data } = await notifications().getDevicePushTokenAsync()
     return { kind: 'enabled', token: String(data) }
   } catch {
     return {
@@ -54,7 +65,7 @@ export async function onPushWhileOpen(
 ): Promise<() => void> {
   if (!PUSH_IS_CONFIGURED) return () => {}
 
-  const subscription = Notifications.addNotificationReceivedListener(
+  const subscription = notifications().addNotificationReceivedListener(
     (notification) => {
       const { title, body, data } = notification.request.content
       if (!title || !body) return
