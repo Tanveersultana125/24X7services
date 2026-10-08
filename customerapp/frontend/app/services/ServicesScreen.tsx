@@ -15,6 +15,7 @@ import { SERVICES_QUICK_LINKS } from '@/lib/trending'
 import { ApplianceSpaceCard } from '@/components/ApplianceSpaceCard'
 import { TrustPoints } from '@/components/TrustPoints'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
+import { AllBrandsGrid, TopTechnicians } from '@/components/TopTechnicians'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
 import { ApplianceGridSkeleton } from '@/components/SkeletonLoader'
@@ -151,6 +152,14 @@ export function ServicesScreen() {
 
       <Section title="What you get either way">
         <TrustPoints tiles />
+      </Section>
+
+      <Section title="Top technicians">
+        <TopTechnicians />
+      </Section>
+
+      <Section title="We service all brands">
+        <AllBrandsGrid />
       </Section>
     </AppShell>
   )

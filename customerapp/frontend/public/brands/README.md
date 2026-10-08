@@ -15,6 +15,16 @@ current company logo carries "Set yourself free" under the letters, which this
 file predates. If someone can get the SVG from IFB, drop it in as `ifb.svg`,
 point the fixture at it and delete the PNG.
 
+## The "We service all brands" grid
+
+The Services page closes on a wider grid than the catalog's four
+(`components/TopTechnicians.tsx`, web and mobile). Its extra logos are from
+Wikimedia Commons too, unaltered: `whirlpool.svg` (Whirlpool Corporation Logo,
+2017), `haier.svg`, `panasonic.svg` (blue), `godrej.svg`, `voltas.svg`,
+`electrolux.svg` (2015) and `bluestar.png` (Blue Star primary logo, scaled to
+480px wide). That grid is a fixed list in the component, not catalog data — a
+brand there is not something a booking can be tagged with.
+
 ## What goes here
 
 One SVG per brand, named after its id in the catalog:
