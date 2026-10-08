@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { ScrollView, View, useWindowDimensions } from 'react-native'
+import { View } from 'react-native'
 import { PackageOpen, TrendingUp } from 'lucide-react-native'
 import { router } from 'expo-router'
 import type { BusinessConfig, CatalogAppliance, CatalogService } from '@app/shared'
@@ -14,6 +14,7 @@ import { Tappable } from '@/components/ui/Tappable'
 import { Text } from '@/components/ui/Text'
 import { SERVICES_QUICK_LINKS } from '@/lib/trending'
 import { ApplianceSpaceCard } from '@/components/ApplianceSpaceCard'
+import { ApplianceCarousel } from '@/components/ApplianceCarousel'
 import { TrustPoints } from '@/components/TrustPoints'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
 import { AllBrandsGrid, TopTechnicians } from '@/components/TopTechnicians'
@@ -63,9 +64,6 @@ export function ServicesScreen() {
   // An appliance carries no clip and no score of its own — both are worked
   // out from the services under it, and so is how many there are.
   const summaries = all.data ? summaryByAppliance(all.data.services) : null
-  // One and a half cards on screen, so the rail reads as one that scrolls.
-  const { width } = useWindowDimensions()
-  const cardWidth = Math.min(256, Math.round((width - 32) * 0.6))
 
   const countFor = (applianceId: string): number =>
     all.data?.services.filter((service) => service.applianceId === applianceId).length ?? 0
@@ -110,9 +108,9 @@ export function ServicesScreen() {
         </View>
       </View>
 
-      {/* The appliances as tall photographs on a rail, the way a catalogue
-          of rooms is browsed: the picture says what it is before the name
-          does. */}
+      {/* The appliances as tall photographs, one at a time with an arrow
+          either side: the picture says what it is before the name does, and
+          a single card in the middle reads cleaner than two half-cards. */}
       <Section className="mt-8" title="What we service">
         {all.status === 'loading' ? (
           <ApplianceGridSkeleton />
@@ -125,29 +123,25 @@ export function ServicesScreen() {
             description="The catalog is being set up. Please check back shortly."
           />
         ) : (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            snapToInterval={cardWidth + 12}
-            decelerationRate="fast"
-            className="-mx-4"
-            contentContainerClassName="gap-3 px-4"
-          >
-            {all.data?.appliances.map((appliance, index) => {
+          <ApplianceCarousel
+            label="What we service"
+            items={(all.data?.appliances ?? []).map((appliance, index) => {
               const from = fromPrices?.get(appliance.id)
-              return (
-                <View key={appliance.id} style={{ width: cardWidth }}>
+              return {
+                key: appliance.id,
+                name: appliance.name,
+                node: (
                   <ApplianceSpaceCard
                     appliance={appliance}
                     serviceCount={countFor(appliance.id)}
                     from={from === undefined ? undefined : formatPaise(from)}
                     rating={summaries?.get(appliance.id)?.rating}
-                    priority={index < 2}
+                    priority={index === 0}
                   />
-                </View>
-              )
+                ),
+              }
             })}
-          </ScrollView>
+          />
         )}
       </Section>
 

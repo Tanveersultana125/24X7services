@@ -13,6 +13,7 @@ import { SearchBar } from '@/components/SearchBar'
 import { ServicesHero } from '@/components/ServicesHero'
 import { SERVICES_QUICK_LINKS } from '@/lib/trending'
 import { ApplianceSpaceCard } from '@/components/ApplianceSpaceCard'
+import { ApplianceCarousel } from '@/components/ApplianceCarousel'
 import { TrustPoints } from '@/components/TrustPoints'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
 import { AllBrandsGrid, TopTechnicians } from '@/components/TopTechnicians'
@@ -118,9 +119,9 @@ export function ServicesScreen() {
         </ul>
       </div>
 
-      {/* The appliances as tall photographs on a rail, the way a catalogue
-          of rooms is browsed: the picture says what it is before the name
-          does. */}
+      {/* The appliances as tall photographs, one at a time with an arrow
+          either side: the picture says what it is before the name does, and
+          a single card in the middle reads cleaner than two half-cards. */}
       <Section className="mt-8" title="What we service">
         {all.status === 'loading' ? (
           <ApplianceGridSkeleton />
@@ -133,22 +134,25 @@ export function ServicesScreen() {
             description="The catalog is being set up. Please check back shortly."
           />
         ) : (
-          <ul className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 lg:mx-0 lg:grid lg:grid-cols-5 lg:overflow-visible lg:px-0">
-            {all.data?.appliances.map((appliance, index) => {
+          <ApplianceCarousel
+            label="What we service"
+            items={(all.data?.appliances ?? []).map((appliance, index) => {
               const from = fromPrices?.get(appliance.id)
-              return (
-                <li key={appliance.id} className="w-[60%] max-w-64 shrink-0 snap-start lg:w-auto lg:max-w-none">
+              return {
+                key: appliance.id,
+                name: appliance.name,
+                node: (
                   <ApplianceSpaceCard
                     appliance={appliance}
                     serviceCount={countFor(appliance.id)}
                     from={from === undefined ? undefined : formatPaise(from)}
                     rating={summaries?.get(appliance.id)?.rating}
-                    priority={index < 2}
+                    priority={index === 0}
                   />
-                </li>
-              )
+                ),
+              }
             })}
-          </ul>
+          />
         )}
       </Section>
 
