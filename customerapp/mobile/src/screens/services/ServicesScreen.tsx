@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { ScrollView, View, useWindowDimensions } from 'react-native'
 import { PackageOpen, TrendingUp } from 'lucide-react-native'
 import { router } from 'expo-router'
-import type { CatalogAppliance, CatalogService } from '@app/shared'
+import type { BusinessConfig, CatalogAppliance, CatalogService } from '@app/shared'
 
 import { AppShell, Section } from '@/components/AppShell'
 import { Header } from '@/components/Screen'
@@ -17,10 +17,18 @@ import { ApplianceSpaceCard } from '@/components/ApplianceSpaceCard'
 import { TrustPoints } from '@/components/TrustPoints'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
 import { AllBrandsGrid, TopTechnicians } from '@/components/TopTechnicians'
+import { ServicesFaq } from '@/components/ServicesFaq'
+import { SupportCard } from '@/components/SupportCard'
 import { EmptyState } from '@/components/EmptyState'
 import { ErrorState } from '@/components/ErrorState'
 import { ApplianceGridSkeleton } from '@/components/SkeletonLoader'
-import { cheapestByAppliance, fetchAllServices, fetchAppliances, summaryByAppliance } from '@/lib/catalog'
+import {
+  cheapestByAppliance,
+  fetchAllServices,
+  fetchAppliances,
+  fetchBusinessConfig,
+  summaryByAppliance,
+} from '@/lib/catalog'
 import { formatPaise } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
 
@@ -36,12 +44,18 @@ import { useAsync } from '@/lib/useAsync'
 interface ServicesData {
   appliances: CatalogAppliance[]
   services: CatalogService[]
+  config: BusinessConfig | null
 }
 
 export function ServicesScreen() {
   const load = useCallback(async (): Promise<ServicesData> => {
-    const [appliances, services] = await Promise.all([fetchAppliances(), fetchAllServices()])
-    return { appliances, services }
+    const [appliances, services, config] = await Promise.all([
+      fetchAppliances(),
+      fetchAllServices(),
+      // The FAQ reads its numbers from here; a page without it still answers.
+      fetchBusinessConfig().catch(() => null),
+    ])
+    return { appliances, services, config }
   }, [])
 
   const all = useAsync(load)
@@ -152,6 +166,16 @@ export function ServicesScreen() {
       <Section title="We service all brands">
         <AllBrandsGrid />
       </Section>
+
+      <Section title="Questions people ask">
+        <ServicesFaq config={all.data?.config ?? null} />
+      </Section>
+
+      {all.data?.config?.supportPhone ? (
+        <Section>
+          <SupportCard supportPhone={all.data.config.supportPhone} />
+        </Section>
+      ) : null}
     </AppShell>
   )
 }
