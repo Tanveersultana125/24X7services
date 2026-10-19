@@ -1,12 +1,8 @@
 import { useCallback, useState } from 'react'
 import { View } from 'react-native'
 import { router, type Href } from 'expo-router'
-import { doc, getDoc } from 'firebase/firestore'
 import { Pencil } from 'lucide-react-native'
 import {
-  addressSchema,
-  COL,
-  SUB,
   type Address,
   type BusinessConfig,
   type CatalogAppliance,
@@ -23,7 +19,7 @@ import { Text } from '@/components/ui/Text'
 import { ErrorState } from '@/components/ui/States'
 import { Skeleton, SkeletonGroup } from '@/components/ui/Skeleton'
 import { fetchAppliance, fetchBusinessConfig, fetchIssuesFor, fetchServicesFor } from '@/lib/catalog'
-import { db } from '@/lib/firebase'
+import { fetchSavedAddress } from '@/lib/api/bookingAddresses'
 import { useAuth } from '@/lib/auth'
 import { formatPaise, formatSlotWindow, relativeDateLabel, shortAddress } from '@/lib/format'
 import { patchDraft, useBookingDraft } from '@/lib/bookingDraft'
@@ -69,12 +65,7 @@ export default function ReviewScreen() {
       fetchServicesFor(applianceId),
       fetchIssuesFor(applianceId),
       fetchBusinessConfig(),
-      addressId && uid
-        ? getDoc(doc(db(), COL.users, uid, SUB.addresses, addressId)).then((snap) => {
-            const parsed = addressSchema.safeParse({ id: snap.id, ...snap.data() })
-            return parsed.success ? parsed.data : null
-          })
-        : Promise.resolve(null),
+      addressId && uid ? fetchSavedAddress(uid, addressId) : Promise.resolve(null),
     ])
 
     return {

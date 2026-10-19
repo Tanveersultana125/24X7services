@@ -2,16 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { KeyboardAvoidingView, Platform, ScrollView, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useLocalSearchParams } from 'expo-router'
-import { collection, doc, onSnapshot, orderBy, query } from 'firebase/firestore'
 import { MessagesSquare, Send, UserRound } from 'lucide-react-native'
-import {
-  COL,
-  SUB,
-  supportMessageSchema,
-  supportTicketSchema,
-  type SupportMessage,
-  type SupportTicket,
-} from '@app/shared'
+import type { SupportMessage, SupportTicket } from '@app/shared'
 
 import { Header, Screen } from '@/components/Screen'
 import { SignInPrompt } from '@/components/ProfileShell'
@@ -24,7 +16,7 @@ import { Skeleton, SkeletonGroup } from '@/components/ui/Skeleton'
 import { useToast } from '@/components/Toast'
 import { callFn, friendlyError } from '@/lib/callables'
 import { useAuth } from '@/lib/auth'
-import { db } from '@/lib/firebase'
+import { subscribeTicket, subscribeTicketMessages } from '@/lib/api/support'
 import { relativeTime } from '@/lib/format'
 import { cn } from '@/lib/cn'
 
@@ -82,38 +74,20 @@ function Conversation({ ticketId, signedIn }: { ticketId: string | null; signedI
   useEffect(() => {
     if (!signedIn || !ticketId) return
 
-    const unsubscribeTicket = onSnapshot(
-      doc(db(), COL.supportTickets, ticketId),
-      (snap) => {
-        const parsed = supportTicketSchema.safeParse({
-          id: snap.id,
-          ...snap.data(),
-        })
-        if (!snap.exists() || !parsed.success) {
+    const unsubscribeTicket = subscribeTicket(
+      ticketId,
+      (next) => {
+        if (!next) {
           setStatus('missing')
           return
         }
-        setTicket(parsed.data)
+        setTicket(next)
         setStatus('ready')
       },
       () => setStatus('missing')
     )
 
-    const unsubscribeMessages = onSnapshot(
-      query(collection(db(), COL.supportTickets, ticketId, SUB.messages), orderBy('at', 'asc')),
-      (snap) => {
-        const next: SupportMessage[] = []
-        for (const document of snap.docs) {
-          const parsed = supportMessageSchema.safeParse({
-            id: document.id,
-            ...document.data(),
-          })
-          if (parsed.success) next.push(parsed.data)
-        }
-        setMessages(next)
-      },
-      () => setMessages([])
-    )
+    const unsubscribeMessages = subscribeTicketMessages(ticketId, setMessages, () => setMessages([]))
 
     return () => {
       unsubscribeTicket()

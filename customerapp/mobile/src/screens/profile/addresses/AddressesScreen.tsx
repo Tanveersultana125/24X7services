@@ -1,8 +1,7 @@
 import { useCallback, useState } from 'react'
 import { View } from 'react-native'
-import { collection, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore'
 import { MapPin, MapPinOff, Plus } from 'lucide-react-native'
-import { addressSchema, COL, SUB, type Address, type AddressInput } from '@app/shared'
+import type { Address, AddressInput } from '@app/shared'
 
 import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
 import { AddressCard } from '@/components/AddressCard'
@@ -14,7 +13,7 @@ import { EmptyState, ErrorState } from '@/components/ui/States'
 import { Skeleton, SkeletonGroup } from '@/components/ui/Skeleton'
 import { useToast } from '@/components/Toast'
 import { fetchServiceAreas } from '@/lib/catalog'
-import { db } from '@/lib/firebase'
+import { deleteAddress, fetchAddresses, saveAddress } from '@/lib/api/addresses'
 import { useAsync } from '@/lib/useAsync'
 import { AddressForm } from '@/screens/profile/addresses/AddressForm'
 
@@ -55,15 +54,7 @@ function AddressBook({ uid }: { uid: string }) {
   const [reloadKey, setReloadKey] = useState(0)
 
   const load = useCallback(async () => {
-    const [snap, areas] = await Promise.all([
-      getDocs(collection(db(), COL.users, uid, SUB.addresses)),
-      fetchServiceAreas(),
-    ])
-    const addresses: Address[] = []
-    for (const document of snap.docs) {
-      const parsed = addressSchema.safeParse({ id: document.id, ...document.data() })
-      if (parsed.success) addresses.push(parsed.data)
-    }
+    const [addresses, areas] = await Promise.all([fetchAddresses(uid), fetchServiceAreas()])
     return { addresses, serviced: new Set(areas.map((area) => area.pincode)) }
     // reloadKey is the point: bumping it re-runs the load.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -74,10 +65,7 @@ function AddressBook({ uid }: { uid: string }) {
   async function save(input: AddressInput, id?: string): Promise<void> {
     setBusy(true)
     try {
-      const ref = id
-        ? doc(db(), COL.users, uid, SUB.addresses, id)
-        : doc(collection(db(), COL.users, uid, SUB.addresses))
-      await setDoc(ref, { ...input, updatedAt: Date.now(), ...(id ? {} : { createdAt: Date.now() }) }, { merge: true })
+      await saveAddress(uid, input, id)
       setEditing(null)
       setReloadKey((key) => key + 1)
       toast.show('Saved.', { tone: 'success' })
@@ -91,7 +79,7 @@ function AddressBook({ uid }: { uid: string }) {
   async function remove(address: Address): Promise<void> {
     setBusy(true)
     try {
-      await deleteDoc(doc(db(), COL.users, uid, SUB.addresses, address.id))
+      await deleteAddress(uid, address.id)
       setDeleting(null)
       setReloadKey((key) => key + 1)
       toast.show('Address removed.')

@@ -1,8 +1,7 @@
 import { useCallback, useState } from 'react'
 import { View } from 'react-native'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { Bell, BellRing, Lock } from 'lucide-react-native'
-import { COL, DEFAULT_NOTIFICATION_PREFS, userProfileSchema, type NotificationPrefs } from '@app/shared'
+import { DEFAULT_NOTIFICATION_PREFS, type NotificationPrefs } from '@app/shared'
 
 import { useSignInHref } from '@/components/ProfileShell'
 import { SwitchRow } from '@/components/ui/Switch'
@@ -12,7 +11,7 @@ import { Text } from '@/components/ui/Text'
 import { Skeleton, SkeletonGroup } from '@/components/ui/Skeleton'
 import { useToast } from '@/components/Toast'
 import { callFn } from '@/lib/callables'
-import { db } from '@/lib/firebase'
+import { fetchNotificationPrefs, saveNotificationPrefs } from '@/lib/api/notifications'
 import { enablePushNotifications, PUSH_IS_CONFIGURED } from '@/lib/push'
 import { useAsync } from '@/lib/useAsync'
 
@@ -30,9 +29,7 @@ export function Notifications({ uid }: { uid: string | null }) {
   const signIn = useSignInHref()
   const load = useCallback(async (): Promise<NotificationPrefs> => {
     if (!uid) return DEFAULT_NOTIFICATION_PREFS
-    const snap = await getDoc(doc(db(), COL.users, uid))
-    const parsed = userProfileSchema.safeParse(snap.data())
-    return (parsed.success ? parsed.data.notifications : undefined) ?? DEFAULT_NOTIFICATION_PREFS
+    return fetchNotificationPrefs(uid)
   }, [uid])
 
   const prefs = useAsync(load)
@@ -64,7 +61,7 @@ export function Notifications({ uid }: { uid: string | null }) {
         }
       }
 
-      await savePrefs(uid, { ...current, [key]: next })
+      await saveNotificationPrefs(uid, { ...current, [key]: next })
     } catch {
       setLocal(before)
       toast.show('We could not save that. Please try again.', { tone: 'error' })
@@ -137,12 +134,4 @@ export function Notifications({ uid }: { uid: string | null }) {
       </Card>
     </View>
   )
-}
-
-/**
- * The write, kept outside the component — `Date.now` in a render is a bug
- * waiting for a re-render, even when it only ever runs from a tap.
- */
-async function savePrefs(uid: string, prefs: NotificationPrefs): Promise<void> {
-  await setDoc(doc(db(), COL.users, uid), { notifications: prefs, updatedAt: Date.now() }, { merge: true })
 }

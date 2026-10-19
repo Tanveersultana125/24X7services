@@ -1,9 +1,8 @@
 import { useCallback } from 'react'
 import { View } from 'react-native'
 import type { Href } from 'expo-router'
-import { doc, getDoc } from 'firebase/firestore'
 import { Check, ShieldCheck, ShieldX, X } from 'lucide-react-native'
-import { COL, warrantySchema, type Booking, type Warranty } from '@app/shared'
+import type { Booking, Warranty } from '@app/shared'
 
 import { BookingShell } from '@/components/BookingShell'
 import { Card } from '@/components/ui/Card'
@@ -13,7 +12,7 @@ import { Text } from '@/components/ui/Text'
 import { EmptyState , ErrorState } from '@/components/ui/States'
 
 import { Skeleton, SkeletonGroup } from '@/components/ui/Skeleton'
-import { db } from '@/lib/firebase'
+import { fetchWarranty } from '@/lib/api/warranty'
 import { daysUntil, formatDateTime } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/cn'
@@ -42,9 +41,7 @@ function WarrantyBody({ booking }: { booking: Booking }) {
 
   const load = useCallback(async (): Promise<Warranty | null> => {
     if (!warrantyId) return null
-    const snap = await getDoc(doc(db(), COL.warranties, warrantyId))
-    const parsed = warrantySchema.safeParse({ id: snap.id, ...snap.data() })
-    return parsed.success ? parsed.data : null
+    return fetchWarranty(warrantyId)
   }, [warrantyId])
 
   const warranty = useAsync(load)

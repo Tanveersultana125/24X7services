@@ -1,9 +1,8 @@
 import { useCallback, useState } from 'react'
 import { View } from 'react-native'
 import { router } from 'expo-router'
-import { doc, getDoc } from 'firebase/firestore'
 import { UserX } from 'lucide-react-native'
-import { addressSchema, COL, SUB, type TechnicianPublic, type TechPreference } from '@app/shared'
+import type { TechnicianPublic, TechPreference } from '@app/shared'
 
 import { BookingStep } from '@/components/BookingStep'
 import { TechnicianCard } from '@/components/TechnicianCard'
@@ -13,7 +12,7 @@ import { EmptyState , ErrorState } from '@/components/ui/States'
 
 import { Skeleton, SkeletonGroup } from '@/components/ui/Skeleton'
 import { callFn } from '@/lib/callables'
-import { db } from '@/lib/firebase'
+import { pincodeOfSavedAddress } from '@/lib/api/bookingAddresses'
 import { useAuth } from '@/lib/auth'
 import { patchDraft, useBookingDraft } from '@/lib/bookingDraft'
 import { useAsync } from '@/lib/useAsync'
@@ -171,11 +170,4 @@ export default function TechnicianScreen() {
       ) : null}
     </BookingStep>
   )
-}
-
-async function pincodeOfSavedAddress(uid: string | undefined, addressId: string): Promise<string | undefined> {
-  if (!uid) return undefined
-  const snap = await getDoc(doc(db(), COL.users, uid, SUB.addresses, addressId))
-  const parsed = addressSchema.safeParse({ id: snap.id, ...snap.data() })
-  return parsed.success ? parsed.data.pincode : undefined
 }

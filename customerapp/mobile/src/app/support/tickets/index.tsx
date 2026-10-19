@@ -1,9 +1,8 @@
 import { useCallback } from 'react'
 import { View } from 'react-native'
 import type { Href } from 'expo-router'
-import { collection, getDocs, limit, orderBy, query, where } from 'firebase/firestore'
 import { ChevronRight, MessagesSquare } from 'lucide-react-native'
-import { COL, supportTicketSchema, type SupportTicket } from '@app/shared'
+import type { SupportTicket } from '@app/shared'
 
 import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
 import { Card } from '@/components/ui/Card'
@@ -14,7 +13,7 @@ import { ToneBadge , EmptyState , ErrorState } from '@/components/ui/States'
 
 
 import { TicketListSkeleton } from '@/components/ui/Skeleton'
-import { db } from '@/lib/firebase'
+import { fetchTickets } from '@/lib/api/support'
 import { relativeTime } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/cn'
@@ -48,25 +47,7 @@ export default function TicketsScreen() {
 }
 
 function Tickets({ uid }: { uid: string }) {
-  const load = useCallback(async (): Promise<SupportTicket[]> => {
-    const snap = await getDocs(
-      query(
-        collection(db(), COL.supportTickets),
-        where('uid', '==', uid),
-        orderBy('lastMessageAt', 'desc'),
-        limit(100)
-      )
-    )
-    const tickets: SupportTicket[] = []
-    for (const document of snap.docs) {
-      const parsed = supportTicketSchema.safeParse({
-        id: document.id,
-        ...document.data(),
-      })
-      if (parsed.success) tickets.push(parsed.data)
-    }
-    return tickets
-  }, [uid])
+  const load = useCallback((): Promise<SupportTicket[]> => fetchTickets(uid), [uid])
 
   const tickets = useAsync(load)
 

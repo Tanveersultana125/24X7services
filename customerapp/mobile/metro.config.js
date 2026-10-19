@@ -43,6 +43,10 @@ uniwind.resolver.resolveRequest = (context, moduleName, platform) => {
   if (moduleName === '@app/shared') {
     return { type: 'sourceFile', filePath: path.join(shared, 'src', 'index.ts') }
   }
+  // The generic catalog is not in the package index yet (see catalog-v2.ts).
+  if (moduleName === '@app/shared/catalog-v2') {
+    return { type: 'sourceFile', filePath: path.join(shared, 'src', 'catalog-v2.ts') }
+  }
   return uniwindResolve(context, moduleName, platform)
 }
 

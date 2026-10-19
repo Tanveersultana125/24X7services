@@ -2,7 +2,6 @@ import { useCallback } from 'react'
 import { View } from 'react-native'
 import { router, type Href } from 'expo-router'
 import Constants from 'expo-constants'
-import { doc, getDoc } from 'firebase/firestore'
 import {
   BadgeCheck,
   Bell,
@@ -24,13 +23,7 @@ import {
   WalletMinimal,
   type LucideIcon,
 } from 'lucide-react-native'
-import {
-  COL,
-  REFERRAL_REWARD,
-  formatPaise,
-  userProfileSchema,
-  type UserProfile,
-} from '@app/shared'
+import { REFERRAL_REWARD, formatPaise, type UserProfile } from '@app/shared'
 
 import { AppShell } from '@/components/AppShell'
 import { brand } from '@/config/brand'
@@ -42,7 +35,7 @@ import { Text } from '@/components/ui/Text'
 import { ProfileSkeleton } from '@/components/ui/Skeleton'
 import { useToast } from '@/components/Toast'
 import { signOut, useAuth } from '@/lib/auth'
-import { db } from '@/lib/firebase'
+import { fetchProfile } from '@/lib/api/profile'
 import { formatPhone } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
 
@@ -117,9 +110,7 @@ export default function ProfileScreen() {
 
   const load = useCallback(async (): Promise<UserProfile | null> => {
     if (!uid) return null
-    const snap = await getDoc(doc(db(), COL.users, uid))
-    const parsed = userProfileSchema.safeParse(snap.data())
-    return parsed.success ? parsed.data : null
+    return fetchProfile(uid)
   }, [uid])
 
   const profile = useAsync(load)

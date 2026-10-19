@@ -1,13 +1,9 @@
 import { useCallback, useState } from 'react'
 import { View } from 'react-native'
 import { router } from 'expo-router'
-import { addDoc, collection, getDocs } from 'firebase/firestore'
 import { Plus } from 'lucide-react-native'
 import {
   addressInputSchema,
-  addressSchema,
-  COL,
-  SUB,
   type Address,
   type AddressInput,
   type AddressLabel,
@@ -24,7 +20,8 @@ import { ErrorState } from '@/components/ui/States'
 import { Skeleton, SkeletonGroup } from '@/components/ui/Skeleton'
 import { useToast } from '@/components/Toast'
 import { fetchServiceAreas } from '@/lib/catalog'
-import { db } from '@/lib/firebase'
+import { fetchAddresses } from '@/lib/api/addresses'
+import { addAddress } from '@/lib/api/bookingAddresses'
 import { useAuth } from '@/lib/auth'
 import { patchDraft, useBookingDraft } from '@/lib/bookingDraft'
 import { useAsync } from '@/lib/useAsync'
@@ -66,12 +63,7 @@ export default function AddressScreen() {
     const servicedPincodes = new Set(areas.map((area) => area.pincode))
     if (!uid) return { addresses: [], servicedPincodes }
 
-    const snap = await getDocs(collection(db(), COL.users, uid, SUB.addresses))
-    const addresses: Address[] = []
-    for (const doc of snap.docs) {
-      const parsed = addressSchema.safeParse({ id: doc.id, ...doc.data() })
-      if (parsed.success) addresses.push(parsed.data)
-    }
+    const addresses = await fetchAddresses(uid)
     return { addresses, servicedPincodes }
     // reloadKey re-runs this after a new address is saved.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -90,15 +82,11 @@ export default function AddressScreen() {
 
   async function save(input: AddressInput): Promise<void> {
     if (!uid) return
-    const ref = await addDoc(collection(db(), COL.users, uid, SUB.addresses), {
-      ...input,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    })
+    const addressId = await addAddress(uid, input)
     setAdding(false)
     setReloadKey((key) => key + 1)
     toast.show('Address saved.', { tone: 'success' })
-    patchDraft({ addressId: ref.id, address: undefined })
+    patchDraft({ addressId, address: undefined })
     router.push('/book/slot')
   }
 
