@@ -216,7 +216,6 @@ export function ApplianceScreen() {
   const router = useRouter()
   const params = useSearchParams()
   const parsed = applianceIdSchema.safeParse(params.get('a'))
-  const openAt = params.get('s')
   const applianceId: ApplianceId | null = parsed.success ? parsed.data : null
 
   const load = useCallback(async (): Promise<ApplianceData> => {
@@ -312,10 +311,6 @@ export function ApplianceScreen() {
   const repairService =
     services.find((service) => service.serviceKey === 'repair') ?? null
 
-  // The service the customer arrived on, when they arrived on one: the page
-  // opens scrolled to it.
-  const requested =
-    services.find((service) => service.serviceKey === openAt) ?? null
   const cheapestFee = services.length
     ? Math.min(...services.map((service) => service.visitFee))
     : null
@@ -359,29 +354,17 @@ export function ApplianceScreen() {
   }
 
   /**
-   * Scroll to the service named in the URL, once it is on the page.
-   *
-   * After the catalog lands, not before: at navigation time the list does not
-   * exist, which is why a fragment could not do this. Once only — `done` is a
-   * ref rather than state so a re-render cannot fire it again and drag the
-   * page back from wherever the customer has since scrolled.
-   *
-   * `scroll-mt` on the row keeps the sticky header off it, so the service
-   * lands below the bar rather than under it.
+   * Every visit opens at the top — the appliance, its price and the service
+   * row — even when the link named a service. Once the catalog lands, so a
+   * scroll position carried over from the previous page cannot leave the
+   * customer halfway down the list.
    */
-  const scrolled = useRef(false)
+  const settled = useRef(false)
   useEffect(() => {
-    if (scrolled.current || !requested) return
-    const row = document.getElementById(`service-${requested.id}`)
-    if (!row) return
-
-    scrolled.current = true
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    row.scrollIntoView({
-      behavior: reduced ? 'auto' : 'smooth',
-      block: 'start',
-    })
-  }, [requested])
+    if (settled.current || !services.length) return
+    settled.current = true
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }, [services.length])
 
   /**
    * Starting a booking is starting a new draft, not adding to whatever was left

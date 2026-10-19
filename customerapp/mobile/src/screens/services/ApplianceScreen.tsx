@@ -178,7 +178,6 @@ export function ApplianceScreen() {
   const insets = useSafeAreaInsets()
   const params = useLocalSearchParams<{ a?: string; s?: string }>()
   const parsed = applianceIdSchema.safeParse(params.a)
-  const openAt = params.s ?? null
   const applianceId: ApplianceId | null = parsed.success ? parsed.data : null
   const reducedMotion = usePrefersReducedMotion()
   const ink = useColor('text-ink')
@@ -254,9 +253,6 @@ export function ApplianceScreen() {
   // repair, not make the customer choose between repair and installation first.
   const repairService = services.find((service) => service.serviceKey === 'repair') ?? null
 
-  // The service the customer arrived on, when they arrived on one: the page
-  // opens scrolled to it.
-  const requested = services.find((service) => service.serviceKey === openAt) ?? null
   const cheapestFee = services.length ? Math.min(...services.map((service) => service.visitFee)) : null
 
   // The longest cover on offer here, service overrides included. "Up to",
@@ -299,7 +295,6 @@ export function ApplianceScreen() {
   /** Offsets of each service row inside its group's body. */
   const rowY = useRef(new Map<string, { group: string; y: number }>())
   const headingHeight = useRef(0)
-  const scrolled = useRef(false)
 
   function scrollTo(y: number): void {
     scroller.current?.scrollTo({ y: Math.max(0, y), animated: !reducedMotion })
@@ -321,28 +316,15 @@ export function ApplianceScreen() {
     return true
   }
 
-  /**
-   * Scroll to the service named in the link, once it is on the page — after
-   * the catalog lands and the row has been laid out, and once only, so a
-   * re-layout cannot drag the page back from wherever the customer has since
-   * scrolled.
-   */
-  function settleInitialScroll(): void {
-    if (scrolled.current || !requested) return
-    if (jumpToRow(requested.id)) scrolled.current = true
-  }
-
   function place(id: string) {
     return (event: LayoutChangeEvent) => {
       sectionY.current.set(id, event.nativeEvent.layout.y)
-      settleInitialScroll()
     }
   }
 
   function placeRow(group: string, serviceId: string) {
     return (event: LayoutChangeEvent) => {
       rowY.current.set(serviceId, { group, y: event.nativeEvent.layout.y })
-      settleInitialScroll()
     }
   }
 
