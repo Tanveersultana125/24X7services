@@ -18,7 +18,7 @@ import { formatPaise } from '@app/shared'
 
 import { AppShell, Section } from '@/components/AppShell'
 import { HomeHeaderSearch, HomeHeaderStrip, HomeHeaderTop } from '@/components/HomeHeader'
-import { PromotionalBanner, BannerCard, TONE_TOP, TONES_EDGE } from '@/components/PromotionalBanner'
+import { PromotionalBanner, BannerCard, useToneEdge } from '@/components/PromotionalBanner'
 import { CategoryGrid } from '@/components/CategoryGrid'
 import { ServiceRail, durationNote, type ServiceRailItem } from '@/components/ServiceRail'
 import { BrandDisclaimer } from '@/components/BrandCard'
@@ -29,8 +29,8 @@ import { Card } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
 import { Tappable } from '@/components/ui/Tappable'
 import { Text } from '@/components/ui/Text'
-import { ErrorState } from '@/components/States'
-import { CategoryGridSkeleton, HomeSkeleton, Skeleton } from '@/components/SkeletonLoader'
+import { ErrorState } from '@/components/ui/States'
+import { CategoryGridSkeleton, HomeSkeleton, Skeleton } from '@/components/ui/Skeleton'
 import { CartBar } from '@/components/CartBar'
 import { VideoRail, type ReelItem } from '@/components/VideoRail'
 import { ServiceSheet, serviceOptions } from '@/components/ServiceSheet'
@@ -225,7 +225,8 @@ export function HomeScreen() {
   })
 
   // The banner's colour while there is a banner to match.
-  const headerTone = heroTone && heroBanners.length > 0 && !pastHero ? TONE_TOP[heroTone] : undefined
+  const [heroTop] = useToneEdge(heroTone ?? 'blue')
+  const headerTone = heroTone && heroBanners.length > 0 && !pastHero ? heroTop : undefined
   const activeTone = heroTone ?? heroBanners[0]?.tone
 
   const headerProps = {
@@ -467,9 +468,10 @@ function ToneLayer({ tone, shown }: { tone: BannerTone; shown: boolean }) {
     opacity.value = withTiming(shown ? 1 : 0, { duration: 500, reduceMotion: ReduceMotion.System })
   }, [shown, opacity])
   const style = useAnimatedStyle(() => ({ opacity: opacity.value }))
+  const edge = useToneEdge(tone)
   return (
     <Animated.View style={[{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }, style]}>
-      <LinearGradient colors={TONES_EDGE[tone]} style={{ flex: 1 }} />
+      <LinearGradient colors={edge} style={{ flex: 1 }} />
     </Animated.View>
   )
 }

@@ -5,7 +5,7 @@ import type { Warranty } from '@app/shared'
 import { CardLink } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
 import { Text } from '@/components/ui/Text'
-import { ToneBadge } from '@/components/States'
+import { ToneBadge } from '@/components/ui/States'
 import { daysUntil, formatDateKey } from '@/lib/format'
 import { cn } from '@/lib/cn'
 

@@ -1,5 +1,5 @@
 import { View } from 'react-native'
-import { Skeleton, SkeletonGroup, SkeletonText } from '@/components/States'
+import { Skeleton, SkeletonGroup, SkeletonText } from '@/components/ui/States'
 
 /**
  * Skeletons stand in for content that is on its way, and they are shaped like

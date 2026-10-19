@@ -134,6 +134,7 @@ export function ReferCard({ code }: { code: string }) {
  */
 function Speckle() {
   const dot = useColor('text-bg')
+  const opaque = useColor('text-white')
   return (
     <View
       pointerEvents="none"
@@ -147,8 +148,8 @@ function Speckle() {
             <Circle cx="7" cy="7" r="1.5" fill={dot} />
           </Pattern>
           <RadialGradient id="fade" cx="70%" cy="30%" r="70%">
-            <Stop offset="0" stopColor="#fff" stopOpacity="1" />
-            <Stop offset="1" stopColor="#fff" stopOpacity="0" />
+            <Stop offset="0" stopColor={opaque} stopOpacity="1" />
+            <Stop offset="1" stopColor={opaque} stopOpacity="0" />
           </RadialGradient>
           <Mask id="mask">
             <Rect width="224" height="224" fill="url(#fade)" />

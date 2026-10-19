@@ -7,10 +7,10 @@ import { COL, invoiceSchema, type Invoice } from '@app/shared'
 
 import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
 import { Card } from '@/components/ui/Card'
-import { ToneBadge , EmptyState , ErrorState } from '@/components/States'
+import { ToneBadge , EmptyState , ErrorState } from '@/components/ui/States'
 
 
-import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
+import { Skeleton, SkeletonGroup } from '@/components/ui/Skeleton'
 import { Icon } from '@/components/ui/Icon'
 import { Tappable } from '@/components/ui/Tappable'
 import { Text } from '@/components/ui/Text'

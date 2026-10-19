@@ -16,7 +16,7 @@ import {
 
 import { AppShell, Section } from '@/components/AppShell'
 import { Header } from '@/components/Screen'
-import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
+import { Skeleton, SkeletonGroup } from '@/components/ui/Skeleton'
 import { Card } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
 import { Tappable } from '@/components/ui/Tappable'

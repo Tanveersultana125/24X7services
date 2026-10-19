@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react-native'
-import { useResolveClassNames } from 'uniwind'
+import { useCSSVariable, useResolveClassNames } from 'uniwind'
 import { cn } from '@/lib/cn'
 
 /**
@@ -14,13 +14,13 @@ export function Icon({
   as: Component,
   className,
   strokeWidth = 2,
-  fill,
+  filled = false,
 }: {
   as: LucideIcon
   className?: string
   strokeWidth?: number
-  /** For a filled glyph (a star in a rating). */
-  fill?: string
+  /** Fill the glyph with its own colour (a star in a rating). */
+  filled?: boolean
 }) {
   const style = useResolveClassNames(cn('size-5 text-ink', className)) as {
     width?: number | string
@@ -31,13 +31,15 @@ export function Icon({
     marginLeft?: number
     marginRight?: number
   }
+  const ink = useInk()
   const size = toPx(style.width) ?? 20
+  const color = style.color ?? ink
   return (
     <Component
       size={size}
-      color={style.color ?? '#17150f'}
+      color={color}
       strokeWidth={strokeWidth}
-      {...(fill ? { fill } : {})}
+      {...(filled ? { fill: color } : {})}
       style={{
         ...(style.opacity === undefined ? {} : { opacity: style.opacity }),
         ...(style.marginTop === undefined ? {} : { marginTop: style.marginTop }),
@@ -53,7 +55,14 @@ export function Icon({
 /** The icon's colour as a string, for the rare prop that wants one. */
 export function useColor(className: string): string {
   const style = useResolveClassNames(className) as { color?: string }
-  return style.color ?? '#17150f'
+  const ink = useInk()
+  return style.color ?? ink
+}
+
+/** The theme's ink, for when a class resolves to no colour at all. */
+function useInk(): string {
+  const ink = useCSSVariable('--color-ink')
+  return typeof ink === 'string' ? ink : 'black'
 }
 
 /**

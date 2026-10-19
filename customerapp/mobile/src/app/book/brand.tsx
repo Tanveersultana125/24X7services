@@ -6,8 +6,8 @@ import { brandApplianceMatrixEntrySchema, COL, type CatalogBrand } from '@app/sh
 
 import { BookingStep } from '@/components/BookingStep'
 import { BrandCard, BrandDisclaimer } from '@/components/BrandCard'
-import { ErrorState } from '@/components/States'
-import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
+import { ErrorState } from '@/components/ui/States'
+import { Skeleton, SkeletonGroup } from '@/components/ui/Skeleton'
 import { Text } from '@/components/ui/Text'
 import { fetchBrands } from '@/lib/catalog'
 import { db } from '@/lib/firebase'

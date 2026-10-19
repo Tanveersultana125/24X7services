@@ -12,8 +12,8 @@ import {
 } from '@app/shared'
 
 import { ProfileShell, useSignInHref } from '@/components/ProfileShell'
-import { ErrorState } from '@/components/States'
-import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
+import { ErrorState } from '@/components/ui/States'
+import { Skeleton, SkeletonGroup } from '@/components/ui/Skeleton'
 import { useToast } from '@/components/Toast'
 import { Icon } from '@/components/ui/Icon'
 import { Tappable } from '@/components/ui/Tappable'

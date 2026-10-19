@@ -5,9 +5,9 @@ import { isPlanActive, type CatalogPlan, type UserPlan } from '@app/shared'
 
 import { SignInPrompt, useSignInHref } from '@/components/ProfileShell'
 import { PlanCard, PlanOfferCard } from '@/components/PlanCard'
-import { EmptyState , ErrorState } from '@/components/States'
+import { EmptyState , ErrorState } from '@/components/ui/States'
 
-import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
+import { Skeleton, SkeletonGroup } from '@/components/ui/Skeleton'
 import { useToast } from '@/components/Toast'
 import { Text } from '@/components/ui/Text'
 import { fetchAppliances } from '@/lib/catalog'

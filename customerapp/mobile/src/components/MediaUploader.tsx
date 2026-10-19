@@ -55,6 +55,7 @@ export function MediaUploader({ items, onItemsChange, limits, onUpload, classNam
   const [rejection, setRejection] = useState<string | null>(null)
   const [choosing, setChoosing] = useState<'image' | 'video' | null>(null)
   const spinner = useColor('text-muted')
+  const onDark = useColor('text-white')
 
   // The upload callbacks resolve long after the render that started them, so
   // they read the list through a ref rather than closing over a stale copy.
@@ -199,7 +200,7 @@ export function MediaUploader({ items, onItemsChange, limits, onUpload, classNam
 
               {item.progress !== undefined ? (
                 <View className="absolute inset-0 items-center justify-center gap-1 bg-night/60">
-                  <ActivityIndicator color="#ffffff" />
+                  <ActivityIndicator color={onDark} />
                   <Text className="text-xs text-white" style={{ fontVariant: ['tabular-nums'] }}>
                     {Math.round(item.progress)}%
                   </Text>

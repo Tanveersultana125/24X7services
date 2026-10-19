@@ -5,9 +5,9 @@ import { ShieldCheck } from 'lucide-react-native'
 import { COL, warrantySchema, type Warranty } from '@app/shared'
 
 import { WarrantyCard } from '@/components/WarrantyCard'
-import { EmptyState , ErrorState } from '@/components/States'
+import { EmptyState , ErrorState } from '@/components/ui/States'
 
-import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
+import { Skeleton, SkeletonGroup } from '@/components/ui/Skeleton'
 import { Text } from '@/components/ui/Text'
 import { fetchAllServices, fetchAppliances } from '@/lib/catalog'
 import { db } from '@/lib/firebase'

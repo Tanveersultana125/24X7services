@@ -11,8 +11,8 @@ import {
 } from '@app/shared'
 
 import { ReferCard } from '@/components/ReferCard'
-import { ErrorState } from '@/components/States'
-import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
+import { ErrorState } from '@/components/ui/States'
+import { Skeleton, SkeletonGroup } from '@/components/ui/Skeleton'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Field'
 import { Icon } from '@/components/ui/Icon'

@@ -24,8 +24,8 @@ import {
 
 import { Header } from '@/components/Screen'
 import { BottomSheet } from '@/components/ui/Overlay'
-import { ErrorState } from '@/components/States'
-import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
+import { ErrorState } from '@/components/ui/States'
+import { Skeleton, SkeletonGroup } from '@/components/ui/Skeleton'
 import { useToast } from '@/components/Toast'
 import { Icon, useColor } from '@/components/ui/Icon'
 import { Tappable } from '@/components/ui/Tappable'

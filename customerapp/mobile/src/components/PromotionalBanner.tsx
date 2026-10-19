@@ -26,6 +26,7 @@ import type { Href } from 'expo-router'
 import type { Banner, BannerTone } from '@app/shared'
 import { usePrefersReducedMotion } from '@/components/ServiceClip'
 import { useColor } from '@/components/ui/Icon'
+import { useTokenColors } from '@/lib/useTokenColors'
 import { Img } from '@/components/ui/Img'
 import { Tappable } from '@/components/ui/Tappable'
 import { Text } from '@/components/ui/Text'
@@ -225,32 +226,17 @@ function Dot({ on }: { on: boolean }) {
 const STORY_MS = 8000
 
 /**
- * Each tone's darkest colour, as a fixed value: the header over an
- * edge-to-edge banner is painted with it, and the slide's gradient starts from
- * exactly it, so the two read as one block. Fixed rather than tokens because
+ * A tone's gradient, deep to light, from the fixed tone-* tokens in
+ * global.css. Home paints it top to bottom behind the header and the banner
+ * together, as one block, and the header over an edge-to-edge banner takes the
+ * first stop, so the two read as one. Fixed rather than theme tokens because
  * `brand-deep` lightens in the dark theme and the seam would show.
- */
-export const TONE_TOP: Record<BannerTone, string> = {
-  blue: '#1E3A8A',
-  amber: '#3B1A05',
-  green: '#08402F',
-  teal: '#11293E',
-  violet: '#0E0E22',
-}
-
-/**
- * The same gradients run top to bottom, from `TONE_TOP` down. Home paints them
- * behind the header and the banner together, as one block, not the card.
  *
  * The stops of a `LinearGradient` rather than the web's class string: a
  * gradient is not a className here.
  */
-export const TONES_EDGE: Record<BannerTone, readonly [string, string, string]> = {
-  blue: ['#1E3A8A', '#2547D0', '#4AA8DC'],
-  amber: ['#3B1A05', '#8C4F10', '#E0952E'],
-  green: ['#08402F', '#0B7A50', '#2FB483'],
-  teal: ['#11293E', '#1E6E8C', '#5FC9E8'],
-  violet: ['#0E0E22', '#2B2A6E', '#5A4ED0'],
+export function useToneEdge(tone: BannerTone): readonly [string, string, string] {
+  return useTokenColors([`tone-${tone}-1`, `tone-${tone}-2`, `tone-${tone}-3`] as const)
 }
 
 /**
@@ -264,7 +250,8 @@ export const TONES_EDGE: Record<BannerTone, readonly [string, string, string]> =
 function useToneStops(tone: BannerTone): readonly [string, string, string] {
   const deep = useColor('text-brand-deep')
   const brand = useColor('text-brand')
-  return tone === 'blue' ? [deep, brand, '#4AA8DC'] : TONES_EDGE[tone]
+  const edge = useToneEdge(tone)
+  return tone === 'blue' ? [deep, brand, edge[2]] : edge
 }
 
 /** The card's own ground: a gradient corner to corner, rounded. */
@@ -858,6 +845,7 @@ function StepsBody({
   const start = title.split(' ').length * 0.07 + 0.35 // the line starts once the headline is up
   const each = 0.55 // seconds the line takes from one step to the next
   const last = steps.length - 1
+  const [toneTop] = useToneEdge(banner.tone)
   // The rail runs between the first and the last dot: half a column in from each side.
   const inset = `${50 / steps.length}%` as const
 
@@ -881,7 +869,7 @@ function StepsBody({
               duration={420}
               className="size-6 items-center justify-center rounded-full bg-white"
             >
-              <Text className="text-xs font-bold" style={{ color: TONE_TOP[banner.tone] }}>
+              <Text className="text-xs font-bold" style={{ color: toneTop }}>
                 ✓
               </Text>
             </Play>

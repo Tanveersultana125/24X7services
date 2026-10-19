@@ -37,12 +37,12 @@ import { TrustPoints } from '@/components/TrustPoints'
 import { usePrefersReducedMotion } from '@/components/ServiceClip'
 import { Chip, Tag } from '@/components/ui/Chip'
 import { Card } from '@/components/ui/Card'
-import { Icon, useColor } from '@/components/ui/Icon'
+import { Icon } from '@/components/ui/Icon'
 import { Img } from '@/components/ui/Img'
 import { Tappable } from '@/components/ui/Tappable'
 import { Text } from '@/components/ui/Text'
-import { ErrorState } from '@/components/States'
-import { ServiceListSkeleton } from '@/components/SkeletonLoader'
+import { ErrorState } from '@/components/ui/States'
+import { ServiceListSkeleton } from '@/components/ui/Skeleton'
 import { brand, MANUFACTURER_WARRANTY_NOTICE } from '@/config/brand'
 import { startDraft } from '@/lib/bookingDraft'
 import { useCart } from '@/lib/cart'
@@ -182,7 +182,6 @@ export function ApplianceScreen() {
   const openAt = params.s ?? null
   const applianceId: ApplianceId | null = parsed.success ? parsed.data : null
   const reducedMotion = usePrefersReducedMotion()
-  const ink = useColor('text-ink')
 
   const load = useCallback(async (): Promise<ApplianceData> => {
     if (!applianceId) {
@@ -420,7 +419,7 @@ export function ApplianceScreen() {
                 accessibilityLabel={`Rated ${score.rating.toFixed(2)}, ${countNote(score.reviewCount)} reviews. Read them.`}
                 className="mt-1.5 flex-row items-center gap-1.5 self-start"
               >
-                <Icon as={Star} fill={ink} className="size-3.5 text-ink" />
+                <Icon as={Star} filled className="size-3.5 text-ink" />
                 <Text className="text-sm text-ink underline decoration-dotted">
                   <Text className="text-sm font-semibold text-ink">{score.rating.toFixed(2)}</Text> (
                   {countNote(score.reviewCount)} reviews)
