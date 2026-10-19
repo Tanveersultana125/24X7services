@@ -4,7 +4,7 @@ import { router, type Href } from 'expo-router'
 import { ArrowRight, ChevronRight } from 'lucide-react-native'
 import { formatPaise, type ApplianceId, type CatalogAppliance, type CatalogService } from '@app/shared'
 
-import { BottomSheet } from '@/components/BottomSheet'
+import { BottomSheet } from '@/components/ui/Overlay'
 import { durationNote } from '@/components/ServiceRail'
 import { Icon } from '@/components/ui/Icon'
 import { Img } from '@/components/ui/Img'

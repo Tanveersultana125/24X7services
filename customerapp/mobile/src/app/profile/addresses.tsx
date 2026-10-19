@@ -14,16 +14,16 @@ import {
 
 import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
 import { AddressCard } from '@/components/AddressCard'
-import { BottomSheet } from '@/components/BottomSheet'
-import { ConfirmModal } from '@/components/Modal'
+import { BottomSheet , ConfirmModal } from '@/components/ui/Overlay'
+
 import { Chip } from '@/components/ui/Chip'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Field'
 import { Icon } from '@/components/ui/Icon'
 import { Tappable } from '@/components/ui/Tappable'
 import { Text } from '@/components/ui/Text'
-import { EmptyState } from '@/components/EmptyState'
-import { ErrorState } from '@/components/ErrorState'
+import { EmptyState , ErrorState } from '@/components/States'
+
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { useToast } from '@/components/Toast'
 import { fetchServiceAreas } from '@/lib/catalog'
@@ -42,7 +42,7 @@ import { useAsync } from '@/lib/useAsync'
  * rewrite where a past job happened.
  */
 
-const LABELS: ReadonlyArray<{ value: AddressLabel; text: string }> = [
+const LABELS: readonly { value: AddressLabel; text: string }[] = [
   { value: 'home', text: 'Home' },
   { value: 'office', text: 'Office' },
   { value: 'other', text: 'Other' },

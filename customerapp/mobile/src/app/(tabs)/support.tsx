@@ -15,7 +15,7 @@ import {
 } from 'lucide-react-native'
 
 import { AppShell, Section } from '@/components/AppShell'
-import { Header } from '@/components/Header'
+import { Header } from '@/components/Screen'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { Card } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'

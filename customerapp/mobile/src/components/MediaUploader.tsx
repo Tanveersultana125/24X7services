@@ -4,7 +4,7 @@ import { Camera, ImagePlus, Images, Trash2, Video, type LucideIcon } from 'lucid
 import type { MediaLimits } from '@app/shared'
 import { compressPhoto, formatBytes, isPhoto, pickMedia, validateMedia, type PickedMedia } from '@/lib/media'
 import { cn } from '@/lib/cn'
-import { BottomSheet } from '@/components/BottomSheet'
+import { BottomSheet } from '@/components/ui/Overlay'
 import { Icon, useColor } from '@/components/ui/Icon'
 import { Img } from '@/components/ui/Img'
 import { Tappable } from '@/components/ui/Tappable'

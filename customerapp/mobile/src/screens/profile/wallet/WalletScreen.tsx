@@ -23,8 +23,8 @@ import {
 } from '@app/shared'
 
 import { Header } from '@/components/Screen'
-import { BottomSheet } from '@/components/BottomSheet'
-import { ErrorState } from '@/components/ErrorState'
+import { BottomSheet } from '@/components/ui/Overlay'
+import { ErrorState } from '@/components/States'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { useToast } from '@/components/Toast'
 import { Icon, useColor } from '@/components/ui/Icon'
@@ -36,6 +36,7 @@ import { fetchLedger, fetchWallet } from '@/lib/wallet'
 import { formatDateTime } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/cn'
+import { brand } from '@/config/brand'
 
 /**
  * The customer's balance with us, and the reason for every paisa of it.
@@ -51,7 +52,7 @@ import { cn } from '@/lib/cn'
  * thing, and the statement says which is which on every line.
  *
  * Add money is the reason the limits in the schema matter — see the note at
- * the top of `shared/wallet.ts`. The balance is closed-loop: it buys 24X7
+ * the top of `shared/wallet.ts`. The balance is closed-loop: it buys our
  * services, it cannot be transferred or withdrawn, and it is refundable on
  * request. Nothing on this screen may quietly stop any of those being true.
  *
@@ -121,6 +122,8 @@ export function WalletFrame({ children }: { children: (scrollTo: ScrollTo) => Re
         contentContainerStyle={{ paddingBottom: 40 + insets.bottom }}
         keyboardShouldPersistTaps="handled"
       >
+        {/* scrollTo reads the ref only when a press calls it, never while rendering. */}
+        {/* eslint-disable-next-line react-hooks/refs */}
         {children(scrollTo)}
       </ScrollView>
     </View>
@@ -343,7 +346,7 @@ function AddMoneySheet({
       onClose={onClose}
       dismissable={busy === null}
       title="Add money"
-      description="Goes into your 24X7 balance and comes off your next bill. Refundable on request; it never expires."
+      description={`Goes into your ${brand.name} balance and comes off your next bill. Refundable on request; it never expires.`}
     >
       <View className="flex-row flex-wrap justify-between gap-y-3 py-4">
         {TOPUP_PRESETS.map((amount) => (
@@ -366,7 +369,7 @@ function AddMoneySheet({
       </View>
 
       <Text className="pb-4 text-xs text-muted">
-        Your balance can only be spent on 24X7 services. It cannot be transferred or withdrawn as cash.
+        Your balance can only be spent on {brand.name} services. It cannot be transferred or withdrawn as cash.
       </Text>
     </BottomSheet>
   )
@@ -446,7 +449,7 @@ function BalanceCard({
 
         <View className="flex-row items-center gap-2">
           <Icon as={WalletMinimal} className="size-5 text-white" />
-          <Text className="text-sm font-semibold uppercase tracking-[0.84px] text-white">24X7 Credits</Text>
+          <Text className="text-sm font-semibold uppercase tracking-[0.84px] text-white">{`${brand.name} Credits`}</Text>
         </View>
 
         <Text className="mt-10 text-xs font-semibold uppercase tracking-[0.96px] text-white/70">Balance</Text>
@@ -662,7 +665,7 @@ function LedgerRow({ entry }: { entry: WalletEntry }) {
  */
 const FAQ = [
   {
-    q: 'What is my 24X7 balance?',
+    q: `What is my ${brand.name} balance?`,
     a: 'Two things in one number. Credits we gave you — for a visit we reached late, a job we had to cancel, a referral — and money you added yourself. Both are spent the same way, and the activity list above says which is which on every line.',
   },
   {
@@ -683,7 +686,7 @@ const FAQ = [
   },
   {
     q: 'Can I send it to someone else, or withdraw it?',
-    a: 'No. Your balance can only be spent on 24X7 services, on this account. It is not a wallet you can pay other people from, and there is no cash withdrawal.',
+    a: `No. Your balance can only be spent on ${brand.name} services, on this account. It is not a wallet you can pay other people from, and there is no cash withdrawal.`,
   },
   {
     q: 'Why does my balance not match what I expected?',

@@ -22,7 +22,6 @@ import {
   Star,
   User,
   WalletMinimal,
-  WashingMachine,
   type LucideIcon,
 } from 'lucide-react-native'
 import {
@@ -34,7 +33,8 @@ import {
 } from '@app/shared'
 
 import { AppShell } from '@/components/AppShell'
-import { Header } from '@/components/Header'
+import { brand } from '@/config/brand'
+import { Header } from '@/components/Screen'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { Tappable } from '@/components/ui/Tappable'
@@ -72,21 +72,19 @@ function signInTo(href: string): Href {
 }
 
 /** The three that the rest of this screen exists to be less important than. */
-const TILES: ReadonlyArray<{ href: Href; label: string; icon: LucideIcon }> = [
+const TILES: readonly { href: Href; label: string; icon: LucideIcon }[] = [
   { href: '/bookings', label: 'My bookings', icon: ClipboardList },
-  { href: '/profile/appliances', label: 'My appliances', icon: WashingMachine },
+  { href: '/profile/wallet', label: 'Balance', icon: WalletMinimal },
   { href: '/support', label: 'Help & support', icon: Headset },
 ]
 
-const ROWS: ReadonlyArray<{ href: Href; label: string; detail: string; icon: LucideIcon }> = [
+const ROWS: readonly { href: Href; label: string; detail: string; icon: LucideIcon }[] = [
   { href: '/profile/personal', label: 'Personal details', detail: 'Your name and email', icon: User },
   { href: '/profile/plans', label: 'Plans', detail: 'Yearly cover on your appliances', icon: CalendarCheck },
-  { href: '/profile/wallet', label: 'Balance', detail: 'Credits, and money you have added', icon: WalletMinimal },
-  { href: '/profile/gift-cards', label: 'Gift cards', detail: 'Redeem one, or buy one for someone', icon: Gift },
   {
     href: '/profile/membership',
     label: 'Membership',
-    detail: '24X7 Plus — no visit fee, 10% off repairs',
+    detail: `${brand.name} Plus — no visit fee, 10% off repairs`,
     icon: BadgeCheck,
   },
   { href: '/profile/reviews', label: 'Your reviews', detail: 'What you told us', icon: Star },
@@ -106,7 +104,7 @@ const ROWS: ReadonlyArray<{ href: Href; label: string; detail: string; icon: Luc
     detail: 'Permissions, legal, closing your account',
     icon: Settings,
   },
-  { href: '/profile/about', label: 'About 24X7', detail: 'Who we are, and the paperwork', icon: Info },
+  { href: '/profile/about', label: `About ${brand.name}`, detail: 'Who we are, and the paperwork', icon: Info },
 ]
 
 /** The version the app was built as, from app.json. */

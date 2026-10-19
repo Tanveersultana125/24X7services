@@ -4,18 +4,21 @@
  */
 
 export const brand = {
-  /** DECISION NEEDED: confirm the trading name before the Play Store listing. */
-  name: '24X7',
-  fullName: '24X7 Services',
+  /** PLACEHOLDER until the lead confirms the final name; every screen reads it from here. */
+  name: 'Urban',
+  fullName: 'Urban Services',
   tagline: 'Home appliance repair, done right',
 
   /** A text wordmark, not an image — see BRAND_LOGOS_ENABLED below. */
-  wordmark: '24X7',
+  wordmark: 'Urban',
 
   /** DECISION NEEDED: must match the Play Console package before first upload. */
   androidAppId: 'com.twentyfourseven.services',
 
   supportEmail: 'support@example.com',
+
+  /** DECISION NEEDED: the public link a referral share points at. */
+  appUrl: 'https://example.com',
 } as const
 
 /**
@@ -73,5 +76,5 @@ export const TRUST_POINTS = [
   { key: 'approval', label: 'Repairs only after your approval' },
   { key: 'warranty', label: 'Service warranty' },
   { key: 'invoice', label: 'Digital GST invoice' },
-  { key: 'support', label: '24x7 support' },
+  { key: 'support', label: '24/7 support' },
 ] as const

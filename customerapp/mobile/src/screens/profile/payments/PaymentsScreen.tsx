@@ -7,9 +7,9 @@ import { COL, invoiceSchema, type Invoice } from '@app/shared'
 
 import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
 import { Card } from '@/components/ui/Card'
-import { ToneBadge } from '@/components/StatusBadge'
-import { EmptyState } from '@/components/EmptyState'
-import { ErrorState } from '@/components/ErrorState'
+import { ToneBadge , EmptyState , ErrorState } from '@/components/States'
+
+
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { Icon } from '@/components/ui/Icon'
 import { Tappable } from '@/components/ui/Tappable'

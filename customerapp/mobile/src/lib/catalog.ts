@@ -55,9 +55,9 @@ import { db } from './firebase'
 async function readAll<S extends z.ZodTypeAny>(
   q: Query,
   schema: S
-): Promise<Array<z.infer<S>>> {
+): Promise<z.infer<S>[]> {
   const snap = await getDocs(q)
-  const rows: Array<z.infer<S>> = []
+  const rows: z.infer<S>[] = []
   for (const document of snap.docs) {
     const parsed = schema.safeParse({ id: document.id, ...document.data() })
     if (parsed.success) rows.push(parsed.data)

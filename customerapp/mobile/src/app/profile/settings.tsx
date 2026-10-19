@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/Field'
 import { Icon } from '@/components/ui/Icon'
 import { Tappable } from '@/components/ui/Tappable'
 import { Text } from '@/components/ui/Text'
-import { ConfirmModal } from '@/components/Modal'
+import { ConfirmModal } from '@/components/ui/Overlay'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { useToast } from '@/components/Toast'
 import { callFn, friendlyError } from '@/lib/callables'
@@ -22,6 +22,7 @@ import { collectMyData, downloadJson } from '@/lib/exportData'
 import { enablePushNotifications, PUSH_IS_CONFIGURED } from '@/lib/push'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/cn'
+import { brand } from '@/config/brand'
 
 /**
  * What we may send, what we hold, and the way out.
@@ -48,7 +49,7 @@ import { cn } from '@/lib/cn'
  * There is no theme switch: the app follows the phone's light or dark mode.
  */
 
-const LEGAL: ReadonlyArray<{ href: Href; label: string }> = [
+const LEGAL: readonly { href: Href; label: string }[] = [
   { href: '/legal/terms', label: 'Terms of Service' },
   { href: '/legal/privacy', label: 'Privacy Policy' },
   { href: '/legal/cancellation', label: 'Cancellation and refunds' },
@@ -95,7 +96,7 @@ function Settings({ uid }: { uid: string | null }) {
     try {
       const data = await collectMyData(uid)
       const stamp = new Date().toISOString().slice(0, 10)
-      downloadJson(data, `24x7-my-data-${stamp}.json`)
+      downloadJson(data, `${brand.name.toLowerCase()}-my-data-${stamp}.json`)
       toast.show('Your data has been downloaded.', { tone: 'success' })
     } catch {
       toast.show('We could not put that file together. Please try again.', { tone: 'error' })

@@ -12,7 +12,7 @@ import {
 } from '@app/shared'
 
 import { ProfileShell, useSignInHref } from '@/components/ProfileShell'
-import { ErrorState } from '@/components/ErrorState'
+import { ErrorState } from '@/components/States'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { useToast } from '@/components/Toast'
 import { Icon } from '@/components/ui/Icon'
@@ -22,6 +22,7 @@ import { db } from '@/lib/firebase'
 import { fetchWallet } from '@/lib/wallet'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/cn'
+import { brand } from '@/config/brand'
 
 /**
  * How this customer would rather pay.
@@ -44,7 +45,7 @@ import { cn } from '@/lib/cn'
 const OPTIONS = [
   {
     id: 'balance_first',
-    label: 'Use my 24X7 balance first',
+    label: `Use my ${brand.name} balance first`,
     detail: 'Credits and money you have added come off the bill, and you pay the rest.',
     icon: WalletMinimal,
   },
@@ -60,12 +61,12 @@ const OPTIONS = [
     detail: 'Settle with the technician once the job is done, where the service allows it.',
     icon: Banknote,
   },
-] as const satisfies ReadonlyArray<{
+] as const satisfies readonly {
   id: PaymentPreference
   label: string
   detail: string
   icon: LucideIcon
-}>
+}[]
 
 /** The write, kept outside the component. */
 async function savePreference(uid: string, preference: PaymentPreference): Promise<void> {

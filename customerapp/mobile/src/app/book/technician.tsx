@@ -9,8 +9,8 @@ import { BookingStep } from '@/components/BookingStep'
 import { TechnicianCard } from '@/components/TechnicianCard'
 import { CardButton } from '@/components/ui/Card'
 import { Text } from '@/components/ui/Text'
-import { EmptyState } from '@/components/EmptyState'
-import { ErrorState } from '@/components/ErrorState'
+import { EmptyState , ErrorState } from '@/components/States'
+
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { callFn } from '@/lib/callables'
 import { db } from '@/lib/firebase'
@@ -31,11 +31,11 @@ import { useAsync } from '@/lib/useAsync'
  * actually take the job rather than the whole roster.
  */
 
-const CHOICES: ReadonlyArray<{
+const CHOICES: readonly {
   value: Exclude<TechPreference, 'specific'>
   title: string
   detail: string
-}> = [
+}[] = [
   {
     value: 'any',
     title: 'Any available expert',

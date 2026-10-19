@@ -10,7 +10,7 @@ import {
 } from '@app/shared'
 
 import { Header, Screen } from '@/components/Screen'
-import { ErrorState } from '@/components/ErrorState'
+import { ErrorState } from '@/components/States'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { ServiceDetails } from '@/components/ServiceSheet'
 import { fetchAppliance, fetchIssuesFor, fetchServicesFor } from '@/lib/catalog'

@@ -6,8 +6,8 @@ import { bookingSchema, COL, reviewSchema, type Booking, type Review } from '@ap
 
 import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
 import { ReviewCard } from '@/components/ReviewCard'
-import { EmptyState } from '@/components/EmptyState'
-import { ErrorState } from '@/components/ErrorState'
+import { EmptyState , ErrorState } from '@/components/States'
+
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { fetchAllServices } from '@/lib/catalog'
 import { db } from '@/lib/firebase'

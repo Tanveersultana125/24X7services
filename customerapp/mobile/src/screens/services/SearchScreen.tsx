@@ -2,7 +2,7 @@ import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { router, useLocalSearchParams, type Href } from 'expo-router'
-import { ArrowLeft, Check, ChevronRight, History, SearchX, Sparkles, TrendingUp, X } from 'lucide-react-native'
+import { ArrowLeft, Check, ChevronRight, History, SearchX, TrendingUp, X } from 'lucide-react-native'
 import type { CatalogAppliance, CatalogIssue, CatalogService, SearchHit } from '@app/shared'
 
 import { AppShell } from '@/components/AppShell'
@@ -16,8 +16,8 @@ import { Icon } from '@/components/ui/Icon'
 import { Img } from '@/components/ui/Img'
 import { Tappable } from '@/components/ui/Tappable'
 import { Text } from '@/components/ui/Text'
-import { EmptyState } from '@/components/EmptyState'
-import { ErrorState } from '@/components/ErrorState'
+import { EmptyState , ErrorState } from '@/components/States'
+
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { fetchAllIssues, fetchAllServices, fetchAppliances } from '@/lib/catalog'
 import { ServiceSheet, serviceOptions } from '@/components/ServiceSheet'
@@ -452,20 +452,8 @@ function HitRows({
 }
 
 /**
- * Problems in the words a customer would use, each one a question the
- * assistant has a full answer for. Tapping opens the chat with it already sent.
- */
-const ASK_PROMPTS = [
-  { emoji: '🧊', text: 'My fridge is not cooling and the food is getting warm.' },
-  { emoji: '🔊', text: 'My washing machine makes a loud noise while spinning.' },
-  { emoji: '💧', text: 'Water is dripping from my AC indoors.' },
-  { emoji: '🚿', text: 'My geyser is not heating the water.' },
-  { emoji: '⚡', text: 'My microwave runs but the food stays cold.' },
-] as const
-
-/**
- * What an empty search box offers: what this person looked for before, what
- * most people look for, and a way to just describe the problem instead.
+ * What an empty search box offers: what this person looked for before, and
+ * what most people look for.
  */
 function Suggestions({
   recent,
@@ -514,38 +502,6 @@ function Suggestions({
             </Tappable>
           ))}
         </View>
-      </View>
-
-      {/* The grey rule the rest of the app uses between unrelated blocks. */}
-      <Band />
-
-      <View>
-        <View className="mb-4 flex-row items-center gap-2">
-          <Heading>Just tell us what is wrong</Heading>
-          <Icon as={Sparkles} className="size-5 text-[#C45CE8]" />
-        </View>
-        <View className="items-start gap-2.5">
-          {ASK_PROMPTS.map((prompt) => (
-            <Tappable
-              key={prompt.text}
-              href={`/assistant?q=${encodeURIComponent(prompt.text)}` as Href}
-              className="min-h-11 max-w-full flex-row items-center gap-2 rounded-card border border-border px-3.5 py-2 active:border-brand active:opacity-100"
-            >
-              <Text aria-hidden className="text-sm">
-                {prompt.emoji}
-              </Text>
-              <Text className="shrink text-sm text-ink">{prompt.text}</Text>
-            </Tappable>
-          ))}
-        </View>
-
-        <Tappable
-          href={'/assistant' as Href}
-          className="mt-7 min-h-14 flex-row items-center justify-center gap-2 rounded-card border border-border px-4 active:border-brand active:opacity-100"
-        >
-          <Text className="text-center text-base font-semibold text-ink">Something else? Ask our assistant</Text>
-          <Icon as={Sparkles} className="size-5 text-[#C45CE8]" />
-        </Tappable>
       </View>
     </View>
   )

@@ -29,7 +29,7 @@ import { Card } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
 import { Tappable } from '@/components/ui/Tappable'
 import { Text } from '@/components/ui/Text'
-import { ErrorState } from '@/components/ErrorState'
+import { ErrorState } from '@/components/States'
 import { CategoryGridSkeleton, HomeSkeleton, Skeleton } from '@/components/SkeletonLoader'
 import { CartBar } from '@/components/CartBar'
 import { VideoRail, type ReelItem } from '@/components/VideoRail'
@@ -314,7 +314,7 @@ export function HomeScreen() {
               it — the annual plans and Plus — lived under Profile, behind an
               account, which is where a price list goes to be unread. */}
           <Tappable
-            href={'/care' as Href}
+            href="/profile/plans"
             className="mt-5 flex-row items-center gap-3 rounded-card bg-brand-soft p-4 active:opacity-70"
           >
             <View className="size-10 shrink-0 items-center justify-center rounded-full bg-bg">
@@ -568,7 +568,7 @@ const FOOTER_LINKS = [
   { href: '/legal/privacy', label: 'Privacy' },
   { href: '/legal/cancellation', label: 'Cancellation' },
   { href: '/support', label: 'Support' },
-] as const satisfies ReadonlyArray<{ href: Href; label: string }>
+] as const satisfies readonly { href: Href; label: string }[]
 
 function HomeFooter() {
   return (

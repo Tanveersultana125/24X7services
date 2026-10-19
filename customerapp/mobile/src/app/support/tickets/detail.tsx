@@ -19,7 +19,7 @@ import { Chip } from '@/components/ui/Chip'
 import { Button } from '@/components/ui/Button'
 import { Icon, useColor } from '@/components/ui/Icon'
 import { Text } from '@/components/ui/Text'
-import { ErrorState } from '@/components/ErrorState'
+import { ErrorState } from '@/components/States'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { useToast } from '@/components/Toast'
 import { callFn, friendlyError } from '@/lib/callables'
@@ -71,18 +71,16 @@ function Conversation({ ticketId, signedIn }: { ticketId: string | null; signedI
 
   const [ticket, setTicket] = useState<SupportTicket | null>(null)
   const [messages, setMessages] = useState<SupportMessage[]>([])
-  const [status, setStatus] = useState<'loading' | 'ready' | 'missing'>('loading')
+  const [loaded, setStatus] = useState<'loading' | 'ready' | 'missing'>('loading')
+  // No id in the link means there is nothing to load: missing, without a round trip.
+  const status = ticketId ? loaded : 'missing'
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
   const [focused, setFocused] = useState(false)
   const scroller = useRef<ScrollView>(null)
 
   useEffect(() => {
-    if (!signedIn) return
-    if (!ticketId) {
-      setStatus('missing')
-      return
-    }
+    if (!signedIn || !ticketId) return
 
     const unsubscribeTicket = onSnapshot(
       doc(db(), COL.supportTickets, ticketId),

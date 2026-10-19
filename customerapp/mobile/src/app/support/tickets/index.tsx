@@ -10,9 +10,9 @@ import { Card } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
 import { Tappable } from '@/components/ui/Tappable'
 import { Text } from '@/components/ui/Text'
-import { ToneBadge } from '@/components/StatusBadge'
-import { EmptyState } from '@/components/EmptyState'
-import { ErrorState } from '@/components/ErrorState'
+import { ToneBadge , EmptyState , ErrorState } from '@/components/States'
+
+
 import { TicketListSkeleton } from '@/components/SkeletonLoader'
 import { db } from '@/lib/firebase'
 import { relativeTime } from '@/lib/format'

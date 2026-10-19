@@ -5,8 +5,8 @@ import { ShieldCheck } from 'lucide-react-native'
 import { COL, warrantySchema, type Warranty } from '@app/shared'
 
 import { WarrantyCard } from '@/components/WarrantyCard'
-import { EmptyState } from '@/components/EmptyState'
-import { ErrorState } from '@/components/ErrorState'
+import { EmptyState , ErrorState } from '@/components/States'
+
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { Text } from '@/components/ui/Text'
 import { fetchAllServices, fetchAppliances } from '@/lib/catalog'
@@ -65,8 +65,8 @@ export function WarrantiesView({
   appliances,
 }: {
   warranties: readonly Warranty[]
-  services: ReadonlyArray<{ applianceId: string; serviceKey: string; name: string }>
-  appliances: ReadonlyArray<{ id: string; name: string }>
+  services: readonly { applianceId: string; serviceKey: string; name: string }[]
+  appliances: readonly { id: string; name: string }[]
 }) {
   if (warranties.length === 0) {
     return (

@@ -11,7 +11,7 @@ import {
 } from '@app/shared'
 
 import { ReferCard } from '@/components/ReferCard'
-import { ErrorState } from '@/components/ErrorState'
+import { ErrorState } from '@/components/States'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Field'
@@ -22,6 +22,7 @@ import { useToast } from '@/components/Toast'
 import { callFn, friendlyError } from '@/lib/callables'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/cn'
+import { brand } from '@/config/brand'
 
 export function Refer() {
   const load = useCallback(() => callFn('getReferral', {}), [])
@@ -118,7 +119,7 @@ function HowItWorks() {
   const steps = [
     {
       title: 'Send your code',
-      body: 'To anyone who has not booked with 24X7 before.',
+      body: `To anyone who has not booked with ${brand.name} before.`,
     },
     {
       title: 'They enter it before their first booking',
@@ -180,7 +181,7 @@ const FAQ = [
   },
   {
     q: 'Where does the money go?',
-    a: 'Onto your 24X7 balance as credits, which come off your next bill. Like the rest of the balance it never expires, and it can only be spent on 24X7 services.',
+    a: `Onto your ${brand.name} balance as credits, which come off your next bill. Like the rest of the balance it never expires, and it can only be spent on ${brand.name} services.`,
   },
   {
     q: 'Can I use more than one code myself?',
@@ -274,7 +275,7 @@ function ApplyCode({ onApplied }: { onApplied: () => void }) {
         <Input
           label="Referral code"
           hideLabel
-          placeholder="24X7-ABCDEF"
+          placeholder="ABCDEF"
           value={value}
           onChangeText={setValue}
           {...(error ? { error } : {})}

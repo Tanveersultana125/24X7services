@@ -3,8 +3,8 @@ import { View } from 'react-native'
 import { CalendarClock, XCircle } from 'lucide-react-native'
 import type { Booking, SlotOption } from '@app/shared'
 
-import { BottomSheet } from '@/components/BottomSheet'
-import { ConfirmModal } from '@/components/Modal'
+import { BottomSheet , ConfirmModal } from '@/components/ui/Overlay'
+
 import { DateStrip } from '@/components/DateStrip'
 import { TimeSlot } from '@/components/TimeSlot'
 import { Button } from '@/components/ui/Button'

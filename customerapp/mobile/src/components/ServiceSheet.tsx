@@ -55,6 +55,7 @@ import {
 import { formatPaise } from '@/lib/format'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/cn'
+import { brand } from '@/config/brand'
 
 /**
  * A service, opened over the page it was tapped on — the way the marketplaces
@@ -485,7 +486,7 @@ export function ServiceDetails({
         <Band />
         <View className="px-5 py-7">
           <Text accessibilityRole="header" className="text-2xl font-bold text-ink">
-            <Text className="text-2xl font-bold text-brand">24X7</Text>
+            <Text className="text-2xl font-bold text-brand">{brand.name}</Text>
             {' promise'}
           </Text>
           <View className="mt-5 gap-4">
@@ -556,7 +557,7 @@ export function ServiceDetails({
             open={shareOpen}
             onClose={() => setShareOpen(false)}
             title={service.name}
-            text={`${service.name} on 24X7 — ${formatPaise(service.visitFee)} visit fee, quoted before any work starts.`}
+            text={`${service.name} on ${brand.name} — ${formatPaise(service.visitFee)} visit fee, quoted before any work starts.`}
             url={shareUrl}
             image={photos[0]}
           />
@@ -725,7 +726,7 @@ function Choices({
   chosen,
   onChoose,
 }: {
-  choices: ReadonlyArray<{ key: string; label: string; note?: string }>
+  choices: readonly { key: string; label: string; note?: string }[]
   chosen: string | null
   onChoose: (key: string) => void
 }) {

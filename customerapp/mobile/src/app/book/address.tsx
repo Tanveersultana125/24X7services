@@ -20,7 +20,7 @@ import { Input } from '@/components/ui/Field'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { Text } from '@/components/ui/Text'
-import { ErrorState } from '@/components/ErrorState'
+import { ErrorState } from '@/components/States'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { useToast } from '@/components/Toast'
 import { fetchServiceAreas } from '@/lib/catalog'
@@ -43,7 +43,7 @@ import { useAsync } from '@/lib/useAsync'
  * editing it later cannot rewrite where a past job happened.
  */
 
-const LABELS: ReadonlyArray<{ value: AddressLabel; text: string }> = [
+const LABELS: readonly { value: AddressLabel; text: string }[] = [
   { value: 'home', text: 'Home' },
   { value: 'office', text: 'Office' },
   { value: 'other', text: 'Other' },

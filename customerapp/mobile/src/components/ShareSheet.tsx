@@ -9,7 +9,7 @@ import {
   MoreHorizontal,
   Send,
 } from 'lucide-react-native'
-import { BottomSheet } from '@/components/BottomSheet'
+import { BottomSheet } from '@/components/ui/Overlay'
 import { useToast } from '@/components/Toast'
 import { copyText, shareText } from '@/lib/share'
 import { cn } from '@/lib/cn'
@@ -75,13 +75,13 @@ export function ShareSheet({
     })
   }
 
-  const targets: ReadonlyArray<{
+  const targets: readonly {
     key: string
     label: string
     href: string
     tint: string
     icon: React.ReactNode
-  }> = [
+  }[] = [
     {
       key: 'whatsapp',
       label: 'WhatsApp',

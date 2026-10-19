@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/Field'
 import { Icon } from '@/components/ui/Icon'
 import { Tappable } from '@/components/ui/Tappable'
 import { Text } from '@/components/ui/Text'
-import { ErrorState } from '@/components/ErrorState'
+import { ErrorState } from '@/components/States'
 import { Skeleton, SkeletonGroup } from '@/components/SkeletonLoader'
 import { fetchServiceAreas } from '@/lib/catalog'
 import { callFn, friendlyError } from '@/lib/callables'
@@ -186,7 +186,7 @@ export default function LocationScreen() {
 }
 
 /** Cities in the order they first appear; the areas inside are already sorted. */
-function groupByCity(areas: readonly ServiceArea[]): Array<[string, ServiceArea[]]> {
+function groupByCity(areas: readonly ServiceArea[]): [string, ServiceArea[]][] {
   const groups = new Map<string, ServiceArea[]>()
   for (const area of areas) {
     const existing = groups.get(area.city)

@@ -19,9 +19,10 @@ import { Tappable } from '@/components/ui/Tappable'
 import { Text } from '@/components/ui/Text'
 import { copyText, shareText } from '@/lib/share'
 import { cn } from '@/lib/cn'
+import { brand } from '@/config/brand'
 
 /** Where the invite points. The web build uses its own origin; the app has none. */
-const APP_URL = 'https://24x7.app'
+const APP_URL = brand.appUrl
 
 /**
  * The offer, the code, and the ways to send it — one block, because they are
@@ -44,7 +45,7 @@ export function ReferCard({ code }: { code: string }) {
   async function sheet(): Promise<void> {
     if (busy) return
     setBusy(true)
-    const outcome = await shareText(message, 'Try 24X7')
+    const outcome = await shareText(message, `Try ${brand.name}`)
     setBusy(false)
     if (outcome === 'copied') {
       toast.show('Invite copied. Paste it wherever you like.', { tone: 'success' })
