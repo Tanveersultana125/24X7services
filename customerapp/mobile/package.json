@@ -70,5 +70,5 @@
     "postinstall": "node scripts/sync-public.mjs && uniwind generate-artifacts --css ./src/global.css --dts ./src/uniwind-types.d.ts"
   },
   "private": true,
-  "description": "Urban (placeholder name) customer app — Expo + Expo Router (React Native). Same Firebase backend and @app/shared as the Next.js web app."
+  "description": "Customer Service (placeholder name) customer app — Expo + Expo Router (React Native). Same Firebase backend and @app/shared as the Next.js web app."
 }

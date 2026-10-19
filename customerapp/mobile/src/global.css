@@ -86,6 +86,9 @@
   --color-art-mint: #8fe0d6;
   --color-art-mint-mid: #6fd3c6;
   --color-art-teal: #2fb7a6;
+  /* The assistant's avatar. */
+  --color-art-violet: #7c5cff;
+  --color-art-magenta: #e85da8;
 }
 
 /* Light and dark, following the phone. The dark palette is the warm one turned

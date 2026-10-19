@@ -5,12 +5,12 @@
 
 export const brand = {
   /** PLACEHOLDER until the lead confirms the final name; every screen reads it from here. */
-  name: 'Urban',
-  fullName: 'Urban Services',
+  name: 'Customer Service',
+  fullName: 'Customer Service',
   tagline: 'Home appliance repair, done right',
 
   /** A text wordmark, not an image — see BRAND_LOGOS_ENABLED below. */
-  wordmark: 'Urban',
+  wordmark: 'Customer Service',
 
   /** DECISION NEEDED: must match the Play Console package before first upload. */
   androidAppId: 'com.twentyfourseven.services',

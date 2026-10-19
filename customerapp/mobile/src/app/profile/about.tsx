@@ -80,7 +80,7 @@ export default function AboutScreen() {
         </View>
 
         <Text accessibilityRole="header" className="mt-4 text-2xl font-bold text-ink">
-          {brand.name} Home Services
+          {brand.fullName}
         </Text>
         {APP_VERSION ? (
           <Text className="mt-0.5 text-sm text-muted tabular-nums">Version {APP_VERSION}</Text>
