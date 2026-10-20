@@ -6,7 +6,6 @@ import { BookingShell } from '@/components/BookingShell'
 import { TrackingMap } from '@/components/TrackingMap'
 import { TechnicianCard } from '@/components/TechnicianCard'
 import { StatusBadge } from '@/components/ui/States'
-import { JobOtpPanel } from '@/components/JobOtpPanel'
 import { Card } from '@/components/ui/Card'
 import { Text } from '@/components/ui/Text'
 import { useTracking } from '@/lib/useTracking'
@@ -87,8 +86,6 @@ function Track({ booking }: { booking: Booking }) {
           <TechnicianCard technician={booking.technicianSnapshot} maskedNumber={booking.contact?.maskedNumber} />
         </View>
       ) : null}
-
-      <JobOtpPanel className="mt-6" booking={booking} />
 
       {!onTheWay ? (
         <Text className="mt-6 text-sm leading-[22px] text-muted">

@@ -13,7 +13,6 @@ import type { Booking, BookingEvent, BookingStage } from '@app/shared'
 
 import { BookingShell } from '@/components/BookingShell'
 import { StatusTimeline } from '@/components/StatusTimeline'
-import { JobOtpPanel } from '@/components/JobOtpPanel'
 import { Card } from '@/components/ui/Card'
 import { Icon } from '@/components/ui/Icon'
 import { Text } from '@/components/ui/Text'
@@ -103,8 +102,6 @@ function Progress({ booking, events }: { booking: Booking; events: BookingEvent[
           </Text>
         </Card>
       ) : null}
-
-      <JobOtpPanel className="mt-6" booking={booking} />
 
       <View className="mt-7">
         <BlockTitle>What has happened</BlockTitle>

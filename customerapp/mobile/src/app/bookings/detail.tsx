@@ -9,7 +9,6 @@ import { StatusBadge } from '@/components/ui/States'
 import { StatusTimeline } from '@/components/StatusTimeline'
 import { TechnicianCard } from '@/components/TechnicianCard'
 import { PriceSummary } from '@/components/PriceSummary'
-import { JobOtpPanel } from '@/components/JobOtpPanel'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Text } from '@/components/ui/Text'
@@ -104,8 +103,6 @@ function Detail({ booking, events }: { booking: Booking; events: BookingEvent[] 
           <TechnicianCard technician={booking.technicianSnapshot} maskedNumber={booking.contact?.maskedNumber} />
         </View>
       ) : null}
-
-      <JobOtpPanel className="mt-6" booking={booking} />
 
       <Card className="mt-6 gap-4 p-4">
         <Row icon={CalendarDays} label="When">

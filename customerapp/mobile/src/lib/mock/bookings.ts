@@ -69,7 +69,7 @@ export const BOOKINGS: Booking[] = [
     address: ADDRESSES[1]!,
     slot: { date: '2026-10-24', start: '10:00' },
     status: 'confirmed',
-    price: { items: 89900, discount: 13485, fees: 4900, taxes: 0, total: 81315 },
+    price: { items: 89900, discount: 13500, fees: 4900, taxes: 0, total: 81300 },
     timeline: [{ status: 'confirmed', at: '2026-10-19T08:40:00+05:30' }],
     photos: { before: [], after: [] },
     createdAt: '2026-10-19T08:38:00+05:30',

@@ -19,17 +19,23 @@ export function isUpcoming(booking: Booking): boolean {
   return !FINISHED.includes(booking.status)
 }
 
+/**
+ * A copy, so a booking changed in place (cancelled, rescheduled) reads as a
+ * new value and the screen showing it re-renders.
+ */
+const copy = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T
+
 /** Every booking, newest slot first. */
 export function fetchBookings(): Promise<Booking[]> {
   const list = [...BOOKINGS].sort((a, b) =>
     `${b.slot.date} ${b.slot.start}`.localeCompare(`${a.slot.date} ${a.slot.start}`)
   )
-  return mockRequest(list)
+  return mockRequest(copy(list))
 }
 
 /** One booking, or null when there is no booking with that id. */
 export function fetchBooking(id: string): Promise<Booking | null> {
-  return mockRequest(BOOKINGS.find((b) => b.id === id) ?? null)
+  return mockRequest(copy(BOOKINGS.find((b) => b.id === id) ?? null))
 }
 
 export function useBookings(): AsyncState<Booking[]> {
