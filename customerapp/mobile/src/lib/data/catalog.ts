@@ -96,6 +96,65 @@ export function fetchQuestions(serviceId: string): Promise<Question[]> {
   return mockRequest(list)
 }
 
+/** The top-level category above `id` (itself, when it is top-level). */
+function rootOf(id: string): Category | undefined {
+  let at = CATEGORIES.find((c) => c.id === id)
+  while (at?.parentId) {
+    const parent: string = at.parentId
+    at = CATEGORIES.find((c) => c.id === parent)
+  }
+  return at
+}
+
+/** One sub-category and its services, a section on the category page. */
+export interface CategorySection {
+  category: Category
+  services: Service[]
+}
+
+/**
+ * Everything the category page draws: the top-level category, one section per
+ * sub-category that has services, and which section to open on (the one asked
+ * for, when a sub-category was). Null when there is no such category.
+ */
+export interface CategoryPage {
+  root: Category
+  sections: CategorySection[]
+  initialSectionId: string | null
+}
+
+export function fetchCategoryPage(id: string): Promise<CategoryPage | null> {
+  const root = rootOf(id)
+  if (!root) return mockRequest(null)
+  const subs = CATEGORIES.filter((c) => c.parentId === root.id).sort(byOrder)
+  // A category with no sub-categories is its own single section.
+  const groups = subs.length ? subs : [root]
+  const sections = groups
+    .map((category) => ({
+      category,
+      services: SERVICES.filter((s) => withDescendants(category.id).has(s.categoryId)),
+    }))
+    .filter((section) => section.services.length > 0)
+  return mockRequest({ root, sections, initialSectionId: id === root.id ? null : id })
+}
+
+/** A service with the category it sits in and the top-level one above that. */
+export interface ServicePage {
+  service: Service
+  category: Category | null
+  root: Category | null
+}
+
+export function fetchServicePage(id: string): Promise<ServicePage | null> {
+  const service = SERVICES.find((s) => s.id === id)
+  if (!service) return mockRequest(null)
+  return mockRequest({
+    service,
+    category: CATEGORIES.find((c) => c.id === service.categoryId) ?? null,
+    root: rootOf(service.categoryId) ?? null,
+  })
+}
+
 // ---------------------------------------------------------------------------
 // Hooks
 // ---------------------------------------------------------------------------
@@ -122,4 +181,12 @@ export function usePopularServices(): AsyncState<Service[]> {
 
 export function useQuestions(serviceId: string): AsyncState<Question[]> {
   return useAsync(useCallback(() => fetchQuestions(serviceId), [serviceId]))
+}
+
+export function useCategoryPage(id: string): AsyncState<CategoryPage | null> {
+  return useAsync(useCallback(() => fetchCategoryPage(id), [id]))
+}
+
+export function useServicePage(id: string): AsyncState<ServicePage | null> {
+  return useAsync(useCallback(() => fetchServicePage(id), [id]))
 }

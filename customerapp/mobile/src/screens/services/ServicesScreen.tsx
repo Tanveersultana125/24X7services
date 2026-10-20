@@ -14,6 +14,7 @@ import { Tappable } from '@/components/ui/Tappable'
 import { Text } from '@/components/ui/Text'
 import { SERVICES_QUICK_LINKS } from '@/lib/trending'
 import { ApplianceSpaceCard } from '@/components/ApplianceSpaceCard'
+import { CategoryStrip } from '@/screens/catalog/CategoryStrip'
 import { ApplianceCarousel } from '@/components/ApplianceCarousel'
 import { TrustPoints } from '@/components/TrustPoints'
 import { HowItWorks, HOW_IT_WORKS_SUBTITLE } from '@/components/HowItWorks'
@@ -111,6 +112,9 @@ export function ServicesScreen() {
       {/* The appliances as tall photographs, one at a time with an arrow
           either side: the picture says what it is before the name does, and
           a single card in the middle reads cleaner than two half-cards. */}
+      {/* Every category, from data: Appliance Repair, Cleaning, Salon. */}
+      <CategoryStrip className="mt-8" />
+
       <Section className="mt-8" title="What we service">
         {all.status === 'loading' ? (
           <ApplianceGridSkeleton />
