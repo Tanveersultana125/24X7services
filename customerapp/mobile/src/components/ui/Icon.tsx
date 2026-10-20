@@ -32,9 +32,9 @@ export function Icon({
     marginRight?: number
   }
   const size = toPx(style.width) ?? 20
-  // The base classes carry text-ink, so there is always a colour; no second
-  // hook to look the theme's ink up again.
-  const color = style.color
+  // The base classes carry text-ink; INK covers the first web render, before
+  // the stylesheet is registered and the class resolves to nothing.
+  const color = style.color ?? INK
   return (
     <Component
       size={size}
@@ -53,12 +53,20 @@ export function Icon({
   )
 }
 
+/**
+ * The light theme's --color-ink (src/global.css). Only seen until the class
+ * resolves: on the web, the first render can come before the stylesheet is
+ * registered, and an undefined colour would make a LinearGradient invalid and
+ * a filled star empty.
+ */
+const INK = '#17150f'
+
 /** The icon's colour as a string, for the rare prop that wants one. */
 export function useColor(className: string): string {
   // text-ink first, so a class with no colour of its own still resolves to the
   // theme's ink, in the same single lookup.
   const style = useResolveClassNames(cn('text-ink', className)) as { color?: string }
-  return style.color as string
+  return style.color ?? INK
 }
 
 /**
