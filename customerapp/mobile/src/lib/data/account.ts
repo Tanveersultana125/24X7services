@@ -19,7 +19,7 @@ export function fetchUser(): Promise<AccountUser> {
 }
 
 /** Saved addresses, the default first. */
-export function fetchAddresses(): Promise<Address[]> {
+export function fetchAddressBook(): Promise<Address[]> {
   return mockRequest([...ADDRESSES].sort((a, b) => Number(b.isDefault) - Number(a.isDefault)))
 }
 
@@ -38,7 +38,7 @@ export function useUser(): AsyncState<AccountUser> {
 }
 
 export function useAddresses(): AsyncState<Address[]> {
-  return useAsync(fetchAddresses)
+  return useAsync(fetchAddressBook)
 }
 
 export function useCoupons(): AsyncState<Coupon[]> {

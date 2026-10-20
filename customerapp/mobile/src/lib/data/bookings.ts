@@ -28,7 +28,7 @@ export function fetchBookings(): Promise<Booking[]> {
 }
 
 /** One booking, or null when there is no booking with that id. */
-export function fetchBooking(id: string): Promise<Booking | null> {
+export function fetchBookingById(id: string): Promise<Booking | null> {
   return mockRequest(BOOKINGS.find((b) => b.id === id) ?? null)
 }
 
@@ -37,5 +37,5 @@ export function useBookings(): AsyncState<Booking[]> {
 }
 
 export function useBooking(id: string): AsyncState<Booking | null> {
-  return useAsync(useCallback(() => fetchBooking(id), [id]))
+  return useAsync(useCallback(() => fetchBookingById(id), [id]))
 }
