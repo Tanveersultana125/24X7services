@@ -155,6 +155,12 @@ export function fetchServicePage(id: string): Promise<ServicePage | null> {
   })
 }
 
+/** The services with these ids, in the order asked; ids with no service are skipped. */
+export function fetchServicesByIds(ids: readonly string[]): Promise<Service[]> {
+  const found = ids.map((id) => SERVICES.find((s) => s.id === id)).filter((s): s is Service => s !== undefined)
+  return mockRequest(found)
+}
+
 // ---------------------------------------------------------------------------
 // Hooks
 // ---------------------------------------------------------------------------
@@ -189,4 +195,10 @@ export function useCategoryPage(id: string): AsyncState<CategoryPage | null> {
 
 export function useServicePage(id: string): AsyncState<ServicePage | null> {
   return useAsync(useCallback(() => fetchServicePage(id), [id]))
+}
+
+/** Re-reads when the set of ids changes, not on every render that builds a new array. */
+export function useServicesByIds(ids: readonly string[]): AsyncState<Service[]> {
+  const key = [...new Set(ids)].sort().join(',')
+  return useAsync(useCallback(() => fetchServicesByIds(key ? key.split(',') : []), [key]))
 }

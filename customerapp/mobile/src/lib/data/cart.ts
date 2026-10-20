@@ -21,10 +21,12 @@ const storedSchema = z.object({
   /** The top-level category the cart belongs to, so a second category starts a new cart. */
   categoryId: z.string().nullable(),
   items: z.array(cartItemSchema),
+  /** The coupon applied in the cart, if any. Dropped when the cart changes category. */
+  couponCode: z.string().nullable().default(null),
 })
 type Stored = z.infer<typeof storedSchema>
 
-const EMPTY: Stored = { categoryId: null, items: [] }
+const EMPTY: Stored = { categoryId: null, items: [], couponCode: null }
 
 const cartStore = createLocalStore<Stored>({
   storageKey: STORAGE_KEY,
@@ -71,7 +73,16 @@ export function setQty(
     qty > 0
       ? [...others, { serviceId: service.id, ...(variant ? { variantId: variant.id } : {}), qty, unitPrice: variant?.price ?? service.price }]
       : others
-  cartStore.set({ categoryId: items.length ? rootCategoryId : null, items })
+  cartStore.set({
+    categoryId: items.length ? rootCategoryId : null,
+    items,
+    couponCode: items.length ? base.couponCode : null,
+  })
+}
+
+/** Applies a coupon by code, or removes it with null. Whether it fits is pricing's call (lib/data/pricing). */
+export function setCoupon(code: string | null): void {
+  cartStore.set({ ...cartStore.getSnapshot().value, couponCode: code })
 }
 
 export function clearCart(): void {
@@ -81,6 +92,7 @@ export function clearCart(): void {
 export interface CartState {
   items: CartItem[]
   categoryId: string | null
+  couponCode: string | null
   /** Units across every line. */
   count: number
   /** Sum of unit price × quantity, in paise. */
@@ -92,6 +104,7 @@ export function useCart(): CartState {
   return {
     items: value.items,
     categoryId: value.categoryId,
+    couponCode: value.couponCode,
     count: value.items.reduce((sum, item) => sum + item.qty, 0),
     total: value.items.reduce((sum, item) => sum + item.unitPrice * item.qty, 0),
   }
