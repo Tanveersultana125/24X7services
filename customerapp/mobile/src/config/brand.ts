@@ -17,8 +17,12 @@ export const brand = {
 
   supportEmail: 'support@example.com',
 
-  /** DECISION NEEDED: the public link a referral share points at. */
-  appUrl: 'https://example.com',
+  /**
+   * The public link a referral share points at. Kept on the live domain:
+   * a placeholder must never reach a link a customer sends to a friend.
+   * TODO: final domain decide hone pe change karna.
+   */
+  appUrl: 'https://24x7.app',
 } as const
 
 /**
