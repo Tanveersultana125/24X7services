@@ -54,5 +54,14 @@ export async function fetchMyAppliance(
 
 /** The last 20 bookings made on one saved appliance, newest first. */
 export async function fetchApplianceBookings(uid: string, applianceDocId: string): Promise<Booking[]> {
-  return readAll(query( collection(db(), COL.bookings), where('uid', '==', uid), where('userApplianceId', '==', applianceDocId), orderBy('createdAt', 'desc'), limit(20) ), bookingSchema)
+  return readAll(
+    query(
+      collection(db(), COL.bookings),
+      where('uid', '==', uid),
+      where('userApplianceId', '==', applianceDocId),
+      orderBy('createdAt', 'desc'),
+      limit(20)
+    ),
+    bookingSchema
+  )
 }

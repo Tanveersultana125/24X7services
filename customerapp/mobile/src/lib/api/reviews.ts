@@ -16,5 +16,13 @@ export async function fetchReview(reviewId: string): Promise<Review | null> {
  * the schema are dropped and the rest are kept.
  */
 export async function fetchMyReviews(uid: string): Promise<Review[]> {
-  return readAll(query(collection(db(), COL.reviews), where('uid', '==', uid), orderBy('createdAt', 'desc'), limit(100)), reviewSchema)
+  return readAll(
+    query(
+      collection(db(), COL.reviews),
+      where('uid', '==', uid),
+      orderBy('createdAt', 'desc'),
+      limit(100)
+    ),
+    reviewSchema
+  )
 }

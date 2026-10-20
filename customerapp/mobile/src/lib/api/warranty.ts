@@ -16,5 +16,13 @@ export async function fetchWarranty(warrantyId: string): Promise<Warranty | null
  * Rows that fail the schema are dropped and the rest are kept.
  */
 export async function fetchMyWarranties(uid: string): Promise<Warranty[]> {
-  return readAll(query(collection(db(), COL.warranties), where('uid', '==', uid), orderBy('expiresAt', 'asc'), limit(100)), warrantySchema)
+  return readAll(
+    query(
+      collection(db(), COL.warranties),
+      where('uid', '==', uid),
+      orderBy('expiresAt', 'asc'),
+      limit(100)
+    ),
+    warrantySchema
+  )
 }

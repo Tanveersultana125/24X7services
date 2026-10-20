@@ -25,7 +25,15 @@ import { db } from '@/lib/firebase'
  * somebody replied to an hour ago is the one being looked for.
  */
 export async function fetchTickets(uid: string): Promise<SupportTicket[]> {
-  return readAll(query( collection(db(), COL.supportTickets), where('uid', '==', uid), orderBy('lastMessageAt', 'desc'), limit(100) ), supportTicketSchema)
+  return readAll(
+    query(
+      collection(db(), COL.supportTickets),
+      where('uid', '==', uid),
+      orderBy('lastMessageAt', 'desc'),
+      limit(100)
+    ),
+    supportTicketSchema
+  )
 }
 
 /**

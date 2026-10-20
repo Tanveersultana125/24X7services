@@ -17,7 +17,15 @@ export async function fetchInvoice(invoiceId: string): Promise<Invoice | null> {
  * fail the schema are dropped and the rest are kept.
  */
 export async function fetchMyInvoices(uid: string): Promise<Invoice[]> {
-  return readAll(query(collection(db(), COL.invoices), where('uid', '==', uid), orderBy('issuedAt', 'desc'), limit(100)), invoiceSchema)
+  return readAll(
+    query(
+      collection(db(), COL.invoices),
+      where('uid', '==', uid),
+      orderBy('issuedAt', 'desc'),
+      limit(100)
+    ),
+    invoiceSchema
+  )
 }
 
 /**

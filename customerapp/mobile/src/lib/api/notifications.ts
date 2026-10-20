@@ -23,7 +23,14 @@ import { fetchProfile } from '@/lib/api/profile'
 
 /** The latest hundred, newest first. One that does not parse is left out. */
 export async function fetchNotifications(uid: string): Promise<AppNotification[]> {
-  return readAll(query(collection(db(), COL.notifications, uid, SUB.items), orderBy('at', 'desc'), limit(100)), notificationSchema)
+  return readAll(
+    query(
+      collection(db(), COL.notifications, uid, SUB.items),
+      orderBy('at', 'desc'),
+      limit(100)
+    ),
+    notificationSchema
+  )
 }
 
 /** Stamps one notification as read, now. */
