@@ -16,6 +16,8 @@ export const brand = {
   androidAppId: 'com.twentyfourseven.services',
 
   supportEmail: 'support@example.com',
+  /** DECISION NEEDED: the real helpline. The Support tab's Call us dials this. */
+  supportPhone: '+919000000000',
 
   /** DECISION NEEDED: the public link a referral share points at. */
   appUrl: 'https://example.com',

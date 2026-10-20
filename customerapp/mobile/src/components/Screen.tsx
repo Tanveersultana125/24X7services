@@ -60,7 +60,9 @@ export function Screen({
       {scroll ? (
         <ScrollView
           className="flex-1"
-          contentContainerClassName={cn('px-4 pb-10', contentClassName)}
+          // Capped and centred, so a tablet reads like a wide phone rather than
+          // a stretched one: 720px is a comfortable line length and card width.
+          contentContainerClassName={cn('w-full max-w-[720px] self-center px-4 pb-10', contentClassName)}
           contentContainerStyle={{ paddingBottom: 40 + bottom }}
           keyboardShouldPersistTaps="handled"
           refreshControl={
@@ -73,7 +75,7 @@ export function Screen({
           {children}
         </ScrollView>
       ) : (
-        <View className="flex-1" style={{ paddingBottom: bottom }}>
+        <View className="w-full max-w-[720px] flex-1 self-center" style={{ paddingBottom: bottom }}>
           {children}
         </View>
       )}
