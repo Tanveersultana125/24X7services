@@ -63,36 +63,60 @@ export function fetchMostBookedServices(): Promise<Service[]> {
   return mockRequest(SERVICES.filter((s) => s.popular))
 }
 
-/** A word's letters and digits only: "a/c" → "ac", "men's" → "mens". */
+/** A word's letters and digits only: "a/c" → "ac", "1.5-ton" → "15ton". */
 const squash = (word: string) => word.replace(/[^a-z0-9]/g, '')
 
 /**
  * Services whose name, category or highlights have a word starting with each
  * word typed. Prefixes, not substrings: "ac" finds the AC, not "machine".
  *
- * Punctuation is handled on both sides, so "a/c", "men's", "full-home" and
- * "sofa & carpet" find what they name. A typed word matches when, squashed,
- * it starts a squashed word of the text ("a/c" → "ac" finds "AC", "men's"
- * finds "Men's"), or when each of its pieces two letters or longer starts a
- * word ("full-home" finds "Full home"). Single-letter pieces are not matched
- * on their own: "a" and "c" start half the words in the catalog.
+ * Punctuation is ignored on both sides, without dropping any piece of a word:
+ * a typed word, squashed to its letters and digits, has to start a run of
+ * consecutive words of the text, read the same way. So "a/c" finds "AC",
+ * "men's" finds "Men's", "full-home" finds "Full home", "1.5-ton" finds
+ * "1.5 ton", "3-door" finds "3 door" and "a/c-repair" finds "AC repair".
+ *
+ * A run may not start on a one-letter word that stands alone in the text
+ * ("a clean finish"): it is an article, and "a/c" would otherwise find it.
+ * A letter joined to the next by punctuation ("A/C") can start one. A
+ * one-letter query still finds every word that starts with that letter.
  */
 export function searchServices(term: string): Promise<Service[]> {
-  const words = term.toLowerCase().split(/\s+/).filter((w) => squash(w).length > 0)
+  const words = term.toLowerCase().split(/\s+/).map(squash).filter(Boolean)
   if (words.length === 0) return mockRequest([])
   const names = new Map(CATEGORIES.map((c) => [c.id, c.name]))
   const hits = SERVICES.filter((s) => {
-    const text = [s.name, names.get(s.categoryId) ?? '', ...s.highlights].join(' ').toLowerCase()
-    const pieces = text.split(/[^a-z0-9]+/).filter(Boolean)
-    const squashed = text.split(/\s+/).map(squash).filter(Boolean)
-    const starts = (prefix: string) => pieces.some((t) => t.startsWith(prefix)) || squashed.some((t) => t.startsWith(prefix))
-    return words.every((word) => {
-      if (starts(squash(word))) return true
-      const parts = word.split(/[^a-z0-9]+/).filter((part) => part.length >= 2)
-      return parts.length > 1 && parts.every(starts)
-    })
+    const text = tokenize([s.name, names.get(s.categoryId) ?? '', ...s.highlights].join(' ').toLowerCase())
+    return words.every((word) => text.tokens.some((_, i) => startsRun(word, text, i)))
   })
   return mockRequest(hits)
+}
+
+type Tokens = { tokens: string[]; loneLetters: Set<number> }
+
+/** "a/c repair, a clean" → tokens a, c, repair, a, clean; lone letters: the second a. */
+function tokenize(text: string): Tokens {
+  const tokens: string[] = []
+  const loneLetters = new Set<number>()
+  for (const word of text.split(/\s+/)) {
+    const pieces = word.split(/[^a-z0-9]+/).filter(Boolean)
+    if (pieces.length === 1 && /^[a-z]$/.test(pieces[0])) loneLetters.add(tokens.length)
+    tokens.push(...pieces)
+  }
+  return { tokens, loneLetters }
+}
+
+/** Whether `word` is a prefix of tokens[at] + tokens[at + 1] + … */
+function startsRun(word: string, { tokens, loneLetters }: Tokens, at: number): boolean {
+  let rest = word
+  for (let i = at; i < tokens.length; i++) {
+    const token = tokens[i]
+    if (token.startsWith(rest)) return true
+    // Crossing into the next word needs this one used up whole.
+    if (!rest.startsWith(token) || (i === at && loneLetters.has(at))) return false
+    rest = rest.slice(token.length)
+  }
+  return false
 }
 
 /**
