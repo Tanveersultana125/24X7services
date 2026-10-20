@@ -18,7 +18,7 @@ const TECHNICIAN = {
  * repair waiting for approval, confirmed for next week, completed and rated,
  * completed and not rated, and cancelled with a refund.
  */
-export const BOOKINGS: readonly Booking[] = [
+export const BOOKINGS: Booking[] = [
   {
     id: 'BK1042',
     uid: USER.uid,

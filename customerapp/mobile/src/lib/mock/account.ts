@@ -16,7 +16,7 @@ export const USER: MockUser = {
   plusMember: false,
 }
 
-export const ADDRESSES: readonly Address[] = [
+export const ADDRESSES: Address[] = [
   {
     id: 'home',
     label: 'home',

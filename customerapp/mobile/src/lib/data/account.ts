@@ -39,3 +39,11 @@ export function useAddresses(): AsyncState<Address[]> {
 export function useCoupons(): AsyncState<Coupon[]> {
   return useAsync(fetchCoupons)
 }
+
+/** Saves a new address. The first one saved becomes the default. */
+export async function addAddress(input: Omit<Address, 'id' | 'isDefault'>): Promise<Address> {
+  const address: Address = { ...input, id: `addr-${Date.now()}`, isDefault: ADDRESSES.length === 0 }
+  await mockRequest(undefined)
+  ADDRESSES.push(address)
+  return address
+}

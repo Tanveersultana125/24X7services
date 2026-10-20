@@ -46,8 +46,7 @@ export function CartScreen() {
       router.push(`/login?next=${encodeURIComponent('/cart')}`)
       return
     }
-    // The booking steps (questions, address, slot, checkout) are PR-8.
-    toast.show('Next: the booking steps, coming in the next update.')
+    router.push('/checkout/questions')
   }
 
   const empty = cart.items.length === 0
