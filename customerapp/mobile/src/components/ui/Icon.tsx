@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react-native'
-import { useCSSVariable, useResolveClassNames } from 'uniwind'
+import { useResolveClassNames } from 'uniwind'
 import { cn } from '@/lib/cn'
 
 /**
@@ -31,9 +31,10 @@ export function Icon({
     marginLeft?: number
     marginRight?: number
   }
-  const ink = useInk()
   const size = toPx(style.width) ?? 20
-  const color = style.color ?? ink
+  // The base classes carry text-ink, so there is always a colour; no second
+  // hook to look the theme's ink up again.
+  const color = style.color
   return (
     <Component
       size={size}
@@ -54,15 +55,10 @@ export function Icon({
 
 /** The icon's colour as a string, for the rare prop that wants one. */
 export function useColor(className: string): string {
-  const style = useResolveClassNames(className) as { color?: string }
-  const ink = useInk()
-  return style.color ?? ink
-}
-
-/** The theme's ink, for when a class resolves to no colour at all. */
-function useInk(): string {
-  const ink = useCSSVariable('--color-ink')
-  return typeof ink === 'string' ? ink : 'black'
+  // text-ink first, so a class with no colour of its own still resolves to the
+  // theme's ink, in the same single lookup.
+  const style = useResolveClassNames(cn('text-ink', className)) as { color?: string }
+  return style.color as string
 }
 
 /**
