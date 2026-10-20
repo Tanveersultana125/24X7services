@@ -1,4 +1,4 @@
-import { collection, doc, getDocs, limit, onSnapshot, orderBy, query, where } from 'firebase/firestore'
+import { collection, doc, limit, onSnapshot, orderBy, query, where } from 'firebase/firestore'
 import {
   COL,
   SUB,
@@ -8,6 +8,7 @@ import {
   type SupportTicket,
 } from '@app/shared'
 
+import { parseRows, readAll } from '@/lib/catalog/read'
 import { db } from '@/lib/firebase'
 
 /**
@@ -24,23 +25,7 @@ import { db } from '@/lib/firebase'
  * somebody replied to an hour ago is the one being looked for.
  */
 export async function fetchTickets(uid: string): Promise<SupportTicket[]> {
-  const snap = await getDocs(
-    query(
-      collection(db(), COL.supportTickets),
-      where('uid', '==', uid),
-      orderBy('lastMessageAt', 'desc'),
-      limit(100)
-    )
-  )
-  const tickets: SupportTicket[] = []
-  for (const document of snap.docs) {
-    const parsed = supportTicketSchema.safeParse({
-      id: document.id,
-      ...document.data(),
-    })
-    if (parsed.success) tickets.push(parsed.data)
-  }
-  return tickets
+  return readAll(query( collection(db(), COL.supportTickets), where('uid', '==', uid), orderBy('lastMessageAt', 'desc'), limit(100) ), supportTicketSchema)
 }
 
 /**
@@ -77,15 +62,7 @@ export function subscribeTicketMessages(
   return onSnapshot(
     query(collection(db(), COL.supportTickets, ticketId, SUB.messages), orderBy('at', 'asc')),
     (snap) => {
-      const next: SupportMessage[] = []
-      for (const document of snap.docs) {
-        const parsed = supportMessageSchema.safeParse({
-          id: document.id,
-          ...document.data(),
-        })
-        if (parsed.success) next.push(parsed.data)
-      }
-      onMessages(next)
+      onMessages(parseRows(snap.docs, supportMessageSchema))
     },
     () => onError()
   )

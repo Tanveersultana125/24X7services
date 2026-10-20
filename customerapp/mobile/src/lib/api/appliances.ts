@@ -1,6 +1,7 @@
 import { collection, deleteDoc, doc, getDoc, getDocs, limit, orderBy, query, where } from 'firebase/firestore'
 import { bookingSchema, COL, SUB, userApplianceInputSchema, type Booking, type UserApplianceInput } from '@app/shared'
 
+import { readAll } from '@/lib/catalog/read'
 import { db } from '@/lib/firebase'
 
 /**
@@ -53,19 +54,5 @@ export async function fetchMyAppliance(
 
 /** The last 20 bookings made on one saved appliance, newest first. */
 export async function fetchApplianceBookings(uid: string, applianceDocId: string): Promise<Booking[]> {
-  const history = await getDocs(
-    query(
-      collection(db(), COL.bookings),
-      where('uid', '==', uid),
-      where('userApplianceId', '==', applianceDocId),
-      orderBy('createdAt', 'desc'),
-      limit(20)
-    )
-  )
-  const bookings: Booking[] = []
-  for (const document of history.docs) {
-    const booking = bookingSchema.safeParse({ id: document.id, ...document.data() })
-    if (booking.success) bookings.push(booking.data)
-  }
-  return bookings
+  return readAll(query( collection(db(), COL.bookings), where('uid', '==', uid), where('userApplianceId', '==', applianceDocId), orderBy('createdAt', 'desc'), limit(20) ), bookingSchema)
 }

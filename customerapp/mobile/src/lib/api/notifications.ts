@@ -1,4 +1,4 @@
-import { collection, doc, getDocs, limit, orderBy, query, setDoc, updateDoc } from 'firebase/firestore'
+import { collection, doc, limit, orderBy, query, setDoc, updateDoc } from 'firebase/firestore'
 import {
   COL,
   DEFAULT_NOTIFICATION_PREFS,
@@ -8,6 +8,7 @@ import {
   type NotificationPrefs,
 } from '@app/shared'
 
+import { readAll } from '@/lib/catalog/read'
 import { db } from '@/lib/firebase'
 import { fetchProfile } from '@/lib/api/profile'
 
@@ -22,15 +23,7 @@ import { fetchProfile } from '@/lib/api/profile'
 
 /** The latest hundred, newest first. One that does not parse is left out. */
 export async function fetchNotifications(uid: string): Promise<AppNotification[]> {
-  const snap = await getDocs(
-    query(collection(db(), COL.notifications, uid, SUB.items), orderBy('at', 'desc'), limit(100))
-  )
-  const items: AppNotification[] = []
-  for (const document of snap.docs) {
-    const parsed = notificationSchema.safeParse({ id: document.id, ...document.data() })
-    if (parsed.success) items.push(parsed.data)
-  }
-  return items
+  return readAll(query(collection(db(), COL.notifications, uid, SUB.items), orderBy('at', 'desc'), limit(100)), notificationSchema)
 }
 
 /** Stamps one notification as read, now. */

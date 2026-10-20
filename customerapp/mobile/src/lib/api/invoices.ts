@@ -1,7 +1,8 @@
-import { collection, doc, getDoc, getDocs, limit, orderBy, query, where } from 'firebase/firestore'
+import { collection, doc, getDoc, limit, orderBy, query, where } from 'firebase/firestore'
 import { getDownloadURL, ref } from 'firebase/storage'
 import { COL, invoiceSchema, type Invoice } from '@app/shared'
 
+import { readAll } from '@/lib/catalog/read'
 import { db, storage } from '@/lib/firebase'
 
 /** An invoice by id, or null when it is missing or does not parse. */
@@ -16,15 +17,7 @@ export async function fetchInvoice(invoiceId: string): Promise<Invoice | null> {
  * fail the schema are dropped and the rest are kept.
  */
 export async function fetchMyInvoices(uid: string): Promise<Invoice[]> {
-  const snap = await getDocs(
-    query(collection(db(), COL.invoices), where('uid', '==', uid), orderBy('issuedAt', 'desc'), limit(100))
-  )
-  const invoices: Invoice[] = []
-  for (const document of snap.docs) {
-    const parsed = invoiceSchema.safeParse({ id: document.id, ...document.data() })
-    if (parsed.success) invoices.push(parsed.data)
-  }
-  return invoices
+  return readAll(query(collection(db(), COL.invoices), where('uid', '==', uid), orderBy('issuedAt', 'desc'), limit(100)), invoiceSchema)
 }
 
 /**

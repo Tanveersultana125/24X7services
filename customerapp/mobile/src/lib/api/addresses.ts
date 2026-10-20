@@ -1,6 +1,7 @@
-import { collection, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore'
+import { collection, deleteDoc, doc, setDoc } from 'firebase/firestore'
 import { addressSchema, COL, SUB, type Address, type AddressInput } from '@app/shared'
 
+import { readAll } from '@/lib/catalog/read'
 import { db } from '@/lib/firebase'
 
 /**
@@ -13,13 +14,7 @@ import { db } from '@/lib/firebase'
 
 /** Every saved address that parses; one that does not is left out, not fatal. */
 export async function fetchAddresses(uid: string): Promise<Address[]> {
-  const snap = await getDocs(collection(db(), COL.users, uid, SUB.addresses))
-  const addresses: Address[] = []
-  for (const document of snap.docs) {
-    const parsed = addressSchema.safeParse({ id: document.id, ...document.data() })
-    if (parsed.success) addresses.push(parsed.data)
-  }
-  return addresses
+  return readAll(collection(db(), COL.users, uid, SUB.addresses), addressSchema)
 }
 
 /**
