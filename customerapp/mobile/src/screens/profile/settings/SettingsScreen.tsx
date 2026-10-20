@@ -89,7 +89,7 @@ function Settings({ uid }: { uid: string | null }) {
     try {
       const data = await collectMyData(uid)
       const stamp = new Date().toISOString().slice(0, 10)
-      downloadJson(data, `${brand.name.toLowerCase()}-my-data-${stamp}.json`)
+      downloadJson(data, `${brand.slug}-my-data-${stamp}.json`)
       toast.show('Your data has been downloaded.', { tone: 'success' })
     } catch {
       toast.show('We could not put that file together. Please try again.', { tone: 'error' })

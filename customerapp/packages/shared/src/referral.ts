@@ -26,6 +26,8 @@ export const REFERRAL_WELCOME = 25_000 as Paise // ₹250
  * is read off one phone screen and typed into another.
  */
 export const REFERRAL_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+/** What a referral code looks like, for screens to show as an example. */
+export const REFERRAL_CODE_EXAMPLE = '24X7-ABCDEF'
 export const referralCodeSchema = z
   .string()
   .trim()

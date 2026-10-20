@@ -8,6 +8,7 @@ import {
   normaliseGiftCode,
   type GiftCard,
   type Paise,
+  GIFT_CARD_CODE_EXAMPLE,
 } from '@app/shared'
 
 import { ProfileShell, SignInPrompt } from '@/components/ProfileShell'
@@ -87,8 +88,7 @@ function GiftCardsSignedOut() {
         </Text>
         <View className="mt-3 gap-3">
           <Point lead="A code, not a card.">
-            We give you a code like ABCD-EFGH. Forward it, screenshot it, read it out — whoever has it can
-            redeem it, once.
+            {`We give you a code like ${GIFT_CARD_CODE_EXAMPLE}. Forward it, screenshot it, read it out — whoever has it can redeem it, once.`}
           </Point>
           <Point lead="It lands on a balance.">
             {`Redeeming puts the amount on the ${brand.name} balance and it comes off the next bill. Nothing to enter at checkout.`}
@@ -238,7 +238,7 @@ function Redeem() {
         <Input
           label="Gift card code"
           hideLabel
-          placeholder="ABCD-EFGH"
+          placeholder={GIFT_CARD_CODE_EXAMPLE}
           value={value}
           onChangeText={setValue}
           {...(error ? { error } : {})}

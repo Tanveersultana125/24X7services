@@ -38,6 +38,8 @@ export const giftCardAmountSchema = paiseSchema
  * is a string people read out loud and type back in.
  */
 export const GIFT_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+/** What an issued code looks like, for screens to show as an example. */
+export const GIFT_CARD_CODE_EXAMPLE = '24X7-ABCD-EFGH'
 export const giftCardCodeSchema = z
   .string()
   .trim()

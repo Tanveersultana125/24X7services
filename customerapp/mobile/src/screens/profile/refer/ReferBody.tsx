@@ -8,6 +8,7 @@ import {
   formatPaise,
   normaliseReferralCode,
   referralCodeSchema,
+  REFERRAL_CODE_EXAMPLE,
 } from '@app/shared'
 
 import { ReferCard } from '@/components/ReferCard'
@@ -210,7 +211,7 @@ function ApplyCode({ onApplied }: { onApplied: () => void }) {
         <Input
           label="Referral code"
           hideLabel
-          placeholder="ABCDEF"
+          placeholder={REFERRAL_CODE_EXAMPLE}
           value={value}
           onChangeText={setValue}
           {...(error ? { error } : {})}
