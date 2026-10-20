@@ -20,8 +20,11 @@ export async function fetchBooking(bookingId: string): Promise<Booking | null> {
   return parsed.success ? parsed.data : null
 }
 
-/** The parts of a saved appliance the details step offers to reuse. */
-export interface SavedAppliance {
+/**
+ * The parts of a saved appliance the details step offers to reuse: a lighter
+ * shape than the full saved appliance in ./appliances.
+ */
+export interface ReusableAppliance {
   id: string
   type?: string
   modelNumber?: string
@@ -36,7 +39,7 @@ export async function fetchSavedAppliances(
   uid: string,
   applianceId: string,
   brandId: string
-): Promise<SavedAppliance[]> {
+): Promise<ReusableAppliance[]> {
   const snap = await getDocs(
     query(
       collection(db(), COL.users, uid, SUB.appliances),
@@ -44,7 +47,7 @@ export async function fetchSavedAppliances(
       where('brandId', '==', brandId)
     )
   )
-  const saved: SavedAppliance[] = []
+  const saved: ReusableAppliance[] = []
   for (const doc of snap.docs) {
     const parsed = userApplianceInputSchema.safeParse(doc.data())
     if (!parsed.success) continue

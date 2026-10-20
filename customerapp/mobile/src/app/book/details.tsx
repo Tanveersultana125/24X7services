@@ -12,7 +12,7 @@ import { ErrorState } from '@/components/ui/States'
 import { Skeleton, SkeletonGroup } from '@/components/ui/Skeleton'
 import { MANUFACTURER_WARRANTY_NOTICE } from '@/config/brand'
 import { fetchAppliance } from '@/lib/catalog'
-import { fetchSavedAppliances, type SavedAppliance } from '@/lib/api/booking'
+import { fetchSavedAppliances, type ReusableAppliance } from '@/lib/api/booking'
 import { useAuth } from '@/lib/auth'
 import { patchDraft, useBookingDraft } from '@/lib/bookingDraft'
 import { useAsync } from '@/lib/useAsync'
@@ -53,7 +53,7 @@ export default function DetailsScreen() {
 
   const load = useCallback(async (): Promise<{
     appliance: CatalogAppliance | null
-    saved: SavedAppliance[]
+    saved: ReusableAppliance[]
   }> => {
     if (!applianceId) return { appliance: null, saved: [] }
 
@@ -71,7 +71,7 @@ export default function DetailsScreen() {
   // the first if the appliance marks none. See the note above.
   const primaryField = fields.find((field) => field.required) ?? fields[0]
 
-  function reuse(saved: SavedAppliance): void {
+  function reuse(saved: ReusableAppliance): void {
     setType(saved.type ?? '')
     setModelNumber(saved.modelNumber ?? '')
     setError(undefined)

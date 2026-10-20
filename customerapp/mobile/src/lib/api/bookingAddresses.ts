@@ -1,7 +1,8 @@
-import { addDoc, collection, doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc } from 'firebase/firestore'
 import { addressSchema, COL, SUB, type Address, type AddressInput } from '@app/shared'
 
 import { db } from '@/lib/firebase'
+import { saveAddress } from './addresses'
 
 /**
  * The address book, as the booking flow reads and writes it. The full list is
@@ -17,13 +18,8 @@ import { db } from '@/lib/firebase'
  * Writes a new address to the book and resolves with its id, so the booking can
  * carry it straight on. Editing an existing address lives in `./addresses`.
  */
-export async function addAddress(uid: string, input: AddressInput): Promise<string> {
-  const ref = await addDoc(collection(db(), COL.users, uid, SUB.addresses), {
-    ...input,
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-  })
-  return ref.id
+export function addAddress(uid: string, input: AddressInput): Promise<string> {
+  return saveAddress(uid, input)
 }
 
 /** One saved address by id, or null when it is missing or does not parse. */
