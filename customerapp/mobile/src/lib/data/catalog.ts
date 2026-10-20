@@ -60,20 +60,34 @@ export function fetchPopularServices(): Promise<Service[]> {
   return mockRequest(SERVICES.filter((s) => s.popular))
 }
 
+/** A word's letters and digits only: "a/c" → "ac", "men's" → "mens". */
+const squash = (word: string) => word.replace(/[^a-z0-9]/g, '')
+
 /**
  * Services whose name, category or highlights have a word starting with each
  * word typed. Prefixes, not substrings: "ac" finds the AC, not "machine".
+ *
+ * Punctuation is handled on both sides, so "a/c", "men's", "full-home" and
+ * "sofa & carpet" find what they name. A typed word matches when, squashed,
+ * it starts a squashed word of the text ("a/c" → "ac" finds "AC", "men's"
+ * finds "Men's"), or when each of its pieces two letters or longer starts a
+ * word ("full-home" finds "Full home"). Single-letter pieces are not matched
+ * on their own: "a" and "c" start half the words in the catalog.
  */
 export function searchServices(term: string): Promise<Service[]> {
-  // Split the query exactly as the text is split, so "a/c", "men's" and
-  // "sofa & carpet" find what they name instead of nothing.
-  const words = term.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean)
+  const words = term.toLowerCase().split(/\s+/).filter((w) => squash(w).length > 0)
   if (words.length === 0) return mockRequest([])
   const names = new Map(CATEGORIES.map((c) => [c.id, c.name]))
   const hits = SERVICES.filter((s) => {
     const text = [s.name, names.get(s.categoryId) ?? '', ...s.highlights].join(' ').toLowerCase()
-    const tokens = text.split(/[^a-z0-9]+/).filter(Boolean)
-    return words.every((word) => tokens.some((token) => token.startsWith(word)))
+    const pieces = text.split(/[^a-z0-9]+/).filter(Boolean)
+    const squashed = text.split(/\s+/).map(squash).filter(Boolean)
+    const starts = (prefix: string) => pieces.some((t) => t.startsWith(prefix)) || squashed.some((t) => t.startsWith(prefix))
+    return words.every((word) => {
+      if (starts(squash(word))) return true
+      const parts = word.split(/[^a-z0-9]+/).filter((part) => part.length >= 2)
+      return parts.length > 1 && parts.every(starts)
+    })
   })
   return mockRequest(hits)
 }
