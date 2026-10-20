@@ -20,12 +20,14 @@ moving from the appliance-only catalog to the generic one.
 ## Name clashes
 
 Where both layers have the same operation, `lib/data` uses a different name so
-auto-import cannot pick the wrong one:
+auto-import cannot pick the wrong one. This covers `lib/catalog` too, which
+the existing screens read the appliance catalog through:
 
 | `lib/api` | `lib/data` |
 |---|---|
 | `fetchAddresses(uid)` → shared `Address` | `fetchAddressBook()` → catalog-v2 `Address` |
 | `fetchBooking(id)` → shared `Booking` | `fetchBookingById(id)` → catalog-v2 `Booking` |
+| `fetchPopularServices()` (in `lib/catalog`) → `PopularService` | `fetchMostBookedServices()` → catalog-v2 `Service` |
 
 ## Plan to merge them into one layer
 

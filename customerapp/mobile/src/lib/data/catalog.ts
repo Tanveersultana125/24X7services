@@ -55,8 +55,11 @@ export function fetchService(id: string): Promise<Service | null> {
   return mockRequest(SERVICES.find((s) => s.id === id) ?? null)
 }
 
-/** What Home shows under "Most booked". */
-export function fetchPopularServices(): Promise<Service[]> {
+/**
+ * What Home shows under "Most booked". Not `fetchPopularServices`: lib/catalog
+ * has that name for the appliance catalog's PopularService rows.
+ */
+export function fetchMostBookedServices(): Promise<Service[]> {
   return mockRequest(SERVICES.filter((s) => s.popular))
 }
 
@@ -132,8 +135,8 @@ export function useService(id: string): AsyncState<Service | null> {
   return useAsync(useCallback(() => fetchService(id), [id]))
 }
 
-export function usePopularServices(): AsyncState<Service[]> {
-  return useAsync(fetchPopularServices)
+export function useMostBookedServices(): AsyncState<Service[]> {
+  return useAsync(fetchMostBookedServices)
 }
 
 export function useQuestions(serviceId: string): AsyncState<Question[]> {

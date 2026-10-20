@@ -4,8 +4,9 @@
  * src/lib/README.md for which layer a screen should use and the plan to
  * merge the two.
  *
- * Names here are kept distinct from lib/api's on purpose (fetchAddressBook,
- * fetchBookingById), so an editor's auto-import cannot pick the wrong layer.
+ * Names here are kept distinct from lib/api's and lib/catalog's on purpose
+ * (fetchAddressBook, fetchBookingById, fetchMostBookedServices), so an
+ * editor's auto-import cannot pick the wrong layer.
  */
 export * from './account'
 export * from './bookings'
