@@ -1,3 +1,3 @@
-import { AddressesScreen } from '@/screens/profile/addresses/AddressesScreen'
+import { AddressesScreen } from '@/screens/account/AddressesScreen'
 
 export default AddressesScreen

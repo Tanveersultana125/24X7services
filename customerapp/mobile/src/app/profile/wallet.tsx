@@ -1,3 +1,3 @@
-import { WalletScreen } from '@/screens/profile/wallet/WalletScreen'
+import { WalletScreen } from '@/screens/account/WalletScreen'
 
 export default WalletScreen
