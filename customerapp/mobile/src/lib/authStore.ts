@@ -1,6 +1,7 @@
 
 import { onAuthStateChanged, type User } from 'firebase/auth'
 import { auth } from './firebase'
+import { kv } from './storage'
 
 /**
  * Who is signed in, as an external store.
@@ -16,8 +17,15 @@ import { auth } from './firebase'
  * they open the app.
  */
 
+/**
+ * As much of the signed-in account as the screens read. A Firebase `User`
+ * satisfies it, and so does the mock session (lib/data/auth), which is how
+ * the app signs in while there is no backend to sign in against.
+ */
+export type AuthUser = Pick<User, 'uid' | 'displayName' | 'email' | 'phoneNumber' | 'photoURL'>
+
 export interface AuthSnapshot {
-  user: User | null
+  user: AuthUser | null
   /** False until Firebase has reported once. */
   ready: boolean
 }
@@ -27,6 +35,26 @@ const SERVER_SNAPSHOT: AuthSnapshot = { user: null, ready: false }
 let snapshot: AuthSnapshot = SERVER_SNAPSHOT
 const listeners = new Set<() => void>()
 let unsubscribe: (() => void) | null = null
+
+/** Versioned, so a changed shape is ignored rather than half-read. */
+const MOCK_KEY = 'customerapp.mockSession.v1'
+/** The last account Firebase reported, so the mock session can step aside for it. */
+let firebaseUser: User | null = null
+let mockUser: AuthUser | null = readMockUser()
+
+function readMockUser(): AuthUser | null {
+  try {
+    const raw = kv.getItem(MOCK_KEY)
+    return raw ? (JSON.parse(raw) as AuthUser) : null
+  } catch {
+    return null
+  }
+}
+
+/** A real Firebase session wins; the mock one stands in when there is none. */
+function current(): AuthUser | null {
+  return firebaseUser ?? mockUser
+}
 
 function emit(next: AuthSnapshot): void {
   snapshot = next
@@ -40,7 +68,8 @@ export const authStore = {
     // One Firebase subscription however many components are watching.
     if (!unsubscribe) {
       unsubscribe = onAuthStateChanged(auth(), (user) => {
-        emit({ user, ready: true })
+        firebaseUser = user
+        emit({ user: current(), ready: true })
       })
     }
 
@@ -54,6 +83,17 @@ export const authStore = {
 
   getSnapshot(): AuthSnapshot {
     return snapshot
+  },
+
+  /**
+   * Starts or ends the mock session. Kept on the device, so a signed-in demo
+   * survives a restart the way a Firebase session does.
+   */
+  setMockUser(user: AuthUser | null): void {
+    mockUser = user
+    if (user) kv.setItem(MOCK_KEY, JSON.stringify(user))
+    else kv.removeItem(MOCK_KEY)
+    emit({ user: current(), ready: snapshot.ready })
   },
 
   getServerSnapshot(): AuthSnapshot {

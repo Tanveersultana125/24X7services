@@ -7,7 +7,7 @@ export const brand = {
   /** PLACEHOLDER until the lead confirms the final name; every screen reads it from here. */
   name: 'Customer Service',
   fullName: 'Customer Service',
-  tagline: 'Home appliance repair, done right',
+  tagline: 'Home services, at your door',
 
   /** A text wordmark, not an image — see BRAND_LOGOS_ENABLED below. */
   wordmark: 'Customer Service',

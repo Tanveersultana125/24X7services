@@ -20,6 +20,7 @@ import { callFn, friendlyError } from '@/lib/callables'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/cn'
 import { OutcomePanel, type Outcome } from '@/screens/location/OutcomePanel'
+import { CurrentLocationButton, SavedAddresses } from '@/screens/location/LocateMe'
 
 /**
  * Where the work will happen, and whether we can do it there.
@@ -27,14 +28,10 @@ import { OutcomePanel, type Outcome } from '@/screens/location/OutcomePanel'
  * Two ways in, because customers arrive knowing different things. Someone who
  * knows their pincode types it; someone who knows the name of their area picks
  * it off the list of places we actually cover. Both end at the same saved
- * location, and both give an answer before anyone is asked for a phone number.
+ * location, and both give an answer before anything else is asked.
  *
- * There is no "detect my location" button. Turning a coordinate into a pincode
- * needs a geocoding call, and the only key the app could carry for that is one
- * compiled into the bundle, where it gets lifted and billed to us. DECISION
- * NEEDED: if detection is wanted, it belongs behind a callable that keeps the
- * key server-side, which is an addition to the shared registry rather than a
- * screen-level change.
+ * A third way, on a phone: the current location, turned into a pincode by the
+ * phone's own geocoder (LocateMe), plus the customer's saved addresses.
  */
 
 export function LocationScreen() {
@@ -58,8 +55,10 @@ export function LocationScreen() {
     [setLocation]
   )
 
-  async function check(): Promise<void> {
-    const parsed = pincodeSchema.safeParse(pincode.trim())
+  /** Checks the typed pincode, or one handed over by GPS or a saved address. */
+  async function check(given?: string): Promise<void> {
+    if (given !== undefined) setPincode(given)
+    const parsed = pincodeSchema.safeParse((given ?? pincode).trim())
     if (!parsed.success) {
       setFieldError(parsed.error.issues[0]?.message ?? 'Enter a valid pincode')
       return
@@ -92,8 +91,10 @@ export function LocationScreen() {
       contentClassName="px-4 pb-16"
     >
       <Text className="mt-4 text-sm text-muted">
-        We service parts of Hyderabad. Enter a pincode to check yours, or pick an area from the list.
+        We service parts of Hyderabad. Use your location, enter a pincode, or pick an area from the list.
       </Text>
+
+      <CurrentLocationButton onPincode={(found) => void check(found)} />
 
       <View className="mt-5 flex-row items-end gap-2">
         <View className="flex-1">
@@ -126,6 +127,8 @@ export function LocationScreen() {
       </View>
 
       {outcome ? <OutcomePanel outcome={outcome} onContinue={choose} /> : null}
+
+      <SavedAddresses onPincode={(saved) => void check(saved)} />
 
       <View className="mt-8">
         <Text accessibilityRole="header" className="mb-3 text-xl font-bold text-ink">

@@ -179,10 +179,10 @@ export function SignInPrompt({
           href={href}
           className="min-h-12 w-full items-center justify-center rounded-pill bg-brand px-5 active:bg-brand-deep active:opacity-100"
         >
-          <Text className="text-base font-semibold text-white">Log in with your mobile number</Text>
+          <Text className="text-base font-semibold text-white">Log in or sign up</Text>
         </Tappable>
         <Text className="text-center text-xs text-muted">
-          We send a one-time code to confirm it. No password needed.
+          With Google, or with your email and a password.
         </Text>
       </View>
     </View>

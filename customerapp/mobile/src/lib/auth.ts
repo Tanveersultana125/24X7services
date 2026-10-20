@@ -113,6 +113,8 @@ export async function startPhoneSignIn(
 }
 
 export async function signOut(): Promise<void> {
+  // Ends the mock session too (lib/data/auth), whichever one is signed in.
+  authStore.setMockUser(null)
   await firebaseSignOut(auth())
 }
 

@@ -220,9 +220,11 @@ function AccountTile({ onDark = false }: { onDark?: boolean }) {
         destructive
         title={`Log out of ${brand.name}?`}
         description={
-          user.phoneNumber
-            ? `You are logged in as ${formatPhone(user.phoneNumber)}. Your bookings stay saved to this number.`
-            : 'Your bookings stay saved to your account.'
+          user.email
+            ? `You are logged in as ${user.email}. Your bookings stay saved to this account.`
+            : user.phoneNumber
+              ? `You are logged in as ${formatPhone(user.phoneNumber)}. Your bookings stay saved to this number.`
+              : 'Your bookings stay saved to your account.'
         }
         confirmLabel="Log out"
         cancelLabel="Stay logged in"

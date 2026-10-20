@@ -159,9 +159,10 @@ export default function ProfileScreen() {
 
             {user ? (
               <Text className="mt-1.5 text-base text-muted">
-                {/* The account is the number, so it is stated and not offered
-                    as something to change. */}
-                {user.phoneNumber ? formatPhone(user.phoneNumber) : 'Signed in'}
+                {/* Who is signed in, by name and the email the account is. */}
+                {[user.displayName, user.email ?? (user.phoneNumber ? formatPhone(user.phoneNumber) : null)]
+                  .filter(Boolean)
+                  .join(' · ') || 'Signed in'}
               </Text>
             ) : (
               <>
