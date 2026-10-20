@@ -122,6 +122,10 @@ export const questionSchema = z.object({
   /** Photos a `photo` question accepts at most. */
   maxPhotos: z.number().int().positive().optional(),
   order: z.number().int(),
+}).refine((q) => !!q.serviceId !== !!q.categoryId, {
+  // Neither and the question is never asked; both and it is asked of services it is not about.
+  message: 'A question belongs to exactly one service or one category',
+  path: ['serviceId'],
 })
 export type Question = z.infer<typeof questionSchema>
 

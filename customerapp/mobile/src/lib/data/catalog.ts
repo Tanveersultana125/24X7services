@@ -65,7 +65,9 @@ export function fetchPopularServices(): Promise<Service[]> {
  * word typed. Prefixes, not substrings: "ac" finds the AC, not "machine".
  */
 export function searchServices(term: string): Promise<Service[]> {
-  const words = term.toLowerCase().split(/\s+/).filter(Boolean)
+  // Split the query exactly as the text is split, so "a/c", "men's" and
+  // "sofa & carpet" find what they name instead of nothing.
+  const words = term.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean)
   if (words.length === 0) return mockRequest([])
   const names = new Map(CATEGORIES.map((c) => [c.id, c.name]))
   const hits = SERVICES.filter((s) => {
